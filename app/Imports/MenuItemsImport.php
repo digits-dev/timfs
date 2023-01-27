@@ -29,17 +29,17 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
     */
     public function model(array $row)
     {   
-        $code = $row["menu_code"];
+        $code = trim($row["menu_code"]);
         $data_array_segments = array();
         $data_array_old_codes = array();
         $data_array_choice_groups = array();
         $data_array_prices = array();
 
         $segmentations =  MenuSegmentation::where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
-		$category = MenuCategory::firstOrCreate(['category_description' => strtoupper($row["main_category"])]);
-        $subcategory = MenuSubcategory::firstOrCreate(['categories_id' => $category->id,'subcategory_description' => strtoupper($row["sub_category"])]);
-        $product_type = MenuProductType::firstOrCreate(['menu_product_type_description' => strtoupper($row["product_type"])]);
-        $menu_type = MenuType::firstOrCreate(['menu_type_description' => strtoupper($row["menu_type"])]);
+		$category = MenuCategory::firstOrCreate(['category_description' => strtoupper(trim($row["main_category"]))]);
+        $subcategory = MenuSubcategory::firstOrCreate(['categories_id' => $category->id,'subcategory_description' => strtoupper(trim($row["sub_category"]))]);
+        $product_type = MenuProductType::firstOrCreate(['menu_product_type_description' => strtoupper(trim($row["product_type"]))]);
+        $menu_type = MenuType::firstOrCreate(['menu_type_description' => strtoupper(trim($row["menu_type"]))]);
 
         $old_item_codes = MenuOldCodeMaster::where('status','ACTIVE')->orderBy('menu_old_code_column_description','ASC')->get();
         $prices = MenuPriceMaster::where('status','ACTIVE')->orderBy('menu_price_column_description','ASC')->get();
@@ -83,14 +83,14 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
 
         $data_array_menu = [
             'action_type' => "Create",
-            'menu_item_description' => strtoupper($row["menu_description"]),
-            'pos_old_item_description' => strtoupper($row["pos_old_description"]),
+            'menu_item_description' => strtoupper(trim($row["menu_description"])),
+            'pos_old_item_description' => strtoupper(trim($row["pos_old_description"])),
             'menu_categories_id' => $category->id,
             'menu_subcategories_id' => $subcategory->id,
             'menu_product_types_id' => $product_type->id,
             'menu_types_id' => $menu_type->id,
-            'original_concept' => $row["original_concept"],
-            'status' => $row["status"],
+            'original_concept' => trim($row["original_concept"]),
+            'status' => trim($row["status"]),
             'approval_status' => 1,
             'created_by' => CRUDBooster::myId(),
             'created_at' => date('Y-m-d H:i:s')
