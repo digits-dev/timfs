@@ -602,8 +602,9 @@
 					
                     //----edited by cris 20201009-----
                     $this->form[] = [
-        				'label' => 'Packaging UOM', 'name' => 'packagings_id', 'type' => 'text',
-        				'validation' => 'required', 'width' => 'col-sm-4','readonly' => true
+        				'label' => 'Packaging UOM', 'name' => 'packagings_id', 'type' => 'select2',
+						'validation' => 'required|integer|min:0', 'width' => 'col-sm-4', 'readonly' => true,
+						'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'"
         			];
         			//--------------------------------
         
