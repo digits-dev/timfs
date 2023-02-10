@@ -46,6 +46,8 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         foreach($prices as $price){
             array_push($header,$price->menu_price_column_description);
         }
+
+        array_push($header, 'INGREDIENT COST');
         
         array_push($header,'ORIGINAL CONCEPT');
         array_push($header,'STATUS');
@@ -93,6 +95,8 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             array_push($data_items, $data_menu_item->$item_price);
         }
 
+        array_push($data_items, $data_menu_item->food_cost);
+
         array_push($data_items, $data_menu_item->original_concept);
         array_push($data_items, $data_menu_item->menu_item_status);
         
@@ -118,6 +122,7 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         ->leftJoin('menu_categories','menu_items.menu_categories_id','=','menu_categories.id')
         ->leftJoin('menu_subcategories','menu_items.menu_subcategories_id','=','menu_subcategories.id')
         ->select(
+            
             'menu_items.tasteless_menu_code',
             'menu_items.pos_old_item_description',
             'menu_items.menu_item_description',
@@ -125,6 +130,7 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             'menu_types.menu_type_description',
             'menu_categories.category_description',
             'menu_subcategories.subcategory_description',
+            'menu_items.food_cost',
             'menu_items.original_concept',
             'menu_items.status as menu_item_status',
             'menu_items.approved_at',

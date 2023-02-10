@@ -18,6 +18,7 @@
     use Maatwebsite\Excel\HeadingRowImport;
     use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 	use Maatwebsite\Excel\Facades\Excel;
+	Use Alert;
 
 	class AdminMenuItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -35,7 +36,7 @@
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
-			$this->button_edit = false;
+			$this->button_edit = true;
 			$this->button_delete = true;
 			$this->button_detail = true;
 			$this->button_show = true;
@@ -64,6 +65,9 @@
 			foreach($prices as $price){
 				$this->col[] = ["label"=>ucwords(strtolower($price->menu_price_column_description)),"name"=>$price->menu_price_column_name];
 			}
+
+			$this->col[] = ["label"=>"Ingredient Cost","name"=>"food_cost"];
+
             $this->col[] = ["label"=>"Original Concept","name"=>"original_concept"];;
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
@@ -490,19 +494,19 @@
 
 	    }
 
-	    public function getEdit($id){
-	        $module_id = DB::table('cms_moduls')->where('controller','AdminMenuItemsController')->value('id');
+	    // public function getEdit($id){
+	    //     $module_id = DB::table('cms_moduls')->where('controller','AdminMenuItemsController')->value('id');
 	        
-	        $item_info = MenuItemApproval::find($id);
+	    //     $item_info = MenuItemApproval::find($id);
 	        
-	        $create_update_status = ApprovalWorkflowSetting::where('workflow_number', 1)->where('action_type', 'Create')->where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->where('encoder_privilege_id', CRUDBooster::myPrivilegeId())->orWhere('approver_privilege_id', CRUDBooster::myPrivilegeId())->value('current_state');
+	    //     $create_update_status = ApprovalWorkflowSetting::where('workflow_number', 1)->where('action_type', 'Create')->where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->where('encoder_privilege_id', CRUDBooster::myPrivilegeId())->orWhere('approver_privilege_id', CRUDBooster::myPrivilegeId())->value('current_state');
 
-	        if ($item_info->approval_status == $create_update_status){
-				CRUDBooster::redirect(CRUDBooster::mainpath(""),"You're not allowed to edit pending items for approval.","warning");
-			}
+	    //     if ($item_info->approval_status == $create_update_status){
+		// 		CRUDBooster::redirect(CRUDBooster::mainpath(""),"You're not allowed to edit pending items for approval.","warning");
+		// 	}
 			
-	        return parent::getEdit($id);
-	    }
+	    //     return parent::getEdit($id);
+	    // }
 	    
 	    public function uploadView(){
 	        if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {
@@ -706,5 +710,121 @@
 		   $filename = $request->input('filename');
 		   return Excel::download(new MenuItemsExport, $filename.'.xlsx');
 	    }
+
+		public function getEdit($id) {
+			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
+			$data = [];
+			$data['item'] = DB::table('menu_items')->where('id', $id)->get()[0];
+
+			$data['current_ingredients'] = DB::table('menu_ingredients_details')
+											->where('menu_items_id', $id)
+											->where('menu_ingredients_details.status', 'ACTIVE')
+											->leftJoin('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+											->select(\DB::raw('item_masters.id as item_masters_id'),
+													'is_selected',
+													'is_primary',
+													'qty',
+													'cost',
+													'ingredient_group',
+													'uom_id',
+													'uoms.uom_description',
+													'item_masters.ingredient_cost',
+													'item_masters.full_item_description')
+											->leftJoin('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
+											->orderBy('ingredient_group', 'ASC')
+											->orderBy('row_id', 'ASC')
+											->get();
+											
+			$data['item_masters'] = DB::table('item_masters')
+											->select(\DB::raw('item_masters.id as item_masters_id'),
+													'item_masters.packagings_id',
+													'item_masters.ingredient_cost',
+													'item_masters.full_item_description',
+													'item_masters.tasteless_code',
+													'uoms.uom_description')
+											->leftJoin('uoms','item_masters.packagings_id', '=', 'uoms.id')
+											->orderby('full_item_description')
+											->get();
+			return $this->view('menu-items/edit-item', $data);
+		}
+
+		public function submitEdit(Request $request) {
+			$data = [];
+			$total_cost = preg_replace("/[^0-9.]/", "", $request->input('total_cost'));
+			DB::table('menu_items')->where('id', $request->input('menu_items_id'))->update(['food_cost' => $total_cost]);
+
+			DB::table('menu_ingredients_details')
+				->where('status', 'ACTIVE')
+				->where('menu_items_id', $request->input('menu_items_id'))
+				->update(['status' => 'INACTIVE',
+				'row_id' => null,
+				'total_cost' => null,
+				'deleted_by' => CRUDBooster::myID(),
+				'deleted_at' => date('Y-m-d H:i:s')]);
+			
+			if($request->input('ingredient')) {
+				for ($i=0; $i<count($request->input('ingredient')); $i++) {
+					$ingredient = explode(',', $request->input('ingredient')[$i]);
+					$data[$i]['item_masters_id'] = $ingredient[0];
+					$data[$i]['is_primary'] = $ingredient[1];
+					$data[$i]['ingredient_group'] = $ingredient[2];
+					$data[$i]['row_id'] = $ingredient[3];
+					$data[$i]['is_selected'] = $ingredient[4];
+					$data[$i]['menu_items_id'] = $request->input('menu_items_id');
+					$data[$i]['qty'] = $request->input('quantity')[$i];
+					$data[$i]['uom_id'] = $request->input('uom')[$i];
+					$cost = preg_replace("/[^0-9.]/", "", $request->input('cost')[$i]);
+					$data[$i]['cost'] = $cost;
+				}
+				
+				foreach($data as $index => $element) {
+					$is_existing = !!count(DB::table('menu_ingredients_details')->where('menu_items_id', $element['menu_items_id'])->where('item_masters_id', $element['item_masters_id'])->get());
+					if ($is_existing) {
+						$element['updated_at'] = date('Y-m-d H:i:s');
+						$element['updated_by'] = CRUDBooster::myId();
+					} else {
+						$element['created_by'] = CRUDBooster::myId();
+					}
+					$element['total_cost'] = $total_cost;
+					$element['status'] = 'ACTIVE';
+					$element['deleted_at'] = null;
+					$element['deleted_by'] = null;
+					
+					DB::table('menu_ingredients_details')
+						->where('menu_items_id', $element['menu_items_id'])
+						->where('item_masters_id', $element['item_masters_id'])
+						->updateOrInsert(['item_masters_id' => $element['item_masters_id']], $element);
+				}
+			}
+			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
+		}
+
+		public function getDetail($id) {
+			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
+			$data = [];
+			$data['item'] = DB::table('menu_items')
+				->where('id', $id)
+				->get()
+				->first();
+
+			$data['ingredients'] = DB::table('menu_ingredients_details')
+				->where('menu_items_id', $id)
+				->where('menu_ingredients_details.status', 'ACTIVE')
+				->select('tasteless_code',
+					'item_masters_id',
+					'ingredient_group',
+					'row_id',
+					'is_primary',
+					'is_selected',
+					'total_cost',
+					'full_item_description',
+					'qty', 'uom_description',
+					'cost')
+				->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+				->leftJoin('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
+				->orderby('ingredient_group')
+				->get();
+			return $this->view('menu-items/detail-item', $data);
+		}
 
 	}

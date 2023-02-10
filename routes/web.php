@@ -11,6 +11,9 @@
 |
 */
 
+use App\Http\Controllers\AdminMenuItemsController;
+use App\Http\Controllers\AdminFoodCostController;
+
 Route::get('/', function () {
     return redirect('admin/login');
     //return view('welcome');
@@ -70,4 +73,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/item_masters/upload-items-costing','ItemPriceUploadController@store')->name('uploadCostPrice');
     Route::get('/admin/item_masters/update-items-price','ItemPriceUploadController@create')->name('getUpdateItemsPrice');
     Route::get('/admin/item_masters/download-price-template','ItemPriceUploadController@downloadPriceTemplate')->name('downloadPriceTemplate');
+
+    Route::post('/admin/menu_items/edit', [AdminMenuItemsController::class, 'submitEdit'])->name('edit_menu_item');
+    Route::get('/admin/food_cost/{id}/{filter}/{items}', [AdminFoodCostController::class, 'filterByCost'])->name('filter_by_cost');
 });
