@@ -48,7 +48,6 @@
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 			if(in_array(CRUDBooster::getCurrentMethod(),['getEdit','postEditSave','getDetail'])) {
-			    //$this->form[] = ['label'=>'Segment Column Name','name'=>'segment_column_name','type'=>'text','readonly'=>true,'validation'=>'required|unique:segmentations|min:3|max:35','width'=>'col-sm-4'];
 			    $this->form[] = ['label'=>'Segment Column Code','name'=>'segment_column_code','type'=>'text','validation'=>'required|unique:segmentations|min:3|max:15','width'=>'col-sm-4'];
 			    $this->form[] = ['label'=>'Segment Column Description','name'=>'segment_column_description','type'=>'text','validation'=>'required|min:3|max:50','width'=>'col-sm-4'];
 				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'ACTIVE;INACTIVE'];
@@ -304,20 +303,20 @@
 			//replenistment item master file
 		    DB::connection('mysql_trs')->statement('ALTER TABLE items ADD '.$postdata["segment_column_name"].' VARCHAR(30) NOT NULL DEFAULT "X" AFTER '.$last_segmentation->segment_column_name);
 		    
-		    //replenistment approval item master file
-		    // DB::connection('mysql_trs')->statement('ALTER TABLE items  ADD '.$postdata["segment_column_name"].' VARCHAR(30) AFTER '.$last_segmentation->segment_column_name);
-			
+			$segments = [
+				'segmentation_column1' => $postdata["segment_column_name"],
+				'segmentation_column2' => $postdata["segment_column_name"],
+				'segmentation_code'    => str_replace(" ","_",$postdata["segment_column_description"]),
+				'segmentation_label'   => $postdata["segment_column_description"],
+				'segmentation_status'  => "ACTIVE",
+				'updated_by'           => CRUDBooster::myId(),
+				'updated_at'           => date('Y-m-d H:i:s')
+			];
 			//replenishment adding data in segmentation table
-		    DB::connection('mysql_trs')->statement('insert into segmentation (segmentation_column1, segmentation_column2, segmentation_code, segmentation_label, segmentation_status,created_by, created_at) values (?, ?, ?, ?, ?, ?, ?)', array($postdata["segment_column_name"], $postdata["segment_column_name"], str_replace(" ","_",$postdata["segment_column_description"]), $postdata["segment_column_description"], 'ACTIVE', CRUDBooster::myId(), date('Y-m-d H:i:s')));
-		    // DB::connection('mysql_trs')->statement('insert into segmentation (segmentation_column1, segmentation_column2, segmentation_code, segmentation_label, segmentation_status,created_by, created_at) values (?, ?, ?, ?, ?, ?, ?)', array($postdata["segment_column_name"], $postdata["segment_column_name"], $postdata["segment_column_code"], $postdata["segment_column_description"], 'ACTIVE', CRUDBooster::myId(), date('Y-m-d H:i:s')));
-
-			//reimbursement item master file
-			// DB::connection('mysql_trm')->statement('ALTER TABLE items ADD '.$postdata["segment_column_name"].' VARCHAR(30) AFTER '.$last_segmentation->segment_column_name);
-
+		    DB::connection('mysql_trs')->table('segmentation')->insert($segments);
 			//reimbursement adding data in segmentation table
-			DB::connection('mysql_trm')->statement('insert into segmentation (segmentation_column1, segmentation_column2, segmentation_code, segmentation_label, segmentation_status,created_by, created_at) values (?, ?, ?, ?, ?, ?, ?)', array($postdata["segment_column_name"], $postdata["segment_column_name"], str_replace(" ","_",$postdata["segment_column_description"]), $postdata["segment_column_description"], 'ACTIVE', CRUDBooster::myId(), date('Y-m-d H:i:s')));
-
-
+			DB::connection('mysql_trm')->table('segmentation')->insert($segments);
+			
 		    //disconnect connection
 			DB::disconnect('mysql_trs');
 			DB::disconnect('mysql_trm');
