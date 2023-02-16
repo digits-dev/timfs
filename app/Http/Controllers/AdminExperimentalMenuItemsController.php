@@ -5,19 +5,19 @@
 	use DB;
 	use CRUDBooster;
 
-	class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CBController {
-		
-	function cbInit() {
+	class AdminExperimentalMenuItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
+
+	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
-			$this->title_field = "segment_column_name";
+			$this->title_field = "id";
 			$this->limit = "20";
 			$this->orderby = "id,desc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
-			$this->button_add = false;
+			$this->button_add = true;
 			$this->button_edit = true;
 			$this->button_delete = true;
 			$this->button_detail = true;
@@ -25,36 +25,34 @@
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "menu_segmentations";
+			$this->table = "experimental_menu_items";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Created By","name"=>"created_by"];
-			$this->col[] = ["label"=>"Segment Column Code","name"=>"segment_column_code"];
-			$this->col[] = ["label"=>"Segment Column Description","name"=>"segment_column_description"];
-			$this->col[] = ["label"=>"Segment Column Name","name"=>"segment_column_name"];
+			$this->col[] = ["label"=>"Experimental Menu Desc","name"=>"experimental_menu_desc"];
+			$this->col[] = ["label"=>"Concept","name"=>"concept"];
+			$this->col[] = ["label"=>"Srp","name"=>"srp"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
+			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Deleted By","name"=>"deleted_by","join"=>"cms_users,name"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Created By','name'=>'created_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Segment Column Code','name'=>'segment_column_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Segment Column Description','name'=>'segment_column_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Segment Column Name','name'=>'segment_column_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Status','name'=>'status','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Updated By','name'=>'updated_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Menu Description','name'=>'experimental_menu_desc','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Concept','name'=>'concept','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'SRP','name'=>'srp','type'=>'number','validation'=>'required|min:1','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required|min:1|max:255','width'=>'col-sm-10','dataenum'=>'ACTIVE; INACTIVE'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ['label'=>'Created By','name'=>'created_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Segment Column Code','name'=>'segment_column_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Segment Column Description','name'=>'segment_column_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Segment Column Name','name'=>'segment_column_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Status','name'=>'status','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Updated By','name'=>'updated_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Menu Description','name'=>'experimental_menu_desc','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Concept','name'=>'concept','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'SRP','name'=>'srp','type'=>'number','validation'=>'required|min:1','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required|min:1|max:255','width'=>'col-sm-10','dataenum'=>'ACTIVE; INACTIVE'];
 			# OLD END FORM
 
 			/* 
@@ -84,6 +82,7 @@
 	        | 
 	        */
 	        $this->addaction = array();
+			$this->addaction[] = ['label'=>'Edit Ingredient','url'=>CRUDBooster::mainpath('edit_ingredient/[id]'),'icon'=>'fa fa-pencil','color'=>'warning'];
 
 
 	        /* 
@@ -264,7 +263,8 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
-
+			$postdata['created_by'] = CRUDBooster::myId();
+			$postdata['created_at'] = date('Y-m-d H:i:s');
 	    }
 
 	    /* 
@@ -289,7 +289,7 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        //Your code here
-
+			$postdata['updated_by'] = CRUDBooster::myId();
 	    }
 
 	    /* 
@@ -313,7 +313,7 @@
 	    */
 	    public function hook_before_delete($id) {
 	        //Your code here
-
+			DB::table('experimental_menu_items')->where('id', $id)->update(['status' => 'INACTIVE']);
 	    }
 
 	    /* 
@@ -332,47 +332,88 @@
 
 	    //By the way, you can still create your own method in here... :) 
 
-		public function getIndex() {
+		public function getEdit_ingredient($id) {
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			$data = [];
+			$data['item'] = DB::table('experimental_menu_items')->where('id', $id)->first();
+			$data['item_masters'] = DB::table('item_masters')
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+						'item_masters.packagings_id',
+						'item_masters.ingredient_cost',
+						'item_masters.full_item_description',
+						'item_masters.tasteless_code',
+						'packagings.packaging_description')
+				->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
+				->orderby('full_item_description')
+				->get();
 
-			$data['concepts'] = DB::table('menu_segmentations')->where('status', 'ACTIVE')->orderBy('menu_segment_column_description')->get();
-			$data['menu_items'] = DB::table('menu_items')->get();
+			$data['current_ingredients'] = DB::table('experimental_menu_ingredients_details')
+				->where('experimental_menu_items_id', $id)
+				->where('experimental_menu_ingredients_details.status', 'ACTIVE')
+				->leftJoin('item_masters', 'experimental_menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'ingredient_name',
+					'row_id',
+					'ingredient_group',
+					'is_primary',
+					'is_selected',
+					'is_existing',
+					'qty',
+					'uom_id',
+					'uom_name',
+					'cost',
+					'total_cost',
+					'packagings.packaging_description',
+					'item_masters.ingredient_cost',
+					'item_masters.full_item_description')
+				->leftJoin('packagings', 'experimental_menu_ingredients_details.uom_id', '=', 'packagings.id')
+				->orderBy('ingredient_group', 'ASC')
+				->orderBy('row_id', 'ASC')
+				->get();
 
-			return $this->view('menu-items/food-cost', $data);
+			return $this->view('experimental-menu/edit-item', $data);
 		}
 
-		public function filterByCost(Request $request) {
-			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
-			$data = [];
-			$concept;
-			$column_name;
-			$menu_items;
-			$filtered_menu_items_id;
-			$filtered_items;
+		public function submitEdit(Request $request) {
+			$data = json_decode($request->input('data'));
+			// dd($data);
+			$experimental_menu_id = $data[0][0]->experimental_menu_items_id;
+			DB::table('experimental_menu_ingredients_details')
+				->where('experimental_menu_items_id', $experimental_menu_id)
+				->where('status', 'ACTIVE')
+				->update(['status' => 'INACTIVE',
+					'row_id' => null,
+					'total_cost' => null,
+					'deleted_by' => CRUDBooster::myID(),
+					'deleted_at' => date('Y-m-d H:i:s')]);
+			foreach ($data as $index => $ingredient_group) {
+				foreach ($ingredient_group as $member_id => $ingredient_member) {
+					$row = (array) $ingredient_member;
 
-			if ($request->id != 'all') {
-				$concept = DB::table('menu_segmentations')->where('id', $request->input('id'))->get();
-				$column_name = $concept[0]->menu_segment_column_name;
-				$menu_items = DB::table('menu_items')->where($column_name, '1')->get();
-				$filtered_menu_items_id = explode(',', $request->input('items'));
-				$filtered_items = DB::table('menu_items')
-					->whereIn('id', $filtered_menu_items_id)
-					->orderBy('menu_item_description')
-					->get();
-			} else {
-				$filtered_menu_items_id = explode(',', $request->input('items'));
-				$filtered_items = DB::table('menu_items')
-					->whereIn('id', $filtered_menu_items_id)
-					->orderBy('menu_item_description')
-					->get();
+					if (!$row['ingredient_name'] && !$row['item_masters_id']) continue;
+
+					$is_existing =  !!count(DB::table('experimental_menu_ingredients_details')
+						->where('experimental_menu_items_id', $experimental_menu_id)
+						->where('item_masters_id', $row['item_masters_id'])
+						->get());
+					if ($existing) {
+						$row['updated_at'] = date('Y-m-d H:i:s');
+						$row['updated_by'] = CRUDBooster::myId();
+					} else {
+						$row['created_by'] = CRUDBooster::myId();
+					}
+
+					$row['status'] = 'ACTIVE';
+
+					DB::table('experimental_menu_ingredients_details')
+						->where('experimental_menu_items_id', $row['experimental_menu_items_id'])
+						->updateOrInsert(['item_masters_id' => $row['item_masters_id'], 'ingredient_name' => $row['ingredient_name']], $row);
+
+					// DB::table('experimental_menu_ingredients_details')->insert($row);
+				}
 			}
 
-			$data['concept'] = $concept;
-			$data['column_name'] = $column_name;
-			$data['menu_items'] = $menu_items;
-			$data['filtered_menu_items_id'] = $filtered_menu_items_id;
-			$data['filtered_items'] = $filtered_items;
-			return $this->view('menu-items/cost-filtered', $data);
+			return redirect('admin/experimental_menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
 		}
+
 	}

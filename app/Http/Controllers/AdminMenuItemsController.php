@@ -66,7 +66,8 @@
 				$this->col[] = ["label"=>ucwords(strtolower($price->menu_price_column_description)),"name"=>$price->menu_price_column_name];
 			}
 
-			$this->col[] = ["label"=>"Ingredient Cost","name"=>"food_cost"];
+			$this->col[] = ["label"=>"Food Cost","name"=>"food_cost"];
+			$this->col[] = ["label"=>"Food Cost Percentage","name"=>"food_cost_percentage"];
 
             $this->col[] = ["label"=>"Original Concept","name"=>"original_concept"];;
 			$this->col[] = ["label"=>"Status","name"=>"status"];
@@ -712,7 +713,8 @@
 	    }
 
 		public function getEdit($id) {
-			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
+			// dd(CRUDBooster::myPrivilegeName());
+			if(CRUDBooster::myPrivilegeName() != 'Chef' && CRUDBooster::myPrivilegeId() != '1') return redirect('admin/menu_items')->with(['message_type' => 'danger', 'message' => 'You do not have the access to edit the item.']);
 			$data = [];
 			$data['item'] = DB::table('menu_items')->where('id', $id)->get()[0];
 
@@ -750,8 +752,12 @@
 
 		public function submitEdit(Request $request) {
 			$data = [];
-			$total_cost = preg_replace("/[^0-9.]/", "", $request->input('total_cost'));
-			DB::table('menu_items')->where('id', $request->input('menu_items_id'))->update(['food_cost' => $total_cost]);
+			$total_cost_details = explode(',', $request->input('total_cost'));
+			$total_cost = preg_replace("/[^0-9.]/", "", $total_cost_details[0]);
+			$percentage = $total_cost_details[1];
+			DB::table('menu_items')
+				->where('id', $request->input('menu_items_id'))
+				->update(['food_cost' => $total_cost, 'food_cost_percentage' => $percentage]);
 
 			DB::table('menu_ingredients_details')
 				->where('status', 'ACTIVE')

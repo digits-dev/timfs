@@ -1,8 +1,6 @@
 @push('head')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-<script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
-<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+<script src="https://code.jquery.com/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
 <style>
     table, th, td {
         border: 1px solid rgb(215, 214, 214) !important;
@@ -32,10 +30,10 @@
         <table class="table table-striped table-bordered">
             <thead>
                 <tr class="active">
-                    <th scope="col">No.</th>
                     <th scope="col">Concept Name</th>
                     <th scope="col">Low Cost</th>
                     <th scope="col">High Cost</th>
+                    <th scope="col">No Cost</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,9 +42,9 @@
         </table>
     </div>
 
-    <div class="panel-footer">
+    {{-- <div class="panel-footer">
         <button class="btn btn-primary" type="button" id="export"> <i class="fa fa-download" ></i> Export</button>
-    </div>
+    </div> --}}
 </div>
 
 @endsection
@@ -67,21 +65,25 @@
                 const td = $(document.createElement('td'));
                 td.attr('id', concept.id);
                 if (i==0) {
-                    td.text(index + 1);
-                } if (i==1) {
                     td.text(concept.menu_segment_column_description);
-                } else if (i==2) {
+                } else if (i==1) {
                     const items = low.map(item => item.id).join(',');
                     td.text(low.length);
                     td.attr('filter', 'low');
                     td.attr('items', items);
                     td.addClass('low clickable');
-                } else if (i==3) {
+                } else if (i==2) {
                     const items = high.map(item => item.id).join(',');
                     td.text(high.length);
                     td.attr('filter', 'high');
                     td.attr('items', items);
                     td.addClass('high clickable');
+                } else if (i==3) {
+                    const items = groupedItems.filter(item => item.food_cost == 0 || !item.food_cost).map(item => item.id);
+                    td.text(items.length);
+                    td.attr('filter', 'no-cost');
+                    td.attr('items', items.join(','));
+                    td.addClass('clickable');
                 }
                 tr.append(td)
             }
@@ -90,32 +92,38 @@
         });
 
         // TOTAL || ALL
-        // TODO: IMPLEMENT THE TOTAL FILTERING!!
         const totalTR = $(document.createElement('tr'));
         const totalLabelTD = $(document.createElement('td'));
-        const allLow = [...menuItems].filter(item => item.food_cost && item.food_cost / item.menu_price_dine <= 0.30);
-        const allHigh = [...menuItems].filter(item => item.food_cost && item.food_cost / item.menu_price_dine > 0.30);
+        const allLow = [...menuItems].filter(item => Number(item.food_cost) > 0 && item.food_cost / item.menu_price_dine <= 0.30);
+        const allHigh = [...menuItems].filter(item => Number(item.food_cost) > 0 && item.food_cost / item.menu_price_dine > 0.30);
+        const allNoCost = [...menuItems].filter(item => item.food_cost == 0 || !item.food_cost);
         totalTR.css('font-weight', 'bold');
         totalLabelTD.text('All');
-        totalLabelTD.attr('colspan', '2');
+        // totalLabelTD.attr('colspan', '2');
         totalTR.append(totalLabelTD);
-        for (let i=0; i<2; i++) {
+        for (let i=0; i<3; i++) {
             const td = $(document.createElement('td'));
             if (i==0) {
                 const items = allLow.map(item => item.id).join(',');
                 td.text(allLow.length);
                 td.attr('filter', 'low');
                 td.attr('items', items);
-                td.addClass('low clickable')
+                td.addClass('low clickable');
             } else if (i==1) {
                 const items = allHigh.map(item => item.id).join(',');
                 td.text(allHigh.length);
                 td.attr('filter', 'high');
                 td.attr('items', items);
                 td.addClass('high clickable');
-            } 
+            } else if (i==2) {
+                const items = allNoCost.map(item => item.id).join(',');
+                td.text(allNoCost.length);
+                td.attr('filter', 'no-cost');
+                td.attr('items', items);
+                td.addClass('clickable');
+            }
             td.attr('id', 'all');
-            td.addClass('clickable')
+            td.addClass('clickable');
             totalTR.append(td);
         }
 
@@ -135,13 +143,38 @@
             const id = td.attr('id');
             const filter = td.attr('filter');
             const items = td.attr('items');
-            let url = "{{ route('filter_by_cost', ['id' => ':concept', 'filter' => ':filter', 'items'=> ':items']) }}";
-            url = url.replace(':concept', id).replace(':filter', filter).replace(':items', (items ? items : 0));
-            window.location.href = url;
+
+            const form = $(document.createElement('form'))
+                .attr('method', 'POST')
+                .attr('action', "{{ route('filter_by_cost') }}")
+                .css('display', 'none');
+            const csrf = $(document.createElement('input'))
+                .attr({
+                    type: 'hidden',
+                    name: '_token',
+                })
+                .val("{{ csrf_token() }}");
+            const idInput = $(document.createElement('input'))
+                .attr('name', 'id')
+                .val(id);
+            const itemInput = $(document.createElement('input'))
+                .attr('name', 'items')
+                .val(items);
+            const filterInput = $(document.createElement('input'))
+                .attr('name', 'filter')
+                .val(filter);
+            $('.panel-body').append(form);
+            form.append(csrf, idInput, itemInput, filterInput);
+            form.submit();
         });
 
         $(document).on('click', '#export', function() {
             exportToExcel('.xlsx');
+        });
+
+        $('table').DataTable({
+            pagingType: 'full_numbers',
+            pageLength: 100,
         });
 
     });
