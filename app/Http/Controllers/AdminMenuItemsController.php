@@ -726,11 +726,11 @@
 													'is_selected',
 													'is_primary',
 													'qty',
-													'cost',
+													\DB::raw('item_masters.ttp / item_masters.packaging_size * menu_ingredients_details.qty as cost'),
 													'ingredient_group',
 													'uom_id',
 													'packagings.packaging_description',
-													'item_masters.ingredient_cost',
+													\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 													'item_masters.full_item_description')
 											->leftJoin('packagings', 'menu_ingredients_details.uom_id', '=', 'packagings.id')
 											->orderBy('ingredient_group', 'ASC')
@@ -740,7 +740,7 @@
 			$data['item_masters'] = DB::table('item_masters')
 											->select(\DB::raw('item_masters.id as item_masters_id'),
 													'item_masters.packagings_id',
-													'item_masters.ingredient_cost',
+													\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 													'item_masters.full_item_description',
 													'item_masters.tasteless_code',
 													'packagings.packaging_description')
