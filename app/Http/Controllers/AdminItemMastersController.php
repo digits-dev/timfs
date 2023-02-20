@@ -421,6 +421,12 @@
 						'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'",
 						'style' => CRUDBooster::myEditForm()->packagings_id ?: 'display:none;'
         			];
+
+					$this->form[] = [
+                        'label' => 'Ingredient Cost', 'name' => 'ingredient_cost', 'type' => 'number',
+                        'validation' => CRUDBooster::myEditForm()->ingredient_cost ? 'required' : '', 'width' => 'col-sm-4',
+                        'style' => CRUDBooster::myEditForm()->ingredient_cost ?: 'display:none;'
+                    ];
 					
                     $this->form[] = [
                         'label' => 'Tax Status', 'name' => 'tax_status', 'type' => 'text', CRUDBooster::myEditForm()->tax_status ? : 'readonly' => true,
