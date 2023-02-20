@@ -16,6 +16,12 @@
         outline: 2px solid blue;
         background: rgb(220, 220, 220);
     }
+
+    .loading-label {
+        text-align: center;
+        font-style: italic;
+        color: grey;
+    }
 </style>
 @endpush
 
@@ -40,6 +46,7 @@
 
             </tbody>
         </table>
+        <p class="loading-label">Loading...</p>
     </div>
 
     {{-- <div class="panel-footer">
@@ -53,10 +60,11 @@
 <script>
     $(document).ready(function() {
 
+        $('.loading-label').remove();
+
         // PER CONCEPT !!!
         const concepts = {!! json_encode($concepts) !!};
         const menuItems = {!! json_encode($menu_items) !!};
-        // console.log(menuItems.filter(e => e.food_cost == 0));
         concepts.forEach((concept, index) => {
             const tr = $(document.createElement('tr'));
             const groupedItems = [...menuItems].filter(menuItem => !!menuItem[concept.menu_segment_column_name]);
@@ -82,7 +90,7 @@
                 } else if (i==3) {
                     const items = groupedItems.filter(item => item.food_cost == 0 || !item.food_cost).map(item => item.id);
                     td.text(items.length);
-                    td.attr('filter', 'no-cost');
+                    td.attr('filter', 'no');
                     td.attr('items', items.join(','));
                     td.addClass('clickable');
                 }
@@ -100,7 +108,6 @@
         const allNoCost = [...menuItems].filter(item => item.food_cost == 0 || !item.food_cost);
         totalTR.css('font-weight', 'bold');
         totalLabelTD.text('All');
-        // totalLabelTD.attr('colspan', '2');
         totalTR.append(totalLabelTD);
         for (let i=0; i<3; i++) {
             const td = $(document.createElement('td'));

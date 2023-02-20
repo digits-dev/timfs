@@ -224,6 +224,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Input' => Illuminate\Support\Facades\Request::class,
+        'Str'       => Illuminate\Support\Str::class,
     ],
 
 ];

@@ -13,6 +13,26 @@
         justify-content: space-around;
         align-items: center;
     }
+
+    .concept-name {
+        text-align: center;
+        letter-spacing: 3px;
+        font-weight: 600;
+    }
+
+    .filter-name {
+        text-align: center;
+        font-size: 16px;
+        text-transform: uppercase;
+        font-style: italic;
+        color: grey;
+    }
+
+    .loading-label {
+        text-align: center;
+        font-style: italic;
+        color: grey;
+    }
 </style>
 @endpush
 
@@ -30,6 +50,8 @@
     </div>
 
     <div class="panel-body">
+        <h3 class="concept-name">{{$concept[0]->menu_segment_column_description ? $concept[0]->menu_segment_column_description : 'ALL'}}</h3>
+        <p class="filter-name">{{$filter != 'no-cost' ? $filter : 'no'}} Cost</p>
         <table id="tableData" class="table table-striped table-bordered">
             <thead>
                 <tr class="active">
@@ -45,6 +67,7 @@
 
             </tbody>
         </table>
+        <p class="loading-label">Loading...</p>
     </div>
 
     <div class="panel-footer">
@@ -57,6 +80,8 @@
 @push('bottom')
 <script type="text/javascript">
     $(document).ready(function() {
+        $('.loading-label').remove();
+
         let menuItems = {!! json_encode($filtered_items) !!};
         menuItems = menuItems.sort((a, b) => Number((a.food_cost / a.menu_price_dine * 100)) - Number((b.food_cost / b.menu_price_dine * 100)))
         const tbody = $('tbody');
