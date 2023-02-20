@@ -738,6 +738,7 @@
 											->get();
 											
 			$data['item_masters'] = DB::table('item_masters')
+											->where('sku_statuses_id', '!=', '2')
 											->select(\DB::raw('item_masters.id as item_masters_id'),
 													'item_masters.packagings_id',
 													\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
