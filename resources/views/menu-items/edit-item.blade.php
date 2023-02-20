@@ -3,6 +3,12 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
 <style type="text/css">
+    .loading-label {
+        text-align: center;
+        font-style: italic;
+        color: grey;
+    }
+
     .ingredient-section {
         display: flex;
         flex-direction: column;
@@ -271,6 +277,7 @@
             </label>
             <h4 class="recipe-text""><i class="fa fa-cheese"></i> RECIPE <i class="fa fa-utensils"></i></h4>
             <h5 class="no-ingredient-warning" style="display: none;"><i class="fa fa-spoon"></i> No ingredients currently saved.</h5>
+            <p class="loading-label">Loading...</p>
             <section class="ingredient-section">
             </section>
             <section class="section-footer">
@@ -675,6 +682,8 @@
                 $.fn.sumCost();
             });
         });
+
+        $('.loading-label').remove();
         $.fn.firstLoad();
         $.fn.reload();
         $.fn.formatSelected();
