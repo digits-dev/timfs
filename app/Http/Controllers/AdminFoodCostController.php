@@ -362,6 +362,7 @@
 					->get();
 			}
 
+			$data['filter'] = $request->input('filter');
 			$data['concept'] = $concept;
 			$data['column_name'] = $column_name;
 			$data['menu_items'] = $menu_items;

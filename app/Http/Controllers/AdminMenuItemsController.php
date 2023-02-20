@@ -825,7 +825,7 @@
 					'total_cost',
 					'full_item_description',
 					'qty', 'uom_description',
-					'cost')
+					\DB::raw('item_masters.ttp / item_masters.packaging_size * menu_ingredients_details.qty as cost'))
 				->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
 				->leftJoin('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
 				->orderby('ingredient_group')
