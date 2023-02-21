@@ -2,6 +2,11 @@
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
+<script>
+    const savedIngredients = {!! json_encode($current_ingredients) !!};
+    const item_masters = {!! json_encode($item_masters) !!};
+    const menuItem = {!! json_encode($item) !!};
+</script>
 <style type="text/css">
     .loading-label {
         text-align: center;
@@ -301,10 +306,6 @@
 
 <script>
     $(document).ready(function() {
-
-        const savedIngredients = {!! json_encode($current_ingredients) !!};
-        const item_masters = {!! json_encode($item_masters) !!};
-        const menuItem = {!! json_encode($item) !!};
 
         $.fn.firstLoad = function() {
             const entryCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
