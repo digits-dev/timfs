@@ -335,10 +335,10 @@
 				->orderBy('menu_segment_column_description')
 				->get();
 			
-			$data['menu_items'] = DB::table('menu_items')
+			$data['menu_items'] = json_encode(DB::table('menu_items')
 				->where('status', 'ACTIVE')
-				->get();
-			
+				->get());
+
 			$concept_access_id = DB::table('user_concept_acess')
 				->where('cms_users_id', CRUDBooster::myID())
 				->get('menu_segmentations_id')
