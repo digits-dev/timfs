@@ -1,6 +1,12 @@
 @push('head')
 <script src="https://code.jquery.com/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+<script defer>
+    let concepts = {!! json_encode($concepts) !!};
+    let menuItems = {!! json_encode($menu_items) !!};
+    const conceptColumnNames = {!! json_encode($chef_access) !!}.split(',');
+    const privilege = {!! json_encode($privilege) !!};
+</script>
 <style>
     table, th, td {
         border: 1px solid rgb(215, 214, 214) !important;
@@ -58,11 +64,7 @@
 
 @push('bottom')
 <script>
-    let concepts = {!! json_encode($concepts) !!};
-    let menuItems = {!! json_encode($menu_items) !!};
-    const conceptColumnNames = {!! json_encode($chef_access) !!}.split(',');
-    const privilege = {!! json_encode($privilege) !!};
-    
+
     $(document).ready(function() {
         $('.loading-label').remove();
 
