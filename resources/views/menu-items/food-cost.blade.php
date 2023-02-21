@@ -59,7 +59,7 @@
 @push('bottom')
 <script>
     let concepts = {!! json_encode($concepts) !!};
-    let menuItems = {!! $menu_items !!};
+    let menuItems = {!! json_encode($menu_items) !!};
     const conceptColumnNames = {!! json_encode($chef_access) !!}.split(',');
     const privilege = {!! json_encode($privilege) !!};
     

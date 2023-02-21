@@ -35,7 +35,7 @@
 			$this->col = [];
 			$this->col[] = ["label"=>"Privileges","name"=>"id_cms_privileges","join"=>"cms_privileges,name"];
 			$this->col[] = ["label"=>"Users Id","name"=>"cms_users_id","join"=>"cms_users,name"];
-			$this->col[] = ["label"=>"Menu Segmentations Id","name"=>"menu_segmentations_id"];
+			$this->col[] = ["label"=>"Concept Access","name"=>"menu_segmentations_id"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by"];
 			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
@@ -256,6 +256,19 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
+			if ($column_index == 4) {
+				$column_array = explode(',', $column_value);
+				$concepts = DB::table('menu_segmentations')
+					->whereIn('id', $column_array)
+					->get('menu_segment_column_description');
+
+				$column_value = [];
+				foreach ($concepts as $index => $concept) {
+					$column_value[$index] = '<span class="label label-info">' . $concept->menu_segment_column_description . '</span>';
+				}
+				
+				$column_value = implode(' ', $column_value);
+			}
 	    }
 
 	    /*
