@@ -1,6 +1,12 @@
 @push('head')
 <script src="https://code.jquery.com/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+<script>
+    let concepts = {!! json_encode($concepts) !!};
+    let menuItems = {!! json_encode($menu_items) !!};
+    const conceptColumnNames = {!! json_encode($chef_access) !!}.split(',');
+    const privilege = {!! json_encode($privilege) !!};
+</script>
 <style>
     table, th, td {
         border: 1px solid rgb(215, 214, 214) !important;
@@ -59,12 +65,14 @@
 @push('bottom')
 <script>
     $(document).ready(function() {
-
         $('.loading-label').remove();
 
         // PER CONCEPT !!!
-        const concepts = {!! json_encode($concepts) !!};
-        const menuItems = {!! json_encode($menu_items) !!};
+        
+        if (privilege.toLowerCase() == 'chef') {
+            concepts = [...concepts].filter(concept => conceptColumnNames.includes(concept.menu_segment_column_name));
+            menuItems = [...menuItems].filter(menuItem => conceptColumnNames.every(conceptColumnName => !!menuItem[conceptColumnName]));
+        }
         concepts.forEach((concept, index) => {
             const tr = $(document.createElement('tr'));
             const groupedItems = [...menuItems].filter(menuItem => !!menuItem[concept.menu_segment_column_name]);
