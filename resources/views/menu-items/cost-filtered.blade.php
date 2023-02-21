@@ -34,9 +34,6 @@
         color: grey;
     }
 </style>
-<script type="text/javascript">
-    let menuItems = {!! json_encode($filtered_items) !!};
-</script>
 @endpush
 
 
@@ -82,6 +79,8 @@
 
 @push('bottom')
 <script type="text/javascript">
+    let menuItems = {!! json_encode($filtered_items) !!};
+    
     $(document).ready(function() {
         $('.loading-label').remove();
 
