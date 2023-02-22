@@ -333,7 +333,7 @@
 			$data['concepts'] = DB::table('menu_segmentations')
 				->where('status', 'ACTIVE')
 				->orderBy('menu_segment_column_description')
-				->select('menu_segment_column_description', 'menu_segment_column_name')
+				->select('menu_segment_column_description', 'menu_segment_column_name', 'id')
 				->get()
 				->toArray();
 
@@ -351,7 +351,7 @@
 					menu_price_take,
 					food_cost,
 					food_cost_percentage,
-					menu_item_description ' 
+					menu_item_description,' 
 					. implode(', ', $segmentation_columns)))
 				->get();
 			
