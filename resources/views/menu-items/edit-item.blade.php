@@ -499,7 +499,7 @@
                         const form = $('form');
                         const percentage = form.find('.label-total').text().replace(/[^0-9.]/g, '');
                         const totalCost = form.find('.total-cost');
-                        totalCost.val(`${totalCost.val()},${percentage}`)
+                        totalCost.val(`${totalCost.val().replace(/[^0-9.]/g, '')},${percentage}`)
                         console.log(totalCost.val());
                         // return;
                         const wrappers = jQuery.makeArray(form.find('.ingredient-wrapper'));
