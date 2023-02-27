@@ -72,6 +72,7 @@
 <script>
      $(document).ready(function() {
         const ingredients = {!! json_encode($ingredients) !!};
+        console.log(ingredients);
         const item = {!! json_encode($item) !!};
         const tbody = $('.ingredient-tbody');
         const entryCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
@@ -87,10 +88,10 @@
             const tr = $(document.createElement('tr'));
             for (let i=0; i<5; i++) {
                 const td = $(document.createElement('td'));
-                if (i == 0) td.text(primary.tasteless_code);
-                if (i == 1) td.text(primary.full_item_description);
+                if (i == 0) td.text(primary.tasteless_code || 'No Code');
+                if (i == 1) td.text(primary.full_item_description || primary.ingredient_name);
                 if (i == 2) td.text(primary.qty);
-                if (i == 3) td.text(primary.uom_description);
+                if (i == 3) td.text(primary.uom_description || primary.uom_name);
                 if (i == 4) {
                     td.text(primary.cost);
                     td.addClass('cost peso');
