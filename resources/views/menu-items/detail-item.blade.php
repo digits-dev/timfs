@@ -14,6 +14,15 @@
     .total-cost {
         font-weight: bold
     }
+
+    .note {
+        color: blue;
+        font-weight: bold;
+    }
+
+    .label-secondary {
+        background: #7e57c2;
+    }
 </style>
 @endpush
 
@@ -29,6 +38,7 @@
         <i class="fa fa-eye"></i><strong> Detail Menu Item</strong>
     </div>
     <div class="panel-body">
+        <h4 style="font-weight: 600; text-align: center;">Menu Information</h4>
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
@@ -52,11 +62,14 @@
                 <table class="table table-striped table-bordered">
                     <thead>
                         <tr>
-                            <th scoped="col">Tasteless Code</th>
-                            <th scoped="col">Ingredient</th>
-                            <th scoped="col">Quantity</th>
-                            <th scoped="col">UOM</th>
-                            <th scoped="col">Cost</th>
+                            <th scope="col"> </th>
+                            <th scope="col">Status</th>
+                            <th scope="col">From</th>
+                            <th scope="col">Tasteless Code</th>
+                            <th scope="col">Ingredient</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">UOM</th>
+                            <th scope="col">Cost</th>
                         </tr>
                     </thead>
                     <tbody class="ingredient-tbody">
@@ -64,48 +77,82 @@
                 </table>
             </div>
         </div>
+        <p class="note">** Highlighted ingredient names are primary ingredients.</p>
+    </div>
+    <div class="panel-footer">
+        <a class="btn btn-primary" href="{{ CRUDBooster::mainpath() }}" type="button" id="export"> <i class="fa fa-arrow-left" ></i> Back </a>
     </div>
 </div>
 @endsection
 
 @push('bottom')
 <script>
-     $(document).ready(function() {
+    $(document).ready(function() {
         const ingredients = {!! json_encode($ingredients) !!};
-        console.log(ingredients);
+        console.log(ingredients)
         const item = {!! json_encode($item) !!};
         const tbody = $('.ingredient-tbody');
-        const entryCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
-        for (i of entryCount) {
+        const groupCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
+        for (i of groupCount) {
             const groupedIngredients = ingredients.filter(e => e.ingredient_group == i);
-            const isSelected = groupedIngredients.filter(e => e.is_selected == 'TRUE');
+            const isSelected = groupedIngredients.find(e => e.is_selected == 'TRUE');
             let primary;
-            if (isSelected.length) {
-                primary = isSelected[0];
-            } else {
-                primary = groupedIngredients.filter(e => e.is_primary == 'TRUE')[0];
-            }
-            const tr = $(document.createElement('tr'));
-            for (let i=0; i<5; i++) {
-                const td = $(document.createElement('td'));
-                if (i == 0) td.text(primary.tasteless_code || 'No Code');
-                if (i == 1) td.text(primary.full_item_description || primary.ingredient_name);
-                if (i == 2) td.text(primary.qty);
-                if (i == 3) td.text(primary.uom_description || primary.uom_name);
-                if (i == 4) {
-                    td.text(primary.cost);
-                    td.addClass('cost peso');
-                }
+            if (isSelected) isSelected.checked = true;
+            else groupedIngredients.find(e => e.is_primary == 'TRUE').checked = true;
+            groupedIngredients.forEach(groupedIngredient => {
+                const tr = $(document.createElement('tr'));
+                const check = $(document.createElement('td'))
+                    .text(groupedIngredient.checked ? '✓' : '')
+                    .css('font-weight', '700');
+                const status = $(document.createElement('td'));
+                const from = $(document.createElement('td'))
+                const tastelessCode = $(document.createElement('td'))
+                    .text(
+                        groupedIngredient.tasteless_code ||
+                        groupedIngredient.tasteless_menu_code ||
+                        'No Item Code'
+                    ).css('font-style', !groupedIngredient.tastelessCode)
+                const ingredient = $(document.createElement('td'));
+                const ingredientSpan = $(document.createElement('span'))
+                    .text(
+                        groupedIngredient.full_item_description ||
+                        groupedIngredient.menu_item_description ||
+                        groupedIngredient.ingredient_name
+                    ).css('background', groupedIngredient.checked ? 'yellow' : '');
+                ingredient.html(ingredientSpan);
+                const quantity = $(document.createElement('td'))
+                    .text(groupedIngredient.qty);
+                const uom = $(document.createElement('td'))
+                    .text(groupedIngredient.uom_description || groupedIngredient.uom_name);
+                const cost = $(document.createElement('td'));
+                const costSpan = $(document.createElement('span'))
+                    .text(groupedIngredient.cost)
+                    .css('font-weight', groupedIngredient.checked ? 'bold' : '')
+                    .addClass(groupedIngredient.checked ? 'peso cost' : 'peso');
+                cost.html(costSpan);
 
-                tr.append(td);
-            }
-            $('.ingredient-tbody').append(tr);
+                if (groupedIngredient.full_item_description || groupedIngredient.item_masters_id)
+                    from.html('<span class="label label-info">IMFS</span>')
+                else if (groupedIngredient.menu_item_description)
+                    from.html('<span class="label label-warning">MIMF</span>')
+                else
+                    from.html('<span class="label label-secondary">USER</span>')
+
+                if (groupedIngredient.menu_item_status == 'INACTIVE' || groupedIngredient.item_status == 'INACTIVE')
+                    status.html('<span class="label label-danger">INACTIVE</span>')
+                else if (groupedIngredient.menu_item_status == 'ACTIVE' || groupedIngredient.item_status == 'ACTIVE')
+                    status.html('<span class="label label-success">ACTIVE</span>')
+                else if (groupedIngredient.menu_item_status == 'ALTERNATIVE' || groupedIngredient.item_status == 'ALTERNATIVE')
+                    status.html('<span class="label label-primary">ALTERNATIVE</span>')
+                tr.append(check, status, from, tastelessCode, ingredient, quantity, uom, cost);
+                $('.ingredient-tbody').append(tr);
+            });
         }
 
         const totalCostTR = $(document.createElement('tr'));
         const totalCostLabelTD = $(document.createElement('td'));
         const totalCostValueTD = $(document.createElement('td'));
-        totalCostLabelTD.attr('colspan', '4');
+        totalCostLabelTD.attr('colspan', '7');
         totalCostLabelTD.addClass('total-cost-label');
         totalCostLabelTD.text('Food Cost');
         totalCostValueTD.addClass('total-cost peso');
@@ -133,6 +180,8 @@
         }
 
         formatNumbers();
+        $('table th, table td').css('border', '1px solid #aaaaaa');
+        $('table thead').css('background', '#deeaee');
     });
     
 </script>

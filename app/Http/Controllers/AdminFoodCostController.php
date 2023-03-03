@@ -342,7 +342,7 @@
 				$segmentation_columns[$index] = $value->menu_segment_column_name;
 			}
 			
-			$data['menu_items'] = DB::table('menu_items')
+			$menu_items = DB::table('menu_items')
 				->where('status', 'ACTIVE')
 				->select(DB::raw('id,
 					status,
@@ -353,7 +353,8 @@
 					food_cost_percentage,
 					menu_item_description,' 
 					. implode(', ', $segmentation_columns)))
-				->get();
+				->get()
+				->toArray();
 			
 			$concept_access_id = DB::table('user_concept_acess')
 				->where('cms_users_id', CRUDBooster::myID())
@@ -370,6 +371,8 @@
 			foreach ($concepts as $index => $value) {
 				$concept_column_names[$index] = $value->menu_segment_column_name;
 			}
+
+			$data['menu_items'] = array_map(fn ($object) =>(object) array_filter((array) $object), $menu_items);
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 			$data['chef_access'] = implode(',', $concept_column_names);
 
@@ -378,27 +381,47 @@
 
 		public function filterByCost(Request $request) {
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
+			$privilege = CRUDBooster::myPrivilegeName();
 			$data = [];
 			$concept;
 			$column_name;
 			$menu_items;
+			$filter;
 			$filtered_menu_items_id;
 			$filtered_items;
-
+			
 			if ($request->id != 'all') {
 				$concept = DB::table('menu_segmentations')->where('id', $request->input('id'))->get();
 				$column_name = $concept[0]->menu_segment_column_name;
 				$menu_items = DB::table('menu_items')->where($column_name, '1')->get();
 				$filtered_menu_items_id = explode(',', $request->input('items'));
 				$filtered_items = DB::table('menu_items')
+					->where('status', 'ACTIVE')
 					->whereIn('id', $filtered_menu_items_id)
 					->orderBy('menu_item_description')
+					->select('id',
+						'menu_price_dine',
+						'menu_price_dlv',
+						'menu_price_take',
+						'tasteless_menu_code',
+						'menu_item_description',
+						'food_cost',
+						'food_cost_percentage')
 					->get();
 			} else {
 				$filtered_menu_items_id = explode(',', $request->input('items'));
 				$filtered_items = DB::table('menu_items')
+					->where('status', 'ACTIVE')
 					->whereIn('id', $filtered_menu_items_id)
 					->orderBy('menu_item_description')
+					->select('id',
+						'menu_price_dine',
+						'menu_price_dlv',
+						'menu_price_take',
+						'tasteless_menu_code',
+						'menu_item_description',
+						'food_cost',
+						'food_cost_percentage')
 					->get();
 			}
 
