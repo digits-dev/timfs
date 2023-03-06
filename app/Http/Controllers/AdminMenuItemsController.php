@@ -883,16 +883,46 @@
 						->where('id', $ingredient_to_update->id))
 						->update(['cost' => $ingredient_to_update->qty * $updated_cost])
 						->first();
+					
+					//getting the new total cost of the menu
+					$ingredients_of_updated_menu = DB::table('menu_ingredients_details')
+						->where('menu_items_id', $updated_ingredient->menu_items_id)
+						->where('status', 'ACTIVE')
+						->get()
+						->toArray();
 
-					//getting the difference of foodcost
-					$difference = $updated_cost - $ingredient_to_update->cost;
-					if ($difference == 0) continue;
+					//grouping the ingredients	
+					$grouped_ingredients = [];
+
+					foreach ($ingredients_of_updated_menu as $ingredient_of_updated_menu) {
+						$grouped_ingredients[$ingredient_of_updated_menu->ingredient_group][] = $ingredient_of_updated_menu;
+					}
+
+					//getting the new food cost of the updated menu
+					$food_cost_of_updated_menu = 0;
+
+					foreach ($grouped_ingredients as $group) {
+						$primary = array_filter($group, fn ($ingredient) => $ingredient->is_primary == 'TRUE')[0];
+						foreach ($group as $member) {
+							if ($member->is_selected == 'TRUE') {
+								$primary = $member;
+							}
+							
+							$food_cost_of_updated_menu += $primary->cost;
+						}
+					}
 
 					//updating the food cost and food cost percentage
-					$updated_menu = tap(DB::table('menu_items')
-						->where('id', $updated_ingredient->menu_items_id))
-						->update(['food_cost' => DB::raw("food_cost + $difference"),
-							'food_cost_percentage' => DB::raw('ROUND(food_cost / menu_price_dine * 100, 2)')])
+					DB::table('menu_items')
+						->where('id', $updated_ingredient->menu_items_id)
+						->update(['food_cost' => round($food_cost_of_updated_menu, 4)]);
+
+					DB::table('menu_items')
+						->where('id', $updated_ingredient->menu_items_id)
+						->update(['food_cost_percentage' => DB::raw('ROUND(food_cost / menu_price_dine * 100, 2)')]);
+
+					$updated_menu = DB::table('menu_items')
+						->where('id', $updated_ingredient->menu_items_id)
 						->first();
 					
 					//another array of ingredients to be updated
@@ -909,7 +939,7 @@
 
 			}
 			//calling the function... should start the recursion
-			// updateCostOfOtherMenu($to_update, $food_cost); -- COMMENTING FOR NOW !!!
+			updateCostOfOtherMenu($to_update, $food_cost); //-- COMMENTING FOR NOW !!!
 
 			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
 		}
