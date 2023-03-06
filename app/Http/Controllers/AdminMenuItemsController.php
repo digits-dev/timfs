@@ -907,9 +907,8 @@
 							if ($member->is_selected == 'TRUE') {
 								$primary = $member;
 							}
-							
-							$food_cost_of_updated_menu += $primary->cost;
 						}
+						$food_cost_of_updated_menu += $primary->cost;
 					}
 
 					//updating the food cost and food cost percentage
