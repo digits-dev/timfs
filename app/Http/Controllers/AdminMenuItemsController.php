@@ -734,96 +734,183 @@
 	    }
 
 		public function getEdit($id) {
-			// dd(CRUDBooster::myPrivilegeName());
 			if(CRUDBooster::myPrivilegeName() != 'Chef' && CRUDBooster::myPrivilegeId() != '1') return redirect('admin/menu_items')->with(['message_type' => 'danger', 'message' => 'You do not have the access to edit the item.']);
 			$data = [];
-			$data['item'] = DB::table('menu_items')->where('id', $id)->get()[0];
+			$data['item'] = DB::table('menu_items')
+				->where('id', $id)
+				->get()[0];
 
-			$data['current_ingredients'] = DB::table('menu_ingredients_details')
-											->where('menu_items_id', $id)
-											->where('menu_ingredients_details.status', 'ACTIVE')
-											->leftJoin('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
-											->select(\DB::raw('item_masters.id as item_masters_id'),
-													'is_selected',
-													'is_primary',
-													'qty',
-													\DB::raw('item_masters.ttp / item_masters.packaging_size * menu_ingredients_details.qty as cost'),
-													'ingredient_group',
-													'uom_id',
-													'packagings.packaging_description',
-													\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
-													'item_masters.full_item_description')
-											->leftJoin('packagings', 'menu_ingredients_details.uom_id', '=', 'packagings.id')
-											->orderBy('ingredient_group', 'ASC')
-											->orderBy('row_id', 'ASC')
-											->get();
-											
-			$data['item_masters'] = DB::table('item_masters')
-											->where('sku_statuses_id', '!=', '2')
-											->select(\DB::raw('item_masters.id as item_masters_id'),
-													'item_masters.packagings_id',
-													\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
-													'item_masters.full_item_description',
-													'item_masters.tasteless_code',
-													'packagings.packaging_description')
-											->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
-											->orderby('full_item_description')
-											->get();
+			$current_ingredients = DB::table('menu_ingredients_details')
+				->where('menu_items_id', $id)
+				->where('menu_ingredients_details.status', 'ACTIVE')
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'ingredient_name',
+					'menu_as_ingredient_id',
+					'menu_item_description',
+					'is_selected',
+					'is_primary',
+					'is_existing',
+					'qty',
+					'cost',
+					'food_cost',
+					'ingredient_group',
+					'uom_id',
+					'uom_name',
+					'packagings.packaging_description',
+					'uoms.uom_description',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
+					'item_masters.full_item_description',
+					'sku_status_description as item_status',
+					'menu_items.status as menu_status')
+				->leftJoin('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+				->leftJoin('packagings', 'menu_ingredients_details.uom_id', '=', 'packagings.id')
+				->leftJoin('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
+				->leftJoin('menu_items', 'menu_ingredients_details.menu_as_ingredient_id', '=', 'menu_items.id')
+				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->orderBy('ingredient_group', 'ASC')
+				->orderBy('row_id', 'ASC')
+				->get()
+				->toArray();
+
+			$item_masters = DB::table('item_masters')
+				->where('sku_statuses_id', '!=', '2')
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'item_masters.packagings_id',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
+					'item_masters.full_item_description',
+					'item_masters.tasteless_code',
+					'packagings.packaging_description',
+					'brands.brand_description')
+				->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
+				->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id')
+				->orderby('full_item_description')
+				->get()
+				->toArray();
+
+			$menu_items = DB::table('menu_items')
+				->where('menu_items.status', 'ACTIVE')
+				->where('menu_items.id', '!=', $id)
+				->select('menu_items.id as menu_item_id',
+					'menu_item_description',
+					'tasteless_menu_code',
+					'food_cost',
+					'food_cost_percentage',
+					'menu_items.uoms_id',
+					'uom_description')
+				->leftJoin('uoms', 'uoms.id', '=', 'menu_items.uoms_id')
+				->get()
+				->toArray();
+				
+			$data['current_ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $current_ingredients);
+			$data['item_masters'] = array_map(fn ($object) =>(object) array_filter((array) $object), $item_masters);
+			$data['menu_items'] = array_map(fn ($object) =>(object) array_filter((array) $object), $menu_items);
+
 			return $this->view('menu-items/edit-item', $data);
 		}
 
 		public function submitEdit(Request $request) {
-			$data = [];
-			$total_cost_details = explode(',', $request->input('total_cost'));
-			$total_cost = preg_replace("/[^0-9.]/", "", $total_cost_details[0]);
-			$percentage = $total_cost_details[1];
-			DB::table('menu_items')
-				->where('id', $request->input('menu_items_id'))
-				->update(['food_cost' => $total_cost, 'food_cost_percentage' => $percentage]);
+			$menu_items_id = $request->input('menu_items_id');
+			$ingredients = json_decode($request->input('ingredients'));
+			$food_cost = $request->input('food_cost');
+			$food_cost_percentage = $request->input('food_cost_percentage');
 
+			//updating food cost and percentage to menu items table
+			DB::table('menu_items')
+				->where('id', $menu_items_id)
+				->update(['food_cost' => $food_cost, 'food_cost_percentage' => $food_cost_percentage]);
+
+			//inactivating all active ingredients of menu item
 			DB::table('menu_ingredients_details')
 				->where('status', 'ACTIVE')
-				->where('menu_items_id', $request->input('menu_items_id'))
+				->where('menu_items_id', $menu_items_id)
 				->update(['status' => 'INACTIVE',
 				'row_id' => null,
 				'total_cost' => null,
-				'deleted_by' => CRUDBooster::myID(),
+				'deleted_by' => CRUDBooster::myId(),
 				'deleted_at' => date('Y-m-d H:i:s')]);
 			
-			if($request->input('ingredient')) {
-				for ($i=0; $i<count($request->input('ingredient')); $i++) {
-					$ingredient = explode(',', $request->input('ingredient')[$i]);
-					$data[$i]['item_masters_id'] = $ingredient[0];
-					$data[$i]['is_primary'] = $ingredient[1];
-					$data[$i]['ingredient_group'] = $ingredient[2];
-					$data[$i]['row_id'] = $ingredient[3];
-					$data[$i]['is_selected'] = $ingredient[4];
-					$data[$i]['menu_items_id'] = $request->input('menu_items_id');
-					$data[$i]['qty'] = $request->input('quantity')[$i];
-					$data[$i]['uom_id'] = $request->input('uom')[$i];
-					$cost = preg_replace("/[^0-9.]/", "", $request->input('cost')[$i]);
-					$data[$i]['cost'] = $cost;
-				}
-				
-				foreach($data as $index => $element) {
-					$is_existing = !!count(DB::table('menu_ingredients_details')->where('menu_items_id', $element['menu_items_id'])->where('item_masters_id', $element['item_masters_id'])->get());
-					if ($is_existing) {
-						$element['updated_at'] = date('Y-m-d H:i:s');
-						$element['updated_by'] = CRUDBooster::myId();
-					} else {
-						$element['created_by'] = CRUDBooster::myId();
-					}
-					$element['total_cost'] = $total_cost;
-					$element['status'] = 'ACTIVE';
-					$element['deleted_at'] = null;
-					$element['deleted_by'] = null;
+			foreach ($ingredients as $ingredient_group) {
+				foreach ($ingredient_group as $ingredient) {
+					$ingredient = (array) $ingredient;
 					
-					DB::table('menu_ingredients_details')
-						->where('menu_items_id', $element['menu_items_id'])
-						->where('item_masters_id', $element['item_masters_id'])
-						->updateOrInsert(['item_masters_id' => $element['item_masters_id']], $element);
+					//checking if the ingredient already exists
+					$is_existing = !!count(DB::table('menu_ingredients_details')
+						->where('menu_items_id', $menu_items_id)
+						->where('item_masters_id', $ingredient['item_masters_id'])
+						->get());
+					
+					if ($is_existing) {
+						$ingredient['updated_at'] = date('Y-m-d H:i:s');
+						$ingredient['updated_by'] = CRUDBooster::myId();
+					} else {
+						$ingredient['created_at'] = date('Y-m-d H:i:s');
+						$ingredient['created_by'] = CRUDBooster::myId();
+					}
+
+					$ingredient['status'] = 'ACTIVE';
+					$ingredient['deleted_at'] = null;
+					$ingredient['deleted_by'] = null;
+	
+					//finally, inserting ingredients to menu ingredients details table
+					DB::table('menu_ingredients_details')->updateOrInsert([
+						'menu_items_id' => $menu_items_id,
+						'item_masters_id' => $ingredient['item_masters_id'],
+						'ingredient_name' => $ingredient['ingredient_name'],
+						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
+						], $ingredient);
 				}
 			}
+
+			//getting all ingredients that need to be updated
+			$to_update = DB::table('menu_ingredients_details')
+				->where('status', 'ACTIVE')
+				->where('menu_as_ingredient_id', $menu_items_id)
+				->get()
+				->toArray();			
+
+			function updateCostOfOtherMenu($ingredients_to_update, $updated_cost) {
+				//stopping the recursion if array is empty
+				if (!$ingredients_to_update) return;
+
+				
+				foreach ($ingredients_to_update as $ingredient_to_update) {
+					//initializing an array of ingredients that need to be updated
+					$to_update = [];
+
+					//updating the ingredient
+					$updated_ingredient = tap(DB::table('menu_ingredients_details')
+						->where('status', 'ACTIVE')
+						->where('id', $ingredient_to_update->id))
+						->update(['cost' => $ingredient_to_update->qty * $updated_cost])
+						->first();
+
+					//getting the difference of foodcost
+					$difference = $updated_cost - $ingredient_to_update->cost;
+					if ($difference == 0) continue;
+
+					//updating the food cost and food cost percentage
+					$updated_menu = tap(DB::table('menu_items')
+						->where('id', $updated_ingredient->menu_items_id))
+						->update(['food_cost' => DB::raw("food_cost + $difference"),
+							'food_cost_percentage' => DB::raw('ROUND(food_cost / menu_price_dine * 100, 2)')])
+						->first();
+					
+					//another array of ingredients to be updated
+					$to_update = DB::table('menu_ingredients_details')
+						->where('status', 'ACTIVE')
+						->where('menu_as_ingredient_id', $updated_menu->id)
+						->get()
+						->toArray();
+
+					//finally, calling the function itself
+					//the process keeps going on until there are no more ingredients to be updated
+					updateCostOfOtherMenu($to_update, $updated_menu->food_cost);
+				}
+
+			}
+			//calling the function... should start the recursion
+			// updateCostOfOtherMenu($to_update, $food_cost); -- COMMENTING FOR NOW !!!
+
 			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
 		}
 
@@ -835,24 +922,36 @@
 				->get()
 				->first();
 
-			$data['ingredients'] = DB::table('menu_ingredients_details')
+			$ingredients = DB::table('menu_ingredients_details')
 				->where('menu_items_id', $id)
 				->where('menu_ingredients_details.status', 'ACTIVE')
 				->select('tasteless_code',
+					'menu_items.status as menu_item_status',
+					'sku_statuses.sku_status_description as item_status',
 					'item_masters_id',
+					'menu_item_description',
+					'tasteless_menu_code',
+					'ingredient_name',
 					'ingredient_group',
 					'row_id',
 					'is_primary',
 					'is_selected',
 					'total_cost',
 					'full_item_description',
-					'qty', 'uom_description',
-					\DB::raw('item_masters.ttp / item_masters.packaging_size * menu_ingredients_details.qty as cost'))
-				->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+					'qty',
+					'uom_description',
+					'uom_name',
+					'cost')
+				->leftJoin('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
 				->leftJoin('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
+				->leftJoin('menu_items', 'menu_ingredients_details.menu_as_ingredient_id', '=', 'menu_items.id')
+				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
 				->orderby('ingredient_group')
-				->get();
+				->get()
+				->toArray();
+
+			$data['ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $ingredients);
 			return $this->view('menu-items/detail-item', $data);
 		}
 
-	}
+	}	
