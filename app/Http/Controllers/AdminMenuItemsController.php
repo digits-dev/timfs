@@ -771,39 +771,8 @@
 				->orderBy('row_id', 'ASC')
 				->get()
 				->toArray();
-
-			$item_masters = DB::table('item_masters')
-				->where('sku_statuses_id', '!=', '2')
-				->select(\DB::raw('item_masters.id as item_masters_id'),
-					'item_masters.packagings_id',
-					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
-					'item_masters.full_item_description',
-					'item_masters.tasteless_code',
-					'packagings.packaging_description',
-					'brands.brand_description')
-				->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
-				->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id')
-				->orderby('full_item_description')
-				->get()
-				->toArray();
-
-			$menu_items = DB::table('menu_items')
-				->where('menu_items.status', 'ACTIVE')
-				->where('menu_items.id', '!=', $id)
-				->select('menu_items.id as menu_item_id',
-					'menu_item_description',
-					'tasteless_menu_code',
-					'food_cost',
-					'food_cost_percentage',
-					'menu_items.uoms_id',
-					'uom_description')
-				->leftJoin('uoms', 'uoms.id', '=', 'menu_items.uoms_id')
-				->get()
-				->toArray();
 				
 			$data['current_ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $current_ingredients);
-			$data['item_masters'] = array_map(fn ($object) =>(object) array_filter((array) $object), $item_masters);
-			$data['menu_items'] = array_map(fn ($object) =>(object) array_filter((array) $object), $menu_items);
 
 			return $this->view('menu-items/edit-item', $data);
 		}
@@ -881,7 +850,7 @@
 					$updated_ingredient = tap(DB::table('menu_ingredients_details')
 						->where('status', 'ACTIVE')
 						->where('id', $ingredient_to_update->id))
-						->update(['cost' => $ingredient_to_update->qty * $updated_cost])
+						->update(['cost' => round($ingredient_to_update->qty * $updated_cost, 4)])
 						->first();
 					
 					//getting the new total cost of the menu
@@ -981,6 +950,70 @@
 
 			$data['ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $ingredients);
 			return $this->view('menu-items/detail-item', $data);
+		}
+
+		public function searchIngredient(Request $request) {
+			$search_terms = json_decode($request->content);
+			
+			$item_masters = DB::table('item_masters')
+				->where('sku_statuses_id', '!=', '2')
+				->where(function($query) use ($search_terms) {
+					$query->where(function($query_item_desc) use ($search_terms) {
+						$query_item_desc->orWhere(function($q) use ($search_terms) {
+							foreach ($search_terms as $term) {
+								$q->where('full_item_description', 'like', "%{$term}%");
+							}
+						})->orWhere(function($q) use ($search_terms) {
+							foreach ($search_terms as $term) {
+								$q->where('brands.brand_description', 'like', "%{$term}%");
+							}
+						});
+					})->orWhere(function ($query_code) use ($search_terms) {
+						foreach ($search_terms as $term) {
+							$query_code->orWhere('tasteless_code', 'like', "%{$term}%");
+						}
+					});
+				})
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'item_masters.packagings_id',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
+					'item_masters.full_item_description',
+					'item_masters.tasteless_code',
+					'packagings.packaging_description',
+					'brands.brand_description')
+				->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
+				->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id')
+				->orderby('full_item_description')
+				->get()
+				->toArray();
+			
+			$menu_items = DB::table('menu_items')
+				->where('menu_items.status', 'ACTIVE')
+				->where(function($query) use ($search_terms) {
+					$query->orWhere(function($q) use ($search_terms) {
+						foreach ($search_terms as $term) {
+							$q->where('menu_item_description', 'like', "%{$term}%");
+						}
+					})->orWhere(function($q) use ($search_terms) {
+						foreach ($search_terms as $term) {
+							$q->orWhere('tasteless_menu_code', 'like', "%{$term}%");
+						}
+					});
+				})
+				->select('menu_items.id as menu_item_id',
+					'menu_item_description',
+					'tasteless_menu_code',
+					'food_cost',
+					'food_cost_percentage',
+					'menu_items.uoms_id',
+					'uom_description')
+				->leftJoin('uoms', 'uoms.id', '=', 'menu_items.uoms_id')
+				->get()
+				->toArray();
+
+			$response = array_merge($item_masters, $menu_items);
+			
+			return json_encode($response);
 		}
 
 	}	
