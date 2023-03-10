@@ -410,6 +410,8 @@
     const savedIngredients = {!! json_encode($current_ingredients) !!};
     const menuItem = {!! json_encode($item) !!};
     $(document).ready(function() {
+        $('body').addClass('sidebar-collapse');
+
         const debounce = (func, wait, immediate)=> {
             let timeout;
 
