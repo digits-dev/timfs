@@ -409,8 +409,7 @@
 		}
 
 		public function filterByCost($concept_id, $filter, $low_cost) {
-			if(!CRUDBooster::isView())
-				CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
+			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			$privilege = CRUDBooster::myPrivilegeName();
 			$data = [];
 			$concept;
@@ -451,7 +450,6 @@
 				$menu_items = DB::table('menu_items')
 					->where($column_name, '1')
 					->where('status', 'ACTIVE')
-					->where(DB::raw("food_cost_percentage > $low_cost"))
 					->get()
 					->toArray();
 
@@ -491,7 +489,7 @@
 					fn ($obj) => (
 						 (float) $obj->food_cost_percentage <= (float) $low_cost ||
 						 $obj->menu_price_dine == 0 ||
-						 $obj->menu_price_dince == null
+						 $obj->menu_price_dine == null
 					) && $obj->food_cost	
 				);
 			}
