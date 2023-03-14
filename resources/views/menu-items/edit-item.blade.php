@@ -628,6 +628,7 @@
         $.fn.sumCost = function() {
             const wrappers = jQuery.makeArray($('.ingredient-wrapper, .new-ingredient-wrapper'));
             let sum = 0;
+            const lowCost = Number(localStorage.getItem('lowCost')) || 30;
             wrappers.forEach(wrapper => {
                 const primary = $(wrapper).find('.ingredient-entry');
                 const substitute = jQuery.makeArray($(wrapper).find('.substitute, .new-substitute'));
@@ -644,7 +645,7 @@
             const percentage = menuItemSRP != 0 ? Number(((sum / menuItemSRP * 100).toFixed(2))) : 0;
             const percentageText = $('.percentage');
             $(percentageText).text(`${percentage}%`);
-            if (percentage > 30) {
+            if (percentage > lowCost) {
                 $(percentageText).css('color', 'red');
                 $('.total-cost').css({'color': 'red', 'outline': '2px solid red', 'font-weight': 'bold',});
             } else {

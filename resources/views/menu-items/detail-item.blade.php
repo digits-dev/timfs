@@ -89,7 +89,6 @@
 <script>
     $(document).ready(function() {
         const ingredients = {!! json_encode($ingredients) !!};
-        console.log(ingredients)
         const item = {!! json_encode($item) !!};
         const tbody = $('.ingredient-tbody');
         const groupCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
@@ -170,9 +169,10 @@
         const totalCostElem = $('.total-cost');
         const totalCost = costsElems.reduce((total, cost) => total + Number($(cost).text().replace(/[^0-9.]/g, '')), 0);
         const percentage = (totalCost / item.menu_price_dine * 100).toFixed(2);
+        const lowCost = Number(localStorage.getItem('lowCost')) || 30;
         $(totalCostElem).text(totalCost);
         percentageSpan = $(document.createElement('span')).text(`(${item.menu_price_dine == 0 ? '0' : percentage}%)`).addClass('percentage-text');
-        percentageSpan.css('color', item.menu_price_dine != 0 && percentage > 30 ? 'red' : '');
+        percentageSpan.css('color', item.menu_price_dine != 0 && percentage > lowCost ? 'red' : '');
         totalCostLabelTD.text(`Total Cost `).append(percentageSpan);
         function formatNumbers() {
             const elems = jQuery.makeArray($('.peso'));

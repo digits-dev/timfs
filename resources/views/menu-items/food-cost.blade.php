@@ -22,6 +22,16 @@
         font-style: italic;
         color: grey;
     }
+
+    .percentage-input-label {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .percentage-input-label > * {
+        width: revert;
+    }
 </style>
 @endpush
 
@@ -33,6 +43,11 @@
     </div>
 
     <div class="panel-body">
+        <label class="percentage-input-label">
+            Low Cost Percentage
+           <input class="percentage-input form-control percentage-text" type="number" step="any"/>
+           <button class="btn btn-primary set-percentage-btn">Set</button>
+       </label>
         <table class="table table-striped table-bordered">
             <thead>
                 <tr class="active">
@@ -43,115 +58,58 @@
                 </tr>
             </thead>
             <tbody>
-
+                @foreach ($concepts as $concept)
+                    @php
+                        // per concept
+                        $concept_column_name = $concept->menu_segment_column_name;
+                        $items = array_filter($menu_items, fn($obj) => $obj->$concept_column_name != null);
+                        $high_cost = array_filter($items, fn($obj) => (float) $obj->food_cost_percentage > (float) $low_cost_value && $obj->food_cost);
+                        $low_cost = array_filter($items, fn($obj) => ((float) $obj->food_cost_percentage <= (float) $low_cost_value || $obj->menu_price_dine == null) && $obj->food_cost);
+                        $no_cost = array_filter($items, fn($obj) => (float) $obj->food_cost == null || (float) $obj->food_cost == 0);
+                        $high_cost_id = array_map(fn($obj) => $obj->id, $high_cost);
+                        $low_cost_id = array_map(fn($obj) => $obj->id, $low_cost);
+                        $no_cost_id = array_map(fn($obj) => $obj->id, $no_cost);
+                    @endphp
+                <tr>
+                    <td>{{$concept->menu_segment_column_description}}</td>
+                    <td class="clickable" filter="low" id={{$concept->id}} items="{{implode(',', $low_cost_id)}}">{{count($low_cost)}}</td>
+                    <td class="clickable" filter="high" id={{$concept->id}} items="{{implode(',', $high_cost_id)}}">{{count($high_cost)}}</td>
+                    <td class="clickable" filter="no" id={{$concept->id}} items="{{implode(',', $no_cost_id)}}">{{count($no_cost)}}</td>
+                </tr>
+                @endforeach
+                @php
+                    // all concepts
+                    $concept_column_name = $concept->menu_segment_column_name;
+                    $high_cost = array_filter($menu_items, fn($obj) => (float) $obj->food_cost_percentage > (float) $low_cost_value && $obj->food_cost);
+                    $low_cost = array_filter($menu_items, fn($obj) => ((float) $obj->food_cost_percentage <= (float) $low_cost_value || $obj->menu_price_dine == null) && $obj->food_cost);
+                    $no_cost = array_filter($menu_items, fn($obj) => (float) $obj->food_cost == null || (float) $obj->food_cost == 0);
+                    $high_cost_id = array_map(fn($obj) => $obj->id, $high_cost);
+                    $low_cost_id = array_map(fn($obj) => $obj->id, $low_cost);
+                    $no_cost_id = array_map(fn($obj) => $obj->id, $no_cost);
+                @endphp
+                <tr>
+                    <td>ALL</td>
+                    <td class="clickable" filter="low" id="all" items="{{implode(',', $low_cost_id)}}">{{count($low_cost)}}</td>
+                    <td class="clickable" filter="high" id="all" items="{{implode(',', $high_cost_id)}}">{{count($high_cost)}}</td>
+                    <td class="clickable" filter="no" id="all" items="{{implode(',', $no_cost_id)}}">{{count($no_cost)}}</td>
+                </tr>
             </tbody>
         </table>
-        <p class="loading-label">Loading...</p>
     </div>
-
-    {{-- <div class="panel-footer">
-        <button class="btn btn-primary" type="button" id="export"> <i class="fa fa-download" ></i> Export</button>
-    </div> --}}
 </div>
 
 @endsection
 
 @push('bottom')
-<script>
-    let concepts = {!! json_encode($concepts) !!};
-    let menuItems = {!! json_encode($menu_items) !!};
-    const conceptColumnNames = {!! json_encode($chef_access) !!}.split(',');
-    const privilege = {!! json_encode($privilege) !!};
-    
+<script>    
+    const lowCost = {!! json_encode($low_cost_value) !!};
+    const lowCostFromLocalStorage = localStorage.getItem('lowCost');
+    if (lowCostFromLocalStorage && lowCostFromLocalStorage != lowCost) {
+        location.assign("{{CRUDBooster::mainpath()}}/" + localStorage.getItem('lowCost'));
+    }
     $(document).ready(function() {
+
         $('.loading-label').remove();
-
-        // PER CONCEPT !!!
-        
-        if (privilege.toLowerCase() == 'chef') {
-            concepts = [...concepts].filter(concept => conceptColumnNames.includes(concept.menu_segment_column_name));
-            menuItems = [...menuItems].filter(menuItem => conceptColumnNames.some(conceptColumnName => !!menuItem[conceptColumnName]));
-        }
-        concepts.forEach((concept, index) => {
-            const tr = $(document.createElement('tr'));
-            const groupedItems = [...menuItems].filter(menuItem => !!menuItem[concept.menu_segment_column_name]);
-            const low = groupedItems.filter(item => !!Number(item.food_cost) && (!Number(item.menu_price_dine) || item.food_cost / item.menu_price_dine <= 0.30));
-            const high = groupedItems.filter(item => !!Number(item.food_cost) && item.food_cost / item.menu_price_dine > 0.30 && !!Number(item.menu_price_dine));
-            for (let i=0; i<4; i++) {
-                const td = $(document.createElement('td'));
-                td.attr('id', concept.id);
-                if (i==0) {
-                    td.text(concept.menu_segment_column_description);
-                } else if (i==1) {
-                    const items = low.map(item => item.id).join(',');
-                    td.text(low.length);
-                    td.attr('filter', 'low');
-                    td.attr('items', items);
-                    td.addClass('low clickable');
-                } else if (i==2) {
-                    const items = high.map(item => item.id).join(',');
-                    td.text(high.length);
-                    td.attr('filter', 'high');
-                    td.attr('items', items);
-                    td.addClass('high clickable');
-                } else if (i==3) {
-                    const items = groupedItems.filter(item => item.food_cost == 0 || !item.food_cost).map(item => item.id);
-                    td.text(items.length);
-                    td.attr('filter', 'no');
-                    td.attr('items', items.join(','));
-                    td.addClass('clickable');
-                }
-                tr.append(td)
-            }
-
-            $('tbody').append(tr);
-        });
-
-        // TOTAL || ALL
-        const totalTR = $(document.createElement('tr'));
-        const totalLabelTD = $(document.createElement('td'));
-        const allLow = [...menuItems].filter(item => !!Number(item.food_cost) && (!Number(item.menu_price_dine) || item.food_cost / item.menu_price_dine <= 0.30));
-        const allHigh = [...menuItems].filter(item => !!Number(item.food_cost) && item.food_cost / item.menu_price_dine > 0.30 && !!Number(item.menu_price_dine));
-        const allNoCost = [...menuItems].filter(item => item.food_cost == 0 || !item.food_cost);
-        totalTR.css('font-weight', 'bold');
-        totalLabelTD.text('All');
-        totalTR.append(totalLabelTD);
-        for (let i=0; i<3; i++) {
-            const td = $(document.createElement('td'));
-            if (i==0) {
-                const items = allLow.map(item => item.id).join(',');
-                td.text(allLow.length);
-                td.attr('filter', 'low');
-                td.attr('items', items);
-                td.addClass('low clickable');
-            } else if (i==1) {
-                const items = allHigh.map(item => item.id).join(',');
-                td.text(allHigh.length);
-                td.attr('filter', 'high');
-                td.attr('items', items);
-                td.addClass('high clickable');
-            } else if (i==2) {
-                const items = allNoCost.map(item => item.id).join(',');
-                td.text(allNoCost.length);
-                td.attr('filter', 'no-cost');
-                td.attr('items', items);
-                td.addClass('clickable');
-            }
-            td.attr('id', 'all');
-            td.addClass('clickable');
-            totalTR.append(td);
-        }
-
-        $('tbody').append(totalTR);
-        
-
-        function exportToExcel(type, fn, dl) {
-            var elt = document.querySelector('table');
-            var wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
-            return dl ?
-            XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }):
-            XLSX.writeFile(wb, fn || (`Food_Cost_${new Date().toISOString().slice(0, 10)}` + (type || 'xlsx')));
-        }
 
         $(document).on('click', '.clickable', function() {
             const td = $(this);
@@ -183,8 +141,12 @@
             form.submit();
         });
 
-        $(document).on('click', '#export', function() {
-            exportToExcel('.xlsx');
+        $('.percentage-text').val(lowCostFromLocalStorage || lowCost);
+
+        $(document).on('click', '.set-percentage-btn', function() {
+            const percentage = $('.percentage-text').val();
+            localStorage.setItem('lowCost', percentage);
+            location.assign("{{CRUDBooster::mainpath()}}/" + percentage);
         });
 
         $('table').DataTable({

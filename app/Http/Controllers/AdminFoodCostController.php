@@ -326,7 +326,9 @@
 
 	    //By the way, you can still create your own method in here... :) 
 
-		public function getIndex() {
+		public function getIndex($low_cost_value = 30) {
+			$low_cost_value = (float) $low_cost_value;
+
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			$data = [];
 
@@ -372,9 +374,36 @@
 				$concept_column_names[$index] = $value->menu_segment_column_name;
 			}
 
+			if (CRUDBooster::myPrivilegeName() == 'Chef' && $concept_column_names) {
+				$menu_items = DB::table('menu_items')
+					->where(function($subQuery) use ($concept_column_names) {
+						foreach ($concept_column_names as $concept_column_name) {
+							$subQuery->orWhere($concept_column_name, '1');
+						}
+					})
+					->where('status', 'ACTIVE')
+					->select(DB::raw('id,
+						status,
+						menu_price_dine,
+						menu_price_dlv,
+						menu_price_take,
+						food_cost,
+						food_cost_percentage,
+						menu_item_description,' 
+						. implode(', ', $segmentation_columns)))
+					->get()
+					->toArray();
+
+				$data['concepts'] = DB::table('menu_segmentations')
+					->where('status', 'ACTIVE')
+					->whereIn('menu_segment_column_name', $concept_column_names)
+					->get();
+
+			}
+
+			$data['low_cost_value'] = $low_cost_value;
+			$data['concept_column_names'] = $concept_column_names;
 			$data['menu_items'] = array_map(fn ($object) =>(object) array_filter((array) $object), $menu_items);
-			$data['privilege'] = CRUDBooster::myPrivilegeName();
-			$data['chef_access'] = implode(',', $concept_column_names);
 
 			return $this->view('menu-items/food-cost', $data);
 		}
