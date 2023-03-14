@@ -408,58 +408,112 @@
 			return $this->view('menu-items/food-cost', $data);
 		}
 
-		public function filterByCost(Request $request) {
-			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
+		public function filterByCost($concept_id, $filter, $low_cost) {
+			if(!CRUDBooster::isView())
+				CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			$privilege = CRUDBooster::myPrivilegeName();
 			$data = [];
 			$concept;
-			$column_name;
 			$menu_items;
-			$filter;
-			$filtered_menu_items_id;
-			$filtered_items;
-			
-			if ($request->id != 'all') {
-				$concept = DB::table('menu_segmentations')->where('id', $request->input('id'))->get();
-				$column_name = $concept[0]->menu_segment_column_name;
-				$menu_items = DB::table('menu_items')->where($column_name, '1')->get();
-				$filtered_menu_items_id = explode(',', $request->input('items'));
-				$filtered_items = DB::table('menu_items')
-					->where('status', 'ACTIVE')
-					->whereIn('id', $filtered_menu_items_id)
-					->orderBy('menu_item_description')
-					->select('id',
-						'menu_price_dine',
-						'menu_price_dlv',
-						'menu_price_take',
-						'tasteless_menu_code',
-						'menu_item_description',
-						'food_cost',
-						'food_cost_percentage')
-					->get();
-			} else {
-				$filtered_menu_items_id = explode(',', $request->input('items'));
-				$filtered_items = DB::table('menu_items')
-					->where('status', 'ACTIVE')
-					->whereIn('id', $filtered_menu_items_id)
-					->orderBy('menu_item_description')
-					->select('id',
-						'menu_price_dine',
-						'menu_price_dlv',
-						'menu_price_take',
-						'tasteless_menu_code',
-						'menu_item_description',
-						'food_cost',
-						'food_cost_percentage')
-					->get();
+			$column_name;
+
+			$concepts = DB::table('menu_segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('menu_segment_column_description')
+				->select('menu_segment_column_description', 'menu_segment_column_name', 'id')
+				->get()
+				->toArray();
+
+			$segmentation_columns = [];
+			foreach ($concepts as $index => $value) {
+				$segmentation_columns[$index] = $value->menu_segment_column_name;
 			}
 
-			$data['filter'] = $request->input('filter');
+			$concept_access_id = DB::table('user_concept_acess')
+				->where('cms_users_id', CRUDBooster::myID())
+				->get('menu_segmentations_id')
+				->first()
+				->menu_segmentations_id;
+
+			$concepts = DB::table('menu_segmentations')
+				->whereIn('id', explode(',', $concept_access_id))
+				->get('menu_segment_column_name')
+				->toArray();
+			$concept_column_names = [];
+
+			foreach ($concepts as $index => $value) {
+				$concept_column_names[$index] = $value->menu_segment_column_name;
+			}
+			
+			if ($concept_id != 'all') {
+				$concept = DB::table('menu_segmentations')->where('id', $concept_id)->first();
+				$column_name = $concept->menu_segment_column_name;
+				$menu_items = DB::table('menu_items')
+					->where($column_name, '1')
+					->where('status', 'ACTIVE')
+					->where(DB::raw("food_cost_percentage > $low_cost"))
+					->get()
+					->toArray();
+
+			} else {
+				$menu_items = DB::table('menu_items')
+					->where('status', 'ACTIVE')
+					->get()
+					->toArray();
+
+				if (CRUDBooster::myPrivilegeName() == 'Chef' && $concept_column_names) {
+					$menu_items = DB::table('menu_items')
+						->where(function($subQuery) use ($concept_column_names) {
+							foreach ($concept_column_names as $concept_column_name) {
+								$subQuery->orWhere($concept_column_name, '1');
+							}
+						})
+						->where('status', 'ACTIVE')
+						->select(DB::raw('id,
+							status,
+							menu_price_dine,
+							menu_price_dlv,
+							menu_price_take,
+							food_cost,
+							food_cost_percentage,
+							menu_item_description,
+							tasteless_menu_code,' 
+							. implode(', ', $segmentation_columns)))
+						->get()
+						->toArray();
+				}
+			}
+			
+
+			if ($filter == 'low'){
+				$menu_items = array_filter(
+					$menu_items,
+					fn ($obj) => (
+						 (float) $obj->food_cost_percentage <= (float) $low_cost ||
+						 $obj->menu_price_dine == 0 ||
+						 $obj->menu_price_dince == null
+					) && $obj->food_cost	
+				);
+			}
+
+			if ($filter == 'high') {
+				$menu_items = array_filter(
+					$menu_items,
+					fn ($obj) => (float) $obj->food_cost_percentage > (float) $low_cost && $obj->food_cost	
+				);
+			}
+
+			if ($filter == 'no') {
+				$menu_items = array_filter(
+					$menu_items,
+					fn ($obj) => $obj->food_cost == 0 || $obj->food_cost == null
+				);
+			}
+
+			$data['filter'] = $filter;
 			$data['concept'] = $concept;
 			$data['column_name'] = $column_name;
 			$data['menu_items'] = $menu_items;
-			$data['filtered_menu_items_id'] = $filtered_menu_items_id;
-			$data['filtered_items'] = $filtered_items;
 			return $this->view('menu-items/cost-filtered', $data);
 		}
 	}

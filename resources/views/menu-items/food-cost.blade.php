@@ -1,6 +1,13 @@
 @push('head')
 <script src="https://code.jquery.com/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+<script>
+    const lowCost = {!! json_encode($low_cost_value) !!};
+    const lowCostFromLocalStorage = localStorage.getItem('lowCost');
+    if (lowCostFromLocalStorage && lowCostFromLocalStorage != lowCost) {
+        location.assign("{{CRUDBooster::mainpath()}}/" + localStorage.getItem('lowCost'));
+    }
+</script>
 <style>
     table, th, td {
         border: 1px solid rgb(215, 214, 214) !important;
@@ -64,7 +71,7 @@
                         $concept_column_name = $concept->menu_segment_column_name;
                         $items = array_filter($menu_items, fn($obj) => $obj->$concept_column_name != null);
                         $high_cost = array_filter($items, fn($obj) => (float) $obj->food_cost_percentage > (float) $low_cost_value && $obj->food_cost);
-                        $low_cost = array_filter($items, fn($obj) => ((float) $obj->food_cost_percentage <= (float) $low_cost_value || $obj->menu_price_dine == null) && $obj->food_cost);
+                        $low_cost = array_filter($items, fn($obj) => ((float) $obj->food_cost_percentage <= (float) $low_cost_value || $obj->menu_price_dine == null || $obj->menu_price_dine == 0) && $obj->food_cost);
                         $no_cost = array_filter($items, fn($obj) => (float) $obj->food_cost == null || (float) $obj->food_cost == 0);
                         $high_cost_id = array_map(fn($obj) => $obj->id, $high_cost);
                         $low_cost_id = array_map(fn($obj) => $obj->id, $low_cost);
@@ -102,43 +109,16 @@
 
 @push('bottom')
 <script>    
-    const lowCost = {!! json_encode($low_cost_value) !!};
-    const lowCostFromLocalStorage = localStorage.getItem('lowCost');
-    if (lowCostFromLocalStorage && lowCostFromLocalStorage != lowCost) {
-        location.assign("{{CRUDBooster::mainpath()}}/" + localStorage.getItem('lowCost'));
-    }
     $(document).ready(function() {
 
         $('.loading-label').remove();
 
         $(document).on('click', '.clickable', function() {
             const td = $(this);
-            const id = td.attr('id');
+            const concept = td.attr('id');
             const filter = td.attr('filter');
-            const items = td.attr('items');
-
-            const form = $(document.createElement('form'))
-                .attr('method', 'POST')
-                .attr('action', "{{ route('filter_by_cost') }}")
-                .css('display', 'none');
-            const csrf = $(document.createElement('input'))
-                .attr({
-                    type: 'hidden',
-                    name: '_token',
-                })
-                .val("{{ csrf_token() }}");
-            const idInput = $(document.createElement('input'))
-                .attr('name', 'id')
-                .val(id);
-            const itemInput = $(document.createElement('input'))
-                .attr('name', 'items')
-                .val(items);
-            const filterInput = $(document.createElement('input'))
-                .attr('name', 'filter')
-                .val(filter);
-            $('.panel-body').append(form);
-            form.append(csrf, idInput, itemInput, filterInput);
-            form.submit();
+            const low_cost = Number(localStorage.getItem('lowCost'));
+            location.assign("{{CRUDBooster::mainpath()}}/" + `${concept}/${filter}/${low_cost}`);
         });
 
         $('.percentage-text').val(lowCostFromLocalStorage || lowCost);
