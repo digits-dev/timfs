@@ -548,7 +548,7 @@
                 });
 
                 function renderSearchResult() {
-                    const current_ingredients = {item_id: [], menu_item_id: []};
+                    const current_ingredients = {item_id: [], menu_item_id: [menuItem.id?.toString()]};
 
                     $('#form .ingredient').each(function(ingredientIndex) {
                         const ingredient = $(this);
@@ -559,7 +559,7 @@
                     });
     
                     const result = [...searchResult]
-                        .filter(ingredient => !current_ingredients.item_id.includes(ingredient.item_masters_id?.toString()))
+                        .filter(ingredient => !current_ingredients.item_id.includes(ingredient.item_masters_id?.toString()) && !current_ingredients.menu_item_id.includes(ingredient.menu_item_id?.toString()))
                         .sort((a, b) => (a.full_item_description || a.menu_item_description)
                         ?.localeCompare(b.full_item_description || b.menu_item_description));
     
@@ -777,6 +777,7 @@
             const entry = $(this).parents('.substitute, .ingredient-entry');
             const ingredient = entry.find('.ingredient');
 
+            if (!$(this).attr('item_id') && !$(this).attr('menu_item_id')) return;
             if ($(this).attr('item_id') && !$(this).attr('menu_item_id'))
                 entry.find('.item-from')
                     .removeClass('label-info label-warning label-success label-secondary label-primary')
@@ -788,7 +789,6 @@
                     .addClass('label-warning').text('MIMF')
             
             entry.find('.label-danger').text('');
-            if (!$(this).attr('item_id') && !$(this).attr('menu_item_id')) return;
             ingredient.val($(this).attr('item_id') || $(this).attr('menu_item_id'));
             ingredient.attr({
                 cost: $(this).attr('cost'),
