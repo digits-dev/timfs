@@ -98,7 +98,6 @@
 
 @push('bottom')
 <script type="text/javascript">
-    let menuItems = {!! json_encode($menu_items) !!};
     $(document).ready(function() {
         $('.loading-label').remove();
         const tbody = $('tbody');
@@ -107,7 +106,5 @@
             pageLength: 50,
         });
     });
-
-
 </script>
 @endpush
