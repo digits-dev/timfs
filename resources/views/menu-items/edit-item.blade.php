@@ -378,12 +378,12 @@
 
  {{-- DOM STARTS HERE !!!! --}}
 
- <p>
-     <a title="Return" href="{{ CRUDBooster::mainpath() }}">
+<p>
+    <a title="Return" href="{{ CRUDBooster::mainpath() }}">
         <i class="fa fa-chevron-circle-left "></i>
         Back To List Data Menu Item Masterfile
     </a>
- </p>
+</p>
 <div class="panel panel-default">
     <div class="panel-heading">
         <i class="fa fa-pencil"></i><strong> Edit Menu Item</strong>
