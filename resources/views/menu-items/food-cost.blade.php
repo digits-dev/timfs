@@ -117,7 +117,7 @@
             const td = $(this);
             const concept = td.attr('id');
             const filter = td.attr('filter');
-            const low_cost = Number(localStorage.getItem('lowCost'));
+            const low_cost = Number(localStorage.getItem('lowCost')) || 30;
             location.assign("{{CRUDBooster::mainpath()}}/" + `${concept}/${filter}/${low_cost}`);
         });
 
