@@ -795,6 +795,8 @@
                 item_id: $(this).attr('item_id'),
                 menu_item_id: $(this).attr('menu_item_id'),
             });
+            if (!$(this).attr('item_id')) ingredient.removeAttr('item_id');
+            if (!$(this).attr('menu_item_id')) ingredient.removeAttr('menu_item_id');
             entry.find('.display-ingredient').val($(this).attr('item_desc'));
             entry.find('.ingredient-menu').val($(this).attr('menu_item_id'));
             entry.find('.uom').val($(this).attr('uom'));
