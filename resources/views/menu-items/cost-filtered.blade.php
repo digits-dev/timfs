@@ -98,19 +98,13 @@
 
 @push('bottom')
 <script type="text/javascript">
-    let menuItems = {!! json_encode($menu_items) !!};
     $(document).ready(function() {
         $('.loading-label').remove();
-
-        menuItems = menuItems.sort((a, b) => Number((a.food_cost / a.menu_price_dine * 100)) - Number((b.food_cost / b.menu_price_dine * 100)))
         const tbody = $('tbody');
-
         $('table').DataTable({
             pagingType: 'full_numbers',
             pageLength: 50,
         });
     });
-
-
 </script>
 @endpush
