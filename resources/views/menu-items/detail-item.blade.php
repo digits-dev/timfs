@@ -29,10 +29,12 @@
 @extends('crudbooster::admin_template')
 @section('content')
 
-<a title="Return" href="{{ CRUDBooster::mainpath() }}">
-    <i class="fa fa-chevron-circle-left "></i>
-    Back To List Data Menu Item Masterfile
-</a>
+<p>
+    <a title="Return" href="{{ CRUDBooster::mainpath() }}">
+        <i class="fa fa-chevron-circle-left "></i>
+        Back To List Data Menu Item Masterfile
+    </a>
+</p>
 <div class="panel panel-default">
     <div class="panel-heading">
         <i class="fa fa-eye"></i><strong> Detail Menu Item</strong>
