@@ -2,7 +2,25 @@
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
 <style type="text/css">
+    .swal-table-wrapper {
+        max-height: 20em;
+        overflow-y: auto;
+    }
+
+    .version-table th, .version-table td {
+        text-align: center !important;
+        border: 1px solid gray !important;
+        font-size: 15px !important;
+    }
+
+    .date-ago {
+        text-align: right;
+        font-size: 14px !important;
+        padding: 0;
+    }
+
     .info-div {
         position: relative;
     }
@@ -27,7 +45,7 @@
     }
 
     .dropdown-menu {
-        overflow-y: scroll;
+        overflow-y: auto;
         max-height: 255px;
         max-width: 700px;
     }
@@ -763,6 +781,91 @@
 
         }
 
+        $.fn.showVersionTable = function({created_at, ingredients_json, name}) {
+            const parsedIngredients = JSON.parse(ingredients_json);
+            const ingredientGroups = new Set(parsedIngredients.map(e => e.ingredient_group));
+            const wrapperDiv = $(document.createElement('div'))
+                .addClass('swal-table-wrapper');
+            const dateAgo = $(document.createElement('div'))
+                .addClass('date-ago')
+                .text(`version by: ${name}, ${timeago.format(created_at)}`);
+            const table = $(document.createElement('table'))
+                .addClass('table table-striped table-bordered version-table');
+            const thead = $(document.createElement('thead'));
+            const headTR = $(document.createElement('tr'));
+            const checkTH = $(document.createElement('th'));
+            const ingredientNameTH = $(document.createElement('th'))
+                .text('Ingredient');
+            const ingredientQuantityTH = $(document.createElement('th'))
+                .text('Quantity');
+            const ingredientUomTH = $(document.createElement('th'))
+                .text('UOM');
+            const ingredientCostTH = $(document.createElement('th'))
+                .text('Cost');
+            headTR.append(
+                checkTH,
+                ingredientNameTH,
+                ingredientQuantityTH,
+                ingredientUomTH,
+                ingredientCostTH,
+            );
+            thead.append(headTR);
+            
+            const tbody = $(document.createElement('tbody'));
+            ingredientGroups.forEach(group => {
+                const groupedIngredients = parsedIngredients.filter(e => e.ingredient_group == group);
+                const isSelected = groupedIngredients.find(e => e.is_selected == 'TRUE');
+                if (isSelected) isSelected.checked = true;
+                else groupedIngredients.find(e => e.is_primary == 'TRUE').checked = true;
+
+                groupedIngredients.forEach(ingredient => {
+                    const bodyTR = $(document.createElement('tr'));
+                    const checkTD = $(document.createElement('td'))
+                        .text(ingredient.checked ? '✓' : '');
+                    const ingredientNameTD = $(document.createElement('td'))
+                        .text(ingredient.menu_item_description || ingredient.full_item_description || ingredient.ingredient_name);
+                    const ingredientQuantityTD = $(document.createElement('td'))
+                        .text(ingredient.qty);
+                    const ingredientUomTD = $(document.createElement('td'))
+                        .text(ingredient.packaging_description || ingredient.uom_description || ingredient.uom_name);
+                    const ingredientCostTD = $(document.createElement('td'))
+                        .text(ingredient.cost)
+                        .addClass(ingredient.checked ? 'version-cost' : '');
+                    bodyTR.append(
+                        checkTD,
+                        ingredientNameTD,
+                        ingredientQuantityTD,
+                        ingredientUomTD,
+                        ingredientCostTD,
+                    );
+                    tbody.append(bodyTR);
+                });
+            });
+
+            const total = jQuery.makeArray(tbody.find('.version-cost')).reduce((a, b) => a += Number($(b).text()), 0);
+
+            const totalCostTR = $(document.createElement('tr'));
+            const totalCostLabelTD = $(document.createElement('td'))
+                .attr('colspan', '4')
+                .text('Total Cost');
+            const totalCostValueTD = $(document.createElement('td')).text(total);
+            totalCostTR.append(totalCostLabelTD, totalCostValueTD);
+            tbody.append(totalCostTR);
+
+            table.append(thead, tbody);
+            wrapperDiv.append(table, dateAgo);
+
+            Swal.fire({
+                title: `Version: ${created_at}`,
+                html: wrapperDiv.prop('outerHTML'),
+                width: '50em',
+                showCloseButton: true,
+                showConfirmButton: false,
+                focusConfirm: false,
+                returnFocus: false,
+            });
+        }
+
         $(document).on('click', '#save-edit', function(event) {
             const formValues = $('#form input, #form select');
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
@@ -1111,16 +1214,7 @@
 
             if (version) {
                 const selectedVersion = ingredientVersions.filter(e => e.created_at == version)[0];
-                const versionIngredients = JSON.parse(selectedVersion.ingredients_json);
-                savedIngredients = versionIngredients;
-                const wrappers = $('#form .ingredient-wrapper, #form .new-ingredient-wrapper')
-                wrappers.remove();
-                $.fn.firstLoad();
-                $.fn.sumCost();
-                $('#form button').not('.version-btn').remove();
-                $('#form .add-sub-btn').remove();
-                $('#form .new-add-sub-btn').remove();
-                $('input').attr('disabled', true);
+                $.fn.showVersionTable(selectedVersion);
             }
         });
 

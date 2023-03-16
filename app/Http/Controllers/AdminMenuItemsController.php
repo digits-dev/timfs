@@ -752,15 +752,15 @@
 
 			$data = [];
 			$data['item'] = DB::table('menu_items')
-				->select('*', 'menu_items.id as id')
+				->select('menu_items.id as id',
+					'menu_items.tasteless_menu_code',
+					'menu_items.menu_price_dine',
+					'menu_items.menu_item_description')
 				->where('menu_items.id', $id)
 				->leftJoin('menu_ingredients_approval', 'menu_ingredients_approval.menu_items_id', '=', 'menu_items.id')
-				->get()[0];
+				->first();
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
-
-			$is_approved = $data['item']->accounting_approval_status == 'APPROVED' && $data['item']->marketing_approval_status == 'APPROVED' || 
-			$data['item']->accounting_approval_status == null && $data['item']->marketing_approval_status == null;
 
 			$current_ingredients = DB::table('menu_ingredients_details_temp')
 				->where('menu_items_id', $id)
@@ -796,7 +796,8 @@
 
 			$versions = DB::table('menu_ingredients_versions')
 				->where('menu_items_id', $id)
-				->select('ingredients_json', 'created_at')
+				->select('menu_ingredients_versions.ingredients_json', 'menu_ingredients_versions.created_at', 'cms_users.name')
+				->leftJoin('cms_users', 'menu_ingredients_versions.created_by', '=', 'cms_users.id')
 				->get()
 				->toArray();
 			
@@ -855,7 +856,7 @@
 							})
 							->first();
 					}
-					$ingredient_version[$group_index] = array_merge($member, (array) $ingredient_data);
+					$ingredient_version[] = array_merge($member, (array) $ingredient_data);
 				}
 			}
 			

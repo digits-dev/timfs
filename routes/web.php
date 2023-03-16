@@ -82,7 +82,6 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
 
     //food cost
     Route::get('admin/food_cost/{low_cost_value}', [AdminFoodCostController::class, 'getIndex']);
-    // Route::post('/admin/food_cost/filter', [AdminFoodCostController::class, 'filterByCost'])->name('filter_by_cost');
     Route::get('/admin/food_cost/{concept}/{filter}/{low_cost}', [AdminFoodCostController::class, 'filterByCost'])->name('filter_by_cost');
 
     //experimental menu
