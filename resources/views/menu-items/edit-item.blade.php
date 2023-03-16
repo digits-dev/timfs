@@ -73,10 +73,24 @@
     .ingredient-entry {
         padding: 15px;
         position: relative;
+        display: flex;
+        gap: 5px;
+    }
+
+    .ingredient-entry .actions {
+        display: flex;
+        align-items: center;
+        gap: 3px;
     }
 
     .ingredient-entry > *, .substitute > *, .new-substitute {
         display:inline-block;
+    }
+
+    .ingredient-inputs {
+        display: flex;
+        width: 100%;
+        overflow: auto;
     }
 
     .ingredient-inputs > * {
@@ -114,6 +128,7 @@
 
     label {
         margin-bottom: 10px;
+        white-space: nowrap;
     }
 
     .menu-item-label {
@@ -180,6 +195,12 @@
         margin-left: 50px;
         margin-bottom: 10px;
     }
+
+    .substitute .actions, .new-substitute .actions {
+        display: flex;
+        gap: 3px;
+    }
+
     .substitute .actions > * {
         margin: 1px;
     }
