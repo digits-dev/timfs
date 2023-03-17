@@ -333,7 +333,6 @@
 				}
 			}
 
-
 	    }
 
 	    /* 
@@ -396,7 +395,6 @@
 				foreach($menu_segments as $segments){
 					$postdata[$segments] = null;
 				}
-
 				foreach($returnInputs['menu_segment_column_description'] as $menu_segments_id){
 					$menu_segmentations_column_name = DB::table('menu_segmentations')
 						->where('id', $menu_segments_id)
@@ -531,7 +529,6 @@
 				->where('status','ACTIVE')
 				->select('menu_segment_column_name')
 				->get()->toArray();		
-
 			$menu_segment = Arr::pluck($user_menu_segmentations, 'menu_segment_column_name');
 			$data['user_menu_segment'] = [];
 			foreach($data['row'] as $key=>$value){
