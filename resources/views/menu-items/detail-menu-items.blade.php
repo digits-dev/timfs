@@ -3,9 +3,10 @@
 @section('content')
   <!-- Your html goes here -->
   <p><a title='Return' href='{{ CRUDBooster::mainpath() }}'><i class='fa fa-chevron-circle-left '></i>&nbsp; Back To Add Menu Item</a></p>
+
   <div class='panel panel-default'>
     <div class='panel-heading'>Edit Form</div>
-    <div class='panel-body'>      
+      <div class='panel-body'>      
         <div class='form-group'>
             <div class="box-body" id="parent-form-area">
               <div class='table-responsive'>
