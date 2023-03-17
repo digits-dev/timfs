@@ -545,7 +545,7 @@
 		public function getDetail($id) {
 			//Create an Auth
 			if(!CRUDBooster::isRead() && $this->global_privilege==FALSE || $this->button_edit==FALSE) {    
-			  CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
 			}
 			
 			$data = [];
@@ -580,6 +580,6 @@
 			}
 			//Please use view method instead view method from laravel
 			return $this->view('menu-items.detail-menu-items',$data);
-		  }
+		}
 
 	}
