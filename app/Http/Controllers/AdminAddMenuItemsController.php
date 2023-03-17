@@ -388,10 +388,9 @@
 			$postdata['menu_subcategories_id'] = $returnInputs['sub_category'];
 			$postdata['status'] = $returnInputs['status'];
 			$postdata['updated_by'] = CRUDBooster::myid();
-			// Reset Menu Segmentation 
-
 			// Update Menu Segmentation 
 			if($returnInputs['menu_segment_column_description'] != null){
+				// Reset Menu Segmentation 
 				foreach($menu_segments as $segments){
 					$postdata[$segments] = null;
 				}
