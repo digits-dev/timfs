@@ -188,7 +188,7 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
-	        $this->script_js = NULL;
+	        $this->script_js = "";
 
 
             /*
@@ -396,7 +396,7 @@
 				foreach($menu_segments as $segments){
 					$postdata[$segments] = null;
 				}
-				
+
 				foreach($returnInputs['menu_segment_column_description'] as $menu_segments_id){
 					$menu_segmentations_column_name = DB::table('menu_segmentations')
 						->where('id', $menu_segments_id)
@@ -405,6 +405,10 @@
 					$postdata[$menu_segmentations_column_name] = 1;
 					array_push($menu_segment_names, $menu_segmentations_column_name);
 				}
+			}else{
+				foreach($menu_segments as $segments){
+					$postdata[$segments] = null;
+				}				
 			}
 
 		
@@ -527,6 +531,7 @@
 				->where('status','ACTIVE')
 				->select('menu_segment_column_name')
 				->get()->toArray();		
+
 			$menu_segment = Arr::pluck($user_menu_segmentations, 'menu_segment_column_name');
 			$data['user_menu_segment'] = [];
 			foreach($data['row'] as $key=>$value){
@@ -539,5 +544,45 @@
 
 			return $this->view('menu-items.edit-menu-items',$data);
 		}
+
+		public function getDetail($id) {
+			//Create an Auth
+			if(!CRUDBooster::isRead() && $this->global_privilege==FALSE || $this->button_edit==FALSE) {    
+			  CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			}
+			
+			$data = [];
+			$data['page_title'] = 'Detail Data';
+			$data['row'] = DB::table('menu_items')->where('menu_items.id',$id)
+			->leftjoin('menu_types', 'menu_items.menu_types_id', '=', 'menu_types.id')
+			->leftjoin('menu_categories', 'menu_items.menu_categories_id', '=', 'menu_categories.id')
+			->leftjoin('menu_subcategories', 'menu_items.menu_subcategories_id', '=', 'menu_subcategories.id')
+			->select('*',
+				'menu_types.menu_type_description as menu_type',
+				'menu_categories.category_description as main_category',
+				'menu_subcategories.subcategory_description as sub_category')
+			->first();
+			// Menu Segmentations
+			$data['menu_segmentations'] = DB::table('menu_segmentations')
+			->where('status','ACTIVE')
+			->orderBy('menu_segment_column_description')
+			->get();
+			// User Menu Segments
+			$user_menu_segmentations = DB::table('menu_segmentations')
+				->where('status','ACTIVE')
+				->select('menu_segment_column_name')
+				->get()->toArray();		
+			$menu_segment = Arr::pluck($user_menu_segmentations, 'menu_segment_column_name');
+			$data['user_menu_segment'] = [];
+			foreach($data['row'] as $key=>$value){
+				if(in_array($key,$menu_segment)){
+					if($data['row']->$key == 1){
+						$data['user_menu_segment'][] = $key;
+					}
+				}
+			}
+			//Please use view method instead view method from laravel
+			return $this->view('menu-items.detail-menu-items',$data);
+		  }
 
 	}

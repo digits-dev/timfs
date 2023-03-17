@@ -70,7 +70,7 @@
     #menu_type_select1, #menu_type_select2, 
     #menu_type_select3, #menu_type_select4, 
     #menu_type_select5{
-        width: 100% !important;
+        width: 100%;
     }
 
 
@@ -114,7 +114,7 @@
 @extends('crudbooster::admin_template')
 @section('content')
   <!-- Your html goes here -->
-  
+  <p><a title='Return' href='{{ CRUDBooster::mainpath() }}'><i class='fa fa-chevron-circle-left '></i>&nbsp; Back To Add Menu Item</a></p>
   <div class='panel panel-default'>
     <div class='panel-heading'>Add Menu Items</div>
     <div class='panel-body'>
@@ -157,11 +157,11 @@
                     </fieldset>
                     <fieldset>
                         <legend> <span id="required">*</span> PRICE - DELIVERY</legend>
-                        <input type="text" name="price_delivery" placeholder="ENTER PRICE - DELIVERY" required>
+                        <input type="number" name="price_delivery" placeholder="ENTER PRICE - DELIVERY" required>
                     </fieldset>
                     <fieldset>
                         <legend> <span id="required">*</span> PRICE - DINE IN</legend>
-                        <input type="text" name="price_dine_in" placeholder="ENTER PRICE - DINE IN" required>
+                        <input type="number" name="price_dine_in" placeholder="ENTER PRICE - DINE IN" required>
                     </fieldset>
                     <fieldset>
                         <legend> <span id="required">*</span> ORIGINAL CONCEPT</legend>
@@ -227,7 +227,7 @@
                     </fieldset>
                     <fieldset>
                         <legend> <span id="required">*</span> PRICE - TAKE OUT</legend>
-                        <input type="text" name="price_take_out" placeholder="ENTER PRICE - TAKE OUT" required>
+                        <input type="number" name="price_take_out" placeholder="ENTER PRICE - TAKE OUT" required>
                     </fieldset>
                     <fieldset>
                         <legend>STATUS</legend>

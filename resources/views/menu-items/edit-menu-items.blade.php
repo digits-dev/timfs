@@ -65,7 +65,7 @@
     #menu_type_select1, #menu_type_select2, 
     #menu_type_select3, #menu_type_select4, 
     #menu_type_select5{
-        width: 100% !important;
+        width: 100%;
     }
 
     .select2-container .select2-selection--single {
@@ -85,7 +85,6 @@
 
     .select2-container--default .select2-selection--multiple{
         border: none !important;
-        width: 100% !important;
     }
 
     .select2-container .select2-search--inline .select2-search__field{
@@ -102,7 +101,7 @@
 @extends('crudbooster::admin_template')
 @section('content')
   <!-- Your html goes here -->
-  
+  <p><a title='Return' href='{{ CRUDBooster::mainpath() }}'><i class='fa fa-chevron-circle-left '></i>&nbsp; Back To Add Menu Item</a></p>
   <div class='panel panel-default'>
     <div class='panel-heading'>Edit Menu Items</div>
     <div class='panel-body'>
@@ -111,33 +110,37 @@
             <div class="add-content">
                 {{-- First Column --}}
                 <div class="form-column">
+                    <label for="">TASTELESS MENU CODE</label>
+                    <fieldset>
+                        <input type="text" name="pos_item_code_1" readonly value="{{ $row->tasteless_menu_code }}" required>
+                    </fieldset>
                     <label for="">POS OLD ITEM CODE 1</label>
                     <fieldset>
-                        <input type="text" name="pos_item_code_1" value="{{ $row->old_code_1 }}">
+                        <input type="text" name="pos_item_code_1" value="{{ $row->old_code_1 }}" required>
                     </fieldset>
                     <label for="">POS OLD ITEM CODE 2</label>
                     <fieldset>
-                        <input type="text" name="pos_item_code_2" value="{{ $row->old_code_2 }}">
+                        <input type="text" name="pos_item_code_2" value="{{ $row->old_code_2 }}" required>
                     </fieldset>
-                    <label for="">MENU DESCRIPTION</label>
+                    <label for="">POS OLD ITEM CODE 3</label>
                     <fieldset>
-                        <input type="text" name="menu_item_description" value="{{ $row->menu_item_description }}">
+                        <input type="text" name="pos_item_code_3" value="{{ $row->old_code_3 }}" required>
                     </fieldset>
                     <label for="">CHOICES GROUP 1</label>
                     <fieldset>
-                        <input type="text" name="choices_group_1"  value="{{ $row->choices_group_1 }}">
+                        <input type="text" name="choices_group_1"  value="{{ $row->choices_group_1 }}" required>
                     </fieldset>
                     <label for="">CHOICES GROUP 2</label>
                     <fieldset>
-                        <input type="text" name="choices_group_2" value="{{ $row->choices_group_2 }}">
+                        <input type="text" name="choices_group_2" value="{{ $row->choices_group_2 }}" required>
                     </fieldset>
                     <label for="">CHOICES GROUP 3</label>
                     <fieldset>
-                        <input type="text" name="choices_group_3" value="{{ $row->choices_group_3 }}">
+                        <input type="text" name="choices_group_3" value="{{ $row->choices_group_3 }}" required>
                     </fieldset>
                     <label for="">MENU TYPE</label>
                     <fieldset>
-                        <select class="js-example-basic-single" name="menu_type" id="menu_type_select3">
+                        <select class="js-example-basic-single" name="menu_type" id="menu_type_select3" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_types as $menu)
                                 @if ($row->menu_types_id == $menu->id)
@@ -148,22 +151,18 @@
                             @endforeach
                         </select>
                     </fieldset>
-                    <label for="">PRICE - DELIVERY</label>
-                    <fieldset>
-                        <input type="text" name="price_delivery" value="{{ $row->menu_price_dlv }}">
-                    </fieldset>
                     <label for="">PRICE - DINE IN</label>
                     <fieldset>
-                        <input type="text" name="price_dine_in" value="{{ $row->menu_price_dine }}">
+                        <input type="number" name="price_dine_in" value="{{ $row->menu_price_dine }}" required>
                     </fieldset>
                     <label for="">ORIGINAL CONCEPT</label>
                     <fieldset>
-                        <input type="text" name="original_concept" value="{{ $row->original_concept }}">
+                        <input type="text" name="original_concept" value="{{ $row->original_concept }}" required>
                         </select>
                     </fieldset>
                     <label for="">MENU SEGMENTATION</label>
                     <fieldset>
-                        <select class="js-example-basic-multiple" name="menu_segment_column_description[]" multiple="multiple" id="menu_type_select1">
+                        <select class="js-example-basic-multiple" name="menu_segment_column_description[]" multiple="multiple" id="menu_type_select1" required>
                             @foreach ($menu_segmentations as $concept)
                                 @if (in_array($concept->menu_segment_column_name, $user_menu_segment))
                                     <option value="{{ $concept->id }}" selected>{{ $concept->menu_segment_column_description }}</option>
@@ -176,17 +175,9 @@
                 </div>
                 {{-- Second Column --}}
                 <div class="form-column">
-                    <label for="">POS OLD ITEM CODE 3</label>
-                    <fieldset>
-                        <input type="text" name="pos_item_code_3" value="{{ $row->old_code_3 }}">
-                    </fieldset>
-                    <label for="">POS OLD DESCRIPTION</label>
-                    <fieldset>
-                        <input type="text" name="pos_item_description" value="{{ $row->pos_old_item_description }}">
-                    </fieldset>
                     <label for="">PRODUCT TYPE</label>
                     <fieldset>
-                        <select class="js-example-basic-single" name="product_type" id="menu_type_select2" >
+                        <select class="js-example-basic-single" name="product_type" id="menu_type_select2" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_product_types as $product_type)
                                 @if ($row->menu_product_types_id == $product_type->id)
@@ -197,21 +188,17 @@
                             @endforeach
                         </select>
                     </fieldset>
-                    <label for="">CHOICES GROUP 1 SKU</label>
+                    <label for="">MENU DESCRIPTION</label>
                     <fieldset>
-                        <input type="text" name="choices_skugroup_1" value="{{ $row->choices_skugroup_1 }}">
+                        <input type="text" name="menu_item_description" value="{{ $row->menu_item_description }}" required>
                     </fieldset>
-                    <label for="">CHOICES GROUP 2 SKU</label>
+                    <label for="">POS OLD DESCRIPTION</label>
                     <fieldset>
-                        <input type="text" name="choices_skugroup_2" value="{{ $row->choices_skugroup_2 }}">
-                    </fieldset>
-                    <label for="">CHOICES GROUP 3 SKU</label>
-                    <fieldset>
-                        <input type="text" name="choices_skugroup_3" value="{{ $row->choices_skugroup_3 }}">
+                        <input type="text" name="pos_item_description" value="{{ $row->pos_old_item_description }}" required>
                     </fieldset>
                     <label for="">MAIN CATEGORY</label>
                     <fieldset>
-                        <select class="js-example-basic-single" name="menu_categories" id="menu_type_select4" >
+                        <select class="js-example-basic-single" name="menu_categories" id="menu_type_select4" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_categories as $category)
                                 @if ($row->menu_categories_id == $category->id)
@@ -222,9 +209,21 @@
                             @endforeach
                         </select> 
                     </fieldset>
+                    <label for="">CHOICES GROUP 1 SKU</label>
+                    <fieldset>
+                        <input type="text" name="choices_skugroup_1" value="{{ $row->choices_skugroup_1 }}" required>
+                    </fieldset>
+                    <label for="">CHOICES GROUP 2 SKU</label>
+                    <fieldset>
+                        <input type="text" name="choices_skugroup_2" value="{{ $row->choices_skugroup_2 }}" required>
+                    </fieldset>
+                    <label for="">CHOICES GROUP 3 SKU</label>
+                    <fieldset>
+                        <input type="text" name="choices_skugroup_3" value="{{ $row->choices_skugroup_3 }}" required>
+                    </fieldset>
                     <label for="">SUB CATEGORY</label>
                     <fieldset>
-                        <select class="js-example-basic-single" name="sub_category" id="menu_type_select5" >
+                        <select class="js-example-basic-single" name="sub_category" id="menu_type_select5" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_subcategories as $category)
                                 @if ($row->menu_subcategories_id == $category->id)
@@ -235,13 +234,17 @@
                             @endforeach
                         </select> 
                     </fieldset>
+                    <label for="">PRICE - DELIVERY</label>
+                    <fieldset>
+                        <input type="number" name="price_delivery" value="{{ $row->menu_price_dlv }}" required>
+                    </fieldset>
                     <label for="">PRICE - TAKE OUT</label>
                     <fieldset>
-                        <input type="text" name="price_take_out" value="{{ $row->menu_price_take }}">
+                        <input type="number" name="price_take_out" value="{{ $row->menu_price_take }}" required>
                     </fieldset>
                     <label for="">STATUS</label>
                     <fieldset>
-                        <input type="text" name="status" value="ACTIVE" readonly id="success">
+                        <input type="text" name="status" value="ACTIVE" readonly id="success" required>
                     </fieldset>      
                 </div>
             </div>
@@ -278,9 +281,3 @@
 
 </script>
 @endsection
-
-{{-- box-shadow: 2px 3px #888888;
-border: 1px solid #766b6b;
-
-border: 1px solid #DD4B39;
-box-shadow: 2px 3px #DD4B39; --}}

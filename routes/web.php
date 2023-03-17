@@ -85,4 +85,5 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     // add menu items
     Route::get('/admin/add_menu_items/add', [AdminAddMenuItemsController::class, 'getAdd']);
     Route::get('/admin/add_menu_items/edit/{id}', [AdminAddMenuItemsController::class, 'getEdit']);
+    Route::get('/admin/add_menu_items/detail/{id}', [AdminAddMenuItemsController::class, 'getEdit']);
 });
