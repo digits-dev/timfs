@@ -130,11 +130,11 @@
                     <fieldset>
                         <input type="text" name="pos_item_description" value="{{ $row->pos_old_item_description }}" >
                     </fieldset>
-                    <label for="">MENU DESCRIPTION</label>
+                    <label for=""><span id="required">*</span> MENU DESCRIPTION</label>
                     <fieldset>
                         <input type="text" name="menu_item_description" value="{{ $row->menu_item_description }}" required>
                     </fieldset>
-                    <label for="">PRODUCT TYPE</label>
+                    <label for=""><span id="required">*</span> PRODUCT TYPE</label>
                     <fieldset>
                         <select class="js-example-basic-single" name="product_type" id="menu_type_select2" required>
                             <option value="" selected disabled></option>
@@ -146,20 +146,7 @@
                                 @endif
                             @endforeach
                         </select>
-                    </fieldset>
-                    <label for="">MAIN CATEGORY</label>
-                    <fieldset>
-                        <select class="js-example-basic-single" name="menu_categories" id="menu_type_select4" required>
-                            <option value="" selected disabled></option>
-                            @foreach ($menu_categories as $category)
-                                @if ($row->menu_categories_id == $category->id)
-                                    <option value="{{ $category->id }}" selected>{{ $category->category_description }}</option>
-                                @else
-                                    <option value="{{ $category->id }}">{{ $category->category_description }}</option>
-                                @endif
-                            @endforeach
-                        </select> 
-                    </fieldset>
+                    </fieldset>   
                 </div>
                 {{-- Second Column --}}
                 <div class="form-column">
@@ -186,8 +173,8 @@
                     <label for="">CHOICES GROUP 3 SKU</label>
                     <fieldset>
                         <input type="text" name="choices_skugroup_3" value="{{ $row->choices_skugroup_3 }}" >
-                    </fieldset> 
-                    <label for="">MENU TYPE</label>
+                    </fieldset>  
+                    <label for=""><span id="required">*</span> MENU TYPE</label>
                     <fieldset>
                         <select class="js-example-basic-single" name="menu_type" id="menu_type_select3" required>
                             <option value="" selected disabled></option>
@@ -199,14 +186,32 @@
                                 @endif
                             @endforeach
                         </select>
-                    </fieldset>    
+                    </fieldset>
+                    <label for=""><span id="required">*</span> MAIN CATEGORY</label>
+                    <fieldset>
+                        <select class="js-example-basic-single" name="menu_categories" id="menu_type_select4" required>
+                            <option value="" selected disabled></option>
+                            @foreach ($menu_categories as $category)
+                                @if ($row->menu_categories_id == $category->id)
+                                    <option value="{{ $category->id }}" selected>{{ $category->category_description }}</option>
+                                @else
+                                    <option value="{{ $category->id }}">{{ $category->category_description }}</option>
+                                @endif
+                            @endforeach
+                        </select> 
+                    </fieldset>
                 </div>
                 <div class="form-column">
+                    <label for=""><span id="required">*</span> ORIGINAL CONCEPT</label>
+                    <fieldset>
+                        <input type="text" name="original_concept" value="{{ $row->original_concept }}" required>
+                        </select>
+                    </fieldset>
                     <label for="">PRICE - DELIVERY</label>
                     <fieldset>
                         <input type="number" name="price_delivery" value="{{ $row->menu_price_dlv }}">
                     </fieldset>
-                    <label for="">PRICE - DINE IN</label>
+                    <label for=""><span id="required">*</span> PRICE - DINE IN</label>
                     <fieldset>
                         <input type="number" name="price_dine_in" value="{{ $row->menu_price_dine }}" required>
                     </fieldset>
@@ -214,16 +219,11 @@
                     <fieldset>
                         <input type="number" name="price_take_out" value="{{ $row->menu_price_take }}">
                     </fieldset>
-                    <label for="">ORIGINAL CONCEPT</label>
-                    <fieldset>
-                        <input type="text" name="original_concept" value="{{ $row->original_concept }}" required>
-                        </select>
-                    </fieldset>
                     <label for="">STATUS</label>
                     <fieldset>
                         <input type="text" name="status" value="ACTIVE" readonly id="success">
                     </fieldset> 
-                    <label for="">SUB CATEGORY</label>
+                    <label for=""><span id="required">*</span> SUB CATEGORY</label>
                     <fieldset>
                         <select class="js-example-basic-single" name="sub_category" id="menu_type_select5" required>
                             <option value="" selected disabled></option>
@@ -236,7 +236,7 @@
                             @endforeach
                         </select> 
                     </fieldset>
-                    <label for="">MENU SEGMENTATION</label>
+                    <label for=""><span id="required">*</span> MENU SEGMENTATION</label>
                     <fieldset>
                         <select class="js-example-basic-multiple" name="menu_segment_column_description[]" multiple="multiple" id="menu_type_select1" required>
                             @foreach ($menu_segmentations as $concept)

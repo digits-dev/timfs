@@ -123,27 +123,27 @@
             <div class="add-content">
                 <div class="form-column">
                     <fieldset>
-                        <legend> <span id="required">*</span> POS OLD ITEM CODE 1</legend>
+                        <legend> POS OLD ITEM CODE 1</legend>
                         <input type="text" name="pos_item_code_1" placeholder="ENTER POS OLD ITEM CODE 1">
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> POS OLD ITEM CODE 2</legend>
+                        <legend> POS OLD ITEM CODE 2</legend>
                         <input type="text" name="pos_item_code_2" placeholder="ENTER POS OLD ITEM CODE 2">
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> POS OLD ITEM CODE 3</legend>
+                        <legend> POS OLD ITEM CODE 3</legend>
                         <input type="text" name="pos_item_code_3" placeholder="ENTER POS OLD ITEM CODE 3">
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> POS OLD DESCRIPTION</legend>
+                        <legend> POS OLD DESCRIPTION</legend>
                         <input type="text" name="pos_item_description" placeholder="ENTER POS OLD DESCRIPTION">
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> MENU DESCRIPTION</legend>
+                        <legend><span id="required">*</span> MENU DESCRIPTION</legend>
                         <input type="text" name="menu_item_description" placeholder="ENTER MENU DESCRIPTION" required>
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> PRODUCT TYPE</legend>
+                        <legend><span id="required">*</span> PRODUCT TYPE</legend>
                         <select class="js-example-basic-single" name="product_type" id="menu_type_select2" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_product_types as $product_type)
@@ -152,7 +152,7 @@
                         </select>
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> MENU TYPE</legend>
+                        <legend><span id="required">*</span> MENU TYPE</legend>
                         <select class="js-example-basic-single" name="menu_type" id="menu_type_select3" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_types as $menu)
@@ -163,31 +163,31 @@
                 </div>
                 <div class="form-column">
                     <fieldset>
-                        <legend> <span id="required">*</span> CHOICES GROUP 1</legend>
+                        <legend> CHOICES GROUP 1</legend>
                         <input type="text" name="choices_group_1" placeholder="ENTER CHOICES GROUP 1">
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> CHOICES GROUP 1 SKU</legend>
+                        <legend> CHOICES GROUP 1 SKU</legend>
                         <input type="text" name="choices_skugroup_1" placeholder="ENTER CHOICES GROUP 1 SKU">
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> CHOICES GROUP 2</legend>
+                        <legend> CHOICES GROUP 2</legend>
                         <input type="text" name="choices_group_2" placeholder="ENTER CHOICES GROUP 2">
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> CHOICES GROUP 2 SKU</legend>
+                        <legend> CHOICES GROUP 2 SKU</legend>
                         <input type="text" name="choices_skugroup_2" placeholder="ENTER CHOICES GROUP 2 SKU">
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> CHOICES GROUP 3</legend>
+                        <legend> CHOICES GROUP 3</legend>
                         <input type="text" name="choices_group_3" placeholder="ENTER CHOICES GROUP 3">
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> CHOICES GROUP 3 SKU</legend>
+                        <legend> CHOICES GROUP 3 SKU</legend>
                         <input type="text" name="choices_skugroup_3" placeholder="ENTER CHOICES GROUP 3 SKU">
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> MAIN CATEGORY</legend>
+                        <legend><span id="required">*</span> MAIN CATEGORY</legend>
                         <select class="js-example-basic-single" name="menu_categories" id="menu_type_select4" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_categories as $category)
@@ -198,24 +198,24 @@
                 </div>
                 <div class="form-column">
                     <fieldset>
-                        <legend> <span id="required">*</span> PRICE - DELIVERY</legend>
-                        <input type="number" name="price_delivery" placeholder="ENTER PRICE - DELIVERY">
-                    </fieldset>
-                    <fieldset>
-                        <legend> <span id="required">*</span> PRICE - DINE IN</legend>
-                        <input type="number" name="price_dine_in" placeholder="ENTER PRICE - DINE IN" required>
-                    </fieldset>
-                    <fieldset>
-                        <legend> <span id="required">*</span> PRICE - TAKE OUT</legend>
-                        <input type="number" name="price_take_out" placeholder="ENTER PRICE - TAKE OUT">
-                    </fieldset>   
-                    <fieldset>
-                        <legend> <span id="required">*</span> ORIGINAL CONCEPT</legend>
+                        <legend><span id="required">*</span> ORIGINAL CONCEPT</legend>
                         <input type="text" name="original_concept" placeholder="ENTER ORIGINAL CONCEPT" required>
                         </select>
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> MENU SEGMENTATION</legend>
+                        <legend> PRICE - DELIVERY</legend>
+                        <input type="number" name="price_delivery" placeholder="ENTER PRICE - DELIVERY">
+                    </fieldset>
+                    <fieldset>
+                        <legend><span id="required">*</span> PRICE - DINE IN</legend>
+                        <input type="number" name="price_dine_in" placeholder="ENTER PRICE - DINE IN" required>
+                    </fieldset>
+                    <fieldset>
+                        <legend> PRICE - TAKE OUT</legend>
+                        <input type="number" name="price_take_out" placeholder="ENTER PRICE - TAKE OUT">
+                    </fieldset>   
+                    <fieldset>
+                        <legend><span id="required">*</span> MENU SEGMENTATION</legend>
                         <select class="js-example-basic-multiple" name="menu_segment_column_description[]" multiple="multiple" id="menu_type_select1" required>
                             @foreach ($menu_segmentations as $concept)
                                 <option value="{{ $concept->id }}">{{ $concept->menu_segment_column_description }}</option>
@@ -223,7 +223,7 @@
                         </select>
                     </fieldset> 
                     <fieldset>
-                        <legend> <span id="required">*</span> SUB CATEGORY</legend>
+                        <legend><span id="required">*</span> SUB CATEGORY</legend>
                         <select class="js-example-basic-single" name="sub_category" id="menu_type_select5" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_subcategories as $category)
