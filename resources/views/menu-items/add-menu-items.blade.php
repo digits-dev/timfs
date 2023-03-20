@@ -12,8 +12,8 @@
 <style>
 
     .form-column{
-    margin: 0 5vw;
-    width: 50%;
+    margin: 0 3vw;
+    width: 33.3%;
         
     }
 
@@ -124,27 +124,32 @@
                 <div class="form-column">
                     <fieldset>
                         <legend> <span id="required">*</span> POS OLD ITEM CODE 1</legend>
-                        <input type="text" name="pos_item_code_1" placeholder="ENTER POS OLD ITEM CODE 1" required>
+                        <input type="text" name="pos_item_code_1" placeholder="ENTER POS OLD ITEM CODE 1">
                     </fieldset>
                     <fieldset>
                         <legend> <span id="required">*</span> POS OLD ITEM CODE 2</legend>
-                        <input type="text" name="pos_item_code_2" placeholder="ENTER POS OLD ITEM CODE 2" required>
+                        <input type="text" name="pos_item_code_2" placeholder="ENTER POS OLD ITEM CODE 2">
+                    </fieldset>
+                    <fieldset>
+                        <legend> <span id="required">*</span> POS OLD ITEM CODE 3</legend>
+                        <input type="text" name="pos_item_code_3" placeholder="ENTER POS OLD ITEM CODE 3">
+                    </fieldset>
+                    <fieldset>
+                        <legend> <span id="required">*</span> POS OLD DESCRIPTION</legend>
+                        <input type="text" name="pos_item_description" placeholder="ENTER POS OLD DESCRIPTION">
                     </fieldset>
                     <fieldset>
                         <legend> <span id="required">*</span> MENU DESCRIPTION</legend>
                         <input type="text" name="menu_item_description" placeholder="ENTER MENU DESCRIPTION" required>
                     </fieldset>
                     <fieldset>
-                        <legend> <span id="required">*</span> CHOICES GROUP 1</legend>
-                        <input type="text" name="choices_group_1" placeholder="ENTER CHOICES GROUP 1" required>
-                    </fieldset>
-                    <fieldset>
-                        <legend> <span id="required">*</span> CHOICES GROUP 2</legend>
-                        <input type="text" name="choices_group_2" placeholder="ENTER CHOICES GROUP 2" required>
-                    </fieldset>
-                    <fieldset>
-                        <legend> <span id="required">*</span> CHOICES GROUP 3</legend>
-                        <input type="text" name="choices_group_3" placeholder="ENTER CHOICES GROUP 3" required>
+                        <legend> <span id="required">*</span> PRODUCT TYPE</legend>
+                        <select class="js-example-basic-single" name="product_type" id="menu_type_select2" required>
+                            <option value="" selected disabled></option>
+                            @foreach ($menu_product_types as $product_type)
+                                <option value="{{ $product_type->id }}">{{ $product_type->menu_product_type_description }}</option>
+                            @endforeach
+                        </select>
                     </fieldset>
                     <fieldset>
                         <legend> <span id="required">*</span> MENU TYPE</legend>
@@ -155,14 +160,55 @@
                             @endforeach
                         </select>
                     </fieldset>
+                </div>
+                <div class="form-column">
+                    <fieldset>
+                        <legend> <span id="required">*</span> CHOICES GROUP 1</legend>
+                        <input type="text" name="choices_group_1" placeholder="ENTER CHOICES GROUP 1">
+                    </fieldset>
+                    <fieldset>
+                        <legend> <span id="required">*</span> CHOICES GROUP 1 SKU</legend>
+                        <input type="text" name="choices_skugroup_1" placeholder="ENTER CHOICES GROUP 1 SKU">
+                    </fieldset>
+                    <fieldset>
+                        <legend> <span id="required">*</span> CHOICES GROUP 2</legend>
+                        <input type="text" name="choices_group_2" placeholder="ENTER CHOICES GROUP 2">
+                    </fieldset>
+                    <fieldset>
+                        <legend> <span id="required">*</span> CHOICES GROUP 2 SKU</legend>
+                        <input type="text" name="choices_skugroup_2" placeholder="ENTER CHOICES GROUP 2 SKU">
+                    </fieldset>
+                    <fieldset>
+                        <legend> <span id="required">*</span> CHOICES GROUP 3</legend>
+                        <input type="text" name="choices_group_3" placeholder="ENTER CHOICES GROUP 3">
+                    </fieldset>
+                    <fieldset>
+                        <legend> <span id="required">*</span> CHOICES GROUP 3 SKU</legend>
+                        <input type="text" name="choices_skugroup_3" placeholder="ENTER CHOICES GROUP 3 SKU">
+                    </fieldset>
+                    <fieldset>
+                        <legend> <span id="required">*</span> MAIN CATEGORY</legend>
+                        <select class="js-example-basic-single" name="menu_categories" id="menu_type_select4" required>
+                            <option value="" selected disabled></option>
+                            @foreach ($menu_categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->category_description }}</option>
+                            @endforeach
+                        </select> 
+                    </fieldset>
+                </div>
+                <div class="form-column">
                     <fieldset>
                         <legend> <span id="required">*</span> PRICE - DELIVERY</legend>
-                        <input type="number" name="price_delivery" placeholder="ENTER PRICE - DELIVERY" required>
+                        <input type="number" name="price_delivery" placeholder="ENTER PRICE - DELIVERY">
                     </fieldset>
                     <fieldset>
                         <legend> <span id="required">*</span> PRICE - DINE IN</legend>
                         <input type="number" name="price_dine_in" placeholder="ENTER PRICE - DINE IN" required>
                     </fieldset>
+                    <fieldset>
+                        <legend> <span id="required">*</span> PRICE - TAKE OUT</legend>
+                        <input type="number" name="price_take_out" placeholder="ENTER PRICE - TAKE OUT">
+                    </fieldset>   
                     <fieldset>
                         <legend> <span id="required">*</span> ORIGINAL CONCEPT</legend>
                         <input type="text" name="original_concept" placeholder="ENTER ORIGINAL CONCEPT" required>
@@ -175,47 +221,7 @@
                                 <option value="{{ $concept->id }}">{{ $concept->menu_segment_column_description }}</option>
                             @endforeach
                         </select>
-                    </fieldset>
-                </div>
-                <div class="form-column">
-                    <fieldset>
-                        <legend> <span id="required">*</span> POS OLD ITEM CODE 3</legend>
-                        <input type="text" name="pos_item_code_3" placeholder="ENTER POS OLD ITEM CODE 3" required>
-                    </fieldset>
-                    <fieldset>
-                        <legend> <span id="required">*</span> POS OLD DESCRIPTION</legend>
-                        <input type="text" name="pos_item_description" placeholder="ENTER POS OLD DESCRIPTION" required>
-                    </fieldset>
-                    <fieldset>
-                        <legend> <span id="required">*</span> PRODUCT TYPE</legend>
-                        <select class="js-example-basic-single" name="product_type" id="menu_type_select2" required>
-                            <option value="" selected disabled></option>
-                            @foreach ($menu_product_types as $product_type)
-                                <option value="{{ $product_type->id }}">{{ $product_type->menu_product_type_description }}</option>
-                            @endforeach
-                        </select>
-                    </fieldset>
-                    <fieldset>
-                        <legend> <span id="required">*</span> CHOICES GROUP 1 SKU</legend>
-                        <input type="text" name="choices_skugroup_1" placeholder="ENTER CHOICES GROUP 1 SKU" required>
-                    </fieldset>
-                    <fieldset>
-                        <legend> <span id="required">*</span> CHOICES GROUP 2 SKU</legend>
-                        <input type="text" name="choices_skugroup_2" placeholder="ENTER CHOICES GROUP 2 SKU" required>
-                    </fieldset>
-                    <fieldset>
-                        <legend> <span id="required">*</span> CHOICES GROUP 3 SKU</legend>
-                        <input type="text" name="choices_skugroup_3" placeholder="ENTER CHOICES GROUP 3 SKU" required>
-                    </fieldset>
-                    <fieldset>
-                        <legend> <span id="required">*</span> MAIN CATEGORY</legend>
-                        <select class="js-example-basic-single" name="menu_categories" id="menu_type_select4" required>
-                            <option value="" selected disabled></option>
-                            @foreach ($menu_categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->category_description }}</option>
-                            @endforeach
-                        </select> 
-                    </fieldset>
+                    </fieldset> 
                     <fieldset>
                         <legend> <span id="required">*</span> SUB CATEGORY</legend>
                         <select class="js-example-basic-single" name="sub_category" id="menu_type_select5" required>
@@ -224,15 +230,11 @@
                                 <option value="{{ $category->id }}">{{ $category->subcategory_description }}</option>
                             @endforeach
                         </select> 
-                    </fieldset>
-                    <fieldset>
-                        <legend> <span id="required">*</span> PRICE - TAKE OUT</legend>
-                        <input type="number" name="price_take_out" placeholder="ENTER PRICE - TAKE OUT" required>
-                    </fieldset>
+                    </fieldset>   
                     <fieldset>
                         <legend>STATUS</legend>
                         <input type="text" name="status" value="ACTIVE" readonly id="success">
-                    </fieldset>      
+                    </fieldset> 
                 </div>
             </div>
             <div class="panel-footer">
