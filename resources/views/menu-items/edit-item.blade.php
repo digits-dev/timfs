@@ -657,7 +657,7 @@
                         menu_item_id: savedIngredient.menu_as_ingredient_id,
                     });
 
-                    element.find('.date-updated').text(`Updated ${timeago.format(savedIngredient.updated_at || savedIngredient.created_at)}`);
+                    if (savedIngredient.item_masters_id) element.find('.date-updated').text(`Updated ${timeago.format(savedIngredient.updated_at || savedIngredient.created_at)}`);
                     element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
                     element.find('.ingredient_name').val(savedIngredient.ingredient_name);
                     element.find('.prep-quantity').val(savedIngredient.prep_qty || 0).attr('readonly', false);
@@ -1154,7 +1154,7 @@
             entry.find('.ing-quantity').val('1');
             entry.find('.prep-quantity').val('1');
             entry.find('.prep-quantity').attr('readonly', false);
-            entry.find('.date-updated').text(`Updated ${timeago.format($(this).attr('date_updated'))}`)
+            if ($(this).attr('item_id')) entry.find('.date-updated').text(`Updated ${timeago.format($(this).attr('date_updated'))}`)
             $('#form input:valid, #form select:valid').css('outline', 'none');
             $('.item-list').html('');  
             $('.item-list').fadeOut();
