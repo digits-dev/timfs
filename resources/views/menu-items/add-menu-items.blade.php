@@ -198,9 +198,13 @@
                 </div>
                 <div class="form-column">
                     <fieldset>
-                        <legend><span id="required">*</span> ORIGINAL CONCEPT</legend>
-                        <input type="text" name="original_concept" placeholder="ENTER ORIGINAL CONCEPT" required>
-                        </select>
+                        <legend><span id="required">*</span> SUB CATEGORY</legend>
+                        <select class="js-example-basic-single" name="sub_category" id="menu_type_select5" required>
+                            <option value="" selected disabled></option>
+                            @foreach ($menu_subcategories as $category)
+                                <option value="{{ $category->id }}">{{ $category->subcategory_description }}</option>
+                            @endforeach
+                        </select> 
                     </fieldset>
                     <fieldset>
                         <legend> PRICE - DELIVERY</legend>
@@ -213,7 +217,12 @@
                     <fieldset>
                         <legend> PRICE - TAKE OUT</legend>
                         <input type="number" name="price_take_out" placeholder="ENTER PRICE - TAKE OUT">
-                    </fieldset>   
+                    </fieldset>  
+                    <fieldset>
+                        <legend><span id="required">*</span> ORIGINAL CONCEPT</legend>
+                        <input type="text" name="original_concept" placeholder="ENTER ORIGINAL CONCEPT" required>
+                        </select>
+                    </fieldset> 
                     <fieldset>
                         <legend><span id="required">*</span> MENU SEGMENTATION</legend>
                         <select class="js-example-basic-multiple" name="menu_segment_column_description[]" multiple="multiple" id="menu_type_select1" required>
@@ -221,16 +230,7 @@
                                 <option value="{{ $concept->id }}">{{ $concept->menu_segment_column_description }}</option>
                             @endforeach
                         </select>
-                    </fieldset> 
-                    <fieldset>
-                        <legend><span id="required">*</span> SUB CATEGORY</legend>
-                        <select class="js-example-basic-single" name="sub_category" id="menu_type_select5" required>
-                            <option value="" selected disabled></option>
-                            @foreach ($menu_subcategories as $category)
-                                <option value="{{ $category->id }}">{{ $category->subcategory_description }}</option>
-                            @endforeach
-                        </select> 
-                    </fieldset>   
+                    </fieldset>    
                     <fieldset>
                         <legend>STATUS</legend>
                         <input type="text" name="status" value="ACTIVE" readonly id="success">

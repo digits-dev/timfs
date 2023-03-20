@@ -202,27 +202,6 @@
                     </fieldset>
                 </div>
                 <div class="form-column">
-                    <label for=""><span id="required">*</span> ORIGINAL CONCEPT</label>
-                    <fieldset>
-                        <input type="text" name="original_concept" value="{{ $row->original_concept }}" required>
-                        </select>
-                    </fieldset>
-                    <label for="">PRICE - DELIVERY</label>
-                    <fieldset>
-                        <input type="number" name="price_delivery" value="{{ $row->menu_price_dlv }}">
-                    </fieldset>
-                    <label for=""><span id="required">*</span> PRICE - DINE IN</label>
-                    <fieldset>
-                        <input type="number" name="price_dine_in" value="{{ $row->menu_price_dine }}" required>
-                    </fieldset>
-                    <label for="">PRICE - TAKE OUT</label>
-                    <fieldset>
-                        <input type="number" name="price_take_out" value="{{ $row->menu_price_take }}">
-                    </fieldset>
-                    <label for="">STATUS</label>
-                    <fieldset>
-                        <input type="text" name="status" value="ACTIVE" readonly id="success">
-                    </fieldset> 
                     <label for=""><span id="required">*</span> SUB CATEGORY</label>
                     <fieldset>
                         <select class="js-example-basic-single" name="sub_category" id="menu_type_select5" required>
@@ -236,6 +215,27 @@
                             @endforeach
                         </select> 
                     </fieldset>
+                    <label for="">PRICE - DELIVERY</label>
+                    <fieldset>
+                        <input type="number" name="price_delivery" value="{{ $row->menu_price_dlv }}">
+                    </fieldset>
+                    <label for=""><span id="required">*</span> PRICE - DINE IN</label>
+                    <fieldset>
+                        <input type="number" name="price_dine_in" value="{{ $row->menu_price_dine }}" required>
+                    </fieldset>
+                    <label for="">PRICE - TAKE OUT</label>
+                    <fieldset>
+                        <input type="number" name="price_take_out" value="{{ $row->menu_price_take }}">
+                    </fieldset>
+                    <label for=""><span id="required">*</span> ORIGINAL CONCEPT</label>
+                    <fieldset>
+                        <input type="text" name="original_concept" value="{{ $row->original_concept }}" required>
+                        </select>
+                    </fieldset>
+                    <label for="">STATUS</label>
+                    <fieldset>
+                        <input type="text" name="status" value="ACTIVE" readonly id="success">
+                    </fieldset> 
                     <label for=""><span id="required">*</span> MENU SEGMENTATION</label>
                     <fieldset>
                         <select class="js-example-basic-multiple" name="menu_segment_column_description[]" multiple="multiple" id="menu_type_select1" required>
