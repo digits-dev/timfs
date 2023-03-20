@@ -64,7 +64,7 @@
 
     #menu_type_select1, #menu_type_select2, 
     #menu_type_select3, #menu_type_select4, 
-    #menu_type_select5{
+    #menu_type_select5, #status_select2{
         width: 100%;
     }
 
@@ -232,10 +232,6 @@
                         <input type="text" name="original_concept" value="{{ $row->original_concept }}" required>
                         </select>
                     </fieldset>
-                    <label for="">STATUS</label>
-                    <fieldset>
-                        <input type="text" name="status" value="ACTIVE" readonly id="success">
-                    </fieldset> 
                     <label for=""><span id="required">*</span> MENU SEGMENTATION</label>
                     <fieldset>
                         <select class="js-example-basic-multiple" name="menu_segment_column_description[]" multiple="multiple" id="menu_type_select1" required>
@@ -246,6 +242,13 @@
                                     <option value="{{ $concept->id }}" >{{ $concept->menu_segment_column_description }}</option>
                                 @endif
                             @endforeach
+                        </select>
+                    </fieldset>
+                    <label for="">STATUS</label>
+                    <fieldset>
+                        <select class="js-example-basic-single" name="status" id="status_select2" required>
+                            <option value="ACTIVE" {{ $row->status == 'ACTIVE' ? 'selected':'' }}>ACTIVE</option>
+                            <option value="INACTIVE" {{ $row->status == 'INACTIVE' ? 'selected':'' }}>INACTIVE</option>
                         </select>
                     </fieldset>
                 </div>
@@ -280,6 +283,7 @@
         placeholder: "SELECT A SUB CATEGORY",
         allowClear: true
     });
+    $('#status_select2').select2()
 
 </script>
 @endsection

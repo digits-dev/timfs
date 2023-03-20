@@ -276,7 +276,7 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-	            $query->where('menu_items.status', 'ACTIVE');
+	            $query->orderBy('status', 'asc');
 	    }
 
 	    /*
@@ -287,6 +287,13 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
+			if($column_index == '18'){
+				if($column_value == 'INACTIVE'){
+					$column_value = '<span class="label label-danger">INACTIVE</span>';
+				}else{
+					$column_value = '<span class="label label-success">ACTIVE</span>';
+				}
+			}
 	    }
 
 	    /*
@@ -574,7 +581,8 @@
 			->select('*',
 				'menu_types.menu_type_description as menu_type',
 				'menu_categories.category_description as main_category',
-				'menu_subcategories.subcategory_description as sub_category')
+				'menu_subcategories.subcategory_description as sub_category',
+				'menu_items.status as status')
 			->first();
 			// Menu Segmentations
 			$data['menu_segmentations'] = DB::table('menu_segmentations')
