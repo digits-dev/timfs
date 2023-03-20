@@ -429,15 +429,17 @@
 
 			$data = [];
 			$data['item'] = DB::table('menu_items')
-				->select('*', 'menu_items.id as id')
+				->select('menu_items.id as id',
+					'menu_items.tasteless_menu_code',
+					'menu_items.menu_price_dine',
+					'menu_items.menu_item_description',
+					'menu_ingredients_approval.marketing_approval_status',
+					'menu_ingredients_approval.accounting_approval_status')
 				->where('menu_items.id', $id)
 				->leftJoin('menu_ingredients_approval', 'menu_ingredients_approval.menu_items_id', '=', 'menu_items.id')
-				->get()[0];
+				->first();
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
-
-			$is_approved = $data['item']->accounting_approval_status == 'APPROVED' && $data['item']->marketing_approval_status == 'APPROVED' || 
-			$data['item']->accounting_approval_status == null && $data['item']->marketing_approval_status == null;
 
 			$current_ingredients = DB::table('menu_ingredients_details_temp')
 				->where('menu_items_id', $id)
@@ -457,6 +459,10 @@
 					'uom_name',
 					'packagings.packaging_description',
 					'uoms.uom_description',
+					'prep_qty',
+					'menu_ingredients_preparations_id',
+					'yield',
+					'menu_ingredients_details_temp.ttp',
 					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 					'item_masters.full_item_description',
 					'sku_status_description as item_status',
@@ -473,10 +479,17 @@
 
 			$versions = DB::table('menu_ingredients_versions')
 				->where('menu_items_id', $id)
-				->select('ingredients_json', 'created_at')
+				->select('menu_ingredients_versions.ingredients_json', 'menu_ingredients_versions.created_at', 'cms_users.name')
+				->leftJoin('cms_users', 'menu_ingredients_versions.created_by', '=', 'cms_users.id')
 				->get()
 				->toArray();
-			
+
+			$data['preparations'] = DB::table('menu_ingredients_preparations')
+				->where('status', 'ACTIVE')
+				->select('id', 'preparation_desc')
+				->orderBy('preparation_desc', 'ASC')
+				->get();
+						
 			$data['versions'] = $versions;
 			$data['current_ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $current_ingredients);
 			return $this->view('menu-items/edit-item', $data);

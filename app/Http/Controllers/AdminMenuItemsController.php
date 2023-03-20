@@ -755,7 +755,9 @@
 				->select('menu_items.id as id',
 					'menu_items.tasteless_menu_code',
 					'menu_items.menu_price_dine',
-					'menu_items.menu_item_description')
+					'menu_items.menu_item_description',
+					'menu_ingredients_approval.marketing_approval_status',
+					'menu_ingredients_approval.accounting_approval_status')
 				->where('menu_items.id', $id)
 				->leftJoin('menu_ingredients_approval', 'menu_ingredients_approval.menu_items_id', '=', 'menu_items.id')
 				->first();
@@ -780,10 +782,16 @@
 					'uom_name',
 					'packagings.packaging_description',
 					'uoms.uom_description',
+					'prep_qty',
+					'menu_ingredients_preparations_id',
+					'yield',
+					'menu_ingredients_details_temp.ttp',
 					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 					'item_masters.full_item_description',
 					'sku_status_description as item_status',
-					'menu_items.status as menu_status')
+					'menu_items.status as menu_status',
+					'item_masters.updated_at',
+					'item_masters.created_at')
 				->leftJoin('item_masters', 'menu_ingredients_details_temp.item_masters_id', '=', 'item_masters.id')
 				->leftJoin('packagings', 'menu_ingredients_details_temp.uom_id', '=', 'packagings.id')
 				->leftJoin('uoms', 'menu_ingredients_details_temp.uom_id', '=', 'uoms.id')
@@ -800,7 +808,13 @@
 				->leftJoin('cms_users', 'menu_ingredients_versions.created_by', '=', 'cms_users.id')
 				->get()
 				->toArray();
-			
+
+			$data['preparations'] = DB::table('menu_ingredients_preparations')
+				->where('status', 'ACTIVE')
+				->select('id', 'preparation_desc')
+				->orderBy('preparation_desc', 'ASC')
+				->get();
+						
 			$data['versions'] = $versions;
 			$data['current_ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $current_ingredients);
 			return $this->view('menu-items/edit-item', $data);
@@ -1099,11 +1113,13 @@
 				})
 				->select(\DB::raw('item_masters.id as item_masters_id'),
 					'item_masters.packagings_id',
-					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
+					\DB::raw('round(item_masters.ttp / item_masters.packaging_size, 4) as ingredient_cost'),
 					'item_masters.full_item_description',
 					'item_masters.tasteless_code',
 					'packagings.packaging_description',
-					'brands.brand_description')
+					'brands.brand_description',
+					'item_masters.updated_at',
+					'item_masters.created_at')
 				->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
 				->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id')
 				->orderby('full_item_description')

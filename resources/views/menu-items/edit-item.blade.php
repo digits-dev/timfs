@@ -3,7 +3,15 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js" integrity="sha512-jVMFsAksn8aljb9IJ+3OCAq38dJpquMBjgEuz7Q5Oqu5xenfin/jxdbKw4P5eKjUF4xiG/GPT5CvCX3Io54gyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style type="text/css">
+    .date-updated {
+        font-size: 12px;
+        color: gray;
+        font-weight: 400;
+        font-style: italic;
+    }
+
     .swal-table-wrapper {
         max-height: 20em;
         overflow-y: auto;
@@ -93,6 +101,10 @@
         overflow: auto;
     }
 
+    .ingredient-inputs::-webkit-scrollbar {
+        height: 3px;
+    }
+
     .ingredient-inputs > * {
         margin-right: 10px;
     }
@@ -104,10 +116,6 @@
 
     #add-row {
         margin-bottom: 10px;
-    }
-
-    .display-ingredient, .ingredient_name {
-        min-width: 27vw;
     }
 
     .uom {
@@ -129,6 +137,14 @@
     label {
         margin-bottom: 10px;
         white-space: nowrap;
+    }
+
+    .label-wide {
+        min-width: 110px;
+    }
+
+    .ingredient-label {
+        min-width: 300px;
     }
 
     .menu-item-label {
@@ -170,7 +186,7 @@
         position: relative;
     }
 
-    input, button {
+    input, button, select {
         font-weight: normal;
         margin-top: 3px;
     }
@@ -190,6 +206,7 @@
         border: 1px dashed grey;
         border-radius: 5px;
         display: flex;
+        gap: 5px;
         align-items: center;
         padding: 10px;
         margin-left: 50px;
@@ -268,8 +285,8 @@
 <div class="ingredient-wrapper" style="display: none;">
     <div class="ingredient-entry" isExisting="true">
         <div class="ingredient-inputs">
-            <label>
-                <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
+            <label class="ingredient-label">
+                <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span> <span class="date-updated"></span>
                 <div>
                     <input value="" type="text" name="ingredient[]" class="ingredient form-control" required/>
                     <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
@@ -278,8 +295,8 @@
                 </div>
             </label>
             <label>
-                <span class="required-star">*</span> Ingredient Quantity
-                <input value="" name="quantity[]" class="form-control quantity" type="number" min="0" step="any" readonly required/>
+                <span class="required-star">*</span> Preparation Quantity
+                <input value="" name="prep-quantity[]" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
             </label>
             <label>
                 <span class="required-star">*</span> Ingredient UOM
@@ -287,6 +304,26 @@
                     <input type="text" class="form-control uom" name="uom[]" value="" style="display: none;"/>
                     <input type="text" class="form-control display-uom" value="" readonly>
                 </div>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> Preparation
+                <select class="form-control preparation" disabled>
+                    @foreach ($preparations as $preparation)
+                    <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
+                    @endforeach
+                </select>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> Yield %
+                <input value="" name="yield[]" class="form-control yield" type="number" readonly required>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> TTP
+                <input value="" name="ttp[]" class="form-control ttp" type="number" readonly required>
+            </label>
+            <label>
+                <span class="required-star">*</span> Ingredient Quantity
+                <input value="" name="ing-qty[]" class="form-control ing-quantity" type="number" readonly required>
             </label>
             <label>
                 <span class="required-star">*</span> Ingredient Cost
@@ -310,7 +347,7 @@
  <div class="new-ingredient-wrapper" style="display: none;">
     <div class="ingredient-entry" isExisting="false">
         <div class="ingredient-inputs">
-            <label>
+            <label class="ingredient-label">
                 <span class="required-star">*</span> Ingredient <span class="item-from label label-secondary">USER</span>
                 <div>
                     <input value="" type="text" name="ingredient_name[]" class="ingredient_name form-control" required/>
@@ -319,8 +356,8 @@
                 </div>
             </label>
             <label>
-                <span class="required-star">*</span> Ingredient Quantity
-                <input value="" name="quantity[]" class="form-control quantity" type="number" min="0" step="any" required/>
+                <span class="required-star">*</span> Preparation Quantity
+                <input value="" name="quantity[]" class="form-control prep-quantity" type="number" min="0" step="any" required/>
             </label>
             <label>
                 <span class="required-star">*</span> Ingredient UOM
@@ -328,9 +365,29 @@
                     <input type="text" class="form-control uom_name" name="uom_name[]" value="" required>
                 </div>
             </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> Preparation
+                <select class="form-control preparation">
+                    @foreach ($preparations as $preparation)
+                    <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
+                    @endforeach
+                </select>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> Yield %
+                <input value="" name="yield[]" class="form-control yield" type="number" required>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> TTP
+                <input value="" name="ttp[]" class="form-control ttp" type="number" required>
+            </label>
+            <label>
+                <span class="required-star">*</span> Ingredient Quantity
+                <input value="" name="ing-qty[]" class="form-control ing-quantity" type="number" readonly required>
+            </label>
             <label>
                 <span class="required-star">*</span> Ingredient Cost
-                <input value="" name="cost[]" class="form-control cost" type="text" required>
+                <input value="" name="cost[]" class="form-control cost" type="text" readonly required>
             </label>
         </div>
         <div class="actions">
@@ -349,8 +406,8 @@
 
  <div class="substitute" style="display: none;" isExisting="true">
     <div class="ingredient-inputs">
-        <label>
-            <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
+        <label class="ingredient-label">
+            <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span> <span class="date-updated"></span>
             <div>
                 <input value="" type="text" name="ingredient[]" class="ingredient form-control" required/>
                 <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
@@ -359,8 +416,8 @@
             </div>
         </label>
         <label>
-            <span class="required-star">*</span> Ingredient Quantity
-            <input value="" name="quantity[]" class="form-control quantity" type="number" min="0" step="any" readonly required/>
+            <span class="required-star">*</span> Preparation Quantity
+            <input value="" name="quantity[]" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
         </label>
         <label>
             <span class="required-star">*</span> Ingredient UOM
@@ -368,6 +425,26 @@
                 <input type="text" class="form-control uom" name="uom[]" value="" style="display: none;"/>
                 <input type="text" class="form-control display-uom" value="" readonly>
             </div>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> Preparation
+            <select class="form-control preparation" disabled>
+                @foreach ($preparations as $preparation)
+                <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
+                @endforeach
+            </select>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> Yield %
+            <input value="" name="yield[]" class="form-control yield" type="number" readonly required>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> TTP
+            <input value="" name="ttp[]" class="form-control ttp" type="number" readonly required>
+        </label>
+        <label>
+            <span class="required-star">*</span> Ingredient Quantity
+            <input value="" name="ing-qty[]" class="form-control ing-quantity" type="number" readonly required>
         </label>
         <label>
             <span class="required-star">*</span> Ingredient Cost
@@ -382,7 +459,7 @@
 
  <div class="new-substitute" style="display: none;" isExisting="false">
     <div class="ingredient-inputs">
-        <label>
+        <label class="ingredient-label">
             <span class="required-star">*</span> Ingredient <span class="item-from label label-secondary">USER</span>
             <div>
                 <input value="" type="text" name="ingredient_name[]" class="ingredient_name form-control" required/>
@@ -391,8 +468,8 @@
             </div>
         </label>
         <label>
-            <span class="required-star">*</span> Ingredient Quantity
-            <input value="" name="quantity[]" class="form-control quantity" type="number" min="0" step="any" required/>
+            <span class="required-star">*</span> Preparation Quantity
+            <input value="" name="quantity[]" class="form-control prep-quantity" type="number" min="0" step="any" required/>
         </label>
         <label>
             <span class="required-star">*</span> Ingredient UOM
@@ -400,9 +477,29 @@
                 <input type="text" class="form-control uom_name" name="uom_name[]" value="" required>
             </div>
         </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> Preparation
+            <select class="form-control preparation">
+                @foreach ($preparations as $preparation)
+                <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
+                @endforeach
+            </select>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> Yield %
+            <input value="" name="yield[]" class="form-control yield" type="number" required>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> TTP
+            <input value="" name="ttp[]" class="form-control ttp" type="number" required>
+        </label>
+        <label>
+            <span class="required-star">*</span> Ingredient Quantity
+            <input value="" name="ing-qty[]" class="form-control ing-quantity" type="number" readonly required>
+        </label>
         <label>
             <span class="required-star">*</span> Ingredient Cost
-            <input value="" name="cost[]" class="form-control cost" type="text" required>
+            <input value="" name="cost[]" class="form-control cost" type="text" readonly required>
         </label>
     </div>
     <div class="actions">
@@ -516,68 +613,34 @@
             for (i of entryCount) {
                 const groupedIngredients = savedIngredients.filter(e => e.ingredient_group == i);
                 const wrapperTemplate = $(document.createElement('div'));
-                wrapperTemplate.addClass('ingredient-wrapper');
-                wrapperTemplate.append($('.add-sub-btn').eq(0).clone());
-                wrapperTemplate.append($('.new-add-sub-btn').eq(0).clone());
+                wrapperTemplate
+                    .addClass('ingredient-wrapper')
+                    .append($('.add-sub-btn').eq(0).clone())
+                    .append($('.new-add-sub-btn').eq(0).clone());
 
                 groupedIngredients.forEach(savedIngredient => {
+                    let element;
                     if (savedIngredient.is_primary == 'TRUE') {
                         if (savedIngredient.is_existing == 'TRUE') {
                             //primary and existing
                             element = $('.ingredient-wrapper .ingredient-entry').eq(0).clone();
-                            const ingredientInput = element.find('.ingredient');
-                            ingredientInput.val(savedIngredient.item_masters_id || savedIngredient.menu_as_ingredient_id);
-                            ingredientInput.attr({
-                                cost: savedIngredient.ingredient_cost || savedIngredient.food_cost,
-                                uom: savedIngredient.uom_id,
-                                item_id: savedIngredient.item_masters_id,
-                                menu_item_id: savedIngredient.menu_as_ingredient_id,
-                            });
-                            element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
-                            element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
-                            element.find('.uom').val(savedIngredient.uom_id);
-                            element.find('.display-uom').val(savedIngredient.packaging_description);
-                            element.find('.cost').val(savedIngredient.cost);
                         } else {
                             //primary and new
                             element = $('.new-ingredient-wrapper .ingredient-entry').eq(0).clone();
-                            element.find('.ingredient_name').val(savedIngredient.ingredient_name);
-                            element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
-                            element.find('.uom_name').val(savedIngredient.uom_name);
-                            element.find('.cost').val(savedIngredient.cost);
                         }
                     } else {
                         if (savedIngredient.is_existing == 'TRUE') {
                             //substitute and existing
                             element = $('.substitute').eq(0).clone();
                             if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
-                            const ingredientInput = element.find('.ingredient');
-                            ingredientInput.val(savedIngredient.item_masters_id || savedIngredient.menu_as_ingredient_id);
-                            ingredientInput.attr({
-                                cost: savedIngredient.ingredient_cost || savedIngredient.food_cost,
-                                uom: savedIngredient.uom_id,
-                                item_id: savedIngredient.item_masters_id,
-                                menu_item_id: savedIngredient.menu_as_ingredient_id,
-                            });
-                            element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
-                            element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
-                            element.find('.uom').val(savedIngredient.uom_id);
-                            element.find('.display-uom').val(savedIngredient.packaging_description);
-                            element.find('.cost').val(savedIngredient.cost);
-                            element.css('display', '');
                         } else {
                             //substitute and new
                             element = $('.new-substitute').eq(0).clone();
                             if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
-                            element.find('.ingredient_name').val(savedIngredient.ingredient_name);
-                            element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
-                            element.find('.uom_name').val(savedIngredient.uom_name);
-                            element.find('.cost').val(savedIngredient.cost);
-                            element.css('display', '');
                         }
                     }
                     if (savedIngredient.menu_status == 'INACTIVE' || savedIngredient.item_status == 'INACTIVE') 
-                        element.find('.label-danger').text('⚠️INACTIVE ITEM');
+                        element.find('.label-danger').text('⚠️INACTIVE');
 
                     if (savedIngredient.item_masters_id && !savedIngredient.menu_as_ingredient_id)
                         element.find('.item-from').addClass('label label-info').text('IMFS');
@@ -585,8 +648,37 @@
                     if (savedIngredient.menu_as_ingredient_id && !savedIngredient.item_masters_id)
                         element.find('.item-from').addClass('label-warning').text('MIMF');
 
+                    const ingredientInput = element.find('.ingredient');
+                    ingredientInput.val(savedIngredient.item_masters_id || savedIngredient.menu_as_ingredient_id);
+                    ingredientInput.attr({
+                        cost: savedIngredient.ingredient_cost || savedIngredient.food_cost,
+                        uom: savedIngredient.uom_id,
+                        item_id: savedIngredient.item_masters_id,
+                        menu_item_id: savedIngredient.menu_as_ingredient_id,
+                    });
+
+                    element.find('.date-updated').text(`Updated ${timeago.format(savedIngredient.updated_at || savedIngredient.created_at)}`);
+                    element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
+                    element.find('.ingredient_name').val(savedIngredient.ingredient_name);
+                    element.find('.prep-quantity').val(savedIngredient.qty).attr('readonly', false);
+                    element.find('.uom').val(savedIngredient.uom_id);
+                    element.find('.uom_name').val(savedIngredient.uom_name);
+                    element.find('.display-uom').val(savedIngredient.packaging_description);
+                    element.find('.preparation option').attr('selected', false);
+                    element.find(`.preparation option[value="${savedIngredient.menu_ingredients_preparations_id}"]`).attr('selected', true);
+                    element.find('.yield').val(savedIngredient.yield);
+                    element.find('.ttp').val(savedIngredient.ttp);
+                    element.find('.ing-quantity').val(savedIngredient.qty);
+                    element.find('.cost').val(savedIngredient.cost);
+
+                    element.css('display', '');
                     wrapperTemplate.append(element);
                 });
+
+                wrapperTemplate
+                    .find('.preparation, .yield')
+                    .attr('readonly', false)
+                    .attr('disabled', false);
                 section.append(wrapperTemplate);
             }
         }
@@ -599,8 +691,6 @@
             $('.display-ingredient').keyup(debounce(function() {
                 const entry = $(this).parents('.ingredient-entry, .substitute');
                 const query = $(this).val().trim().toLowerCase().split(' ').filter(e => !!e);
-                const arrayOfIngredients = [];
-                const index = $('.display-ingredient').index(this);
                 const itemList = entry.find('.item-list');
                 let searchResult  = [];
 
@@ -615,67 +705,12 @@
                     data: { content: JSON.stringify(query)},
                     success: function(response) {
                         searchResult = JSON.parse(response);
-                        renderSearchResult();
+                        $.fn.renderSearchResult(entry, itemList, searchResult);
                     },
                     error: function(response) { 
                         console.log(response); 
                     }  
                 });
-
-                function renderSearchResult() {
-                    const current_ingredients = {item_id: [], menu_item_id: [menuItem.id?.toString()]};
-
-                    $('#form .ingredient').each(function(ingredientIndex) {
-                        const ingredient = $(this);
-                        if (ingredientIndex != $('#form .ingredient').index(entry.find('.ingredient'))) {
-                            if (ingredient.attr('item_id'))  current_ingredients.item_id.push(ingredient.attr('item_id'));
-                            if (ingredient.attr('menu_item_id')) current_ingredients.menu_item_id.push(ingredient.attr('menu_item_id'));
-                        }
-                    });
-    
-                    const result = [...searchResult]
-                        .filter(ingredient => !current_ingredients.item_id.includes(ingredient.item_masters_id?.toString()) && !current_ingredients.menu_item_id.includes(ingredient.menu_item_id?.toString()))
-                        .sort((a, b) => (a.full_item_description || a.menu_item_description)
-                        ?.localeCompare(b.full_item_description || b.menu_item_description));
-    
-                    if (!result.length) {
-                        result.push({full_item_description: 'No Item Found'});
-                    }
-    
-                    $('.item-list').html('');
-                    
-                   itemList.fadeIn('fast');
-    
-                    const ul = $(document.createElement('ul'));
-                    ul.addClass('dropdown-menu');
-                    ul.css({
-                        display: 'block',
-                        position: 'absolute',
-                    });
-                    result.forEach(e => {
-                        const li = $(document.createElement('li'));
-                        const a = $(document.createElement('a'));
-                        if (!e.item_masters_id && !e.menu_item_id) {
-                            a.css('color', 'red !important');
-                        }
-                        li.addClass('list-item dropdown-item');
-                        li.attr({
-                            item_id: e.item_masters_id,
-                            cost: e.ingredient_cost,
-                            uom: e.packagings_id || e.uoms_id,
-                            uom_desc: e.packaging_description || e.uom_description,
-                            menu_item_id: e.menu_item_id,
-                            food_cost: e.food_cost,
-                            item_desc: e.full_item_description || e.menu_item_description,
-                        });
-                        a.html(e.full_item_description && e.item_masters_id ? `<span class="label label-info">IMFS</span> ${e.full_item_description}`
-                            : e.menu_item_description ? `<span class="label label-warning">MIMF</span> ${e.menu_item_description}` 
-                            : 'No Item Found');
-                        li.append(a);
-                        ul.append(li);
-                    });
-                    itemList.append(ul);
-                }
             }, 750));
 
             $(window).keydown(function(event) {
@@ -689,16 +724,31 @@
                 $('#form input:valid, #form select:valid').css('outline', 'none');
             });
 
-            $('.quantity').keyup(function() {
-                const entry = $(this).parents('.ingredient-entry, .substitute');
-                const ingredientCost = entry.find('.ingredient').attr('cost') || entry.find('.ingredient').attr('food_cost');
-                entry.find('.cost').val($(this).val() * ingredientCost);
-                $.fn.sumCost();
+            $('.prep-quantity').keyup(function() {
+                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
+                $.fn.computeIngredientCost(entry);
+            });
+
+            $('.yield').keyup(function() {
+                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
+                const yield = $(this).val();
+                const preperationQuantityInput = entry.find('.prep-quantity');
+                let preperationQuantity = preperationQuantityInput.val();
+                if (!preperationQuantity) {
+                    preperationQuantityInput.val('1');
+                    preperationQuantity = preperationQuantityInput.val();
+                }
+                $.fn.computeIngredientCost(entry);
+            });
+
+            $('.ttp').keyup(function() {
+                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
+                $.fn.computeIngredientCost(entry);
             });
 
             $('.cost').keyup(function() {
                 const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
-                $.fn.sumCost();
+                $.fn.computeIngredientCost(entry);
             });
         }
 
@@ -749,7 +799,7 @@
             const substitutes = jQuery.makeArray($('.substitute, .new-substitute'));
             substitutes.forEach(sub => {
                 if ($(sub).attr('primary') == 'true') {
-                    $(sub).css('background', '#F4D35E');
+                    $(sub).css('background', '#ffe662');
                     $(sub).find('.set-primary').css('color', 'black');
                 } else {
                     $(sub).css('background', '');
@@ -869,7 +919,7 @@
             const totalCostLabelTD = $(document.createElement('td'))
                 .attr('colspan', '4')
                 .text('Total Cost');
-            const totalCostValueTD = $(document.createElement('td')).text(total);
+            const totalCostValueTD = $(document.createElement('td')).text(math.round(total, 4));
             totalCostTR.append(totalCostLabelTD, totalCostValueTD);
             tbody.append(totalCostTR);
 
@@ -887,6 +937,145 @@
             });
         }
 
+        $.fn.renderSearchResult = function(entry, itemList, searchResult) {
+            const current_ingredients = {item_id: [], menu_item_id: [menuItem.id?.toString()]};
+
+            $('#form .ingredient').each(function(ingredientIndex) {
+                const ingredient = $(this);
+                if (ingredientIndex != $('#form .ingredient').index(entry.find('.ingredient'))) {
+                    if (ingredient.attr('item_id'))  current_ingredients.item_id.push(ingredient.attr('item_id'));
+                    if (ingredient.attr('menu_item_id')) current_ingredients.menu_item_id.push(ingredient.attr('menu_item_id'));
+                }
+            });
+
+            const result = [...searchResult]
+                .filter(ingredient => !current_ingredients.item_id.includes(ingredient.item_masters_id?.toString()) && !current_ingredients.menu_item_id.includes(ingredient.menu_item_id?.toString()))
+                .sort((a, b) => (a.full_item_description || a.menu_item_description)
+                ?.localeCompare(b.full_item_description || b.menu_item_description));
+
+            if (!result.length) {
+                result.push({full_item_description: 'No Item Found'});
+            }
+
+            $('.item-list').html('');
+            
+            itemList.fadeIn('fast');
+
+            const ul = $(document.createElement('ul'));
+            ul.addClass('dropdown-menu');
+            ul.css({
+                display: 'block',
+                position: 'absolute',
+            });
+            result.forEach(e => {
+                const li = $(document.createElement('li'));
+                const a = $(document.createElement('a'));
+                if (!e.item_masters_id && !e.menu_item_id) {
+                    a.css('color', 'red !important');
+                }
+                li.addClass('list-item dropdown-item');
+                li.attr({
+                    item_id: e.item_masters_id,
+                    cost: e.ingredient_cost,
+                    uom: e.packagings_id || e.uoms_id,
+                    uom_desc: e.packaging_description || e.uom_description,
+                    menu_item_id: e.menu_item_id,
+                    food_cost: e.food_cost,
+                    item_desc: e.full_item_description || e.menu_item_description,
+                    date_updated: e.updated_at || e.created_at,
+                });
+                a.html(e.full_item_description && e.item_masters_id ? `<span class="label label-info">IMFS</span> ${e.full_item_description}`
+                    : e.menu_item_description ? `<span class="label label-warning">MIMF</span> ${e.menu_item_description}` 
+                    : 'No Item Found');
+                li.append(a);
+                ul.append(li);
+            });
+            itemList.append(ul);
+        }
+
+        $.fn.computeIngredientCost = function(entry) {
+            const preperationQuantity = entry.find('.prep-quantity').val();
+            const ttp = entry.find('.ttp').val();
+            const yieldInput = entry.find('.yield');
+            const ingredientQuantityInput = entry.find('.ing-quantity');
+            const costInput = entry.find('.cost');
+            let yieldPercent = yieldInput.val() || 0;
+            const ingredientQuantity = math.round(((preperationQuantity * 10000) / (yieldPercent * 100)), 4);
+            const cost = math.round(ingredientQuantity / 1000 * ttp, 4);
+            ingredientQuantityInput.val(ingredientQuantity);
+            costInput.val(cost);
+            $.fn.sumCost();
+        }
+
+        $.fn.submitForm = function() {
+            const ingredientsArray = [];
+            const ingredientGroups = jQuery.makeArray($('#form .ingredient-wrapper, #form .new-ingredient-wrapper'));
+            ingredientGroups.forEach((ingredientGroup, groupIndex) => {
+                const group = $(ingredientGroup);
+                const ingredientArray = [];
+                const ingredients = jQuery.makeArray(group.find('.ingredient-entry, .substitute, .new-substitute'));
+                ingredients.forEach((ingredient, memberIndex) => {
+                    const ingredientMember = $(ingredient);
+                    const ingredientObject = {};
+                    ingredientObject.is_existing = (ingredientMember.attr('isExisting') == 'true').toString().toUpperCase();
+                    ingredientObject.is_primary = (ingredientMember.hasClass('ingredient-entry')).toString().toUpperCase();
+                    ingredientObject.is_selected = (ingredientMember.attr('primary') == 'true').toString().toUpperCase();
+                    ingredientObject.row_id = memberIndex;
+                    ingredientObject.ingredient_group = groupIndex;
+                    ingredientObject.menu_items_id = menuItem.id;
+                    ingredientObject.item_masters_id = ingredientMember.find('.ingredient').attr('item_id');
+                    ingredientObject.menu_as_ingredient_id = ingredientMember.find('.ingredient').attr('menu_item_id');
+                    ingredientObject.ingredient_name = ingredientMember.find('.ingredient_name').val()?.trim().toUpperCase();
+                    ingredientObject.prep_qty = ingredientMember.find('.prep-quantity').val();
+                    ingredientObject.uom_id = ingredientMember.find('.uom').val();
+                    ingredientObject.uom_name = ingredientMember.find('.uom_name').val()?.trim().toUpperCase();
+                    ingredientObject.menu_ingredients_preparations_id = ingredientMember.find('.preparation').val();
+                    ingredientObject.yield = ingredientMember.find('.yield').val();
+                    ingredientObject.ttp = ingredientMember.find('.ttp').val();
+                    ingredientObject.qty = ingredientMember.find('.ing-quantity').val();
+                    ingredientObject.cost = ingredientMember.find('.cost').val().replace(/[^0-9.]/g, '');
+                    ingredientObject.total_cost = $('.total-cost').val().replace(/[^0-9.]/g, '');
+
+                    ingredientArray.push(ingredientObject);
+                });
+                if (ingredientArray.length) {
+                    ingredientsArray.push(ingredientArray);
+                }
+            });
+            const result = JSON.stringify(ingredientsArray);
+            const form = $(document.createElement('form'))
+                .attr('method', 'POST')
+                .attr('action', "{{ route('edit_menu_item') }}")
+                .css('display', 'none');
+
+            const csrf = $(document.createElement('input'))
+                .attr({
+                    type: 'hidden',
+                    name: '_token',
+                }).val("{{ csrf_token() }}");
+
+            const ingredientsData = $(document.createElement('input'))
+                .attr('name', 'ingredients')
+                .val(result);
+
+            const menuItemData = $(document.createElement('input'))
+                .attr('name', 'menu_items_id')
+                .val("{{ $item->id }}");
+            
+            const totalCostData = $(document.createElement('input'))
+                .attr('name', 'food_cost')
+                .val($('.total-cost').val().replace(/[^0-9.]/g, ''));
+
+            const percentageData = $(document.createElement('input'))
+                .attr('name', 'food_cost_percentage')
+                .val($('.percentage').text().replace(/[^0-9.]/g, ''));
+
+
+            form.append(csrf, ingredientsData, menuItemData, totalCostData, percentageData);
+            $('.panel-body').append(form);
+            form.submit();
+        }
+
         $(document).on('click', '#save-edit', function(event) {
             const formValues = $('#form input, #form select');
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
@@ -902,68 +1091,7 @@
                     confirmButtonText: 'Save'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        const ingredientsArray = [];
-                        const ingredientGroups = jQuery.makeArray($('#form .ingredient-wrapper, #form .new-ingredient-wrapper'));
-                        ingredientGroups.forEach((ingredientGroup, groupIndex) => {
-                            const group = $(ingredientGroup);
-                            const ingredientArray = [];
-                            const ingredients = jQuery.makeArray(group.find('.ingredient-entry, .substitute, .new-substitute'));
-                            ingredients.forEach((ingredient, memberIndex) => {
-                                const ingredientMember = $(ingredient);
-                                const ingredientObject = {};
-                                ingredientObject.is_existing = (ingredientMember.attr('isExisting') == 'true').toString().toUpperCase();
-                                ingredientObject.is_primary = (ingredientMember.hasClass('ingredient-entry')).toString().toUpperCase();
-                                ingredientObject.is_selected = (ingredientMember.attr('primary') == 'true').toString().toUpperCase();
-                                ingredientObject.row_id = memberIndex;
-                                ingredientObject.ingredient_group = groupIndex;
-                                ingredientObject.menu_items_id = menuItem.id;
-                                ingredientObject.item_masters_id = ingredientMember.find('.ingredient').attr('item_id');
-                                ingredientObject.menu_as_ingredient_id = ingredientMember.find('.ingredient').attr('menu_item_id');
-                                ingredientObject.ingredient_name = ingredientMember.find('.ingredient_name').val()?.trim().toUpperCase();
-                                ingredientObject.qty = ingredientMember.find('.quantity').val();
-                                ingredientObject.uom_id = ingredientMember.find('.uom').val();
-                                ingredientObject.uom_name = ingredientMember.find('.uom_name').val()?.trim().toUpperCase();
-                                ingredientObject.cost = ingredientMember.find('.cost').val().replace(/[^0-9.]/g, '');
-                                ingredientObject.total_cost = $('.total-cost').val().replace(/[^0-9.]/g, '');
-
-                                ingredientArray.push(ingredientObject);
-                            });
-                            if (ingredientArray.length) {
-                                ingredientsArray.push(ingredientArray);
-                            }
-                        });
-                        const result = JSON.stringify(ingredientsArray);
-                        const form = $(document.createElement('form'))
-                            .attr('method', 'POST')
-                            .attr('action', "{{ route('edit_menu_item') }}")
-                            .css('display', 'none');
-
-                        const csrf = $(document.createElement('input'))
-                            .attr({
-                                type: 'hidden',
-                                name: '_token',
-                            }).val("{{ csrf_token() }}");
-
-                        const ingredientsData = $(document.createElement('input'))
-                            .attr('name', 'ingredients')
-                            .val(result);
-
-                        const menuItemData = $(document.createElement('input'))
-                            .attr('name', 'menu_items_id')
-                            .val("{{ $item->id }}");
-                        
-                        const totalCostData = $(document.createElement('input'))
-                            .attr('name', 'food_cost')
-                            .val($('.total-cost').val().replace(/[^0-9.]/g, ''));
-
-                        const percentageData = $(document.createElement('input'))
-                            .attr('name', 'food_cost_percentage')
-                            .val($('.percentage').text().replace(/[^0-9.]/g, ''));
-
-
-                        form.append(csrf, ingredientsData, menuItemData, totalCostData, percentageData);
-                        $('.panel-body').append(form);
-                        form.submit();
+                        $.fn.submitForm();
                     }
                 });
             } else {
@@ -1008,13 +1136,17 @@
             entry.find('.ingredient-menu').val($(this).attr('menu_item_id'));
             entry.find('.uom').val($(this).attr('uom'));
             entry.find('.display-uom').val($(this).attr('uom_desc'));
-            entry.find('.cost').val($(this).attr('cost') || $(this).attr('food_cost'));
-            entry.find('.quantity').val('1');
-            entry.find('.quantity').attr('readonly', false);
+            entry.find('.ttp').val($(this).attr('cost') || $(this).attr('food_cost') || 0);
+            entry.find('.yield').val('100').attr('readonly', false);
+            entry.find('.preparation').attr('disabled', false);
+            entry.find('.ing-quantity').val('1');
+            entry.find('.prep-quantity').val('1');
+            entry.find('.prep-quantity').attr('readonly', false);
+            entry.find('.date-updated').text(`Updated ${timeago.format($(this).attr('date_updated'))}`)
             $('#form input:valid, #form select:valid').css('outline', 'none');
             $('.item-list').html('');  
             $('.item-list').fadeOut();
-            $.fn.sumCost();
+            $.fn.computeIngredientCost(entry);
         });
 
         $(document).on('click', '.move-up', function() {
@@ -1055,7 +1187,7 @@
             section.find('.ingredient').val('');
             section.find('.display-ingredient').val('');
             section.find('.ingredient').val('');
-            section.find('.quantity').val('');
+            section.find('.prep-quantity').val('');
             section.find('.uom').val('');
             section.find('.cost').val('');
             section.css('display', '');
@@ -1067,13 +1199,13 @@
 
         $(document).on('click', '#add-new', function() {
             const section = $($('.new-ingredient-wrapper').eq(0).clone());
-            section.find('input').val('').attr('readonly', false);
-            section.find('.ingredient').val('');
-            section.find('.display-ingredient').val('');
-            section.find('.ingredient').val('');
-            section.find('.quantity').val('');
-            section.find('.uom').val('');
-            section.find('.cost').val('');
+            // section.find('input').val('').attr('readonly', false);
+            // section.find('.ingredient').val('');
+            // section.find('.display-ingredient').val('');
+            // section.find('.ingredient').val('');
+            // section.find('.prep-quantity').val('');
+            // section.find('.uom').val('');
+            // section.find('.cost').val('');
             section.css('display', '');
             $('.ingredient-section').append(section);
             $('.item-list').fadeOut();
@@ -1146,7 +1278,6 @@
             ingredientWrapper.find('.substitute, .new-substitute').attr('primary', false);
             if (!isPrimary) {
                 sub.attr('primary', true);
-                sub.css('background', '#F4D35E');
             }
             $.fn.formatSelected();
             $.fn.sumCost();
