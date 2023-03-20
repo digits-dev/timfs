@@ -833,41 +833,62 @@
 				foreach ($group as $member) {
 					$member = (array) $member;
 					$ingredient_data = null;
+
+					// if from IMFS
 					if ($member['item_masters_id']) {
 						$ingredient_data = DB::table('item_masters')
-							->where('item_masters.id', $member['item_masters_id'])
+							->where('item_masters.id', DB::raw($member['item_masters_id']))
 							->select(\DB::raw('item_masters.id as item_masters_id'),
 								'packagings.packaging_description',
 								'uoms.uom_description',
 								\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 								'item_masters.full_item_description',
-								'sku_status_description as item_status')
+								'sku_status_description as item_status',
+								'menu_ingredients_preparations.preparation_desc')
 							->leftJoin('packagings', function($join) use ($member) {
-								$join->where('packagings.id', '=', $member['uom_id']);
+								$join->where('packagings.id', '=', DB::raw($member['uom_id']));
 							})
 							->leftJoin('uoms', function($join) use ($member) {
-								$join->where('uoms.id', '=', $member['uom_id']);
+								$join->where('uoms.id', '=', DB::raw($member['uom_id']));
 							})
+							->leftJoin('menu_ingredients_preparations',
+								'menu_ingredients_preparations.id',
+								'=',
+								DB::raw($member['menu_ingredients_preparations_id']))
 							->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
 							->first();
 					}
 
-					if ($member['menu_as_ingredient_id']) {
+					// if from MIMF
+					else if ($member['menu_as_ingredient_id']) {
 						$ingredient_data = DB::table('menu_items')
-							->where('menu_items.id', $member['menu_as_ingredient_id'])
+							->where('menu_items.id', DB::raw($member['menu_as_ingredient_id']))
 							->select(\DB::raw('menu_items.id as menu_as_ingredient_id'),
 								'menu_item_description',
 								'packagings.packaging_description',
 								'uoms.uom_description',
 								'food_cost',
 								'food_cost_percentage',
-								'menu_items.status as menu_status')
+								'menu_items.status as menu_status',
+								'menu_ingredients_preparations.preparation_desc')
 							->leftJoin('packagings', function($join) use ($member) {
-								$join->where('packagings.id', '=', $member['uom_id']);
+								$join->where('packagings.id', '=', DB::raw($member['uom_id']));
 							})
 							->leftJoin('uoms', function($join) use ($member) {
-								$join->where('uoms.id', '=', $member['uom_id']);
+								$join->where('uoms.id', '=', DB::raw($member['uom_id']));
 							})
+							->leftJoin('menu_ingredients_preparations',
+								'menu_ingredients_preparations.id',
+								'=',
+								DB::raw($member['menu_ingredients_preparations_id']))
+							->first();
+					}
+
+					// if from USER
+					else {
+						$ingredient_data = DB::table('menu_ingredients_preparations')
+							->where('id', DB::raw($member['menu_ingredients_preparations_id']))
+							->get('preparation_desc')
 							->first();
 					}
 					$ingredient_version[] = array_merge($member, (array) $ingredient_data);

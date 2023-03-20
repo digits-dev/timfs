@@ -466,7 +466,9 @@
 					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 					'item_masters.full_item_description',
 					'sku_status_description as item_status',
-					'menu_items.status as menu_status')
+					'menu_items.status as menu_status',
+					'item_masters.updated_at',
+					'item_masters.created_at')
 				->leftJoin('item_masters', 'menu_ingredients_details_temp.item_masters_id', '=', 'item_masters.id')
 				->leftJoin('packagings', 'menu_ingredients_details_temp.uom_id', '=', 'packagings.id')
 				->leftJoin('uoms', 'menu_ingredients_details_temp.uom_id', '=', 'uoms.id')

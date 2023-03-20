@@ -20,7 +20,7 @@
     .version-table th, .version-table td {
         text-align: center !important;
         border: 1px solid gray !important;
-        font-size: 15px !important;
+        font-size: 13px !important;
     }
 
     .date-ago {
@@ -660,16 +660,16 @@
                     element.find('.date-updated').text(`Updated ${timeago.format(savedIngredient.updated_at || savedIngredient.created_at)}`);
                     element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
                     element.find('.ingredient_name').val(savedIngredient.ingredient_name);
-                    element.find('.prep-quantity').val(savedIngredient.qty).attr('readonly', false);
+                    element.find('.prep-quantity').val(savedIngredient.prep_qty || 0).attr('readonly', false);
                     element.find('.uom').val(savedIngredient.uom_id);
                     element.find('.uom_name').val(savedIngredient.uom_name);
                     element.find('.display-uom').val(savedIngredient.packaging_description);
                     element.find('.preparation option').attr('selected', false);
                     element.find(`.preparation option[value="${savedIngredient.menu_ingredients_preparations_id}"]`).attr('selected', true);
-                    element.find('.yield').val(savedIngredient.yield);
-                    element.find('.ttp').val(savedIngredient.ttp);
-                    element.find('.ing-quantity').val(savedIngredient.qty);
-                    element.find('.cost').val(savedIngredient.cost);
+                    element.find('.yield').val(savedIngredient.yield || 0);
+                    element.find('.ttp').val(savedIngredient.ttp || 0);
+                    element.find('.ing-quantity').val(savedIngredient.qty || 0);
+                    element.find('.cost').val(savedIngredient.cost || 0);
 
                     element.css('display', '');
                     wrapperTemplate.append(element);
@@ -813,7 +813,7 @@
                 $('button').remove();
                 $('.add-sub-btn').remove();
                 $('.new-add-sub-btn').remove();
-                $('input').attr('disabled', true);
+                $('#form input, #form select').attr('disabled', true);
             }
             
             if (privilege == 'Ingredient Approver (Accounting)' && 
@@ -855,8 +855,7 @@
         $.fn.showVersionTable = function({created_at, ingredients_json, name}) {
             const parsedIngredients = JSON.parse(ingredients_json);
             const ingredientGroups = new Set(parsedIngredients.map(e => e.ingredient_group));
-            const wrapperDiv = $(document.createElement('div'))
-                .addClass('swal-table-wrapper');
+            const wrapperDiv = $(document.createElement('div')).addClass('swal-table-wrapper');
             const dateAgo = $(document.createElement('div'))
                 .addClass('date-ago')
                 .text(`version by: ${name}, ${timeago.format(created_at)}`);
@@ -865,20 +864,23 @@
             const thead = $(document.createElement('thead'));
             const headTR = $(document.createElement('tr'));
             const checkTH = $(document.createElement('th'));
-            const ingredientNameTH = $(document.createElement('th'))
-                .text('Ingredient');
-            const ingredientQuantityTH = $(document.createElement('th'))
-                .text('Quantity');
-            const ingredientUomTH = $(document.createElement('th'))
-                .text('UOM');
-            const ingredientCostTH = $(document.createElement('th'))
-                .text('Cost');
+            const ingredientNameTH = $(document.createElement('th')).text('Ingredient');
+            const prepQtyTH = $(document.createElement('th')).text('Preparation Qty');
+            const uomTH = $(document.createElement('th')).text('UOM');
+            const preparationTH = $(document.createElement('th')).text('Preparation');
+            const yieldTH = $(document.createElement('th')).text('Yield');
+            const ttpTH = $(document.createElement('th')).text('TTP');
+            const ingredientQtyTH = $(document.createElement('th')).text('Ingredient Qty');
+            const costTH = $(document.createElement('th')).text('Cost');
             headTR.append(
                 checkTH,
                 ingredientNameTH,
-                ingredientQuantityTH,
-                ingredientUomTH,
-                ingredientCostTH,
+                prepQtyTH,
+                uomTH,
+                preparationTH,
+                yieldTH,
+                ingredientQtyTH,
+                costTH,
             );
             thead.append(headTR);
             
@@ -895,18 +897,27 @@
                         .text(ingredient.checked ? '✓' : '');
                     const ingredientNameTD = $(document.createElement('td'))
                         .text(ingredient.menu_item_description || ingredient.full_item_description || ingredient.ingredient_name);
-                    const ingredientQuantityTD = $(document.createElement('td'))
-                        .text(ingredient.qty);
-                    const ingredientUomTD = $(document.createElement('td'))
+                    const prepQtyTD = $(document.createElement('td'))
+                        .text(ingredient.prep_qty);
+                    const uomTD = $(document.createElement('td'))
                         .text(ingredient.packaging_description || ingredient.uom_description || ingredient.uom_name);
+                    const preparationTD = $(document.createElement('td'))
+                        .text(ingredient.preparation_desc);
+                    const yieldTD = $(document.createElement('td'))
+                        .text(ingredient.yield + '%');
+                    const ingredientQtyTD = $(document.createElement('td'))
+                        .text(ingredient.qty);
                     const ingredientCostTD = $(document.createElement('td'))
                         .text(ingredient.cost)
                         .addClass(ingredient.checked ? 'version-cost' : '');
                     bodyTR.append(
                         checkTD,
                         ingredientNameTD,
-                        ingredientQuantityTD,
-                        ingredientUomTD,
+                        prepQtyTD,
+                        uomTD,
+                        preparationTD,
+                        yieldTD,
+                        ingredientQtyTD,
                         ingredientCostTD,
                     );
                     tbody.append(bodyTR);
@@ -917,7 +928,8 @@
 
             const totalCostTR = $(document.createElement('tr'));
             const totalCostLabelTD = $(document.createElement('td'))
-                .attr('colspan', '4')
+                .attr('colspan', '7')
+                .css('font-weight', 'bold')
                 .text('Total Cost');
             const totalCostValueTD = $(document.createElement('td')).text(math.round(total, 4));
             totalCostTR.append(totalCostLabelTD, totalCostValueTD);
@@ -929,7 +941,7 @@
             Swal.fire({
                 title: `Version: ${created_at}`,
                 html: wrapperDiv.prop('outerHTML'),
-                width: '50em',
+                width: '55em',
                 showCloseButton: true,
                 showConfirmButton: false,
                 focusConfirm: false,
