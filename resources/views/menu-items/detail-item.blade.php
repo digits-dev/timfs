@@ -2,8 +2,13 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
 <style>
-    th, td {
+    table th, table td {
         text-align: center;
+        border: 1px solid #aaaaaa !important; 
+    }
+    
+    table thead {
+        background: #deeaee;
     }
 
     .total-cost-label, .percentage-label {
@@ -68,8 +73,12 @@
                             <th scope="col">From</th>
                             <th scope="col">Tasteless Code</th>
                             <th scope="col">Ingredient</th>
-                            <th scope="col">Quantity</th>
+                            <th scope="col">Preparation Quantity</th>
                             <th scope="col">UOM</th>
+                            <th scope="col">Preparation</th>
+                            <th scope="col">Yield</th>
+                            <th scope="col">TTP</th>
+                            <th scope="col">Ingredient Quantity</th>
                             <th scope="col">Cost</th>
                         </tr>
                     </thead>
@@ -89,10 +98,12 @@
 @push('bottom')
 <script>
     $(document).ready(function() {
+        $('body').addClass('sidebar-collapse');
+
         const ingredients = {!! json_encode($ingredients) !!};
         const item = {!! json_encode($item) !!};
         const tbody = $('.ingredient-tbody');
-        const groupCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
+        const groupCount = new Set([...ingredients.map(e => e.ingredient_group)]);
         for (i of groupCount) {
             const groupedIngredients = ingredients.filter(e => e.ingredient_group == i);
             const isSelected = groupedIngredients.find(e => e.is_selected == 'TRUE');
@@ -104,7 +115,7 @@
                 const check = $(document.createElement('td'))
                     .text(groupedIngredient.checked ? '✓' : '')
                     .css('font-weight', '700');
-                const status = $(document.createElement('td'));
+                const status = $(document.createElement('td')); 
                 const from = $(document.createElement('td'))
                 const tastelessCode = $(document.createElement('td'))
                     .text(
@@ -120,16 +131,25 @@
                         groupedIngredient.ingredient_name
                     ).css('background', groupedIngredient.checked ? 'yellow' : '');
                 ingredient.html(ingredientSpan);
-                const quantity = $(document.createElement('td'))
-                    .text(groupedIngredient.qty);
+                const prepQuantity = $(document.createElement('td'))
+                    .text(groupedIngredient.prep_qty || 0);
                 const uom = $(document.createElement('td'))
                     .text(groupedIngredient.uom_description || groupedIngredient.uom_name);
+                const preparation = $(document.createElement('td'))
+                    .text(groupedIngredient.preparation_desc);
+                const yieldPercent = $(document.createElement('td'))
+                    .text(groupedIngredient.yield || 0);
+                const ttp = $(document.createElement('td'))
+                    .text(groupedIngredient.ttp || 0);
+                const ingredientQty = $(document.createElement('td'))
+                    .text(groupedIngredient.qty || 0);
                 const cost = $(document.createElement('td'));
                 const costSpan = $(document.createElement('span'))
-                    .text(groupedIngredient.cost)
+                    .text(groupedIngredient.cost || 0)
                     .css('font-weight', groupedIngredient.checked ? 'bold' : '')
                     .addClass(groupedIngredient.checked ? 'peso cost' : 'peso');
                 cost.html(costSpan);
+
 
                 if (groupedIngredient.full_item_description || groupedIngredient.item_masters_id)
                     from.html('<span class="label label-info">IMFS</span>')
@@ -144,7 +164,22 @@
                     status.html('<span class="label label-success">ACTIVE</span>')
                 else if (groupedIngredient.menu_item_status == 'ALTERNATIVE' || groupedIngredient.item_status == 'ALTERNATIVE')
                     status.html('<span class="label label-primary">ALTERNATIVE</span>')
-                tr.append(check, status, from, tastelessCode, ingredient, quantity, uom, cost);
+
+                tr.append(
+                    check,
+                    status,
+                    from,
+                    tastelessCode,
+                    ingredient,
+                    prepQuantity,
+                    uom,
+                    preparation,
+                    yieldPercent,
+                    ttp,
+                    ingredientQty,
+                    cost,
+                );
+
                 $('.ingredient-tbody').append(tr);
             });
         }
@@ -152,7 +187,7 @@
         const totalCostTR = $(document.createElement('tr'));
         const totalCostLabelTD = $(document.createElement('td'));
         const totalCostValueTD = $(document.createElement('td'));
-        totalCostLabelTD.attr('colspan', '7');
+        totalCostLabelTD.attr('colspan', '11');
         totalCostLabelTD.addClass('total-cost-label');
         totalCostLabelTD.text('Food Cost');
         totalCostValueTD.addClass('total-cost peso');
@@ -181,8 +216,6 @@
         }
 
         formatNumbers();
-        $('table th, table td').css('border', '1px solid #aaaaaa');
-        $('table thead').css('background', '#deeaee');
     });
     
 </script>

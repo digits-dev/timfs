@@ -1002,11 +1002,16 @@
 					'qty',
 					'uom_description',
 					'uom_name',
-					'cost')
+					'cost',
+					'yield',
+					'prep_qty',
+					'menu_ingredients_details.ttp',
+					'menu_ingredients_preparations.preparation_desc')
 				->leftJoin('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
 				->leftJoin('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
 				->leftJoin('menu_items', 'menu_ingredients_details.menu_as_ingredient_id', '=', 'menu_items.id')
 				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->leftJoin('menu_ingredients_preparations', 'menu_ingredients_details.menu_ingredients_preparations_id', 'menu_ingredients_preparations.id')
 				->orderby('ingredient_group')
 				->get()
 				->toArray();
