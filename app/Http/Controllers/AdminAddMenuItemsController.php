@@ -299,7 +299,25 @@
 	    public function hook_before_add(&$postdata) {        
 
 			$returnInputs = Input::all();
+
+			// Promo_id
+			$promo_id = DB::table('menu_types')
+			->select('id')
+			->where('status', 'ACTIVE')
+			->where('menu_type_description', 'PROMO')->value('id');
+
+			if($returnInputs['menu_type'] == $promo_id){
+				$tasteless_menu_code = (int) DB::table('menu_items')->where('tasteless_menu_code','like',"5%")
+				->select('tasteless_menu_code')
+				->max('tasteless_menu_code');
+			}else{
+				$tasteless_menu_code = (int) DB::table('menu_items')->where('tasteless_menu_code','like',"6%")
+				->select('tasteless_menu_code')
+				->max('tasteless_menu_code');
+			}
 			// Add data to database
+
+			$postdata['tasteless_menu_code'] = $tasteless_menu_code+1;
 			$postdata['old_code_1'] = $returnInputs['pos_item_code_1'];
 			$postdata['old_code_2'] = $returnInputs['pos_item_code_2'];
 			$postdata['old_code_3'] = $returnInputs['pos_item_code_3'];
@@ -356,7 +374,8 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {  
-			
+
+
 			$returnInputs = Input::all();
 			$row = DB::table('menu_items')->where('id',$id)->get()->toArray();
 			$menu_segment_names = [];
@@ -407,7 +426,6 @@
 					$postdata[$segments] = null;
 				}				
 			}
-
 		
 		
 	    }
@@ -464,27 +482,27 @@
 			$data['menu_product_types'] = DB::table('menu_product_types')
 				->where('status','ACTIVE')
 				->orderBy('menu_product_type_description')
-				->get();
+				->get()->unique('menu_product_type_description');
 			// Menu Types
 			$data['menu_types'] = DB::table('menu_types')
 				->where('status', 'ACTIVE')
 				->orderBy('menu_type_description')
-				->get();
+				->get()->unique('menu_type_description');
 			// Menu Categories
 			$data['menu_categories'] = DB::table('menu_categories')
 				->where('status', 'ACTIVE')
 				->orderBy('category_description')
-				->get();
+				->get()->unique('category_description');
 			// Menu Segmentations
 			$data['menu_segmentations'] = DB::table('menu_segmentations')
 				->where('status','ACTIVE')
 				->orderBy('menu_segment_column_description')
-				->get();
+				->get()->unique('menu_segment_column_description');
 			// Menu Subcategories
 			$data['menu_subcategories'] = DB::table('menu_subcategories')
 				->where('status', 'ACTIVE')
 				->orderBy('subcategory_description')
-				->get();
+				->get()->unique('subcategory_description');
 
 			return $this->view('menu-items.add-menu-items',$data);
 		}
@@ -502,27 +520,27 @@
 			$data['menu_product_types'] = DB::table('menu_product_types')
 				->where('status','ACTIVE')
 				->orderBy('menu_product_type_description')
-				->get();
+				->get()->unique('menu_product_type_description');
 			// Menu Types
 			$data['menu_types'] = DB::table('menu_types')
 				->where('status', 'ACTIVE')
 				->orderBy('menu_type_description')
-				->get();
+				->get()->unique('menu_type_description');
 			// Menu Categories
 			$data['menu_categories'] = DB::table('menu_categories')
 				->where('status', 'ACTIVE')
 				->orderBy('category_description')
-				->get();
+				->get()->unique('category_description');
 			// Menu Subcategories
 			$data['menu_subcategories'] = DB::table('menu_subcategories')
 				->where('status', 'ACTIVE')
 				->orderBy('subcategory_description')
-				->get();	
+				->get()->unique('subcategory_description');	
 			// Menu Segmentations
 			$data['menu_segmentations'] = DB::table('menu_segmentations')
 				->where('status','ACTIVE')
 				->orderBy('menu_segment_column_description')
-				->get();
+				->get()->unique('menu_segment_column_description');
 			// User Menu Segments
 			$user_menu_segmentations = DB::table('menu_segmentations')
 				->where('status','ACTIVE')
