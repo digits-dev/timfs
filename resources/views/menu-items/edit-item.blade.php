@@ -1181,38 +1181,6 @@
             );
         });
 
-        $(document).on('click', '#add-existing', function() {
-            const section = $($('.ingredient-wrapper').eq(0).clone());
-            section.find('input').val('');
-            section.find('.ingredient').val('');
-            section.find('.display-ingredient').val('');
-            section.find('.ingredient').val('');
-            section.find('.prep-quantity').val('');
-            section.find('.uom').val('');
-            section.find('.cost').val('');
-            section.css('display', '');
-            $('.ingredient-section').append(section);
-            $('.item-list').fadeOut();
-            $('.no-ingredient-warning').remove();
-            $.fn.reload();
-        });
-
-        $(document).on('click', '#add-new', function() {
-            const section = $($('.new-ingredient-wrapper').eq(0).clone());
-            // section.find('input').val('').attr('readonly', false);
-            // section.find('.ingredient').val('');
-            // section.find('.display-ingredient').val('');
-            // section.find('.ingredient').val('');
-            // section.find('.prep-quantity').val('');
-            // section.find('.uom').val('');
-            // section.find('.cost').val('');
-            section.css('display', '');
-            $('.ingredient-section').append(section);
-            $('.item-list').fadeOut();
-            $('.no-ingredient-warning').remove();
-            $.fn.reload();
-        });
-
         $(document).on('click', '.move-down', function() {
             const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper');
             const sibling = entry.next()[0];
@@ -1245,6 +1213,38 @@
                 }
             );
             
+        });
+
+        $(document).on('click', '#add-existing', function() {
+            const section = $($('.ingredient-wrapper').eq(0).clone());
+            section.find('input').val('');
+            section.find('.ingredient').val('');
+            section.find('.display-ingredient').val('');
+            section.find('.ingredient').val('');
+            section.find('.prep-quantity').val('');
+            section.find('.uom').val('');
+            section.find('.cost').val('');
+            section.css('display', '');
+            $('.ingredient-section').append(section);
+            $('.item-list').fadeOut();
+            $('.no-ingredient-warning').remove();
+            $.fn.reload();
+        });
+
+        $(document).on('click', '#add-new', function() {
+            const section = $($('.new-ingredient-wrapper').eq(0).clone());
+            // section.find('input').val('').attr('readonly', false);
+            // section.find('.ingredient').val('');
+            // section.find('.display-ingredient').val('');
+            // section.find('.ingredient').val('');
+            // section.find('.prep-quantity').val('');
+            // section.find('.uom').val('');
+            // section.find('.cost').val('');
+            section.css('display', '');
+            $('.ingredient-section').append(section);
+            $('.item-list').fadeOut();
+            $('.no-ingredient-warning').remove();
+            $.fn.reload();
         });
 
         $(document).on('click', '.delete', function(event) {
