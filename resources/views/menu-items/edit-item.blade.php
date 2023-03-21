@@ -879,6 +879,7 @@
                 uomTH,
                 preparationTH,
                 yieldTH,
+                ttpTH,
                 ingredientQtyTH,
                 costTH,
             );
@@ -905,6 +906,8 @@
                         .text(ingredient.preparation_desc);
                     const yieldTD = $(document.createElement('td'))
                         .text(ingredient.yield + '%');
+                    const ttpTD = $(document.createElement('td'))
+                        .text(ingredient.ttp);
                     const ingredientQtyTD = $(document.createElement('td'))
                         .text(ingredient.qty);
                     const ingredientCostTD = $(document.createElement('td'))
@@ -917,6 +920,7 @@
                         uomTD,
                         preparationTD,
                         yieldTD,
+                        ttpTD,
                         ingredientQtyTD,
                         ingredientCostTD,
                     );
@@ -928,7 +932,7 @@
 
             const totalCostTR = $(document.createElement('tr'));
             const totalCostLabelTD = $(document.createElement('td'))
-                .attr('colspan', '7')
+                .attr('colspan', '8')
                 .css('font-weight', 'bold')
                 .text('Total Cost');
             const totalCostValueTD = $(document.createElement('td')).text(math.round(total, 4));
@@ -1043,6 +1047,10 @@
                     ingredientObject.uom_name = ingredientMember.find('.uom_name').val()?.trim().toUpperCase();
                     ingredientObject.menu_ingredients_preparations_id = ingredientMember.find('.preparation').val();
                     ingredientObject.yield = ingredientMember.find('.yield').val();
+                    ingredientObject.ttp = ingredientMember.find('.ttp').val();
+                    ingredientObject.qty = ingredientMember.find('.ing-quantity').val();
+                    ingredientObject.cost = ingredientMember.find('.cost').val().replace(/[^0-9.]/g, '');
+                    ingredientObject.total_cost = $('.total-cost').val().replace(/[^0-9.]/g, '');
                     ingredientArray.push(ingredientObject);
                 });
                 if (ingredientArray.length) {
