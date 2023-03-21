@@ -946,6 +946,14 @@
 					$ingredient['status'] = 'ACTIVE';
 					$ingredient['deleted_at'] = null;
 					$ingredient['deleted_by'] = null;
+
+					//unsetting ingredients details that could be outdated
+					unset(
+						$ingredient['ttp'], 
+						$ingredient['qty'], 
+						$ingredient['cost'], 
+						$ingredient['total_cost'], 
+					);
 	
 					//finally, inserting ingredients to menu ingredients details table
 					DB::table('menu_ingredients_details_temp')->updateOrInsert([
