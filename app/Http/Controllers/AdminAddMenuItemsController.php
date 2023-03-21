@@ -307,7 +307,7 @@
 
 			$returnInputs = Input::all();
 
-			// Promo_id
+			// Tasteless menu code
 			$promo_id = DB::table('menu_types')
 			->select('id')
 			->where('status', 'ACTIVE')
@@ -322,8 +322,8 @@
 				->select('tasteless_menu_code')
 				->max('tasteless_menu_code');
 			}
-			// Add data to database
 
+			// Add data to database
 			$postdata['tasteless_menu_code'] = $tasteless_menu_code+1;
 			$postdata['old_code_1'] = $returnInputs['pos_item_code_1'];
 			$postdata['old_code_2'] = $returnInputs['pos_item_code_2'];
