@@ -27,7 +27,11 @@ class CreateMenuIngredientsAutoComputeView extends Migration
             CREATE VIEW MENU_INGREDIENTS_AUTO_COMPUTE AS 
             SELECT
                 *,
-                round( (qty / 1000 * ttp), 4) AS cost
+                round( (
+                        innerQuery.qty * innerQuery.ttp
+                    ) / 1000,
+                    4
+                ) AS cost
             FROM (
                 SELECT
                     menu_ingredients_details_temp.id,
@@ -51,16 +55,11 @@ class CreateMenuIngredientsAutoComputeView extends Migration
                     menu_ingredients_details_temp.yield,
                     menu_ingredients_details_temp.status,
                     menu_items.food_cost_temp AS food_cost,
-                    round( (prep_qty * 10000) / (yield * 100),
-                        4
-                    ) AS qty,
+                    round( (prep_qty / (yield) * 100), 4) AS qty,
                     CASE
-                        WHEN menu_items.id IS NOT NULL THEN menu_items.food_cost_temp
                         WHEN item_masters_ttp.id IS NOT NULL THEN item_masters_ttp.computed_ttp
-                        ELSE round(
-                            menu_ingredients_details_temp.ttp,
-                            4
-                        )
+                        WHEN menu_ingredients_details_temp.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost_temp, 4)
+                        ELSE menu_ingredients_details_temp.ttp
                     END AS ttp
                 FROM
                     menu_ingredients_details_temp
@@ -68,8 +67,7 @@ class CreateMenuIngredientsAutoComputeView extends Migration
                     LEFT JOIN menu_items ON menu_items.id = menu_ingredients_details_temp.menu_as_ingredient_id
                     LEFT JOIN uoms ON menu_ingredients_details_temp.uom_id = uoms.id
                     LEFT JOIN packagings ON packagings.id = menu_ingredients_details_temp.uom_id
-            ) AS innerQuery
-    
+            ) AS innerQuery    
     
         ");
 

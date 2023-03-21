@@ -798,44 +798,6 @@
 				->get()
 				->toArray();
 
-			// $current_ingredients = DB::table('menu_ingredients_details_temp')
-			// 	->where('menu_items_id', $id)
-			// 	->where('menu_ingredients_details_temp.status', 'ACTIVE')
-			// 	->select(\DB::raw('item_masters.id as item_masters_id'),
-			// 		'ingredient_name',
-			// 		'menu_as_ingredient_id',
-			// 		'menu_item_description',
-			// 		'is_selected',
-			// 		'is_primary',
-			// 		'is_existing',
-			// 		'qty',
-			// 		'cost',
-			// 		'food_cost',
-			// 		'ingredient_group',
-			// 		'uom_id',
-			// 		'uom_name',
-			// 		'packagings.packaging_description',
-			// 		'uoms.uom_description',
-			// 		'prep_qty',
-			// 		'menu_ingredients_preparations_id',
-			// 		'yield',
-			// 		'menu_ingredients_details_temp.ttp',
-			// 		\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
-			// 		'item_masters.full_item_description',
-			// 		'sku_status_description as item_status',
-			// 		'menu_items.status as menu_status',
-			// 		'item_masters.updated_at',
-			// 		'item_masters.created_at')
-			// 	->leftJoin('item_masters', 'menu_ingredients_details_temp.item_masters_id', '=', 'item_masters.id')
-			// 	->leftJoin('packagings', 'menu_ingredients_details_temp.uom_id', '=', 'packagings.id')
-			// 	->leftJoin('uoms', 'menu_ingredients_details_temp.uom_id', '=', 'uoms.id')
-			// 	->leftJoin('menu_items', 'menu_ingredients_details_temp.menu_as_ingredient_id', '=', 'menu_items.id')
-			// 	->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
-			// 	->orderBy('ingredient_group', 'ASC')
-			// 	->orderBy('row_id', 'ASC')
-			// 	->get()
-			// 	->toArray();
-
 			$versions = DB::table('menu_ingredients_versions')
 				->where('menu_items_id', $id)
 				->select('menu_ingredients_versions.ingredients_json', 'menu_ingredients_versions.created_at', 'cms_users.name')
@@ -1000,10 +962,10 @@
 				->where('status', 'ACTIVE')
 				->where('menu_as_ingredient_id', $menu_items_id)
 				->get()
-				->toArray();			
+				->toArray();
 
 			//calling the function... should start the recursion
-			self::updateCostOfOtherMenu($to_update, $food_cost, '_temp'); //-- COMMENTING FOR NOW !!!
+			self::updateCostOfOtherMenu($to_update);
 
 
 			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
@@ -1215,25 +1177,15 @@
 			return json_encode($response);
 		}
 
-		function updateCostOfOtherMenu($ingredients_to_update, $updated_cost, $temp) {
+		function updateCostOfOtherMenu($ingredients_to_update) {
 			//stopping the recursion if array is empty
 			if (!$ingredients_to_update) return;
 
-			
 			foreach ($ingredients_to_update as $ingredient_to_update) {
-				//initializing an array of ingredients that need to be updated
-				$to_update = [];
 
-				//updating the ingredient
-				$updated_ingredient = tap(DB::table('menu_ingredients_details' . $temp)
-					->where('status', 'ACTIVE')
-					->where('id', $ingredient_to_update->id))
-					->update(['cost' => round($ingredient_to_update->qty * $updated_cost, 4)])
-					->first();
-				
-				//getting the new total cost of the menu
-				$ingredients_of_updated_menu = DB::table('menu_ingredients_details' . $temp)
-					->where('menu_items_id', $updated_ingredient->menu_items_id)
+				//gettIng the ingredients of the affected menu item
+				$ingredients_to_calculate = DB::table('menu_ingredients_auto_compute')
+					->where('menu_items_id', $ingredient_to_update->menu_items_id)
 					->where('status', 'ACTIVE')
 					->get()
 					->toArray();
@@ -1241,8 +1193,8 @@
 				//grouping the ingredients	
 				$grouped_ingredients = [];
 
-				foreach ($ingredients_of_updated_menu as $ingredient_of_updated_menu) {
-					$grouped_ingredients[$ingredient_of_updated_menu->ingredient_group][] = $ingredient_of_updated_menu;
+				foreach ($ingredients_to_calculate as $ingredient_to_calculate) {
+					$grouped_ingredients[$ingredient_to_calculate->ingredient_group][] = $ingredient_to_calculate;
 				}
 
 				//getting the new food cost of the updated menu
@@ -1260,27 +1212,23 @@
 
 				//updating the food cost and food cost percentage
 				DB::table('menu_items')
-					->where('id', $updated_ingredient->menu_items_id)
-					->update(['food_cost' . $temp => round($food_cost_of_updated_menu, 4)]);
+					->where('id', $ingredient_to_update->menu_items_id)
+					->update(['food_cost_temp' => round($food_cost_of_updated_menu, 4)]);
 
 				DB::table('menu_items')
-					->where('id', $updated_ingredient->menu_items_id)
-					->update(['food_cost_percentage' . $temp => DB::raw('ROUND(food_cost / menu_price_dine * 100, 2)')]);
-
-				$updated_menu = DB::table('menu_items')
-					->where('id', $updated_ingredient->menu_items_id)
-					->first();
+					->where('id', $ingredient_to_update->menu_items_id)
+					->update(['food_cost_percentage_temp' => DB::raw('ROUND(food_cost / menu_price_dine * 100, 2)')]);
 				
 				//another array of ingredients to be updated
-				$to_update = DB::table('menu_ingredients_details' . $temp)
+				$to_update = DB::table('menu_ingredients_details_temp')
 					->where('status', 'ACTIVE')
-					->where('menu_as_ingredient_id', $updated_menu->id)
+					->where('menu_as_ingredient_id', $ingredient_to_update->menu_items_id)
 					->get()
 					->toArray();
 
 				//finally, calling the function itself
 				//the process keeps going on until there are no more ingredients to be updated
-				self::updateCostOfOtherMenu($to_update, $updated_menu->food_cost, $temp);
+				self::updateCostOfOtherMenu($to_update);
 			}
 
 		}

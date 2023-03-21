@@ -1012,7 +1012,7 @@
             const ingredientQuantityInput = entry.find('.ing-quantity');
             const costInput = entry.find('.cost');
             let yieldPercent = yieldInput.val() || 0;
-            const ingredientQuantity = math.round(((preperationQuantity * 10000) / (yieldPercent * 100)), 4);
+            const ingredientQuantity = math.round(preperationQuantity / (yieldPercent) * 100, 4);
             const cost = math.round(ingredientQuantity / 1000 * ttp, 4);
             ingredientQuantityInput.val(ingredientQuantity);
             costInput.val(cost);
