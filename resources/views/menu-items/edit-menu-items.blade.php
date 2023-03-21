@@ -96,6 +96,17 @@
         text-align: center;
     }
 
+    .select2-container .select2-selection--single .select2-selection__rendered{
+        padding: 0 !important;
+        margin-top: -2px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__clear{
+        margin-right: 10px !important;
+        padding: 0 !important;
+    }
+    
+
 </style>
 @endpush
 @extends('crudbooster::admin_template')
