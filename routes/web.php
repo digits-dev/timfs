@@ -11,6 +11,7 @@
 |
 */
 
+use App\Http\Controllers\AdminAddMenuItemsController;
 use App\Http\Controllers\AdminMenuItemsController;
 use App\Http\Controllers\AdminFoodCostController;
 use App\Http\Controllers\AdminExperimentalMenuItemsController;
@@ -80,6 +81,12 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/food_cost/filter', [AdminFoodCostController::class, 'filterByCost'])->name('filter_by_cost');
     Route::post('/admin/experimental_menu_items/edit', [AdminExperimentalMenuItemsController::class, 'submitEdit'])->name('edit_experimental_menu_item');
     Route::post('/admin/menu_items/search', [AdminMenuItemsController::class, 'searchIngredient'])->name('search_ingredient');
+
     Route::get('admin/food_cost/{low_cost_value}', [AdminFoodCostController::class, 'getIndex']);
     Route::get('/admin/food_cost/{concept}/{filter}/{low_cost}', [AdminFoodCostController::class, 'filterByCost'])->name('filter_by_cost');
+
+    // add menu items
+    Route::get('/admin/add_menu_items/add', [AdminAddMenuItemsController::class, 'getAdd']);
+    Route::get('/admin/add_menu_items/edit/{id}', [AdminAddMenuItemsController::class, 'getEdit']);
+    Route::get('/admin/add_menu_items/detail/{id}', [AdminAddMenuItemsController::class, 'getDetail']);
 });
