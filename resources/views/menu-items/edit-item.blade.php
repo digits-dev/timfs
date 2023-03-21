@@ -1043,11 +1043,6 @@
                     ingredientObject.uom_name = ingredientMember.find('.uom_name').val()?.trim().toUpperCase();
                     ingredientObject.menu_ingredients_preparations_id = ingredientMember.find('.preparation').val();
                     ingredientObject.yield = ingredientMember.find('.yield').val();
-                    ingredientObject.ttp = ingredientMember.find('.ttp').val();
-                    ingredientObject.qty = ingredientMember.find('.ing-quantity').val();
-                    ingredientObject.cost = ingredientMember.find('.cost').val().replace(/[^0-9.]/g, '');
-                    ingredientObject.total_cost = $('.total-cost').val().replace(/[^0-9.]/g, '');
-
                     ingredientArray.push(ingredientObject);
                 });
                 if (ingredientArray.length) {
