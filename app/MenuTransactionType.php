@@ -4,9 +4,11 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use CRUDBooster;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MenuTransactionType extends Model
 {
+    use SoftDeletes;
     protected $table = 'menu_transaction_types';
 
     protected $fillable = [
@@ -25,6 +27,10 @@ class MenuTransactionType extends Model
        static::updating(function($model)
        {
            $model->updated_by = CRUDBooster::myId();
+       });
+       static::deleting(function($model)
+       {
+           $model->status = 'INACTIVE';
        });
    }
 }
