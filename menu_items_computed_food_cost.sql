@@ -4,7 +4,11 @@ CREATE VIEW MENU_COMPUTED_FOOD_COST AS
 	    menu_items.tasteless_menu_code,
 	    menu_items.menu_item_description,
 	    menu_items.status,
-	    ROUND(SUM(subquery.cost), 4) AS food_cost
+	    menu_items.food_cost,
+	    menu_items.food_cost_percentage,
+	    menu_items.food_cost_temp,
+	    menu_items.food_cost_percentage_temp,
+	    ROUND(SUM(subquery.cost), 4) AS computed_food_cost
 	FROM menu_items
 	    JOIN (
 	        SELECT
