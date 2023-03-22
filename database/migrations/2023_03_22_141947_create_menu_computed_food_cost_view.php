@@ -45,6 +45,7 @@ class CreateMenuComputedFoodCostView extends Migration
                         JOIN menu_ingredients_auto_compute pic ON mi.id = pic.menu_items_id
                         AND pic.ingredient_group = ig.ingredient_group
                         AND pic.is_primary = 'TRUE'
+                        AND pic.status = 'ACTIVE'
                         LEFT JOIN (
                             SELECT
                                 menu_items_id,
@@ -54,6 +55,7 @@ class CreateMenuComputedFoodCostView extends Migration
                                 menu_ingredients_auto_compute
                             WHERE
                                 is_selected = 'TRUE'
+                                AND menu_ingredients_auto_compute.status = 'ACTIVE'
                         ) sic ON mi.id = sic.menu_items_id
                         AND sic.ingredient_group = ig.ingredient_group
                     GROUP BY
