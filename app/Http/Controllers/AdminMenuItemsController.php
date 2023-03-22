@@ -891,8 +891,10 @@
 					// if from USER
 					else {
 						$ingredient_data = DB::table('menu_ingredients_preparations')
-							->where('id', DB::raw($member['menu_ingredients_preparations_id']))
-							->get('preparation_desc')
+							->where('menu_ingredients_preparations.id', DB::raw($member['menu_ingredients_preparations_id']))
+							->select('preparation_desc', 'uom_description')
+							->leftJoin('uoms', 'uoms.id', '=', DB::raw($member['uom_id']))
+							->get()
 							->first();
 					}
 					$ingredient_version[] = array_merge($member, (array) $ingredient_data);
