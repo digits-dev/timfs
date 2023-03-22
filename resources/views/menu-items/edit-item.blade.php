@@ -1000,7 +1000,7 @@
                     uom: e.packagings_id || e.uoms_id,
                     uom_desc: e.packaging_description || e.uom_description,
                     menu_item_id: e.menu_item_id,
-                    food_cost: e.food_cost,
+                    food_cost_temp: e.food_cost_temp,
                     item_desc: e.full_item_description || e.menu_item_description,
                     date_updated: e.updated_at || e.created_at,
                 });
@@ -1146,7 +1146,7 @@
             ingredient.val($(this).attr('item_id') || $(this).attr('menu_item_id'));
             ingredient.attr({
                 cost: $(this).attr('cost'),
-                food_cost: $(this).attr('food_cost'),
+                food_cost_temp: $(this).attr('food_cost_temp'),
                 uom: $(this).attr('uom'),
                 item_id: $(this).attr('item_id'),
                 menu_item_id: $(this).attr('menu_item_id'),
@@ -1157,7 +1157,7 @@
             entry.find('.ingredient-menu').val($(this).attr('menu_item_id'));
             entry.find('.uom').val($(this).attr('uom'));
             entry.find('.display-uom').val($(this).attr('uom_desc'));
-            entry.find('.ttp').val($(this).attr('cost') || $(this).attr('food_cost') || 0);
+            entry.find('.ttp').val($(this).attr('cost') || $(this).attr('food_cost_temp') || 0);
             entry.find('.yield').val('100').attr('readonly', false);
             entry.find('.preparation').attr('disabled', false);
             entry.find('.ing-quantity').val('1');

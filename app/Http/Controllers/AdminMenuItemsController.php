@@ -1204,8 +1204,8 @@
 				->select('menu_items.id as menu_item_id',
 					'menu_item_description',
 					'tasteless_menu_code',
-					'food_cost',
-					'food_cost_percentage',
+					'food_cost_temp',
+					'food_cost_percentage_temp',
 					'menu_items.uoms_id',
 					'uom_description')
 				->leftJoin('uoms', 'uoms.id', '=', 'menu_items.uoms_id')
@@ -1257,7 +1257,7 @@
 
 				DB::table('menu_items')
 					->where('id', $ingredient_to_update->menu_items_id)
-					->update(['food_cost_percentage_temp' => DB::raw('ROUND(food_cost / menu_price_dine * 100, 2)')]);
+					->update(['food_cost_percentage_temp' => DB::raw('ROUND(food_cost_temp / menu_price_dine * 100, 2)')]);
 				
 				//another array of ingredients to be updated
 				$to_update = DB::table('menu_ingredients_details_temp')
