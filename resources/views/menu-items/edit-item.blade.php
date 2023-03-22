@@ -657,7 +657,11 @@
                         menu_item_id: savedIngredient.menu_as_ingredient_id,
                     });
 
-                    if (savedIngredient.item_masters_id) element.find('.date-updated').text(`Updated ${timeago.format(savedIngredient.updated_at || savedIngredient.created_at)}`);
+                    if (savedIngredient.item_masters_id) element.find('.date-updated').text(
+                        savedIngredient.updated_at ? `Updated ${timeago.format(savedIngredient.updated_at)}` :
+                        savedIngredient.created_at ? `Updated ${timeago.format(savedIngredient.created_at)}` :
+                        ''
+                    );
                     element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
                     element.find('.ingredient_name').val(savedIngredient.ingredient_name);
                     element.find('.prep-quantity').val(savedIngredient.prep_qty || 0).attr('readonly', false);
@@ -1126,15 +1130,17 @@
             const ingredient = entry.find('.ingredient');
 
             if (!$(this).attr('item_id') && !$(this).attr('menu_item_id')) return;
-            if ($(this).attr('item_id') && !$(this).attr('menu_item_id'))
+            if ($(this).attr('item_id') && !$(this).attr('menu_item_id')) {
                 entry.find('.item-from')
                     .removeClass('label-info label-warning label-success label-secondary label-primary')
                     .addClass('label-info')
                     .text('IMFS');
-            else
+            } else {
                 entry.find('.item-from')
                     .removeClass('label-info label-warning label-success label-secondary label-primary')
-                    .addClass('label-warning').text('MIMF')
+                    .addClass('label-warning')
+                    .text('MIMF')
+            }
             
             entry.find('.label-danger').text('');
             ingredient.val($(this).attr('item_id') || $(this).attr('menu_item_id'));
@@ -1157,7 +1163,11 @@
             entry.find('.ing-quantity').val('1');
             entry.find('.prep-quantity').val('1');
             entry.find('.prep-quantity').attr('readonly', false);
-            if ($(this).attr('item_id')) entry.find('.date-updated').text(`Updated ${timeago.format($(this).attr('date_updated'))}`)
+            if ($(this).attr('item_id')) entry.find('.date-updated').text(
+                $(this).attr('updated_at') ? `Updated ${timeago.format($(this).attr('updated_at'))}` :
+                $(this).attr('created_at') ? `Updated ${timeago.format($(this).attr('created_at'))}` :
+                ''
+            );
             $('#form input:valid, #form select:valid').css('outline', 'none');
             $('.item-list').html('');  
             $('.item-list').fadeOut();

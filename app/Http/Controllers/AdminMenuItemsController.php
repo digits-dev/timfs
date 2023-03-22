@@ -1178,11 +1178,11 @@
 					\DB::raw('round(item_masters.ttp / item_masters.packaging_size, 4) as ingredient_cost'),
 					'item_masters.full_item_description',
 					'item_masters.tasteless_code',
-					'packagings.packaging_description',
+					'uoms.uom_description',
 					'brands.brand_description',
 					'item_masters.updated_at',
 					'item_masters.created_at')
-				->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
+				->leftJoin('uoms','item_masters.packagings_id', '=', 'uoms.id')
 				->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id')
 				->orderby('full_item_description')
 				->get()
