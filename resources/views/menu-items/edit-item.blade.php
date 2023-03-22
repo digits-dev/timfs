@@ -344,7 +344,7 @@
     </div>
 </div>
 
- <div class="new-ingredient-wrapper" style="display: none;">
+<div class="new-ingredient-wrapper" style="display: none;">
     <div class="ingredient-entry" isExisting="false">
         <div class="ingredient-inputs">
             <label class="ingredient-label">
@@ -404,7 +404,7 @@
     </div>
 </div>
 
- <div class="substitute" style="display: none;" isExisting="true">
+<div class="substitute" style="display: none;" isExisting="true">
     <div class="ingredient-inputs">
         <label class="ingredient-label">
             <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span> <span class="date-updated"></span>
@@ -455,9 +455,9 @@
         <button class="btn btn-info set-primary" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
         <button class="btn btn-danger delete-sub" title="Delete Ingredient" type="button"> <i class="fa fa-minus" ></i></button>
     </div>
- </div> 
+</div> 
 
- <div class="new-substitute" style="display: none;" isExisting="false">
+<div class="new-substitute" style="display: none;" isExisting="false">
     <div class="ingredient-inputs">
         <label class="ingredient-label">
             <span class="required-star">*</span> Ingredient <span class="item-from label label-secondary">USER</span>
@@ -506,7 +506,7 @@
         <button class="btn btn-info set-primary" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
         <button class="btn btn-danger delete-sub" title="Delete Ingredient" type="button"> <i class="fa fa-minus" ></i></button>
     </div>
- </div> 
+</div> 
 
 {{-- 
     END OF COPY
