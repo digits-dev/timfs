@@ -1,46 +1,44 @@
-SELECT
-    menu_items.id,
-    menu_items.tasteless_menu_code,
-    menu_items.menu_item_description,
-    SUM() as food_cost
-FROM menu_items
-    LEFT JOIN (
-        SELECT
-            menu_items_id,
-            menu_item_description,
-            SUM(
-                CASE
-                    WHEN is_primary = 'TRUE' THEN cost
-                    ELSE 0
-                END
-            ) as primary_cost,
-            SUM(
-                CASE
-                    WHEN is_selected = 'TRUE' THEN cost
-                    ELSE 0
-                END
-            ) as selected_cost
-        FROM (
-                SELECT
-                    menu_items.id as menu_items_id,
-                    menu_items.menu_item_description as menu_description,
-                    menu_items.tasteless_menu_code,
-                    menu_ingredients_auto_compute.ttp,
-                    menu_ingredients_auto_compute.menu_item_description,
-                    menu_ingredients_auto_compute.ingredient_group,
-                    menu_ingredients_auto_compute.full_item_description,
-                    menu_ingredients_auto_compute.is_primary,
-                    menu_ingredients_auto_compute.is_selected,
-                    menu_ingredients_auto_compute.is_existing,
-                    menu_ingredients_auto_compute.cost
-                FROM
-                    menu_ingredients_auto_compute
-                    LEFT JOIN menu_items on menu_items.id = menu_ingredients_auto_compute.menu_items_id
-                WHERE
-                    menu_ingredients_auto_compute.is_primary = 'TRUE'
-                    OR menu_ingredients_auto_compute.is_selected = 'TRUE'
-            ) as innerQuery
-        GROUP BY
-            ingredient_group
-    ) as sub_query
-GROUP BY menu_items_id
+CREATE VIEW MENU_COMPUTED_FOOD_COST AS 
+	SELECT
+	    menu_items.id,
+	    menu_items.tasteless_menu_code,
+	    menu_items.menu_item_description,
+	    menu_items.status,
+	    ROUND(SUM(subquery.cost), 4) AS food_cost
+	FROM menu_items
+	    JOIN (
+	        SELECT
+	            mi.id AS menu_items_id,
+	            ig.ingredient_group,
+	            SUM(COALESCE(sic.cost, pic.cost)) AS cost
+	        FROM menu_items mi
+	            JOIN (
+	                SELECT
+	                    menu_items_id,
+	                    ingredient_group
+	                FROM
+	                    menu_ingredients_auto_compute
+	                GROUP BY
+	                    menu_items_id,
+	                    ingredient_group
+	            ) ig ON mi.id = ig.menu_items_id
+	            JOIN menu_ingredients_auto_compute pic ON mi.id = pic.menu_items_id
+	            AND pic.ingredient_group = ig.ingredient_group
+	            AND pic.is_primary = 'TRUE'
+	            LEFT JOIN (
+	                SELECT
+	                    menu_items_id,
+	                    ingredient_group,
+	                    cost
+	                FROM
+	                    menu_ingredients_auto_compute
+	                WHERE
+	                    is_selected = 'TRUE'
+	            ) sic ON mi.id = sic.menu_items_id
+	            AND sic.ingredient_group = ig.ingredient_group
+	        GROUP BY
+	            mi.id,
+	            ig.ingredient_group
+	    ) subquery ON subquery.menu_items_id = menu_items.id
+	GROUP BY (subquery.menu_items_id)
+; 
