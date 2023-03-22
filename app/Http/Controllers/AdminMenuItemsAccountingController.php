@@ -440,41 +440,37 @@
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 
-			$current_ingredients = DB::table('menu_ingredients_details_temp')
+			$current_ingredients = DB::table('menu_ingredients_auto_compute')
 				->where('menu_items_id', $id)
-				->where('menu_ingredients_details_temp.status', 'ACTIVE')
+				->where('menu_ingredients_auto_compute.status', 'ACTIVE')
 				->select(\DB::raw('item_masters.id as item_masters_id'),
 					'ingredient_name',
 					'menu_as_ingredient_id',
-					'menu_item_description',
+					'menu_ingredients_auto_compute.menu_item_description',
 					'is_selected',
 					'is_primary',
 					'is_existing',
 					'qty',
 					'cost',
-					'food_cost',
+					'menu_items.food_cost',
 					'ingredient_group',
 					'uom_id',
 					'uom_name',
-					'packagings.packaging_description',
-					'uoms.uom_description',
+					'uom_description',
+					'packaging_description',
 					'prep_qty',
 					'menu_ingredients_preparations_id',
 					'yield',
-					'menu_ingredients_details_temp.ttp',
-					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
+					'menu_ingredients_auto_compute.ttp',
+					'menu_ingredients_auto_compute.ttp as ingredient_cost',
 					'item_masters.full_item_description',
 					'sku_status_description as item_status',
 					'menu_items.status as menu_status',
 					'item_masters.updated_at',
 					'item_masters.created_at')
-				->leftJoin('item_masters', 'menu_ingredients_details_temp.item_masters_id', '=', 'item_masters.id')
-				->leftJoin('packagings', 'menu_ingredients_details_temp.uom_id', '=', 'packagings.id')
-				->leftJoin('uoms', 'menu_ingredients_details_temp.uom_id', '=', 'uoms.id')
-				->leftJoin('menu_items', 'menu_ingredients_details_temp.menu_as_ingredient_id', '=', 'menu_items.id')
+				->leftJoin('item_masters', 'item_masters.id', '=', 'menu_ingredients_auto_compute.item_masters_id')
+				->leftJoin('menu_items', 'menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
 				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
-				->orderBy('ingredient_group', 'ASC')
-				->orderBy('row_id', 'ASC')
 				->get()
 				->toArray();
 

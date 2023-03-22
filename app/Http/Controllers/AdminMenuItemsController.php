@@ -1073,10 +1073,29 @@
 			if ($updated_item->marketing_approval_status == 'APPROVED' &&
 			$updated_item->accounting_approval_status == 'APPROVED') {
 				
-				$ingredients = DB::table('menu_ingredients_details_temp')
+				$ingredients = DB::table('menu_ingredients_auto_compute')
 					->where('menu_items_id', $data['menu_items_id'])
 					->where('status', 'ACTIVE')
-					->select('*')
+					->select('id',
+						'menu_items_id',
+						'item_masters_id',
+						'menu_as_ingredient_id',
+						'ingredient_name',
+						'row_id',
+						'ingredient_group',
+						'is_primary',
+						'is_selected',
+						'is_existing',
+						'status',
+						'qty',
+						'prep_qty',
+						'uom_id',
+						'uom_name',
+						'menu_as_ingredient_id',
+						'menu_ingredients_preparations_id',
+						'yield',
+						'ttp',
+						'cost')
 					->orderBy('id', 'ASC')
 					->get()
 					->toArray();
