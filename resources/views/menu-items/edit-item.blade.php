@@ -118,10 +118,6 @@
         margin-bottom: 10px;
     }
 
-    .uom {
-        width: 199.6px;
-    }
-
     .swal2-popup, .swal2-modal, .swal2-icon-warning .swal2-show {
         font-size: 1.6rem !important;
     }
@@ -361,9 +357,11 @@
             </label>
             <label>
                 <span class="required-star">*</span> Ingredient UOM
-                <div>
-                    <input type="text" class="form-control uom_name" name="uom_name[]" value="" required>
-                </div>
+                <select class="form-control uom">
+                    @foreach ($uoms as $uom)
+                    <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                    @endforeach
+                </select>
             </label>
             <label class="label-wide">
                 <span class="required-star">*</span> Preparation
@@ -473,9 +471,11 @@
         </label>
         <label>
             <span class="required-star">*</span> Ingredient UOM
-            <div>
-                <input type="text" class="form-control uom_name" name="uom_name[]" value="" required>
-            </div>
+            <select class="form-control uom">
+                @foreach ($uoms as $uom)
+                <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                @endforeach
+            </select>
         </label>
         <label class="label-wide">
             <span class="required-star">*</span> Preparation
@@ -665,7 +665,7 @@
                     element.find('.uom_name').val(savedIngredient.uom_name);
                     element.find('.display-uom').val(savedIngredient.packaging_description);
                     element.find('.preparation option').attr('selected', false);
-                    element.find(`.preparation option[value="${savedIngredient.menu_ingredients_preparations_id}"]`).attr('selected', true);
+                    element.find('.preparation').val(savedIngredient.menu_ingredients_preparations_id)
                     element.find('.yield').val(savedIngredient.yield || 0);
                     element.find('.ttp').val(savedIngredient.ttp || 0);
                     element.find('.ing-quantity').val(savedIngredient.qty || 0);

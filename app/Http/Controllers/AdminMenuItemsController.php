@@ -809,8 +809,16 @@
 				->where('status', 'ACTIVE')
 				->select('id', 'preparation_desc')
 				->orderBy('preparation_desc', 'ASC')
-				->get();
-						
+				->get()
+				->toArray();
+
+			$data['uoms'] = DB::table('uoms')
+				->where('status', 'ACTIVE')
+				->select('id', 'uom_description')
+				->orderBy('uom_description')
+				->get()
+				->toArray();
+
 			$data['versions'] = $versions;
 			$data['current_ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $current_ingredients);
 			return $this->view('menu-items/edit-item', $data);
@@ -949,11 +957,14 @@
 
 					//unsetting ingredients details that could be outdated
 					unset(
-						$ingredient['ttp'], 
 						$ingredient['qty'], 
 						$ingredient['cost'], 
 						$ingredient['total_cost'], 
 					);
+
+					if ($ingredient['is_existing'] == 'TRUE') {
+						unset($ingredient['ttp']);
+					}
 	
 					//finally, inserting ingredients to menu ingredients details table
 					DB::table('menu_ingredients_details_temp')->updateOrInsert([
