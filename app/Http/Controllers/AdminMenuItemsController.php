@@ -1121,23 +1121,17 @@
 						->updateOrInsert([
 							'menu_items_id' => $newRecord['menu_items_id'],
 							'item_masters_id' => $newRecord['item_masters_id'],
-							'ingredient_name' => $newRecord['ingredient_name']
+							'ingredient_name' => $newRecord['ingredient_name'],
+							'menu_as_ingredient_id' => $newRecord['menu_as_ingredient_id']
 						], $newRecord);
 				}
 				
 				//finally, updating the food cost and percentage
 				DB::table('menu_items')
 					->where('id', $data['menu_items_id'])
-					->update(['food_cost' => $data['food_cost'],
-					'food_cost_percentage' => $data['food_cost_percentage']]);
+					->update(['food_cost' => DB::raw('food_cost_temp'),
+					'food_cost_percentage' => DB::raw('food_cost_percentage_temp')]);
 
-				$to_update = DB::table('menu_ingredients_details')
-					->where('menu_as_ingredient_id', $data['menu_items_id'])
-					->where('status', 'ACTIVE')
-					->get()
-					->toArray();
-				
-				self::updateCostOfOtherMenu($to_update, $data['food_cost'], '');
 			}
 
 			return redirect('admin/menu_items_' . $approver)
