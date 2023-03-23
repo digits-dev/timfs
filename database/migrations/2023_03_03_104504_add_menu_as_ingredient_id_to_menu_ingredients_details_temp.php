@@ -15,7 +15,6 @@ class AddMenuAsIngredientIdToMenuIngredientsDetailsTemp extends Migration
     {
         Schema::table('menu_ingredients_details_temp', function (Blueprint $table) {
             $table->integer('menu_as_ingredient_id')->length(10)->nullable()->after('item_masters_id');
-            $table->text('version_id')->nullable()->after('ingredient_name');
         });
     }
 
@@ -28,7 +27,6 @@ class AddMenuAsIngredientIdToMenuIngredientsDetailsTemp extends Migration
     {
         Schema::table('menu_ingredients_details_temp', function (Blueprint $table) {
             $table->dropColumn('menu_as_ingredient_id');
-            $table->dropColumn('version_id');
         });
     }
 }

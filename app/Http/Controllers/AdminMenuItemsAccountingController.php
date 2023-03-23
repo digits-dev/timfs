@@ -504,19 +504,20 @@
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			$data = [];
 			$data['item'] = DB::table('menu_items')
-				->select('*', 'menu_items.id as id')
-				->where('menu_items.id', $id)
-				->leftJoin('menu_ingredients_approval', 'menu_ingredients_approval.menu_items_id', '=', 'menu_items.id')
-				->get()[0];
+				->where('id', $id)
+				->get()
+				->first();
 
-			$is_approved = $data['item']->accounting_approval_status == 'APPROVED' && $data['item']->marketing_approval_status == 'APPROVED';
-
-			$data['ingredients'] = DB::table('menu_ingredients_details')
+			$ingredients = DB::table('menu_ingredients_details')
 				->where('menu_items_id', $id)
 				->where('menu_ingredients_details.status', 'ACTIVE')
 				->select('tasteless_code',
-					'version_id',
+					'menu_items.status as menu_item_status',
+					'sku_statuses.sku_status_description as item_status',
 					'item_masters_id',
+					'menu_item_description',
+					'tasteless_menu_code',
+					'ingredient_name',
 					'ingredient_group',
 					'row_id',
 					'is_primary',
@@ -525,12 +526,22 @@
 					'full_item_description',
 					'qty',
 					'uom_description',
+					'uom_name',
 					'cost',
-					\DB::raw('item_masters.ttp / item_masters.packaging_size * menu_ingredients_details.qty as updated_cost'))
-				->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+					'yield',
+					'prep_qty',
+					'menu_ingredients_details.ttp',
+					'menu_ingredients_preparations.preparation_desc')
+				->leftJoin('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
 				->leftJoin('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
+				->leftJoin('menu_items', 'menu_ingredients_details.menu_as_ingredient_id', '=', 'menu_items.id')
+				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->leftJoin('menu_ingredients_preparations', 'menu_ingredients_details.menu_ingredients_preparations_id', 'menu_ingredients_preparations.id')
 				->orderby('ingredient_group')
-				->get();
+				->get()
+				->toArray();
+
+			$data['ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $ingredients);
 			return $this->view('menu-items/detail-item', $data);
 		}
 

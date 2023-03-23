@@ -516,7 +516,6 @@
 				->where('menu_items_id', $id)
 				->where('menu_ingredients_details.status', 'ACTIVE')
 				->select('tasteless_code',
-					'version_id',
 					'item_masters_id',
 					'ingredient_group',
 					'row_id',

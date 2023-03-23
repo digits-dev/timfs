@@ -338,6 +338,7 @@
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			$data = [];
 
+			//getting all menu_segmentations AKA concepts
 			$data['concepts'] = DB::table('menu_segmentations')
 				->where('status', 'ACTIVE')
 				->orderBy('menu_segment_column_description')
@@ -345,11 +346,10 @@
 				->get()
 				->toArray();
 
-			$segmentation_columns = [];
-			foreach ($data['concepts'] as $index => $value) {
-				$segmentation_columns[$index] = $value->menu_segment_column_name;
-			}
+			//extracting all menu_segment_column_names
+			$segmentation_columns = array_map(fn($object) => $object->menu_segment_column_name, $data['concepts']);
 			
+			//getting all the menu_items and their menu_segmentations
 			$menu_items = DB::table('menu_items')
 				->where('status', 'ACTIVE')
 				->select(DB::raw('id,
@@ -364,23 +364,26 @@
 				->get()
 				->toArray();
 			
+			//getting the concept ids [irrelevant if not a chef]
 			$concept_access_id = DB::table('user_concept_acess')
 				->where('cms_users_id', CRUDBooster::myID())
 				->get('menu_segmentations_id')
 				->first()
 				->menu_segmentations_id;
 			
+			//getting the menu_segmentations based on concept access
 			$concepts = DB::table('menu_segmentations')
 				->whereIn('id', explode(',', $concept_access_id))
 				->get('menu_segment_column_name')
 				->toArray();
-			$concept_column_names = [];
 
-			foreach ($concepts as $index => $value) {
-				$concept_column_names[$index] = $value->menu_segment_column_name;
-			}
+			//extracting the column_names
+			$concept_column_names = array_map(fn ($object) => $object->menu_segment_column_name, $concepts);
 
+			//if user is chef AND has tagged concepts
 			if (CRUDBooster::myPrivilegeName() == 'Chef' && $concept_column_names) {
+
+				//overwriting the menu_items variable with only the chef has acccess to
 				$menu_items = DB::table('menu_items')
 					->where(function($subQuery) use ($concept_column_names) {
 						foreach ($concept_column_names as $concept_column_name) {
@@ -393,19 +396,21 @@
 						menu_price_dine,
 						menu_price_dlv,
 						menu_price_take,
-						food_cost,
-						food_cost_percentage,
+						food_cost_temp as food_cost,
+						food_cost_percentage_temp as food_cost_percentage,
 						menu_item_description,' 
 						. implode(', ', $segmentation_columns)))
 					->get()
 					->toArray();
-
+				
+				//overwriting the concepts with only the chef has access to
 				$data['concepts'] = DB::table('menu_segmentations')
 					->where('status', 'ACTIVE')
 					->whereIn('menu_segment_column_name', $concept_column_names)
 					->get();
 
 			}
+
 
 			$data['low_cost_value'] = $low_cost_value;
 			$data['concept_column_names'] = $concept_column_names;
@@ -422,50 +427,70 @@
 			$menu_items;
 			$column_name;
 
-			$concepts = DB::table('menu_segmentations')
+			//getting all menu_segmentations AKA concepts
+			$data['concepts'] = DB::table('menu_segmentations')
 				->where('status', 'ACTIVE')
 				->orderBy('menu_segment_column_description')
 				->select('menu_segment_column_description', 'menu_segment_column_name', 'id')
 				->get()
 				->toArray();
 
-			$segmentation_columns = [];
-			foreach ($concepts as $index => $value) {
-				$segmentation_columns[$index] = $value->menu_segment_column_name;
-			}
+			//extracting all menu_segment_column_names
+			$segmentation_columns = array_map(fn($object) => $object->menu_segment_column_name, $data['concepts']);
 
+			//getting the concept ids [irrelevant if not a chef]
 			$concept_access_id = DB::table('user_concept_acess')
 				->where('cms_users_id', CRUDBooster::myID())
 				->get('menu_segmentations_id')
 				->first()
 				->menu_segmentations_id;
 
+			//getting the menu_segmentations based on concept access
 			$concepts = DB::table('menu_segmentations')
 				->whereIn('id', explode(',', $concept_access_id))
 				->get('menu_segment_column_name')
 				->toArray();
-			$concept_column_names = [];
 
-			foreach ($concepts as $index => $value) {
-				$concept_column_names[$index] = $value->menu_segment_column_name;
-			}
+			//extracting the column_names
+			$concept_column_names = array_map(fn ($object) => $object->menu_segment_column_name, $concepts);
 			
+			//if user clicked a single specific concept
 			if ($concept_id != 'all') {
+
+				//getting the clicked concept
 				$concept = DB::table('menu_segmentations')->where('id', $concept_id)->first();
 				$column_name = $concept->menu_segment_column_name;
+
+				//getting the menu_items tagged for the concept
 				$menu_items = DB::table('menu_items')
 					->where($column_name, '1')
 					->where('status', 'ACTIVE')
+					->select('id',
+						'status',
+						'menu_price_dine',
+						'menu_price_dlv',
+						'menu_price_take',
+						($privilege == 'Chef' ? 'food_cost_temp as food_cost' : 'food_cost'),
+						($privilege == 'Chef' ? 'food_cost_percentage_temp as food_cost_percentage' : 'food_cost_percentage'),
+						'menu_item_description',
+						'tasteless_menu_code')
 					->get()
 					->toArray();
+			} 
+			
+			//if a user clicked the 'all' row
+			else {
 
-			} else {
+				//getting all active menu_items
 				$menu_items = DB::table('menu_items')
 					->where('status', 'ACTIVE')
 					->get()
 					->toArray();
 
-				if (CRUDBooster::myPrivilegeName() == 'Chef' && $concept_column_names) {
+				//if user is chef AND has tagged concepts
+				if ($privilege == 'Chef' && $concept_column_names) {
+
+					//overwriting the menu_items with items the chef has access to
 					$menu_items = DB::table('menu_items')
 						->where(function($subQuery) use ($concept_column_names) {
 							foreach ($concept_column_names as $concept_column_name) {
@@ -478,8 +503,8 @@
 							menu_price_dine,
 							menu_price_dlv,
 							menu_price_take,
-							food_cost,
-							food_cost_percentage,
+							food_cost_temp as food_cost,
+							food_cost_percentage_temp as food_cost_percentage,
 							menu_item_description,
 							tasteless_menu_code,' 
 							. implode(', ', $segmentation_columns)))
@@ -488,7 +513,6 @@
 				}
 			}
 			
-
 			if ($filter == 'low'){
 				$menu_items = array_filter(
 					$menu_items,
