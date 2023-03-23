@@ -15,6 +15,7 @@
     .swal-table-wrapper {
         max-height: 20em;
         overflow-y: auto;
+        min-width: 800px;
     }
 
     .version-table th, .version-table td {
