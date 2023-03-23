@@ -949,7 +949,7 @@
             Swal.fire({
                 title: `Version: ${created_at}`,
                 html: wrapperDiv.prop('outerHTML'),
-                width: '55em',
+                width: '60em',
                 showCloseButton: true,
                 showConfirmButton: false,
                 focusConfirm: false,
@@ -1258,13 +1258,6 @@
 
         $(document).on('click', '#add-new', function() {
             const section = $($('.new-ingredient-wrapper').eq(0).clone());
-            // section.find('input').val('').attr('readonly', false);
-            // section.find('.ingredient').val('');
-            // section.find('.display-ingredient').val('');
-            // section.find('.ingredient').val('');
-            // section.find('.prep-quantity').val('');
-            // section.find('.uom').val('');
-            // section.find('.cost').val('');
             section.css('display', '');
             $('.ingredient-section').append(section);
             $('.item-list').fadeOut();
