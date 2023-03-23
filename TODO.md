@@ -50,3 +50,14 @@
   - Only marketing and accounting can approve or reject the edited menu items
   - The approval of the edit (by: marketing and accounting) can be done in any order
   - If both of the approvers approved the menu item, the food cost should be updated in menu items masterfile.
+
+## FORMULA FOR INGREDIENT COST
+
+- `uom_qty` = 1
+- `packaging_size` = from the database
+- `ttp` = from the database
+- `prep_qty` = from the user
+- `yield` = from the user
+- `ingredient_modifier` = `uom_qty` / `packaging_size` - `prep_qty` - (1 + (1 - `yield`))
+- `ingredient_cost` = `ingredient_modifier` \* `ttp`
+- `ingredient_qty` = `prep_qty` (1 + (1 - `yield`))
