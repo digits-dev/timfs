@@ -265,7 +265,7 @@
     }
 
     .swal2-html-container {
-        line-height: 5rem;
+        line-height: 3rem;
     }
 
 </style>
@@ -1102,7 +1102,8 @@
             if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
-                    html: 'Doing so will turn the status of this item to <span class="label label-warning">PENDING</span>',
+                    html: '🟠  Doing so will turn the status of this item to <span class="label label-warning">PENDING</span>.<br/>' +
+                        '📄  This will create a new version.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
