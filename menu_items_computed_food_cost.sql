@@ -10,9 +10,9 @@ CREATE VIEW MENU_COMPUTED_FOOD_COST AS
 	    menu_items.food_cost_percentage_temp,
 	    ROUND(SUM(subquery.cost), 4) AS computed_food_cost,
 	    ROUND(
-	        ROUND(SUM(subquery.cost), 4) / menu_items.menu_price_dine,
-	        4
-	    ) * 100 AS computed_food_cost_percentage
+	        ROUND(SUM(subquery.cost), 4) / menu_items.menu_price_dine * 100,
+	        2
+	    ) AS computed_food_cost_percentage
 	FROM menu_items
 	    JOIN (
 	        SELECT

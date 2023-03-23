@@ -26,9 +26,9 @@ class CreateMenuComputedFoodCostView extends Migration
                 menu_items.food_cost_percentage_temp,
                 ROUND(SUM(subquery.cost), 4) AS computed_food_cost,
                 ROUND(
-                    ROUND(SUM(subquery.cost), 4) / menu_items.menu_price_dine,
-                    4
-                ) * 100 AS computed_food_cost_percentage
+                    ROUND(SUM(subquery.cost), 4) / menu_items.menu_price_dine * 100,
+                    2
+                ) AS computed_food_cost_percentage
             FROM menu_items
                 JOIN (
                     SELECT
@@ -67,7 +67,7 @@ class CreateMenuComputedFoodCostView extends Migration
                         ig.ingredient_group
                 ) subquery ON subquery.menu_items_id = menu_items.id
             GROUP BY (subquery.menu_items_id)
-        ;  
+        ; 
     ");
     }
 
