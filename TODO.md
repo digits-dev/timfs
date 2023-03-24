@@ -60,7 +60,7 @@
 ## Ingredient Cost Formula
 
 - `uom_qty` = 1
-- `packaging_size` = from the database || from the user if new
+- `packaging_size` = from the database || from the user if new || 1
 - `ttp` = from the database || from the user if new
 - `prep_qty` = from the user
 - `yield` = from the user

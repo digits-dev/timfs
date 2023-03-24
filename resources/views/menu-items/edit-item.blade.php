@@ -354,7 +354,7 @@
             </label>
             <label>
                 <span class="required-star">*</span> Packaging Size
-                <input value="" name="pack-size[]" class="form-control pack-size" type="text" required>
+                <input value="" name="pack-size[]" class="form-control pack-size" type="number" required>
             </label>
             <label>
                 <span class="required-star">*</span> Preparation Qty
@@ -472,7 +472,7 @@
         </label>
         <label>
             <span class="required-star">*</span> Packaging Size
-            <input value="" name="pack-size[]" class="form-control pack-size" type="text" required>
+            <input value="" name="pack-size[]" class="form-control pack-size" type="number" required>
         </label>
         <label>
             <span class="required-star">*</span> Preparation Qty
@@ -535,7 +535,6 @@
     </div>
     <div class="panel-body">
         <form class='form-horizontal' id="form" method="POST" autocomplete="off">
-            @csrf
             <input type="text" name="menu_items_id" value="{{$item->id}}" style="display: none;">
             <label class="menu-item-label">
                 Menu Item Code
@@ -550,6 +549,9 @@
                 <input class="form-control menu-item-srp" type="text" value="₱ {{$item->menu_price_dine}}" disabled>
             </label>
             <div class="info-div">
+                <label> Portion Size
+                    <input type="number" class="form-control portion" value="{{$item->portion_size}}" required>
+                </label>
                 <h4 class="recipe-text""><i class="fa fa-cheese"></i> RECIPE <i class="fa fa-utensils"></i></h4>
                 <h5 class="no-ingredient-warning" style="display: none;"><i class="fa fa-spoon"></i> No ingredients currently saved.</h5>
                 <p class="loading-label">Loading...</p>
