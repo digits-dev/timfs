@@ -673,6 +673,7 @@
                     );
                     element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
                     element.find('.ingredient_name').val(savedIngredient.ingredient_name);
+                    element.find('.pack-size').val(savedIngredient.packaging_size);
                     element.find('.prep-quantity').val(savedIngredient.prep_qty || 0).attr('readonly', false);
                     element.find('.uom').val(savedIngredient.uom_id);
                     element.find('.uom_name').val(savedIngredient.uom_name);
@@ -680,10 +681,9 @@
                     element.find('.preparation option').attr('selected', false);
                     element.find('.preparation').val(savedIngredient.menu_ingredients_preparations_id)
                     element.find('.yield').val(savedIngredient.yield || 0);
-                    element.find('.ttp').val(savedIngredient.ttp || 0);
-                    element.find('.ing-quantity').val(savedIngredient.qty || 0);
-                    element.find('.cost').val(savedIngredient.cost || 0);
+                    element.find('.ttp').val(savedIngredient.ttp || 0).attr('packaging_size', savedIngredient.packaging_size);
 
+                    $.fn.computeIngredientCost(element);
                     element.css('display', '');
                     wrapperTemplate.append(element);
                 });
@@ -1171,6 +1171,13 @@
             entry.find('.label-danger').text('');
             entry.find('.date-updated').text('');
             ingredient.val(item.attr('item_id') || item.attr('menu_item_id'));
+            ingredient.attr({
+                cost: $(this).attr('cost'),
+                food_cost_temp: $(this).attr('food_cost_temp'),
+                uom: $(this).attr('uom'),
+                item_id: $(this).attr('item_id'),
+                menu_item_id: $(this).attr('menu_item_id'),
+            });
             if (!item.attr('item_id')) ingredient.removeAttr('item_id');
             if (!item.attr('menu_item_id')) ingredient.removeAttr('menu_item_id');
             entry.find('.display-ingredient').val(item.attr('item_desc'));
