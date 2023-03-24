@@ -27,8 +27,14 @@
 - [x] Update the view details page also
 - [x] Implement the workflow of menu item
 - [x] Show the version of the ingredient lists
-- [ ] Price as of Date
-- [ ] Update ingredient cost if imfs is updated
+- [x] Show when was the last price update
+- [x] Update ingredient cost if imfs is updated
+- [x] Implement the lastest formula
+- [x] Turn the UOM to select
+- [x] Add necessary inputs for the ingredients entered by users
+- [ ] Create a new migration file for new columns in database
+- [ ] Save the new fields to database
+- [ ] Render the new saved ingredients to the database
 - [ ] Substitute filtering (filter all menu items that has substitute ingredient)
 - [x] Improve the brand searching
 - [ ] Implement the workflow of the experimental menu
@@ -58,6 +64,6 @@
 - `ttp` = from the database
 - `prep_qty` = from the user
 - `yield` = from the user
-- `ingredient_modifier` = `uom_qty` / `packaging_size` - `prep_qty` - (1 + (1 - `yield`))
+- `ingredient_modifier` = `uom_qty` / `packaging_size` \* `prep_qty` \* (1 + (1 - `yield`))
 - `ingredient_cost` = `ingredient_modifier` \* `ttp`
-- `ingredient_qty` = `prep_qty` (1 + (1 - `yield`))
+- `ingredient_qty` = `prep_qty` \* (1 + (1 - `yield`))

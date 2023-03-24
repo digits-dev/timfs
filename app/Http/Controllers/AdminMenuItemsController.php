@@ -1169,7 +1169,8 @@
 				})
 				->select(\DB::raw('item_masters.id as item_masters_id'),
 					'item_masters.packagings_id',
-					\DB::raw('round(item_masters.ttp / item_masters.packaging_size, 4) as ingredient_cost'),
+					'ttp',
+					'packaging_size',
 					'item_masters.full_item_description',
 					'item_masters.tasteless_code',
 					'uoms.uom_description',
@@ -1198,7 +1199,7 @@
 				->select('menu_items.id as menu_item_id',
 					'menu_item_description',
 					'tasteless_menu_code',
-					'food_cost_temp',
+					'food_cost_temp', // NOTE: Change food_cost_temp to food_cost in repo without workflow
 					'food_cost_percentage_temp',
 					'menu_items.uoms_id',
 					'uom_description')

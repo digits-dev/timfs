@@ -353,8 +353,12 @@
                 </div>
             </label>
             <label>
+                <span class="required-star">*</span> Packaging Size
+                <input value="" name="pack-size[]" class="form-control pack-size" type="text" required>
+            </label>
+            <label>
                 <span class="required-star">*</span> Preparation Quantity
-                <input value="" name="quantity[]" class="form-control prep-quantity" type="number" min="0" step="any" required/>
+                <input value="" name="prep-quantity[]" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
             </label>
             <label>
                 <span class="required-star">*</span> Ingredient UOM
@@ -374,11 +378,11 @@
             </label>
             <label class="label-wide">
                 <span class="required-star">*</span> Yield %
-                <input value="" name="yield[]" class="form-control yield" type="number" required>
+                <input value="" name="yield[]" class="form-control yield" type="number" readonly required>
             </label>
             <label class="label-wide">
                 <span class="required-star">*</span> TTP
-                <input value="" name="ttp[]" class="form-control ttp" type="number" required>
+                <input value="" name="ttp[]" class="form-control ttp" type="number" readonly required>
             </label>
             <label>
                 <span class="required-star">*</span> Ingredient Quantity
@@ -736,13 +740,6 @@
 
             $('.yield').keyup(function() {
                 const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
-                const yield = $(this).val();
-                const preperationQuantityInput = entry.find('.prep-quantity');
-                let preperationQuantity = preperationQuantityInput.val();
-                if (!preperationQuantity) {
-                    preperationQuantityInput.val('1');
-                    preperationQuantity = preperationQuantityInput.val();
-                }
                 $.fn.computeIngredientCost(entry);
             });
 
@@ -755,6 +752,21 @@
                 const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
                 $.fn.computeIngredientCost(entry);
             });
+
+            $('.pack-size').keyup(function() {
+                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
+                const value = $(this).val();
+                if (value && value > 0) {
+                    entry.find('.prep-quantity').attr('readonly', false);
+                    entry.find('.yield').attr('readonly', false);
+                    entry.find('.ttp').attr('readonly', false);
+                    $.fn.computeIngredientCost(entry);
+                } else {
+                    entry.find('.prep-quantity').attr('readonly', true);
+                    entry.find('.yield').attr('readonly', true);
+                    entry.find('.ttp').attr('readonly', true);
+                }
+            })
         }
 
         $.fn.sumCost = function() {
@@ -997,7 +1009,8 @@
                 li.addClass('list-item dropdown-item');
                 li.attr({
                     item_id: e.item_masters_id,
-                    cost: e.ingredient_cost,
+                    ttp: e.ttp || e.food_cost_temp || 0, // NOTE: Change food_cost_temp to food_cost in repo without workflow
+                    packaging_size: e.packaging_size || 1,
                     uom: e.packagings_id || e.uoms_id,
                     uom_desc: e.packaging_description || e.uom_description,
                     menu_item_id: e.menu_item_id,
@@ -1015,17 +1028,22 @@
         }
 
         $.fn.computeIngredientCost = function(entry) {
-            const preperationQuantity = entry.find('.prep-quantity').val();
-            const ttp = entry.find('.ttp').val();
             const yieldInput = entry.find('.yield');
             const ingredientQuantityInput = entry.find('.ing-quantity');
+            const packagingSizeInput = entry.find('.pack-size');
+            const preperationQuantity = entry.find('.prep-quantity').val();
+            const ttpInput = entry.find('.ttp');
+            const ttp = ttpInput.val() || 0;
             const costInput = entry.find('.cost');
-            let yieldPercent = yieldInput.val() || 0;
-            const ingredientQuantity = math.round(preperationQuantity / (yieldPercent) * 100, 4);
-            const cost = math.round(ingredientQuantity / 1000 * ttp, 4);
-            ingredientQuantityInput.val(ingredientQuantity);
-            costInput.val(cost);
-            $.fn.sumCost();
+            const yieldPercent = math.round(yieldInput.val() / 100, 4) || 0;
+            const uomQty = 1;
+            const packagingSize = packagingSizeInput.val() || ttpInput.attr('packaging_size');
+            const ingredientModifier = math.round(uomQty / packagingSize * preperationQuantity * (1 + (1 - yieldPercent)), 4);
+            const ingredientCost = math.round(ingredientModifier * ttp, 4);
+            const ingredientQty = math.round(preperationQuantity * (1 + (1 - yieldPercent)), 4);
+
+            ingredientQuantityInput.val(ingredientQty);
+            costInput.val(ingredientCost);
         }
 
         $.fn.submitForm = function() {
@@ -1127,12 +1145,13 @@
             }
         }); 
 
-        $(document).on('click', '.list-item', function(event) { 
-            const entry = $(this).parents('.substitute, .ingredient-entry');
+        $(document).on('click', '.list-item', function(event) {
+            const item = $(this);
+            const entry = item.parents('.substitute, .ingredient-entry');
             const ingredient = entry.find('.ingredient');
 
-            if (!$(this).attr('item_id') && !$(this).attr('menu_item_id')) return;
-            if ($(this).attr('item_id') && !$(this).attr('menu_item_id')) {
+            if (!item.attr('item_id') && !item.attr('menu_item_id')) return;
+            if (item.attr('item_id') && !item.attr('menu_item_id')) {
                 entry.find('.item-from')
                     .removeClass('label-info label-warning label-success label-secondary label-primary')
                     .addClass('label-info')
@@ -1145,31 +1164,30 @@
             }
             
             entry.find('.label-danger').text('');
-            ingredient.val($(this).attr('item_id') || $(this).attr('menu_item_id'));
-            ingredient.attr({
-                cost: $(this).attr('cost'),
-                food_cost_temp: $(this).attr('food_cost_temp'),
-                uom: $(this).attr('uom'),
-                item_id: $(this).attr('item_id'),
-                menu_item_id: $(this).attr('menu_item_id'),
-            });
-            if (!$(this).attr('item_id')) ingredient.removeAttr('item_id');
-            if (!$(this).attr('menu_item_id')) ingredient.removeAttr('menu_item_id');
-            entry.find('.display-ingredient').val($(this).attr('item_desc'));
-            entry.find('.ingredient-menu').val($(this).attr('menu_item_id'));
-            entry.find('.uom').val($(this).attr('uom'));
-            entry.find('.display-uom').val($(this).attr('uom_desc'));
-            entry.find('.ttp').val($(this).attr('cost') || $(this).attr('food_cost_temp') || 0);
+            entry.find('.date-updated').text('');
+            ingredient.val(item.attr('item_id') || item.attr('menu_item_id'));
+            if (!item.attr('item_id')) ingredient.removeAttr('item_id');
+            if (!item.attr('menu_item_id')) ingredient.removeAttr('menu_item_id');
+            entry.find('.display-ingredient').val(item.attr('item_desc'));
+            entry.find('.uom').val(item.attr('uom'));
+            entry.find('.display-uom').val(item.attr('uom_desc'));
+            entry.find('.ttp')
+                .val(item.attr('ttp'))
+                .attr('ttp', item.attr('ttp'))
+                .attr('packaging_size', item.attr('packaging_size'));
             entry.find('.yield').val('100').attr('readonly', false);
             entry.find('.preparation').attr('disabled', false);
             entry.find('.ing-quantity').val('1');
-            entry.find('.prep-quantity').val('1');
-            entry.find('.prep-quantity').attr('readonly', false);
-            if ($(this).attr('item_id')) entry.find('.date-updated').text(
-                $(this).attr('updated_at') ? `Updated ${timeago.format($(this).attr('updated_at'))}` :
-                $(this).attr('created_at') ? `Updated ${timeago.format($(this).attr('created_at'))}` :
-                ''
-            );
+            entry.find('.prep-quantity')
+                .val('1')
+                .attr('readonly', false);
+            if (item.attr('item_id')) {
+                entry.find('.date-updated').text(
+                    item.attr('date_updated') ?
+                    `Updated ${timeago.format(item.attr('date_updated'))}` :
+                    ''
+                );
+            }
             $('#form input:valid, #form select:valid').css('outline', 'none');
             $('.item-list').html('');  
             $('.item-list').fadeOut();
