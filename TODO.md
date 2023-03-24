@@ -57,13 +57,20 @@
   - The approval of the edit (by: marketing and accounting) can be done in any order
   - If both of the approvers approved the menu item, the food cost should be updated in menu items masterfile.
 
-## FORMULA FOR INGREDIENT COST
+## Ingredient Cost Formula
 
 - `uom_qty` = 1
-- `packaging_size` = from the database
-- `ttp` = from the database
+- `packaging_size` = from the database || from the user if new
+- `ttp` = from the database || from the user if new
 - `prep_qty` = from the user
 - `yield` = from the user
 - `ingredient_modifier` = `uom_qty` / `packaging_size` \* `prep_qty` \* (1 + (1 - `yield`))
 - `ingredient_cost` = `ingredient_modifier` \* `ttp`
 - `ingredient_qty` = `prep_qty` \* (1 + (1 - `yield`))
+
+## Files that need to be copied to timfs-prod
+
+database\migrations\2023_03_17_085417_create_menu_ingredients_preparations_table.php
+database\migrations\2023_03_24_094654_add_packaging_size_column_in_menu_ingredients_details.php
+database\migrations\2023_03_20_160426_create_menu_ingredients_auto_compute_view.php
+app\Http\Controllers\AdminMenuIngredientsPreparationsController.php

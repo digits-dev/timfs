@@ -471,8 +471,12 @@
             </div>
         </label>
         <label>
+            <span class="required-star">*</span> Packaging Size
+            <input value="" name="pack-size[]" class="form-control pack-size" type="text" required>
+        </label>
+        <label>
             <span class="required-star">*</span> Preparation Quantity
-            <input value="" name="quantity[]" class="form-control prep-quantity" type="number" min="0" step="any" required/>
+            <input value="" name="prep-quantity[]" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
         </label>
         <label>
             <span class="required-star">*</span> Ingredient UOM
@@ -492,11 +496,11 @@
         </label>
         <label class="label-wide">
             <span class="required-star">*</span> Yield %
-            <input value="" name="yield[]" class="form-control yield" type="number" required>
+            <input value="" name="yield[]" class="form-control yield" type="number" readonly required>
         </label>
         <label class="label-wide">
             <span class="required-star">*</span> TTP
-            <input value="" name="ttp[]" class="form-control ttp" type="number" required>
+            <input value="" name="ttp[]" class="form-control ttp" type="number" readonly required>
         </label>
         <label>
             <span class="required-star">*</span> Ingredient Quantity
@@ -1065,6 +1069,7 @@
                     ingredientObject.item_masters_id = ingredientMember.find('.ingredient').attr('item_id');
                     ingredientObject.menu_as_ingredient_id = ingredientMember.find('.ingredient').attr('menu_item_id');
                     ingredientObject.ingredient_name = ingredientMember.find('.ingredient_name').val()?.trim().toUpperCase();
+                    ingredientObject.packaging_size = ingredientMember.find('.pack-size').val();
                     ingredientObject.prep_qty = ingredientMember.find('.prep-quantity').val();
                     ingredientObject.uom_id = ingredientMember.find('.uom').val();
                     ingredientObject.uom_name = ingredientMember.find('.uom_name').val()?.trim().toUpperCase();

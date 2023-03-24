@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPackagingSizeColumnInMenuIngredientsDetails extends Migration
+class AddPackagingSizeColumnInMenuIngredientsDetailsTemp extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddPackagingSizeColumnInMenuIngredientsDetails extends Migration
      */
     public function up()
     {
-        Schema::table('menu_ingredients_details', function (Blueprint $table) {
-            DB::statement('alter table menu_ingredients_details add column `packaging_size` float null after status');
+        Schema::table('menu_ingredients_details_temp', function (Blueprint $table) {
+            DB::statement('alter table menu_ingredients_details_temp add column `packaging_size` float null after status');
         });
     }
 
@@ -25,7 +25,7 @@ class AddPackagingSizeColumnInMenuIngredientsDetails extends Migration
      */
     public function down()
     {
-        Schema::table('menu_ingredients_details', function (Blueprint $table) {
+        Schema::table('menu_ingredients_details_temp', function (Blueprint $table) {
             $table->dropColumn('packaging_size');
         });
     }
