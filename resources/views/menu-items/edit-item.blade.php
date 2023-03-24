@@ -364,7 +364,7 @@
                 <span class="required-star">*</span> Ingredient UOM
                 <select class="form-control uom">
                     @foreach ($uoms as $uom)
-                    <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                    <option {{$uom->uom_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->uom_description}}</option>
                     @endforeach
                 </select>
             </label>
@@ -482,7 +482,7 @@
             <span class="required-star">*</span> Ingredient UOM
             <select class="form-control uom">
                 @foreach ($uoms as $uom)
-                <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                <option {{$uom->uom_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->uom_description}}</option>
                 @endforeach
             </select>
         </label>
