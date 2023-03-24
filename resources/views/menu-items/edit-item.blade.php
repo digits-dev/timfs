@@ -283,7 +283,7 @@
     <div class="ingredient-entry" isExisting="true">
         <div class="ingredient-inputs">
             <label class="ingredient-label">
-                <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span> <span class="date-updated"></span>
+                <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
                 <div>
                     <input value="" type="text" name="ingredient[]" class="ingredient form-control" required/>
                     <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
@@ -315,7 +315,7 @@
                 <input value="" name="yield[]" class="form-control yield" type="number" readonly required>
             </label>
             <label class="label-wide">
-                <span class="required-star">*</span> TTP
+                <span class="required-star">*</span> TTP <span class="date-updated"></span>
                 <input value="" name="ttp[]" class="form-control ttp" type="number" readonly required>
             </label>
             <label>
@@ -410,7 +410,7 @@
 <div class="substitute" style="display: none;" isExisting="true">
     <div class="ingredient-inputs">
         <label class="ingredient-label">
-            <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span> <span class="date-updated"></span>
+            <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
             <div>
                 <input value="" type="text" name="ingredient[]" class="ingredient form-control" required/>
                 <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
@@ -442,7 +442,7 @@
             <input value="" name="yield[]" class="form-control yield" type="number" readonly required>
         </label>
         <label class="label-wide">
-            <span class="required-star">*</span> TTP
+            <span class="required-star">*</span> TTP <span class="date-updated"></span>
             <input value="" name="ttp[]" class="form-control ttp" type="number" readonly required>
         </label>
         <label>
@@ -666,9 +666,9 @@
                         menu_item_id: savedIngredient.menu_as_ingredient_id,
                     });
 
-                    if (savedIngredient.item_masters_id) element.find('.date-updated').text(
-                        savedIngredient.updated_at ? `Updated ${timeago.format(savedIngredient.updated_at)}` :
-                        savedIngredient.created_at ? `Updated ${timeago.format(savedIngredient.created_at)}` :
+                    if (savedIngredient.item_masters_id) element.find('.date-updated').html(
+                        savedIngredient.updated_at ? `${timeago.format(savedIngredient.updated_at)}` :
+                        savedIngredient.created_at ? `${timeago.format(savedIngredient.created_at)}` :
                         ''
                     );
                     element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
@@ -1048,6 +1048,7 @@
 
             ingredientQuantityInput.val(ingredientQty);
             costInput.val(ingredientCost);
+            $.fn.sumCost();
         }
 
         $.fn.submitForm = function() {
@@ -1196,7 +1197,7 @@
             if (item.attr('item_id')) {
                 entry.find('.date-updated').text(
                     item.attr('date_updated') ?
-                    `Updated ${timeago.format(item.attr('date_updated'))}` :
+                    `${timeago.format(item.attr('date_updated'))}` :
                     ''
                 );
             }
