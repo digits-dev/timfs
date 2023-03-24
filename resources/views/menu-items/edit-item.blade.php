@@ -292,7 +292,7 @@
                 </div>
             </label>
             <label>
-                <span class="required-star">*</span> Preparation Quantity
+                <span class="required-star">*</span> Preparation Qty
                 <input value="" name="prep-quantity[]" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
             </label>
             <label>
@@ -319,7 +319,7 @@
                 <input value="" name="ttp[]" class="form-control ttp" type="number" readonly required>
             </label>
             <label>
-                <span class="required-star">*</span> Ingredient Quantity
+                <span class="required-star">*</span> Ingredient Qty
                 <input value="" name="ing-qty[]" class="form-control ing-quantity" type="number" readonly required>
             </label>
             <label>
@@ -357,7 +357,7 @@
                 <input value="" name="pack-size[]" class="form-control pack-size" type="text" required>
             </label>
             <label>
-                <span class="required-star">*</span> Preparation Quantity
+                <span class="required-star">*</span> Preparation Qty
                 <input value="" name="prep-quantity[]" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
             </label>
             <label>
@@ -385,7 +385,7 @@
                 <input value="" name="ttp[]" class="form-control ttp" type="number" readonly required>
             </label>
             <label>
-                <span class="required-star">*</span> Ingredient Quantity
+                <span class="required-star">*</span> Ingredient Qty
                 <input value="" name="ing-qty[]" class="form-control ing-quantity" type="number" readonly required>
             </label>
             <label>
@@ -419,7 +419,7 @@
             </div>
         </label>
         <label>
-            <span class="required-star">*</span> Preparation Quantity
+            <span class="required-star">*</span> Preparation Qty
             <input value="" name="quantity[]" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
         </label>
         <label>
@@ -446,7 +446,7 @@
             <input value="" name="ttp[]" class="form-control ttp" type="number" readonly required>
         </label>
         <label>
-            <span class="required-star">*</span> Ingredient Quantity
+            <span class="required-star">*</span> Ingredient Qty
             <input value="" name="ing-qty[]" class="form-control ing-quantity" type="number" readonly required>
         </label>
         <label>
@@ -475,7 +475,7 @@
             <input value="" name="pack-size[]" class="form-control pack-size" type="text" required>
         </label>
         <label>
-            <span class="required-star">*</span> Preparation Quantity
+            <span class="required-star">*</span> Preparation Qty
             <input value="" name="prep-quantity[]" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
         </label>
         <label>
@@ -503,7 +503,7 @@
             <input value="" name="ttp[]" class="form-control ttp" type="number" readonly required>
         </label>
         <label>
-            <span class="required-star">*</span> Ingredient Quantity
+            <span class="required-star">*</span> Ingredient Qty
             <input value="" name="ing-qty[]" class="form-control ing-quantity" type="number" readonly required>
         </label>
         <label>
