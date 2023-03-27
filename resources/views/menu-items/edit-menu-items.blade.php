@@ -9,7 +9,7 @@
 
     .form-column{
     margin: 0 3vw;
-    width: 33.3%;
+    width: 100%;
         
     }
 
@@ -27,7 +27,7 @@
         box-shadow: 2px 3px #22577A;
     } 
 
-    .form-column legend{
+    .form-column label{
         font-size: 15px;
         font-weight: bold;
         padding: 0px 20px;
@@ -60,12 +60,6 @@
     #success{
         color: green;
         font-weight: bold;
-    }
-
-    #menu_type_select1, #menu_type_select2, 
-    #menu_type_select3, #menu_type_select4, 
-    #menu_type_select5, #status_select2{
-        width: 100%;
     }
 
     .select2-container .select2-selection--single {
@@ -119,76 +113,38 @@
         <form method="POST" action="{{CRUDBooster::mainpath('edit-save/'.$row->id)}}">
             @csrf
             <div class="add-content">
-                {{-- First Column --}}
                 <div class="form-column">
-                    <label for="">TASTELESS MENU CODE</label>
+                    <label> Tasteless Menu Code</label>
                     <fieldset>
-                        <input type="text" name="pos_item_code_1" readonly value="{{ $row->tasteless_menu_code }}">
+                        <input type="text" name="pos_item_code_1" value="{{ $row->tasteless_menu_code }}" readonly>
                     </fieldset>
-                    <label for="">POS OLD ITEM CODE 1</label>
+                    <label> POS Old Item Code 1</label>
                     <fieldset>
-                        <input type="text" name="pos_item_code_1" value="{{ $row->old_code_1 }}">
+                        <input type="text" name="pos_item_code_1" placeholder="Enter pos old item code 1" value="{{ $row->old_code_1 }}">
                     </fieldset>
-                    <label for="">POS OLD ITEM CODE 2</label>
+                    <label> POS Old Item Code 2</label>
                     <fieldset>
-                        <input type="text" name="pos_item_code_2" value="{{ $row->old_code_2 }}">
+                        <input type="text" name="pos_item_code_2" placeholder="Enter pos old item code 2" value="{{ $row->old_code_2 }}">
                     </fieldset>
-                    <label for="">POS OLD ITEM CODE 3</label>
+                    <label> POS Old Item Code 3</label>
                     <fieldset>
-                        <input type="text" name="pos_item_code_3" value="{{ $row->old_code_3 }}">
+                        <input type="text" name="pos_item_code_3" placeholder="Enter pos old item code 3 " value="{{ $row->old_code_3 }}">
                     </fieldset>
-                    <label for="">POS OLD DESCRIPTION</label>
+                    <label> POS Old Description</label>
                     <fieldset>
-                        <input type="text" name="pos_item_description" value="{{ $row->pos_old_item_description }}" >
+                        <input type="text" name="pos_item_description" placeholder="Enter pos old item description" value="{{ $row->pos_old_item_description }}">
                     </fieldset>
-                    <label for=""><span id="required">*</span> MENU DESCRIPTION</label>
+                    <label><span id="required">*</span> Menu Description</label>
                     <fieldset>
-                        <input type="text" name="menu_item_description" value="{{ $row->menu_item_description }}" required>
+                        <input type="text" name="menu_item_description" placeholder="Enter menu description" required value="{{ $row->menu_item_description }}">
                     </fieldset>
-                    <label for=""><span id="required">*</span> PRODUCT TYPE</label>
+                    <label><span id="required">*</span> Product Type</label>
                     <fieldset>
-                        <select class="js-example-basic-single" name="product_type" id="menu_type_select2" required>
-                            <option value="" selected disabled></option>
-                            @foreach ($menu_product_types as $product_type)
-                                @if ($row->menu_product_types_id == $product_type->id)
-                                    <option value="{{ $product_type->id }}" selected>{{ $product_type->menu_product_type_description }}</option>
-                                    @else
-                                    <option value="{{ $product_type->id }}">{{ $product_type->menu_product_type_description }}</option>
-                                @endif
-                            @endforeach
-                        </select>
-                    </fieldset>   
-                </div>
-                {{-- Second Column --}}
-                <div class="form-column">
-                    <label for="">CHOICES GROUP 1</label>
-                    <fieldset>
-                        <input type="text" name="choices_group_1"  value="{{ $row->choices_group_1 }}">
+                        <input type="text" name="product_type" placeholder="Enter a product type" required value="{{ $row->menu_product_types_id }}">
                     </fieldset>
-                    <label for="">CHOICES GROUP 1 SKU</label>
-                    <fieldset>
-                        <input type="text" name="choices_skugroup_1" value="{{ $row->choices_skugroup_1 }}" >
-                    </fieldset>
-                    <label for="">CHOICES GROUP 2</label>
-                    <fieldset>
-                        <input type="text" name="choices_group_2" value="{{ $row->choices_group_2 }}">
-                    </fieldset>
-                    <label for="">CHOICES GROUP 2 SKU</label>
-                    <fieldset>
-                        <input type="text" name="choices_skugroup_2" value="{{ $row->choices_skugroup_2 }}" >
-                    </fieldset>
-                    <label for="">CHOICES GROUP 3</label>
-                    <fieldset>
-                        <input type="text" name="choices_group_3" value="{{ $row->choices_group_3 }}">
-                    </fieldset>
-                    <label for="">CHOICES GROUP 3 SKU</label>
-                    <fieldset>
-                        <input type="text" name="choices_skugroup_3" value="{{ $row->choices_skugroup_3 }}" >
-                    </fieldset>  
-                    <label for=""><span id="required">*</span> MENU TYPE</label>
+                    <label><span id="required">*</span> Menu Type</label>
                     <fieldset>
                         <select class="js-example-basic-single" name="menu_type" id="menu_type_select3" required>
-                            <option value="" selected disabled></option>
                             @foreach ($menu_types as $menu)
                                 @if ($row->menu_types_id == $menu->id)
                                     <option value="{{ $menu->id }}" selected>{{ $menu->menu_type_description }}</option>
@@ -198,10 +154,9 @@
                             @endforeach
                         </select>
                     </fieldset>
-                    <label for=""><span id="required">*</span> MAIN CATEGORY</label>
-                    <fieldset>
+                    <label><span id="required">*</span> Main Category</label>
+                    <fieldset class="main_category">
                         <select class="js-example-basic-single" name="menu_categories" id="menu_type_select4" required>
-                            <option value="" selected disabled></option>
                             @foreach ($menu_categories as $category)
                                 @if ($row->menu_categories_id == $category->id)
                                     <option value="{{ $category->id }}" selected>{{ $category->category_description }}</option>
@@ -212,9 +167,68 @@
                         </select> 
                     </fieldset>
                 </div>
+                <div class="form-column menu_group" id="menu_group_start">
+                    @for ($i=0; $i<count($menu_choices_group); $i++)
+                        @if ($i < count($menu_choices_group)/2)
+                            @php
+                                $choices_group_less = 'choices_group_'.strval($i+1);
+                                $choices_skugroup_less = 'choices_skugroup_'.strval($i+1);                   
+                            @endphp  
+                            <label>{{ ucwords(strtolower($menu_choices_group[$i]->menu_choice_group_column_description)) }}</label>
+                            <fieldset class="choices_group">
+                                <input class="group" type="text" name="choices_group_{{ $i+1 }}" id="input_type_group_{{ $i+1 }}" placeholder="Enter choices group {{ $i+1 }}" value="{{ $row->$choices_group_less }}">
+                            </fieldset>
+                            <label> {{ ucwords(strtolower($menu_choices_group[$i]->menu_choice_group_column_description)) }} SKU</label>
+                            <fieldset class="choices_group">
+                                <select class="js-example-basic-multiple sku group" name="choices_skugroup_{{ $i+1 }}[]" multiple="multiple" id="menu_type_select_sku{{ $i+1 }}">
+                                    @php
+                                        $choices_skugroup = DB::table('menu_items')->where('id',$row->id)->get()->first();
+                                        $list_of_sku_group = explode((', '),$choices_skugroup->$choices_skugroup_less);
+                                        foreach($list_of_sku_group as $value){
+                                            $menu_desc = DB::table('menu_items')->where('tasteless_menu_code', $value)->get()->first();
+                                            if($value != null){
+                                                echo "<option value='".$menu_desc->tasteless_menu_code."'"." selected='selected'".">".$menu_desc->menu_item_description."</option>";
+                                            }
+                                        }
+                                    @endphp
+                                </select>
+                            </fieldset>
+                        @endif
+                    @endfor
+                </div>
+                <div class="form-column menu_group">
+                    @for ($i=0; $i<count($menu_choices_group); $i++)
+                        @if ($i >= count($menu_choices_group)/2)
+                            @php
+                                $choices_group_greater = 'choices_group_'.strval($i+1);
+                                $choices_skugroup_greater = 'choices_skugroup_'.strval($i+1);
+                            @endphp
+                            <label>{{ ucwords(strtolower($menu_choices_group[$i]->menu_choice_group_column_description)) }}</label>
+                            <fieldset class="choices_group">
+                                <input class="group" type="text" name="choices_group_{{ $i+1 }}" placeholder="Enter choices group {{ $i+1 }}" value="{{ $row->$choices_group_greater }}">
+                            </fieldset>
+                            <label>{{ ucwords(strtolower($menu_choices_group[$i]->menu_choice_group_column_description)) }} SKU</label>
+                            <fieldset class="choices_group">
+                                <select class="js-example-basic-multiple sku group" name="choices_skugroup_{{ $i+1 }}[]" multiple="multiple" id="menu_type_select_sku{{ $i+1 }}" >
+                                @php
+                                    $choices_skugroup_row = DB::table('menu_items')->where('id',$row->id)->get()->first();
+                                    $list_of_sku_group_greater = explode((', '),$choices_skugroup->$choices_skugroup_greater);
+                                    foreach($list_of_sku_group_greater as $value){
+                                        $menu_desc = DB::table('menu_items')->where('tasteless_menu_code', $value)->get()->first();
+                                        if($value != null){
+                                            echo "<option value='".$menu_desc->tasteless_menu_code."'"." selected='selected'".">".$menu_desc->menu_item_description."</option>";
+                                        }
+                                    }
+                                @endphp
+                                </select>
+                            </fieldset>
+                        @endif
+                    @endfor
+                </div>
                 <div class="form-column">
-                    <label for=""><span id="required">*</span> SUB CATEGORY</label>
+                    <label><span id="required">*</span> Sub Category</label>
                     <fieldset>
+                        <span>{{ $row->$menu_subcategories_id  }}</span>
                         <select class="js-example-basic-single" name="sub_category" id="menu_type_select5" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_subcategories as $category)
@@ -226,36 +240,36 @@
                             @endforeach
                         </select> 
                     </fieldset>
-                    <label for="">PRICE - DELIVERY</label>
+                    <label><span id="required">*</span> Price - Dine In</label>
                     <fieldset>
-                        <input type="number" name="price_delivery" value="{{ $row->menu_price_dlv }}">
+                        <input type="number" name="price_dine_in" placeholder="Enter price - dine in" value="{{ $row->menu_price_dine }}" required>
                     </fieldset>
-                    <label for=""><span id="required">*</span> PRICE - DINE IN</label>
+                    <label> Price - Delivery</label>
                     <fieldset>
-                        <input type="number" name="price_dine_in" value="{{ $row->menu_price_dine }}" required>
+                        <input type="number" name="price_delivery" placeholder="Leave blank if same as dine in" value="{{ $row->menu_price_dlv }}">
                     </fieldset>
-                    <label for="">PRICE - TAKE OUT</label>
+                    <label> Price - Take Out</label>
                     <fieldset>
-                        <input type="number" name="price_take_out" value="{{ $row->menu_price_take }}">
-                    </fieldset>
-                    <label for=""><span id="required">*</span> ORIGINAL CONCEPT</label>
+                        <input type="number" name="price_take_out" placeholder="Leave blank if same as dine in" value="{{ $row->menu_price_take }}">
+                    </fieldset>  
+                    <label><span id="required">*</span> Original Concept</label>
                     <fieldset>
-                        <input type="text" name="original_concept" value="{{ $row->original_concept }}" required>
+                        <input type="text" name="original_concept" placeholder="Enter original concept" value="{{ $row->original_concept }}" required>
                         </select>
-                    </fieldset>
-                    <label for=""><span id="required">*</span> MENU SEGMENTATION</label>
+                    </fieldset> 
+                    <label><span id="required">*</span> Store List</label>
                     <fieldset>
                         <select class="js-example-basic-multiple" name="menu_segment_column_description[]" multiple="multiple" id="menu_type_select1" required>
                             @foreach ($menu_segmentations as $concept)
-                                @if (in_array($concept->menu_segment_column_name, $user_menu_segment))
+                                @if(in_array($concept->id, $store_list_id))
                                     <option value="{{ $concept->id }}" selected>{{ $concept->menu_segment_column_description }}</option>
                                 @else
-                                    <option value="{{ $concept->id }}" >{{ $concept->menu_segment_column_description }}</option>
+                                    <option value="{{ $concept->id }}">{{ $concept->menu_segment_column_description }}</option>
                                 @endif
                             @endforeach
                         </select>
-                    </fieldset>
-                    <label for="">STATUS</label>
+                    </fieldset>    
+                    <label>Status</label>
                     <fieldset>
                         <select class="js-example-basic-single" name="status" id="status_select2" required>
                             <option value="ACTIVE" {{ $row->status == 'ACTIVE' ? 'selected':'' }}>ACTIVE</option>
@@ -266,7 +280,7 @@
             </div>
             <div class="panel-footer">
                 <a href='http://127.0.0.1:8000/admin/add_menu_items' class='btn btn-default'>Cancel</a>
-                <input type='submit' class='btn btn-primary pull-right' value='Save Changes'/>
+                <input type='submit' class='btn btn-primary pull-right' value='Edit Menu' onclick=""/>
             </div>
         </form>
     </div>
@@ -274,27 +288,120 @@
 
 <script>
 
-    $('#menu_type_select1').select2({
-        placeholder: "SELECT A MENU SEGMENTATION",
-        allowClear: true
+$('#menu_type_select1').select2({
+        placeholder: "Select a menu segmentation",
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%'
     });
     $('#menu_type_select2').select2({
-        placeholder: "SELECT A CONCEPT",
-        allowClear: true
+        placeholder: "Select a concept",
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%'
     });
     $('#menu_type_select3').select2({
-        placeholder: "SELECT A MENU TYPE",
-        allowClear: true
+        placeholder: "Select a menu type",
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%'
     });
     $('#menu_type_select4').select2({
-        placeholder: "SELECT A MAIN CATEGORY",
-        allowClear: true
+        placeholder: "Select a main category",
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%'
     });
     $('#menu_type_select5').select2({
-        placeholder: "SELECT A SUB CATEGORY",
-        allowClear: true
+        placeholder: "Select a sub category",
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%'
+
     });
-    $('#status_select2').select2()
+
+    $('#status_select2').select2({
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%' 
+    })
+
+    // Choices Group SKU 1
+    $('.sku').select2({
+        placeholder: "Select a choice group",
+        // dropdownAutoWidth: true,
+        width: '100%',
+        ajax: {
+            url: '{{ url('/add_menu_items') }}',
+            dataType: 'json',
+            delay: 250,
+            type: 'POST',
+            data: function (params) {
+            return {
+                q: params.term,
+                _token: '{!! csrf_token() !!}'
+            };
+            },
+            processResults: function (data) {
+            return {
+                results: $.map(data, function (item) {
+                console.log(item.tasteless_menu_code)
+                return {
+                    text: item.menu_item_description,
+                    id: item.tasteless_menu_code
+                }
+                })
+            };
+            },
+            cache: true
+        },
+        id: 'id'
+        // minimumInputLength: 2
+    });
+
+    // Menu Type
+    $('.menu_group').hide();
+    $('.choices_group').hide();
+    $('.form-column').css('margin', '0 4vw')
+    $('#menu_group_start').children().eq(0).prepend('<span id="required">* </span>');
+    $('#menu_group_start').children().eq(2).prepend('<span id="required">*</span>');
+
+    if($('#menu_type_select3 option:selected').text() == 'PROMO'){
+        $('#menu_type_select3').attr('disabled', true);
+    }
+
+    // Menu Type - Menu Build choices
+    if($('#menu_type_select3 option:selected').text() == 'MENU BUILD - CHOICES'){
+        $('.choices_group').show();
+        $('.menu_group').show();
+        $('.form-column').css('margin', '0 1vw')
+        $('#input_type_group_1').attr('required', true);
+        $('#menu_type_select_sku1').attr('required', true)
+    }else{
+        $('#menu_type_select3 option:contains("PROMO")').prop('disabled', true);
+    }
+
+    $('#menu_type_select3').change(function() {
+        let menu_type = $('#menu_type_select3 option:selected').text();
+        if(menu_type == 'MENU BUILD - CHOICES'){
+            $('.choices_group').show();
+            $('.menu_group').show();
+            $('.form-column').css('margin', '0 1vw')
+            $('#input_type_group_1').attr('required', true);
+            $('#menu_type_select_sku1').attr('required', true)
+
+        }else{
+            $('.choices_group').hide();
+            $('.group').empty();
+            $('.group').val();
+            $('.menu_group').hide();
+            $('.form-column').css('margin', '0 4vw')
+            $('.choices_group input').val('');
+            $('.choices_group select').val('');
+            $('#input_type_group_1').attr('required', false);
+            $('#menu_type_select_sku1').attr('required', false)
+        }
+    }); 
 
 </script>
 @endsection
