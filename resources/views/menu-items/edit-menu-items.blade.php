@@ -378,6 +378,7 @@ $('#menu_type_select1').select2({
         $('.form-column').css('margin', '0 1vw')
         $('#input_type_group_1').attr('required', true);
         $('#menu_type_select_sku1').attr('required', true)
+        $('#menu_type_select3 option:contains("PROMO")').prop('disabled', true);
     }else{
         $('#menu_type_select3 option:contains("PROMO")').prop('disabled', true);
     }
