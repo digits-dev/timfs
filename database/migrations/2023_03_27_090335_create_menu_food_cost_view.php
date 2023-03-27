@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMenuComputedFoodCostView extends Migration
+class CreateMenuFoodCostView extends Migration
 {
     /**
      * Run the migrations.
@@ -20,13 +20,21 @@ class CreateMenuComputedFoodCostView extends Migration
                 menu_items.tasteless_menu_code,
                 menu_items.menu_item_description,
                 menu_items.status,
+                menu_items.ingredient_total_cost,
+                menu_items.portion_size,
                 menu_items.food_cost,
                 menu_items.food_cost_percentage,
                 menu_items.food_cost_temp,
                 menu_items.food_cost_percentage_temp,
-                ROUND(SUM(subquery.cost), 4) AS computed_food_cost,
                 ROUND(
-                    ROUND(SUM(subquery.cost), 4) / menu_items.menu_price_dine * 100,
+                    ROUND(SUM(subquery.cost), 4) / menu_items.portion_size,
+                    4
+                ) AS computed_food_cost,
+                ROUND(
+                    ROUND(
+                        ROUND(SUM(subquery.cost), 4) / menu_items.portion_size,
+                        4
+                    ) / menu_items.menu_price_dine * 100,
                     2
                 ) AS computed_food_cost_percentage
             FROM menu_items
@@ -67,7 +75,7 @@ class CreateMenuComputedFoodCostView extends Migration
                         ig.ingredient_group
                 ) subquery ON subquery.menu_items_id = menu_items.id
             GROUP BY (subquery.menu_items_id)
-        ; 
+        ;  
     ");
     }
 

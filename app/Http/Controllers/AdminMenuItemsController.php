@@ -991,10 +991,18 @@
 			}
 
 			//getting all ingredients that need to be updated
-			$to_update = DB::table('menu_ingredients_details_temp')
-				->where('status', 'ACTIVE')
-				->where('menu_as_ingredient_id', $menu_items_id)
-				->get()
+			$to_update = DB::table('menu_computed_food_cost')
+				->where(
+					DB::raw('CAST(computed_food_cost AS DECIMAL)'),
+					'!=',
+					DB::raw('CAST(food_cost_temp AS DECIMAL)')
+				)
+				->orWhere(
+					DB::raw('CAST(computed_food_cost_percentage AS DECIMAL)'),
+					'!=',
+					DB::raw('CAST(food_cost_percentage_temp AS DECIMAL)')
+				)
+				->get('id')
 				->toArray();
 
 			//calling the function... should start the recursion
@@ -1227,56 +1235,35 @@
 		function updateCostOfOtherMenu($ingredients_to_update) {
 			//stopping the recursion if array is empty
 			if (!$ingredients_to_update) return;
+			// dd($ingredients_to_update);
 
-			foreach ($ingredients_to_update as $ingredient_to_update) {
-
-				//gettIng the ingredients of the affected menu item
-				$ingredients_to_calculate = DB::table('menu_ingredients_auto_compute')
-					->where('menu_items_id', $ingredient_to_update->menu_items_id)
-					->where('status', 'ACTIVE')
-					->get()
-					->toArray();
-
-				//grouping the ingredients	
-				$grouped_ingredients = [];
-
-				foreach ($ingredients_to_calculate as $ingredient_to_calculate) {
-					$grouped_ingredients[$ingredient_to_calculate->ingredient_group][] = $ingredient_to_calculate;
-				}
-
-				//getting the new food cost of the updated menu
-				$food_cost_of_updated_menu = 0;
-
-				foreach ($grouped_ingredients as $group) {
-					$primary = array_filter($group, fn ($ingredient) => $ingredient->is_primary == 'TRUE')[0];
-					foreach ($group as $member) {
-						if ($member->is_selected == 'TRUE') {
-							$primary = $member;
-						}
-					}
-					$food_cost_of_updated_menu += $primary->cost;
-				}
-
-				//updating the food cost and food cost percentage
+			foreach($ingredients_to_update as $ingredient_to_update) {
 				DB::table('menu_items')
-					->where('id', $ingredient_to_update->menu_items_id)
-					->update(['food_cost_temp' => round($food_cost_of_updated_menu, 4)]);
+					->where('menu_items.id', $ingredient_to_update->id)
+					->leftJoin('menu_computed_food_cost', 'menu_computed_food_cost.id', '=', 'menu_items.id')
+					->update([
+						'menu_items.food_cost_temp' => DB::raw('menu_computed_food_cost.computed_food_cost'),
+						'menu_items.food_cost_percentage_temp' => DB::raw('menu_computed_food_cost.computed_food_cost_percentage')
+					]);
+			}
 
-				DB::table('menu_items')
-					->where('id', $ingredient_to_update->menu_items_id)
-					->update(['food_cost_percentage_temp' => DB::raw('ROUND(food_cost_temp / menu_price_dine * 100, 2)')]);
-				
-				//another array of ingredients to be updated
-				$to_update = DB::table('menu_ingredients_details_temp')
-					->where('status', 'ACTIVE')
-					->where('menu_as_ingredient_id', $ingredient_to_update->menu_items_id)
-					->get()
-					->toArray();
+			$to_update = DB::table('menu_computed_food_cost')
+				->where(
+					DB::raw('CAST(computed_food_cost AS DECIMAL)'),
+					'!=',
+					DB::raw('CAST(food_cost_temp AS DECIMAL)')
+				)
+				->orWhere(
+					DB::raw('CAST(computed_food_cost_percentage AS DECIMAL)'),
+					'!=',
+					DB::raw('CAST(food_cost_percentage_temp AS DECIMAL)')
+				)
+				->get('id')
+				->toArray();
 
 				//finally, calling the function itself
 				//the process keeps going on until there are no more ingredients to be updated
 				self::updateCostOfOtherMenu($to_update);
-			}
 
 		}
 

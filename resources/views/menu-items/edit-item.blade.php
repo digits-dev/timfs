@@ -809,6 +809,7 @@
                     sum += Number(primary.find('.cost').val().replace(/[^0-9.]/g, ''));
                 }
             });
+            sum = math.round(sum, 4);
             const foodCost = math.round(sum / portionSize, 4);
             const percentage = menuItemSRP > 0 ? (foodCost / menuItem.menu_price_dine * 100).toFixed(2) : 0;
             $('.total-cost').val(sum);
