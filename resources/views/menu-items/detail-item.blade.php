@@ -19,6 +19,7 @@
     .note {
         color: blue;
         font-weight: bold;
+        margin-top: 10px;
     }
 
     .label-secondary {
@@ -97,7 +98,7 @@
                 </table>
             </div>
         </div>
-        <p class="note">** Highlighted ingredient names are primary ingredients.</p>
+        <p class="note" style="display: none">** Highlighted ingredient names are primary ingredients.</p>
     </div>
     <div class="panel-footer">
         <a class="btn btn-primary" href="{{ CRUDBooster::mainpath() }}" type="button" id="export"> <i class="fa fa-arrow-left" ></i> Back </a>
@@ -198,6 +199,7 @@
             $('.no-ingredient-warning').css('display', '');
         } else {
             $('.with-ingredient').css('display', '');
+            $('.note').css('display', '');
         }
         const lowCost = Number(localStorage.getItem('lowCost')) || 30;
 
