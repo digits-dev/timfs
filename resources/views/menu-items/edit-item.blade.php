@@ -790,6 +790,7 @@
             const menuItemSRP = menuItem.menu_price_dine;
             const percentageText = $('.percentage');
             const portionInput = $('.portion');
+            if (portionInput.val() <= 0) portionInput.val('1');
             const portionSize = portionInput.val();
             let sum = 0;
             wrappers.forEach(wrapper => {
@@ -1004,7 +1005,8 @@
         $(document).on('click', '#save-edit', function(event) {
             const formValues = $('#form input, #form select');
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
-                jQuery.makeArray($('#form .cost')).every(e => !!$(e).val().replace(/[^0-9.]/g, ''));
+                jQuery.makeArray($('#form .cost')).every(e => !!$(e).val().replace(/[^0-9.]/g, '')) &&
+                $('.portion').val() > 0;
             if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
@@ -1026,6 +1028,7 @@
                 }).then(() => {
                     $('#form input:invalid, #form select:invalid').css('outline', '2px solid red');
                     $('#form .ingredient:invalid').parents('.ingredient-entry').find('.display-ingredient').css('outline', '2px solid red');
+                    if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
                 });
             }
         }); 

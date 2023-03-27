@@ -791,6 +791,8 @@
 				->leftJoin('item_masters', 'item_masters.id', '=', 'menu_ingredients_auto_compute.item_masters_id')
 				->leftJoin('menu_items', 'menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
 				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->orderBy('ingredient_group', 'ASC')
+				->orderBy('row_id', 'ASC')
 				->get()
 				->toArray();
 
