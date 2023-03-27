@@ -41,7 +41,7 @@
 			$this->button_action_style = "button_icon";
 			$this->button_add = true;
 			$this->button_edit = true;
-			$this->button_delete = false;
+			$this->button_delete = true;
 			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
@@ -64,7 +64,10 @@
 			$this->col[] = ["label"=>"Menu Item Description","name"=>"menu_item_description"];
 			$this->col[] = ["label"=>"Menu Category","name"=>"menu_categories_id","join"=>"menu_categories,category_description"];
 			$this->col[] = ["label"=>"Menu Subcategory","name"=>"menu_subcategories_id","join"=>"menu_subcategories,subcategory_description"];
-			$this->col[] = ["label"=>"Menu Product Type","name"=>"menu_product_types_id","join"=>"menu_product_types,menu_product_type_description"];
+			// $this->col[] = ["label"=>"Menu Product Type","name"=>"menu_product_types_id","join"=>"menu_product_types,menu_product_type_description"];
+			$this->col[] = ["label"=>"Menu Product Type Name",
+				"name"=>"menu_product_types_name"
+				];
 			$this->col[] = ["label"=>"Menu Type","name"=>"menu_types_id","join"=>"menu_types,menu_type_description"];
 			foreach($prices as $price){
 				$this->col[] = ["label"=>ucwords(strtolower($price->menu_price_column_description)),"name"=>$price->menu_price_column_name];
@@ -287,6 +290,7 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
+
 			if($column_index == '18'){
 				if($column_value == 'INACTIVE'){
 					$column_value = '<span class="label label-danger">INACTIVE</span>';
@@ -361,7 +365,7 @@
 			$postdata['menu_price_take'] = $price_take_out;
 			$postdata['original_concept'] = $returnInputs['original_concept'];
 			$postdata['pos_old_item_description'] = $returnInputs['pos_item_description'];
-			$postdata['menu_product_types_id'] = $returnInputs['product_type'];
+			$postdata['menu_product_types_name'] = $returnInputs['product_type'];
 			$postdata['menu_categories_id'] = $returnInputs['menu_categories'];
 			$postdata['menu_subcategories_id'] = $returnInputs['sub_category'];
 			$postdata['status'] = $returnInputs['status'];
@@ -378,6 +382,7 @@
 				}
 			}
 
+
 	    }
 
 	    /* 
@@ -389,6 +394,9 @@
 	    */
 	    public function hook_after_add($id) {        
 	        //Your code here
+			$returnInputs = Input::all();
+			$menu = DB::table('menu_items')->where('id',$id)->select('tasteless_menu_code')->first();
+			CRUDBooster::redirect(CRUDBooster::mainpath(),'Tasteless item code '.$menu->tasteless_menu_code.' data has been added',"success");
 
 	    }
 
@@ -453,7 +461,7 @@
 			$postdata['menu_price_take'] = $price_take_out;
 			$postdata['original_concept'] = $returnInputs['original_concept'];
 			$postdata['pos_old_item_description'] = $returnInputs['pos_item_description'];
-			$postdata['menu_product_types_id'] = $returnInputs['product_type'];
+			$postdata['menu_product_types_name'] = $returnInputs['product_type'];
 			$postdata['menu_categories_id'] = $returnInputs['menu_categories'];
 			$postdata['menu_subcategories_id'] = $returnInputs['sub_category'];
 			$postdata['status'] = $returnInputs['status'];
@@ -478,7 +486,7 @@
 				}				
 			}
 		
-		
+			
 	    }
 
 	    /* 
@@ -671,6 +679,12 @@
 				->where('status', 'ACTIVE')
 				->orderBy('menu_choice_group_column_description')
 				->get()->unique('menu_choice_group_column_description');
+			// Product Type
+			$data['menu_product_types'] = DB::table('menu_product_types')
+				->select('menu_product_type_description')
+				->where('status','ACTIVE')
+				->where('id',$data['row']->menu_product_types_id)
+				->value('menu_product_type_description');			
 			// User Menu Segments
 			$user_menu_segmentations = DB::table('menu_segmentations')
 				->where('status','ACTIVE')
@@ -705,7 +719,7 @@
 						->value('menu_item_description');
 					
 					$id = $row_menu_description;
-					
+
 				}
 			}
 
@@ -715,7 +729,6 @@
 
 			
 			$data['groups'] = array_combine($menu_item_key, array_values($implode_menu_item_value));
-			
 			//Please use view method instead view method from laravel
 			return $this->view('menu-items.detail-menu-items',$data);
 		}
