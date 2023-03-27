@@ -396,7 +396,7 @@
 	        //Your code here
 			$returnInputs = Input::all();
 			$menu = DB::table('menu_items')->where('id',$id)->select('tasteless_menu_code')->first();
-			CRUDBooster::redirect(CRUDBooster::mainpath(),'Tasteless item code '.$menu->tasteless_menu_code.' data has been added',"success");
+			CRUDBooster::redirect(CRUDBooster::mainpath(),'Tasteless item code '.$menu->tasteless_menu_code.' has been added',"success");
 
 	    }
 
@@ -498,7 +498,9 @@
 	    */
 	    public function hook_after_edit($id) {
 	        //Your code here 
-
+			$returnInputs = Input::all();
+			$menu = DB::table('menu_items')->where('id',$id)->select('tasteless_menu_code')->first();
+			CRUDBooster::redirect(CRUDBooster::mainpath(),'Tasteless item code '.$menu->tasteless_menu_code.' has been edited',"success");
 
 	    }
 
@@ -727,8 +729,8 @@
 				return implode(', ', $subArray);
 			}, $menu_item_value);
 
-			
 			$data['groups'] = array_combine($menu_item_key, array_values($implode_menu_item_value));
+		
 			//Please use view method instead view method from laravel
 			return $this->view('menu-items.detail-menu-items',$data);
 		}
