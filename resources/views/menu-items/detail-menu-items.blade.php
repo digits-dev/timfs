@@ -43,6 +43,15 @@
                       <td>MENU DESCRIPTION</td>
                       <td>{{ $row->menu_item_description }}</td>
                     </tr>
+                    <tr>
+                      <td>PRODUCT TYPE</td>
+                      @if ($row->menu_product_types_name != null)
+                        <td>{{ $row->menu_product_types_name }}</td>
+                      @else
+                      <td>{{ $menu_product_types }}</td>
+
+                      @endif
+                    </tr>
                       @php
                         $i=0;
                       @endphp

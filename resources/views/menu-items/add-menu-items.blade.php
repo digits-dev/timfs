@@ -134,27 +134,27 @@
                 <div class="form-column">
                     <fieldset>
                         <legend> POS Old Item Code 1</legend>
-                        <input type="text" name="pos_item_code_1" placeholder="Enter pos old item code 1">
+                        <input type="text" name="pos_item_code_1" placeholder="Enter pos old item code 1" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
                         <legend> POS Old Item Code 2</legend>
-                        <input type="text" name="pos_item_code_2" placeholder="Enter pos old item code 2">
+                        <input type="text" name="pos_item_code_2" placeholder="Enter pos old item code 2" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
                         <legend> POS Old Item Code 3</legend>
-                        <input type="text" name="pos_item_code_3" placeholder="Enter pos old item code 3">
+                        <input type="text" name="pos_item_code_3" placeholder="Enter pos old item code 3" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
                         <legend> POS Old Description</legend>
-                        <input type="text" name="pos_item_description" placeholder="Enter pos old item description">
+                        <input type="text" name="pos_item_description" placeholder="Enter pos old item description" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
                         <legend><span id="required">*</span> Menu Description</legend>
-                        <input type="text" name="menu_item_description" placeholder="Enter menu description" required>
+                        <input type="text" name="menu_item_description" placeholder="Enter menu description" required oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
                         <legend><span id="required">*</span> Product Type</legend>
-                        <input type="text" name="product_type" placeholder="Enter a product type" required>
+                        <input type="text" name="product_type" placeholder="Enter a product type" required oninput="this.value = this.value.toUpperCase()">
 
                         {{-- <select class="js-example-basic-single" name="product_type" id="menu_type_select2" required>
                             <option value="" selected disabled></option>
@@ -188,7 +188,7 @@
                         @if ($i < count($menu_choices_group)/2)
                             <fieldset class="choices_group">
                                 <legend> {{ $menu_choices_group[$i]->menu_choice_group_column_description }}</legend>
-                                <input class="group" type="text" name="choices_group_{{ $i+1 }}" placeholder="Enter choices group {{ $i+1 }}" >
+                                <input class="group" type="text" name="choices_group_{{ $i+1 }}" placeholder="Enter choices group {{ $i+1 }}" oninput="this.value = this.value.toUpperCase()">
                             </fieldset>
                             <fieldset class="choices_group">
                                 <legend> {{ $menu_choices_group[$i]->menu_choice_group_column_description }} SKU</legend>
@@ -203,7 +203,7 @@
                         @if ($i >= count($menu_choices_group)/2)
                             <fieldset class="choices_group">
                                 <legend>{{ $menu_choices_group[$i]->menu_choice_group_column_description }}</legend>
-                                <input class="group" type="text" name="choices_group_{{ $i+1 }}" placeholder="Enter choices group {{ $i+1 }}" >
+                                <input class="group" type="text" name="choices_group_{{ $i+1 }}" placeholder="Enter choices group {{ $i+1 }}" oninput="this.value = this.value.toUpperCase()">
                             </fieldset>
                             <fieldset class="choices_group">
                                 <legend>{{ $menu_choices_group[$i]->menu_choice_group_column_description }} SKU</legend>
@@ -225,19 +225,19 @@
                     </fieldset>
                     <fieldset>
                         <legend><span id="required">*</span> Price - Dine In</legend>
-                        <input type="number" name="price_dine_in" placeholder="Enter price - dine in" required>
+                        <input type="number" name="price_dine_in" placeholder="Enter price - dine in" required oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
                         <legend> Price - Delivery</legend>
-                        <input type="number" name="price_delivery" placeholder="Leave blank if same as dine in">
+                        <input type="number" name="price_delivery" placeholder="Leave blank if same as dine in" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
                         <legend> Price - Take Out</legend>
-                        <input type="number" name="price_take_out" placeholder="Leave blank if same as dine in">
+                        <input type="number" name="price_take_out" placeholder="Leave blank if same as dine in" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>  
                     <fieldset>
                         <legend><span id="required">*</span> Original Concept</legend>
-                        <input type="text" name="original_concept" placeholder="Enter original concept" required>
+                        <input type="text" name="original_concept" placeholder="Enter original concept" required oninput="this.value = this.value.toUpperCase()">
                         </select>
                     </fieldset> 
                     <fieldset>

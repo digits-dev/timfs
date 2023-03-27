@@ -99,6 +99,7 @@
         margin-right: 10px !important;
         padding: 0 !important;
     }
+
     
 
 </style>
@@ -120,27 +121,27 @@
                     </fieldset>
                     <label> POS Old Item Code 1</label>
                     <fieldset>
-                        <input type="text" name="pos_item_code_1" placeholder="Enter pos old item code 1" value="{{ $row->old_code_1 }}">
+                        <input type="text" name="pos_item_code_1" placeholder="Enter pos old item code 1" value="{{ $row->old_code_1 }}" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <label> POS Old Item Code 2</label>
                     <fieldset>
-                        <input type="text" name="pos_item_code_2" placeholder="Enter pos old item code 2" value="{{ $row->old_code_2 }}">
+                        <input type="text" name="pos_item_code_2" placeholder="Enter pos old item code 2" value="{{ $row->old_code_2 }}" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <label> POS Old Item Code 3</label>
                     <fieldset>
-                        <input type="text" name="pos_item_code_3" placeholder="Enter pos old item code 3 " value="{{ $row->old_code_3 }}">
+                        <input type="text" name="pos_item_code_3" placeholder="Enter pos old item code 3 " value="{{ $row->old_code_3 }}" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <label> POS Old Description</label>
                     <fieldset>
-                        <input type="text" name="pos_item_description" placeholder="Enter pos old item description" value="{{ $row->pos_old_item_description }}">
+                        <input type="text" name="pos_item_description" placeholder="Enter pos old item description" value="{{ $row->pos_old_item_description }}" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <label><span id="required">*</span> Menu Description</label>
                     <fieldset>
-                        <input type="text" name="menu_item_description" placeholder="Enter menu description" required value="{{ $row->menu_item_description }}">
+                        <input type="text" name="menu_item_description" placeholder="Enter menu description" required value="{{ $row->menu_item_description }}" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <label><span id="required">*</span> Product Type</label>
                     <fieldset>
-                        <input type="text" name="product_type" placeholder="Enter a product type" required value="{{ $row->menu_product_types_id }}">
+                        <input type="text" name="product_type" placeholder="Enter a product type" required value="{{ $row->menu_product_types_name }}" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <label><span id="required">*</span> Menu Type</label>
                     <fieldset>
@@ -176,7 +177,7 @@
                             @endphp  
                             <label>{{ ucwords(strtolower($menu_choices_group[$i]->menu_choice_group_column_description)) }}</label>
                             <fieldset class="choices_group">
-                                <input class="group" type="text" name="choices_group_{{ $i+1 }}" id="input_type_group_{{ $i+1 }}" placeholder="Enter choices group {{ $i+1 }}" value="{{ $row->$choices_group_less }}">
+                                <input class="group" type="text" name="choices_group_{{ $i+1 }}" id="input_type_group_{{ $i+1 }}" placeholder="Enter choices group {{ $i+1 }}" value="{{ $row->$choices_group_less }}" oninput="this.value = this.value.toUpperCase()">
                             </fieldset>
                             <label> {{ ucwords(strtolower($menu_choices_group[$i]->menu_choice_group_column_description)) }} SKU</label>
                             <fieldset class="choices_group">
@@ -205,7 +206,7 @@
                             @endphp
                             <label>{{ ucwords(strtolower($menu_choices_group[$i]->menu_choice_group_column_description)) }}</label>
                             <fieldset class="choices_group">
-                                <input class="group" type="text" name="choices_group_{{ $i+1 }}" placeholder="Enter choices group {{ $i+1 }}" value="{{ $row->$choices_group_greater }}">
+                                <input class="group" type="text" name="choices_group_{{ $i+1 }}" placeholder="Enter choices group {{ $i+1 }}" value="{{ $row->$choices_group_greater }}" oninput="this.value = this.value.toUpperCase()">
                             </fieldset>
                             <label>{{ ucwords(strtolower($menu_choices_group[$i]->menu_choice_group_column_description)) }} SKU</label>
                             <fieldset class="choices_group">
@@ -242,7 +243,7 @@
                     </fieldset>
                     <label><span id="required">*</span> Price - Dine In</label>
                     <fieldset>
-                        <input type="number" name="price_dine_in" placeholder="Enter price - dine in" value="{{ $row->menu_price_dine }}" required>
+                        <input type="number" name="price_dine_in" placeholder="Enter price - dine in" value="{{ $row->menu_price_dine }}" required oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <label> Price - Delivery</label>
                     <fieldset>
@@ -254,7 +255,7 @@
                     </fieldset>  
                     <label><span id="required">*</span> Original Concept</label>
                     <fieldset>
-                        <input type="text" name="original_concept" placeholder="Enter original concept" value="{{ $row->original_concept }}" required>
+                        <input type="text" name="original_concept" placeholder="Enter original concept" value="{{ $row->original_concept }}" required oninput="this.value = this.value.toUpperCase()">
                         </select>
                     </fieldset> 
                     <label><span id="required">*</span> Store List</label>
