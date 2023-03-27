@@ -206,7 +206,7 @@
         if (item.menu_price_dine > 0 && item.food_cost_percentage > lowCost) {
             $('.food-cost-percentage').css('color', 'red');
         }
-        $('table th, table td').css('border', '1px solid #aaaaaa');
+        $('table th, table td').css('border', '1px solid #aaaaaa').css('vertical-align', 'middle');
         $('table thead').css('background', '#deeaee');
     });
     
