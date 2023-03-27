@@ -1120,7 +1120,7 @@
 						'is_selected',
 						'is_existing',
 						'status',
-						'qty',
+						'ingredient_qty as qty',
 						'prep_qty',
 						'uom_id',
 						'uom_name',
