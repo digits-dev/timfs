@@ -831,6 +831,8 @@
 			$ingredients = json_decode($request->input('ingredients'));
 			$food_cost = $request->input('food_cost');
 			$food_cost_percentage = $request->input('food_cost_percentage');
+			$portion_size = $request->input('portion_size');
+			$ingredient_total_cost = $request->input('ingredient_total_cost');
 
 			// creating new version
 			$ingredient_version = [];
@@ -925,7 +927,12 @@
 			//updating food cost and percentage to menu items table
 			DB::table('menu_items')
 				->where('id', $menu_items_id)
-				->update(['food_cost_temp' => $food_cost, 'food_cost_percentage_temp' => $food_cost_percentage]);
+				->update([
+					'food_cost_temp' => $food_cost,
+					'food_cost_percentage_temp' => $food_cost_percentage,
+					'portion_size' => $portion_size,
+					'ingredient_total_cost' => $ingredient_total_cost
+				]);
 
 			//inactivating all active ingredients of menu item
 			DB::table('menu_ingredients_details_temp')
@@ -942,10 +949,13 @@
 					$ingredient = (array) $ingredient;
 					
 					//checking if the ingredient already exists
-					$is_existing = !!count(DB::table('menu_ingredients_details_temp')
-						->where('menu_items_id', $menu_items_id)
-						->where('item_masters_id', $ingredient['item_masters_id'])
-						->get());
+					$is_existing = DB::table('menu_ingredients_details_temp')
+						->where([
+						'menu_items_id' => $menu_items_id,
+						'item_masters_id' => $ingredient['item_masters_id'],
+						'ingredient_name' => $ingredient['ingredient_name'],
+						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
+						])->exists();
 					
 					if ($is_existing) {
 						$ingredient['updated_at'] = date('Y-m-d H:i:s');

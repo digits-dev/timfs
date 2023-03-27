@@ -5,6 +5,10 @@
 <script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js" integrity="sha512-jVMFsAksn8aljb9IJ+3OCAq38dJpquMBjgEuz7Q5Oqu5xenfin/jxdbKw4P5eKjUF4xiG/GPT5CvCX3Io54gyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style type="text/css">
+    .total-cost-section > * {
+        margin-left: 20px;  
+    }
+
     .date-updated {
         font-size: 12px;
         color: gray;
@@ -178,7 +182,7 @@
         align-items: center;
     }
 
-    .label-total {
+    .food-cost-label, .portion-label, .total-cost-label {
         display: inline-table;
         position: relative;
     }
@@ -261,7 +265,7 @@
         transition: 200ms;
     }
 
-    .label-total {
+    .food-cost-label {
         font-size: 18px !important;
     }
 
@@ -549,9 +553,6 @@
                 <input class="form-control menu-item-srp" type="text" value="₱ {{$item->menu_price_dine}}" disabled>
             </label>
             <div class="info-div">
-                <label> Portion Size
-                    <input type="number" class="form-control portion" value="{{$item->portion_size}}" required>
-                </label>
                 <h4 class="recipe-text""><i class="fa fa-cheese"></i> RECIPE <i class="fa fa-utensils"></i></h4>
                 <h5 class="no-ingredient-warning" style="display: none;"><i class="fa fa-spoon"></i> No ingredients currently saved.</h5>
                 <p class="loading-label">Loading...</p>
@@ -566,10 +567,18 @@
                     <button class="btn btn-primary" id="add-existing" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add existing ingredient</button>
                     <button class="btn btn-success" id="add-new" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add new ingredient</button>
                 </div>
-                <label class="label-total">
-                    Food Cost (<span class="percentage"></span>)
-                    <input class="form-control total-cost" name="total_cost" type="text" readonly>
-                </label>
+                <div class="total-cost-section">
+                    <label class="portion-label"> Portion Size
+                        <input type="number" class="form-control portion" value="{{$item->portion_size}}" required>
+                    </label>
+                    <label class="total-cost-label"> Total Cost
+                        <input type="number" class="form-control total-cost" value="{{$item->total_ingredient_cost}}" readonly required>
+                    </label>
+                    <label class="food-cost-label">
+                        Food Cost (<span class="percentage"></span>)
+                        <input class="form-control food-cost" name="total_cost" type="text" readonly>
+                    </label>
+                </div>
             </section>
         </form>
     </div>
@@ -638,6 +647,7 @@
                         } else {
                             //primary and new
                             element = $('.new-ingredient-wrapper .ingredient-entry').eq(0).clone();
+                            element.find('.ttp').attr('readonly', false);
                         }
                     } else {
                         if (savedIngredient.is_existing == 'TRUE') {
@@ -773,12 +783,22 @@
                     entry.find('.ttp').attr('readonly', true);
                 }
             })
+
+            $('.portion').keyup(function() {
+                const value = $(this).val();
+                if (value && value > 0) $.fn.sumCost();
+                else return;
+            })
         }
 
         $.fn.sumCost = function() {
             const wrappers = jQuery.makeArray($('.ingredient-wrapper, .new-ingredient-wrapper'));
-            let sum = 0;
             const lowCost = Number(localStorage.getItem('lowCost')) || 30;
+            const menuItemSRP = menuItem.menu_price_dine;
+            const percentageText = $('.percentage');
+            const portionInput = $('.portion');
+            const portionSize = portionInput.val();
+            let sum = 0;
             wrappers.forEach(wrapper => {
                 const primary = $(wrapper).find('.ingredient-entry');
                 const substitute = jQuery.makeArray($(wrapper).find('.substitute, .new-substitute'));
@@ -788,25 +808,24 @@
                 } else {
                     sum += Number(primary.find('.cost').val().replace(/[^0-9.]/g, ''));
                 }
-                
             });
-            const menuItemSRP = Number(menuItem.menu_price_dine.replace(/[^0-9.]/g, ''));
+            const foodCost = math.round(sum / portionSize, 4);
+            const percentage = menuItemSRP > 0 ? (foodCost / menuItem.menu_price_dine * 100).toFixed(2) : 0;
             $('.total-cost').val(sum);
-            const percentage = menuItemSRP != 0 ? Number(((sum / menuItemSRP * 100).toFixed(2))) : 0;
-            const percentageText = $('.percentage');
+            $('.food-cost').val(foodCost);
             $(percentageText).text(`${percentage}%`);
             if (percentage > lowCost) {
                 $(percentageText).css('color', 'red');
-                $('.total-cost').css({'color': 'red', 'outline': '2px solid red', 'font-weight': 'bold',});
+                $('.food-cost').css({'color': 'red', 'outline': '2px solid red', 'font-weight': 'bold',});
             } else {
                 $(percentageText).css('color', '');
-                $('.total-cost').css({'color': '', 'outline': '', 'font-weight': 'normal'});    
+                $('.food-cost').css({'color': '', 'outline': '', 'font-weight': 'normal'});    
             }
             $.fn.formatNumbers();
         }
 
         $.fn.formatNumbers = function() {
-            const costs = jQuery.makeArray($('.cost, .total-cost'));
+            const costs = jQuery.makeArray($('.cost, .food-cost'));
             costs.forEach(cost => {
                 const ingredientEntry = $(cost).parents('.substitute, .new-substitute, .ingredient-entry');
                 if (ingredientEntry.attr('isExisting') == 'false') {
@@ -1081,7 +1100,6 @@
                     ingredientObject.ttp = ingredientMember.find('.ttp').val();
                     ingredientObject.qty = ingredientMember.find('.ing-quantity').val();
                     ingredientObject.cost = ingredientMember.find('.cost').val().replace(/[^0-9.]/g, '');
-                    ingredientObject.total_cost = $('.total-cost').val().replace(/[^0-9.]/g, '');
                     ingredientArray.push(ingredientObject);
                 });
                 if (ingredientArray.length) {
@@ -1108,16 +1126,32 @@
                 .attr('name', 'menu_items_id')
                 .val("{{ $item->id }}");
             
-            const totalCostData = $(document.createElement('input'))
+            const foodCostData = $(document.createElement('input'))
                 .attr('name', 'food_cost')
-                .val($('.total-cost').val().replace(/[^0-9.]/g, ''));
+                .val($('.food-cost').val().replace(/[^0-9.]/g, ''));
 
             const percentageData = $(document.createElement('input'))
                 .attr('name', 'food_cost_percentage')
                 .val($('.percentage').text().replace(/[^0-9.]/g, ''));
+            
+            const portionData = $(document.createElement('input'))
+                .attr('name', 'portion_size')
+                .val($('.portion').val());
+
+            const totalCostData = $(document.createElement('input'))
+                .attr('name', 'ingredient_total_cost')
+                .val($('.total-cost').val());
 
 
-            form.append(csrf, ingredientsData, menuItemData, totalCostData, percentageData);
+            form.append(
+                csrf,
+                ingredientsData,
+                menuItemData,
+                foodCostData,
+                percentageData,
+                portionData,
+                totalCostData,
+            );
             $('.panel-body').append(form);
             form.submit();
         }
@@ -1380,7 +1414,7 @@
                         .val(hasOneApproval);
                     const foodCost = $(document.createElement('input'))
                         .attr('name', 'food_cost')
-                        .val($('.total-cost').val().replace(/[^0-9.]/g, ''));
+                        .val($('.food-cost').val().replace(/[^0-9.]/g, ''));
                     const foodCostPercentage = $(document.createElement('input'))
                         .attr('name', 'food_cost_percentage')
                         .val($('.percentage').text().replace(/[^0-9.]/g, ''));
