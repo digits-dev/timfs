@@ -1,4 +1,9 @@
 @push('head')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js" integrity="sha512-jVMFsAksn8aljb9IJ+3OCAq38dJpquMBjgEuz7Q5Oqu5xenfin/jxdbKw4P5eKjUF4xiG/GPT5CvCX3Io54gyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
 <style type="text/css">
     .total-cost-section > * {
         margin-left: 20px;  
@@ -269,11 +274,6 @@
     }
 
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js" integrity="sha512-jVMFsAksn8aljb9IJ+3OCAq38dJpquMBjgEuz7Q5Oqu5xenfin/jxdbKw4P5eKjUF4xiG/GPT5CvCX3Io54gyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-<script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
 
 @endpush
 
@@ -566,11 +566,11 @@
                     <button class="btn btn-success" id="add-new" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add new ingredient</button>
                 </div>
                 <div class="total-cost-section">
-                    <label class="portion-label"> Portion Size
+                    <label class="portion-label"><span class="required-star">*</span> Portion Size
                         <input type="number" class="form-control portion" value="{{$item->portion_size}}" required>
                     </label>
                     <label class="total-cost-label"> Total Cost
-                        <input type="number" class="form-control total-cost" value="{{$item->total_ingredient_cost}}" readonly required>
+                        <input type="text" class="form-control total-cost" value="{{$item->total_ingredient_cost}}" readonly>
                     </label>
                     <label class="food-cost-label">
                         Food Cost (<span class="percentage"></span>)
@@ -819,16 +819,12 @@
         }
 
         $.fn.formatNumbers = function() {
-            const costs = jQuery.makeArray($('.cost, .food-cost'));
+            const costs = jQuery.makeArray($('#form .cost, #form .food-cost, #form .total-cost'));
             costs.forEach(cost => {
-                const ingredientEntry = $(cost).parents('.substitute, .new-substitute, .ingredient-entry');
-                if (ingredientEntry.attr('isExisting') == 'false') {
-                    $(cost).val(`₱ ${$(cost).val().replace(/[^0-9.]/g, '')}`);
-                    return;
-                }
-                const val = Number($(cost).val().replace(/[^0-9.]/g, '')).toLocaleString(undefined, {maximumFractionDigits: 4});
-                $(cost).val(`₱ ${val}`);
-            })
+                cost = $(cost);
+                const value = Number(cost.val().replace(/[^0-9.]/g, '')).toLocaleString(undefined, {maximumFractionDigits: 4});
+                cost.val('₱ ' + value);
+            });
         }
 
         $.fn.formatSelected = function() {
@@ -883,7 +879,7 @@
                 li.addClass('list-item dropdown-item');
                 li.attr({
                     item_id: e.item_masters_id,
-                    ttp: e.ttp || e.food_cost_temp || 0, // NOTE: Change food_cost_temp to food_cost in repo without workflow
+                    ttp: e.ttp || e.food_cost || 0,
                     packaging_size: e.packaging_size || 1,
                     uom: e.packagings_id || e.uoms_id,
                     uom_desc: e.packaging_description || e.uom_description,
@@ -989,7 +985,7 @@
 
             const totalCostData = $(document.createElement('input'))
                 .attr('name', 'ingredient_total_cost')
-                .val($('.total-cost').val());
+                .val($('.total-cost').val().replace(/[^0-9.]/g, ''));
 
 
             form.append(
@@ -1232,7 +1228,6 @@
         $.fn.reload();
         $.fn.formatSelected();
         $.fn.sumCost();
-        $.fn.restrictionFormat();
     });
 
 </script>

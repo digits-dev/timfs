@@ -1002,7 +1002,7 @@
 				->select('menu_items.id as menu_item_id',
 					'menu_item_description',
 					'tasteless_menu_code',
-					'food_cost_temp', // NOTE: Change food_cost_temp to food_cost in repo without workflow
+					'food_cost',
 					'food_cost_percentage_temp',
 					'menu_items.uoms_id',
 					'uom_description')
