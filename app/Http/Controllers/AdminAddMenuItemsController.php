@@ -323,22 +323,42 @@
 				->max('tasteless_menu_code');
 			}
 
+			// Price Delivery
+			if($returnInputs['price_delivery'] == null){
+				$price_delivery = $returnInputs['price_dine_in'];
+			}else{
+				$price_delivery = $returnInputs['price_delivery'];
+			}
+
+			if($returnInputs['price_take_out'] == null){
+				$price_take_out = $returnInputs['price_dine_in'];
+			}else{
+				$price_take_out = $returnInputs['price_take_out'];
+			}
+			
+			$choices_group = DB::table('menu_choice_groups')
+				->select('id')
+				->where('status', 'ACTIVE')
+				->get();
+
 			// Add data to database
 			$postdata['tasteless_menu_code'] = $tasteless_menu_code+1;
 			$postdata['old_code_1'] = $returnInputs['pos_item_code_1'];
 			$postdata['old_code_2'] = $returnInputs['pos_item_code_2'];
 			$postdata['old_code_3'] = $returnInputs['pos_item_code_3'];
 			$postdata['menu_item_description'] = $returnInputs['menu_item_description'];
-			$postdata['choices_group_1'] = $returnInputs['choices_group_1'];
-			$postdata['choices_group_2'] = $returnInputs['choices_group_2'];
-			$postdata['choices_group_3'] = $returnInputs['choices_group_3'];
-			$postdata['choices_skugroup_1'] = $returnInputs['choices_skugroup_1'];
-			$postdata['choices_skugroup_2'] = $returnInputs['choices_skugroup_2'];
-			$postdata['choices_skugroup_3'] = $returnInputs['choices_skugroup_3'];
+			for($i=0; $i<count($choices_group); $i++){
+				$choices_group_str = 'choices_group_'.(string)($i+1);
+				$choices_skugroup_str = 'choices_skugroup_'.(string)($i+1);
+				$postdata[$choices_group_str] = $returnInputs[$choices_group_str];
+				if($returnInputs[$choices_skugroup_str] != null){
+					$postdata[$choices_skugroup_str] = implode(', ',$returnInputs[$choices_skugroup_str]);
+				}
+			}
 			$postdata['menu_types_id'] = $returnInputs['menu_type'];
 			$postdata['menu_price_dine'] = $returnInputs['price_dine_in'];
-			$postdata['menu_price_dlv'] = $returnInputs['price_delivery'];
-			$postdata['menu_price_take'] = $returnInputs['price_take_out'];
+			$postdata['menu_price_dlv'] = $price_delivery;
+			$postdata['menu_price_take'] = $price_take_out;
 			$postdata['original_concept'] = $returnInputs['original_concept'];
 			$postdata['pos_old_item_description'] = $returnInputs['pos_item_description'];
 			$postdata['menu_product_types_id'] = $returnInputs['product_type'];
@@ -347,7 +367,7 @@
 			$postdata['status'] = $returnInputs['status'];
 			$postdata['created_by'] = CRUDBooster::myid();
 			$postdata['created_at'] = date('Y-m-d H:i:s');
-			// Get segmentation column name
+			// Get store list column name
 			if($returnInputs['menu_segment_column_description'] != null){
 				foreach($returnInputs['menu_segment_column_description'] as $menu_segments_id){
 					$menu_segmentations_column_name = DB::table('menu_segmentations')
@@ -385,6 +405,7 @@
 
 			$returnInputs = Input::all();
 			$row = DB::table('menu_items')->where('id',$id)->get()->toArray();
+
 			$menu_segment_names = [];
 			$user_menu_segmentations = DB::table('menu_segmentations')
 			->where('status','ACTIVE')
@@ -392,21 +413,44 @@
 			->get();
 			$menu_segments = Arr::pluck($user_menu_segmentations, 'menu_segment_column_name');
 
+			// Price Delivery
+			if($returnInputs['price_delivery'] == null){
+				$price_delivery = $returnInputs['price_dine_in'];
+			}else{
+				$price_delivery = $returnInputs['price_delivery'];
+			}
+
+			if($returnInputs['price_take_out'] == null){
+				$price_take_out = $returnInputs['price_dine_in'];
+			}else{
+				$price_take_out = $returnInputs['price_take_out'];
+			}
+
+			// Choices Group
+			$choices_group = DB::table('menu_choice_groups')
+				->select('id')
+				->where('status', 'ACTIVE')
+				->get();
+
 			// Add data to database
 			$postdata['old_code_1'] = $returnInputs['pos_item_code_1'];
 			$postdata['old_code_2'] = $returnInputs['pos_item_code_2'];
 			$postdata['old_code_3'] = $returnInputs['pos_item_code_3'];
 			$postdata['menu_item_description'] = $returnInputs['menu_item_description'];
-			$postdata['choices_group_1'] = $returnInputs['choices_group_1'];
-			$postdata['choices_group_2'] = $returnInputs['choices_group_2'];
-			$postdata['choices_group_3'] = $returnInputs['choices_group_3'];
-			$postdata['choices_skugroup_1'] = $returnInputs['choices_skugroup_1'];
-			$postdata['choices_skugroup_2'] = $returnInputs['choices_skugroup_2'];
-			$postdata['choices_skugroup_3'] = $returnInputs['choices_skugroup_3'];
+			for($i=0; $i<count($choices_group); $i++){
+				$choices_group_str = 'choices_group_'.(string)($i+1);
+				$choices_skugroup_str = 'choices_skugroup_'.(string)($i+1);
+				$postdata[$choices_group_str] = $returnInputs[$choices_group_str];
+				if($returnInputs[$choices_skugroup_str] != null){
+					$postdata[$choices_skugroup_str] = implode(', ',$returnInputs[$choices_skugroup_str]);
+				}else{
+					$postdata[$choices_skugroup_str] = null;
+				}
+			}
 			$postdata['menu_types_id'] = $returnInputs['menu_type'];
 			$postdata['menu_price_dine'] = $returnInputs['price_dine_in'];
-			$postdata['menu_price_dlv'] = $returnInputs['price_delivery'];
-			$postdata['menu_price_take'] = $returnInputs['price_take_out'];
+			$postdata['menu_price_dlv'] = $price_delivery;
+			$postdata['menu_price_take'] = $price_take_out;
 			$postdata['original_concept'] = $returnInputs['original_concept'];
 			$postdata['pos_old_item_description'] = $returnInputs['pos_item_description'];
 			$postdata['menu_product_types_id'] = $returnInputs['product_type'];
@@ -414,9 +458,9 @@
 			$postdata['menu_subcategories_id'] = $returnInputs['sub_category'];
 			$postdata['status'] = $returnInputs['status'];
 			$postdata['updated_by'] = CRUDBooster::myid();
-			// Update Menu Segmentation 
+			// Update Store List
 			if($returnInputs['menu_segment_column_description'] != null){
-				// Reset Menu Segmentation 
+				// Reset Store List
 				foreach($menu_segments as $segments){
 					$postdata[$segments] = null;
 				}
@@ -510,8 +554,27 @@
 				->where('status', 'ACTIVE')
 				->orderBy('subcategory_description')
 				->get()->unique('subcategory_description');
-
+			// Menu Group Choices
+			$data['menu_choices_group'] = DB::table('menu_choice_groups')
+				->where('status', 'ACTIVE')
+				->orderBy('menu_choice_group_column_description')
+				->get()->unique('menu_choice_group_column_description');
+				
 			return $this->view('menu-items.add-menu-items',$data);
+		}
+
+		public function groupSku(Request $request){
+
+			$results = DB::table('menu_items')
+				->select('tasteless_menu_code' ,'menu_item_description')
+				->where('status', 'ACTIVE')
+				->where('menu_item_description', 'LIKE', '%'. $request->get('q'). '%')
+				->orWhere('tasteless_menu_code', 'LIKE', '%'. $request->get('q'). '%')
+				->orderBy('menu_item_description')
+				->get();
+							
+			return response()->json($results);
+
 		}
 
 		public function getEdit($id) {
@@ -548,6 +611,11 @@
 				->where('status','ACTIVE')
 				->orderBy('menu_segment_column_description')
 				->get()->unique('menu_segment_column_description');
+			// Menu Group Choices
+			$data['menu_choices_group'] = DB::table('menu_choice_groups')
+				->where('status', 'ACTIVE')
+				->orderBy('menu_choice_group_column_description')
+				->get()->unique('menu_choice_group_column_description');
 			// User Menu Segments
 			$user_menu_segmentations = DB::table('menu_segmentations')
 				->where('status','ACTIVE')
@@ -562,7 +630,16 @@
 					}
 				}
 			}
-
+			
+			$data['store_list_id'] = [];
+			foreach($data['user_menu_segment'] as $store_list){
+				$store_list = DB::table('menu_segmentations')->select('*')
+				->where('status', 'ACTIVE')
+				->where('menu_segment_column_name', $store_list)
+				->get();
+				array_push($data['store_list_id'], $store_list[0]->id);
+			}
+			
 			return $this->view('menu-items.edit-menu-items',$data);
 		}
 
@@ -589,6 +666,11 @@
 			->where('status','ACTIVE')
 			->orderBy('menu_segment_column_description')
 			->get();
+			// Choices Group
+			$data['menu_choices_group'] = DB::table('menu_choice_groups')
+				->where('status', 'ACTIVE')
+				->orderBy('menu_choice_group_column_description')
+				->get()->unique('menu_choice_group_column_description');
 			// User Menu Segments
 			$user_menu_segmentations = DB::table('menu_segmentations')
 				->where('status','ACTIVE')
@@ -603,6 +685,37 @@
 					}
 				}
 			}
+
+			// Menu Group SKU
+			$menu_item_value = [];
+			$menu_item_key = [];
+
+			foreach($data['menu_choices_group'] as $value){
+				$group_name = 'choices_'.'sku'.$value->menu_choice_group_column_name;
+				$group_name_val = explode(', ',$data['row']->$group_name);
+				$group_column_desc = $value->menu_choice_group_column_description;
+				array_push($menu_item_value, $group_name_val);
+				array_push($menu_item_key, $group_column_desc);
+			}
+			
+			foreach($menu_item_value as &$value){
+				foreach($value as &$id){
+					$row_menu_description = DB::table('menu_items')
+						->where('tasteless_menu_code', $id)
+						->value('menu_item_description');
+					
+					$id = $row_menu_description;
+					
+				}
+			}
+
+			$implode_menu_item_value = array_map(function($subArray) {
+				return implode(', ', $subArray);
+			}, $menu_item_value);
+
+			
+			$data['groups'] = array_combine($menu_item_key, array_values($implode_menu_item_value));
+			
 			//Please use view method instead view method from laravel
 			return $this->view('menu-items.detail-menu-items',$data);
 		}
