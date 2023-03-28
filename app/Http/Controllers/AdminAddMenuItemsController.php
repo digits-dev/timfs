@@ -66,7 +66,7 @@
 			$this->col[] = ["label"=>"Menu Subcategory","name"=>"menu_subcategories_id","join"=>"menu_subcategories,subcategory_description"];
 			// $this->col[] = ["label"=>"Menu Product Type","name"=>"menu_product_types_id","join"=>"menu_product_types,menu_product_type_description"];
 			$this->col[] = ["label"=>"Menu Product Type Name",
-				"name"=>"menu_product_types_name"
+					'name'=> 'menu_product_types_name'
 				];
 			$this->col[] = ["label"=>"Menu Type","name"=>"menu_types_id","join"=>"menu_types,menu_type_description"];
 			foreach($prices as $price){
@@ -289,15 +289,39 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code here
+	    	//Your code 
+
+			if($column_index == '2'){
+
+				$tasteless_menu_code_id = DB::table('menu_items')
+					->where('status', 'ACTIVE')
+					->where('tasteless_menu_code', $column_value)
+					->first();
+		
+				$product_type_name = DB::table('menu_product_types')
+					->where('id', $tasteless_menu_code_id->menu_product_types_id)
+					->select('menu_product_type_description')
+					->value('menu_product_type_description');
+					
+				if($tasteless_menu_code_id->menu_product_types_name == null){
+					$update = DB::table('menu_items')
+					->where('tasteless_menu_code', $tasteless_menu_code_id->tasteless_menu_code)
+					->update([
+						'menu_product_types_name' => $product_type_name
+					]);
+				}
+								
+			}
 
 			if($column_index == '18'){
+
 				if($column_value == 'INACTIVE'){
 					$column_value = '<span class="label label-danger">INACTIVE</span>';
 				}else{
 					$column_value = '<span class="label label-success">ACTIVE</span>';
 				}
 			}
+
 	    }
 
 	    /*
@@ -313,9 +337,9 @@
 
 			// Tasteless menu code
 			$promo_id = DB::table('menu_types')
-			->select('id')
-			->where('status', 'ACTIVE')
-			->where('menu_type_description', 'PROMO')->value('id');
+				->select('id')
+				->where('status', 'ACTIVE')
+				->where('menu_type_description', 'PROMO')->value('id');
 
 			if($returnInputs['menu_type'] == $promo_id){
 				$tasteless_menu_code = (int) DB::table('menu_items')->where('tasteless_menu_code','like',"5%")
@@ -416,9 +440,9 @@
 
 			$menu_segment_names = [];
 			$user_menu_segmentations = DB::table('menu_segmentations')
-			->where('status','ACTIVE')
-			->select('menu_segment_column_name')
-			->get();
+				->where('status','ACTIVE')
+				->select('menu_segment_column_name')
+				->get();
 			$menu_segments = Arr::pluck($user_menu_segmentations, 'menu_segment_column_name');
 
 			// Price Delivery
@@ -662,20 +686,20 @@
 			$data = [];
 			$data['page_title'] = 'Detail Data';
 			$data['row'] = DB::table('menu_items')->where('menu_items.id',$id)
-			->leftjoin('menu_types', 'menu_items.menu_types_id', '=', 'menu_types.id')
-			->leftjoin('menu_categories', 'menu_items.menu_categories_id', '=', 'menu_categories.id')
-			->leftjoin('menu_subcategories', 'menu_items.menu_subcategories_id', '=', 'menu_subcategories.id')
-			->select('*',
-				'menu_types.menu_type_description as menu_type',
-				'menu_categories.category_description as main_category',
-				'menu_subcategories.subcategory_description as sub_category',
-				'menu_items.status as status')
+				->leftjoin('menu_types', 'menu_items.menu_types_id', '=', 'menu_types.id')
+				->leftjoin('menu_categories', 'menu_items.menu_categories_id', '=', 'menu_categories.id')
+				->leftjoin('menu_subcategories', 'menu_items.menu_subcategories_id', '=', 'menu_subcategories.id')
+				->select('*',
+					'menu_types.menu_type_description as menu_type',
+					'menu_categories.category_description as main_category',
+					'menu_subcategories.subcategory_description as sub_category',
+					'menu_items.status as status')
 			->first();
 			// Menu Segmentations
 			$data['menu_segmentations'] = DB::table('menu_segmentations')
-			->where('status','ACTIVE')
-			->orderBy('menu_segment_column_description')
-			->get();
+				->where('status','ACTIVE')
+				->orderBy('menu_segment_column_description')
+				->get();
 			// Choices Group
 			$data['menu_choices_group'] = DB::table('menu_choice_groups')
 				->where('status', 'ACTIVE')
@@ -701,7 +725,6 @@
 					}
 				}
 			}
-
 			// Menu Group SKU
 			$menu_item_value = [];
 			$menu_item_key = [];
