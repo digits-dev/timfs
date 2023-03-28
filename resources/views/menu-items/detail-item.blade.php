@@ -64,10 +64,10 @@
                 <tr>
                     <td>{{$item->tasteless_menu_code}}</td>
                     <td>{{$item->menu_item_description}}</td>
-                    <td class="peso">{{$item->menu_price_dine}}</td>
+                    <td class="peso">{{'₱ ' . $item->menu_price_dine}}</td>
                     <td>{{$item->portion_size}}</td>
-                    <td class="food-cost">{{$item->food_cost}}</td>
-                    <td class="food-cost-percentage">{{$item->food_cost_percentage ? $item->food_cost_percentage . '%' : ''}}</td>
+                    <td class="food-cost">{{$item->food_cost ? '₱ ' . $item->food_cost : ''}}</td>
+                    <td class="food-cost-percentage">{{$item->food_cost_percentage ? $item->food_cost_percentage . '%' : '0%'}}</td>
                 </tr>
             </tbody>
         </table>
@@ -150,7 +150,7 @@
                 const ttpSpan = $(document.createElement('span'))
                     .addClass('date-updated')
                     .text(groupedIngredient.item_masters_id ? timeago.format(groupedIngredient.updated_at || groupedIngredient.created_at) : '')
-                const ttp = $(document.createElement('td')).html(groupedIngredient.ttp + '<br/>').append(ttpSpan);
+                const ttp = $(document.createElement('td')).html('₱ ' + (groupedIngredient.ttp || '0.00') + '<br/>').append(ttpSpan);
                 const ingredientQty = $(document.createElement('td')).text(groupedIngredient.ingredient_qty);
                 const cost = $(document.createElement('td')).text('₱ ' + groupedIngredient.cost);
 
