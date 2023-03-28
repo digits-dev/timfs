@@ -65,9 +65,7 @@
 			$this->col[] = ["label"=>"Menu Category","name"=>"menu_categories_id","join"=>"menu_categories,category_description"];
 			$this->col[] = ["label"=>"Menu Subcategory","name"=>"menu_subcategories_id","join"=>"menu_subcategories,subcategory_description"];
 			// $this->col[] = ["label"=>"Menu Product Type","name"=>"menu_product_types_id","join"=>"menu_product_types,menu_product_type_description"];
-			$this->col[] = ["label"=>"Menu Product Type Name",
-					'name'=> 'menu_product_types_name'
-				];
+			$this->col[] = ["label"=>"Menu Product Type", 'name'=> 'menu_product_types_name'];
 			$this->col[] = ["label"=>"Menu Type","name"=>"menu_types_id","join"=>"menu_types,menu_type_description"];
 			foreach($prices as $price){
 				$this->col[] = ["label"=>ucwords(strtolower($price->menu_price_column_description)),"name"=>$price->menu_price_column_name];
@@ -302,7 +300,7 @@
 					->where('id', $tasteless_menu_code_id->menu_product_types_id)
 					->select('menu_product_type_description')
 					->value('menu_product_type_description');
-					
+
 				if($tasteless_menu_code_id->menu_product_types_name == null){
 					$update = DB::table('menu_items')
 					->where('tasteless_menu_code', $tasteless_menu_code_id->tasteless_menu_code)
