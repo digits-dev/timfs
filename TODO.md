@@ -71,6 +71,7 @@
 ## Files that need to be copied to timfs-prod
 
 - database\migrations\2023_03_17_085417_create_menu_ingredients_preparations_table.php
+- database\migrations\2023_03_17_132659_add_columns_for_preparation_to_menu_ingredients_details.php
 - database\migrations\2023_03_24_094654_add_packaging_size_column_in_menu_ingredients_details.php
 - database\migrations\2023_03_20_160426_create_menu_ingredients_auto_compute_view.php
 - app\Http\Controllers\AdminMenuIngredientsPreparationsController.php

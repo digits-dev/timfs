@@ -1235,7 +1235,6 @@
 		function updateCostOfOtherMenu($ingredients_to_update) {
 			//stopping the recursion if array is empty
 			if (!$ingredients_to_update) return;
-			// dd($ingredients_to_update);
 
 			foreach($ingredients_to_update as $ingredient_to_update) {
 				DB::table('menu_items')
