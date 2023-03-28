@@ -849,10 +849,10 @@
 					//checking if the ingredient already exists
 					$is_existing = DB::table('menu_ingredients_details')
 						->where([
-						'menu_items_id' => $menu_items_id,
-						'item_masters_id' => $ingredient['item_masters_id'],
-						'ingredient_name' => $ingredient['ingredient_name'],
-						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
+							'menu_items_id' => $menu_items_id,
+							'item_masters_id' => $ingredient['item_masters_id'],
+							'ingredient_name' => $ingredient['ingredient_name'],
+							'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
 						])->exists();
 					
 					if ($is_existing) {
@@ -888,7 +888,7 @@
 				}
 			}
 
-			//getting all ingredients that need to be updated
+			//getting all menu items where computed value(s) is/are not equal to the saved ones
 			$to_update = DB::table('menu_computed_food_cost')
 				->where(
 					DB::raw('CAST(computed_food_cost AS DECIMAL(8, 4))'),
@@ -899,6 +899,11 @@
 					DB::raw('CAST(computed_food_cost_percentage AS DECIMAL(8, 4))'),
 					'!=',
 					DB::raw('CAST(food_cost_percentage AS DECIMAL(8, 4))')
+				)
+				->orWhere(
+					DB::raw('CAST(computed_ingredient_total_cost AS DECIMAL(8, 4))'),
+					'!=',
+					DB::raw('CAST(ingredient_total_cost AS DECIMAL(8, 4))')
 				)
 				->get('id')
 				->toArray();
@@ -1034,10 +1039,12 @@
 					->leftJoin('menu_computed_food_cost', 'menu_computed_food_cost.id', '=', 'menu_items.id')
 					->update([
 						'menu_items.food_cost' => DB::raw('menu_computed_food_cost.computed_food_cost'),
-						'menu_items.food_cost_percentage' => DB::raw('menu_computed_food_cost.computed_food_cost_percentage')
+						'menu_items.food_cost_percentage' => DB::raw('menu_computed_food_cost.computed_food_cost_percentage'),
+						'menu_items.ingredient_total_cost' => DB::raw('menu_computed_food_cost.computed_ingredient_total_cost')
 					]);
 			}
 
+			//another array of menu to be updated
 			$to_update = DB::table('menu_computed_food_cost')
 				->where(
 					DB::raw('CAST(computed_food_cost AS DECIMAL(8, 4))'),
@@ -1048,6 +1055,11 @@
 					DB::raw('CAST(computed_food_cost_percentage AS DECIMAL(8, 4))'),
 					'!=',
 					DB::raw('CAST(food_cost_percentage AS DECIMAL(8, 4))')
+				)
+				->orWhere(
+					DB::raw('CAST(computed_ingredient_total_cost AS DECIMAL(8, 4))'),
+					'!=',
+					DB::raw('CAST(ingredient_total_cost AS DECIMAL(8, 4))')
 				)
 				->get('id')
 				->toArray();

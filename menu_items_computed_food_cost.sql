@@ -8,8 +8,7 @@ CREATE VIEW MENU_COMPUTED_FOOD_COST AS
 	    menu_items.portion_size,
 	    menu_items.food_cost,
 	    menu_items.food_cost_percentage,
-	    menu_items.food_cost_temp,
-	    menu_items.food_cost_percentage_temp,
+	    ROUND(SUM(subquery.cost), 4) as computed_ingredient_total_cost,
 	    ROUND(
 	        ROUND(SUM(subquery.cost), 4) / menu_items.portion_size,
 	        4
