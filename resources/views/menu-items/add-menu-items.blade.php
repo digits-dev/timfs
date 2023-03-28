@@ -12,9 +12,9 @@
 <style>
 
     .form-column{
-    margin: 0 3vw;
+    margin: 0 1vw;
     width: 33.3%;
-        
+    width: 100%
     }
 
     .form-column fieldset{
@@ -67,11 +67,11 @@
         font-weight: bold;
     }
 
-    #menu_type_select1, #menu_type_select2, 
+    /* #menu_type_select1, #menu_type_select2, 
     #menu_type_select3, #menu_type_select4, 
-    #menu_type_select5{
+    #menu_type_select5, #menu_type_select6{
         width: 100%;
-    }
+    } */
 
 
     .select2-container--default .select2-selection--single {
@@ -133,36 +133,39 @@
             <div class="add-content">
                 <div class="form-column">
                     <fieldset>
-                        <legend> POS OLD ITEM CODE 1</legend>
-                        <input type="text" name="pos_item_code_1" placeholder="ENTER POS OLD ITEM CODE 1">
+                        <legend> POS Old Item Code 1</legend>
+                        <input type="text" name="pos_item_code_1" placeholder="Enter pos old item code 1" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
-                        <legend> POS OLD ITEM CODE 2</legend>
-                        <input type="text" name="pos_item_code_2" placeholder="ENTER POS OLD ITEM CODE 2">
+                        <legend> POS Old Item Code 2</legend>
+                        <input type="text" name="pos_item_code_2" placeholder="Enter pos old item code 2" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
-                        <legend> POS OLD ITEM CODE 3</legend>
-                        <input type="text" name="pos_item_code_3" placeholder="ENTER POS OLD ITEM CODE 3">
+                        <legend> POS Old Item Code 3</legend>
+                        <input type="text" name="pos_item_code_3" placeholder="Enter pos old item code 3" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
-                        <legend> POS OLD DESCRIPTION</legend>
-                        <input type="text" name="pos_item_description" placeholder="ENTER POS OLD DESCRIPTION">
+                        <legend> POS Old Description</legend>
+                        <input type="text" name="pos_item_description" placeholder="Enter pos old item description" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
-                        <legend><span id="required">*</span> MENU DESCRIPTION</legend>
-                        <input type="text" name="menu_item_description" placeholder="ENTER MENU DESCRIPTION" required>
+                        <legend><span id="required">*</span> Menu Description</legend>
+                        <input type="text" name="menu_item_description" placeholder="Enter menu description" required oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
-                        <legend><span id="required">*</span> PRODUCT TYPE</legend>
-                        <select class="js-example-basic-single" name="product_type" id="menu_type_select2" required>
+                        <legend><span id="required">*</span> Product Type</legend>
+                        <input type="text" name="product_type" placeholder="Enter a product type" required oninput="this.value = this.value.toUpperCase()">
+
+                        {{-- <select class="js-example-basic-single" name="product_type" id="menu_type_select2" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_product_types as $product_type)
                                 <option value="{{ $product_type->id }}">{{ $product_type->menu_product_type_description }}</option>
                             @endforeach
-                        </select>
+                        </select> --}}
+
                     </fieldset>
                     <fieldset>
-                        <legend><span id="required">*</span> MENU TYPE</legend>
+                        <legend><span id="required">*</span> Menu Type</legend>
                         <select class="js-example-basic-single" name="menu_type" id="menu_type_select3" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_types as $menu)
@@ -170,34 +173,8 @@
                             @endforeach
                         </select>
                     </fieldset>
-                </div>
-                <div class="form-column">
-                    <fieldset>
-                        <legend> CHOICES GROUP 1</legend>
-                        <input type="text" name="choices_group_1" placeholder="ENTER CHOICES GROUP 1">
-                    </fieldset>
-                    <fieldset>
-                        <legend> CHOICES GROUP 1 SKU</legend>
-                        <input type="text" name="choices_skugroup_1" placeholder="ENTER CHOICES GROUP 1 SKU">
-                    </fieldset>
-                    <fieldset>
-                        <legend> CHOICES GROUP 2</legend>
-                        <input type="text" name="choices_group_2" placeholder="ENTER CHOICES GROUP 2">
-                    </fieldset>
-                    <fieldset>
-                        <legend> CHOICES GROUP 2 SKU</legend>
-                        <input type="text" name="choices_skugroup_2" placeholder="ENTER CHOICES GROUP 2 SKU">
-                    </fieldset>
-                    <fieldset>
-                        <legend> CHOICES GROUP 3</legend>
-                        <input type="text" name="choices_group_3" placeholder="ENTER CHOICES GROUP 3">
-                    </fieldset>
-                    <fieldset>
-                        <legend> CHOICES GROUP 3 SKU</legend>
-                        <input type="text" name="choices_skugroup_3" placeholder="ENTER CHOICES GROUP 3 SKU">
-                    </fieldset>
-                    <fieldset>
-                        <legend><span id="required">*</span> MAIN CATEGORY</legend>
+                    <fieldset class="main_category">
+                        <legend><span id="required">*</span> Main Category</legend>
                         <select class="js-example-basic-single" name="menu_categories" id="menu_type_select4" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_categories as $category)
@@ -206,9 +183,39 @@
                         </select> 
                     </fieldset>
                 </div>
+                <div class="form-column menu_group" id="menu_group_start">
+                    @for ($i=0; $i<count($menu_choices_group); $i++)
+                        @if ($i < count($menu_choices_group)/2)
+                            <fieldset class="choices_group">
+                                <legend> {{ $menu_choices_group[$i]->menu_choice_group_column_description }}</legend>
+                                <input class="group" type="text" name="choices_group_{{ $i+1 }}" placeholder="Enter choices group {{ $i+1 }}" oninput="this.value = this.value.toUpperCase()">
+                            </fieldset>
+                            <fieldset class="choices_group">
+                                <legend> {{ $menu_choices_group[$i]->menu_choice_group_column_description }} SKU</legend>
+                                <select class="js-example-basic-multiple sku group" name="choices_skugroup_{{ $i+1 }}[]" multiple="multiple" id="menu_type_select_sku{{ $i+1 }}" >
+                                </select>
+                            </fieldset>
+                        @endif
+                    @endfor
+                </div>
+                <div class="form-column menu_group">
+                    @for ($i=0; $i<count($menu_choices_group); $i++)
+                        @if ($i >= count($menu_choices_group)/2)
+                            <fieldset class="choices_group">
+                                <legend>{{ $menu_choices_group[$i]->menu_choice_group_column_description }}</legend>
+                                <input class="group" type="text" name="choices_group_{{ $i+1 }}" placeholder="Enter choices group {{ $i+1 }}" oninput="this.value = this.value.toUpperCase()">
+                            </fieldset>
+                            <fieldset class="choices_group">
+                                <legend>{{ $menu_choices_group[$i]->menu_choice_group_column_description }} SKU</legend>
+                                <select class="js-example-basic-multiple sku group" name="choices_skugroup_{{ $i+1 }}[]" multiple="multiple" id="menu_type_select_sku{{ $i+1 }}" >
+                                </select>
+                            </fieldset>
+                        @endif
+                    @endfor
+                </div>
                 <div class="form-column">
                     <fieldset>
-                        <legend><span id="required">*</span> SUB CATEGORY</legend>
+                        <legend><span id="required">*</span> Sub Category</legend>
                         <select class="js-example-basic-single" name="sub_category" id="menu_type_select5" required>
                             <option value="" selected disabled></option>
                             @foreach ($menu_subcategories as $category)
@@ -217,24 +224,24 @@
                         </select> 
                     </fieldset>
                     <fieldset>
-                        <legend> PRICE - DELIVERY</legend>
-                        <input type="number" name="price_delivery" placeholder="ENTER PRICE - DELIVERY">
+                        <legend><span id="required">*</span> Price - Dine In</legend>
+                        <input type="number" name="price_dine_in" placeholder="Enter price - dine in" required oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
-                        <legend><span id="required">*</span> PRICE - DINE IN</legend>
-                        <input type="number" name="price_dine_in" placeholder="ENTER PRICE - DINE IN" required>
+                        <legend> Price - Delivery</legend>
+                        <input type="number" name="price_delivery" placeholder="Leave blank if same as dine in" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
-                        <legend> PRICE - TAKE OUT</legend>
-                        <input type="number" name="price_take_out" placeholder="ENTER PRICE - TAKE OUT">
+                        <legend> Price - Take Out</legend>
+                        <input type="number" name="price_take_out" placeholder="Leave blank if same as dine in" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>  
                     <fieldset>
-                        <legend><span id="required">*</span> ORIGINAL CONCEPT</legend>
-                        <input type="text" name="original_concept" placeholder="ENTER ORIGINAL CONCEPT" required>
+                        <legend><span id="required">*</span> Original Concept</legend>
+                        <input type="text" name="original_concept" placeholder="Enter original concept" required oninput="this.value = this.value.toUpperCase()">
                         </select>
                     </fieldset> 
                     <fieldset>
-                        <legend><span id="required">*</span> MENU SEGMENTATION</legend>
+                        <legend><span id="required">*</span> Store List</legend>
                         <select class="js-example-basic-multiple" name="menu_segment_column_description[]" multiple="multiple" id="menu_type_select1" required>
                             @foreach ($menu_segmentations as $concept)
                                 <option value="{{ $concept->id }}">{{ $concept->menu_segment_column_description }}</option>
@@ -242,7 +249,7 @@
                         </select>
                     </fieldset>    
                     <fieldset>
-                        <legend>STATUS</legend>
+                        <legend>Status</legend>
                         <input type="text" name="status" value="ACTIVE" readonly id="success">
                     </fieldset> 
                 </div>
@@ -257,40 +264,141 @@
 
 <script>
     $('#menu_type_select1').select2({
-        placeholder: "SELECT A MENU SEGMENTATION",
-        allowClear: true
+        placeholder: "Select a menu segmentation",
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%'
     });
     $('#menu_type_select2').select2({
-        placeholder: "SELECT A CONCEPT",
-        allowClear: true
+        placeholder: "Select a concept",
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%'
     });
     $('#menu_type_select3').select2({
-        placeholder: "SELECT A MENU TYPE",
-        allowClear: true
+        placeholder: "Select a menu type",
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%'
     });
     $('#menu_type_select4').select2({
-        placeholder: "SELECT A MAIN CATEGORY",
-        allowClear: true
+        placeholder: "Select a main category",
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%'
     });
     $('#menu_type_select5').select2({
-        placeholder: "SELECT A SUB CATEGORY",
-        allowClear: true
-    });
+        placeholder: "Select a sub category",
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%'
 
-    // function addBtn(event){
-    //     Swal.fire({
-    //         title: 'Are you sure?',
-    //         text: "You won't be able to revert this!",
-    //         icon: 'warning',
-    //         showCancelButton: true,
-    //         confirmButtonColor: '#3085d6',
-    //         cancelButtonColor: '#d33',
-    //         confirmButtonText: 'Yes, delete it!'
-    //         }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             $('#form-add').submit()
+    });
+    // Choices Group SKU 1
+    $('.sku').select2({
+        placeholder: "Select a choice group",
+        // dropdownAutoWidth: true,
+        width: '100%',
+        ajax: {
+            url: '{{ url('/add_menu_items') }}',
+            dataType: 'json',
+            delay: 250,
+            type: 'POST',
+            data: function (params) {
+            return {
+                q: params.term,
+                _token: '{!! csrf_token() !!}'
+            };
+            },
+            processResults: function (data) {
+            return {
+                results: $.map(data, function (item) {
+                console.log(item.tasteless_menu_code)
+                return {
+                    text: item.menu_item_description,
+                    id: item.tasteless_menu_code
+                }
+                })
+            };
+            },
+            cache: true
+        },
+        id: 'id'
+        // minimumInputLength: 2
+    });
+    // Menu Type
+    $('.menu_group').hide();
+    $('.choices_group').hide();
+    $('.form-column').css('margin', '0 4vw')
+    $('#menu_group_start').children().eq(0).children().first().prepend('<span id="required">*</span>');
+    $('#menu_group_start').children().eq(1).children().first().prepend('<span id="required">*</span>');
+
+    $('#menu_type_select3').change(function() {
+        let menu_type = $('#menu_type_select3 option:selected').text();
+        if(menu_type == 'MENU BUILD - CHOICES'){
+            $('.choices_group').show();
+            $('.menu_group').show();
+            $('.form-column').css('margin', '0 1vw')
+
+        }else{
+            $('.choices_group').hide();
+            $('.group').empty();
+            $('.group').val();
+            $('.menu_group').hide();
+            $('.form-column').css('margin', '0 4vw')
+            $('.choices_group input').val('');
+            $('.choices_group select').val('');
+            
+        }
+    });
+    
+
+
+
+    // $('.select2-search__field').on('keypress', function(e) {
+    //     console.log('Key pressed: ' + e.which);
+    // })
+
+    // $('#group_1_sku').find('.select2-search__field').on('keypress', function() {
+    //     let txt = $(this).val();
+    //     var ajax_data = 'Patrick Lester'
+    //     $.ajax({
+    //         url: '{{ url('/add_menu_items') }}',
+    //         type: "POST",
+    //         cache: false,
+    //         data: {
+    //             'name': txt,
+    //             _token: '{!! csrf_token() !!}'
+    //         },
+    //         success: function(data){
+    //             // console.log(result.data.ajax_html.map(e => e.tasteless_menu_code));
+
+    //             // let tasteless_menu = result.data.search_tasteless_menu_code;
+    //             // // $("#menu_type_select6").html('');
+    //             // for(i=0; i<tasteless_menu.length; i++){
+
+    //             //     let menu_code = tasteless_menu.map(e => e.tasteless_menu_code)[i];
+    //             //     let menu_description = tasteless_menu.map(e => e.menu_item_description)[i]
+    //             //     // console.log(tasteless_menu[i]);
+    //             //     $("#menu_type_select6").append("<option value='"+menu_code+"'>"+menu_description+"</option>");
+    //             // }
+
+    //             // $.each(data, function (index, value) {
+    //             //     let test = value.search_tasteless_menu_code
+    //             //     for(i=0;i<test.length;i++){
+    //             //         console.log(test[i]['menu_item_description']);
+    //             //         $('#menu_type_select6').append('<option value="' + value.id + '">' + test[i]['menu_item_description'] + '</option>');
+    //             //     }
+    //             // });
+    //         },
+    //         error: function(xhr, status, error) {
+    //             console.log('Error:', error);
     //         }
+
     //     })
-    // }
+    // });
+
+
+
 </script>
 @endsection

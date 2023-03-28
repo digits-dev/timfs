@@ -44,30 +44,32 @@
                       <td>{{ $row->menu_item_description }}</td>
                     </tr>
                     <tr>
-                      <td>CHOICES GROUP 1</td>
-                      <td>{{ $row->choices_group_1 }}</td>
+                      <td>PRODUCT TYPE</td>
+                      @if ($row->menu_product_types_name != null)
+                        <td>{{ $row->menu_product_types_name }}</td>
+                      @else
+                      <td>{{ $menu_product_types }}</td>
+
+                      @endif
                     </tr>
-                    <tr>
-                      <td>CHOICES GROUP 1 SKU</td>
-                      <td>{{ $row->choices_skugroup_1 }}</td>
-                    </tr>
-                    <tr>
-                      <td>CHOICES GROUP 2</td>
-                      <td>{{ $row->choices_group_2 }}</td>
-                    </tr>
-                    <tr>
-                      <td>CHOICES GROUP 2 SKU</td>
-                      <td>{{ $row->choices_skugroup_2 }}</td>
-                    </tr>
-                    <tr>
-                      <td>CHOICES GROUP 3</td>
-                      <td>{{ $row->choices_group_3 }}</td>
-                    </tr>
-                    <tr>
-                      <td>CHOICES GROUP 3 SKU</td>
-                      <td>{{ $row->choices_skugroup_2 }}</td>
-                    </tr>
-                    <tr>
+                      @php
+                        $i=0;
+                      @endphp
+                    @foreach ($groups as $key=>$value)
+                      @php
+                        $choices_grp = 'choices_group_'.strval($i+1);
+                        $i++;
+                      @endphp
+                      <tr>
+                        <td>{{ $key }}</td>
+                        <td>{{ $row->$choices_grp }}</td>
+                      </tr>
+                      <tr>
+                        <td>{{ $key }} SKU</td>
+                        <td>{{ $value }}</td>
+                      </tr>
+                    @endforeach
+                    <tr> 
                       <td>MENU TYPE</td>
                       <td>{{ $row->menu_type }}</td>
                     </tr>
