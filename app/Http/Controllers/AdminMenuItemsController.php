@@ -1034,14 +1034,21 @@
 			if (!$ingredients_to_update) return;
 
 			foreach($ingredients_to_update as $ingredient_to_update) {
-				DB::table('menu_items')
-					->where('menu_items.id', $ingredient_to_update->id)
-					->leftJoin('menu_computed_food_cost', 'menu_computed_food_cost.id', '=', 'menu_items.id')
-					->update([
-						'menu_items.food_cost' => DB::raw('menu_computed_food_cost.computed_food_cost'),
-						'menu_items.food_cost_percentage' => DB::raw('menu_computed_food_cost.computed_food_cost_percentage'),
-						'menu_items.ingredient_total_cost' => DB::raw('menu_computed_food_cost.computed_ingredient_total_cost')
-					]);
+				
+				//extracting the id of menu item to be updated
+				$id = $ingredient_to_update->id;
+
+				//updating food cost, percentage, and total cost
+				DB::statement("
+					UPDATE 	IGNORE menu_items 
+					LEFT JOIN menu_computed_food_cost
+					ON menu_computed_food_cost.id = menu_items.id 
+					SET 
+					menu_items.ingredient_total_cost = menu_computed_food_cost.computed_ingredient_total_cost,
+					menu_items.food_cost = menu_computed_food_cost.computed_food_cost,
+					menu_items.food_cost_percentage = menu_computed_food_cost.computed_food_cost_percentage
+					where menu_items.id = '$id';
+				");
 			}
 
 			//another array of menu to be updated
