@@ -1022,7 +1022,6 @@
 					'menu_item_description',
 					'tasteless_menu_code',
 					'food_cost',
-					'food_cost_percentage_temp',
 					'menu_items.uoms_id',
 					'uom_description')
 				->leftJoin('uoms', 'uoms.id', '=', 'menu_items.uoms_id')
