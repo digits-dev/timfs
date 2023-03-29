@@ -65,9 +65,9 @@
                     <td>{{$item->tasteless_menu_code}}</td>
                     <td>{{$item->menu_item_description}}</td>
                     <td class="peso">{{'₱ ' . $item->menu_price_dine}}</td>
-                    <td>{{$item->portion_size}}</td>
-                    <td class="food-cost">{{$item->food_cost ? '₱ ' . $item->food_cost : ''}}</td>
-                    <td class="food-cost-percentage">{{$item->food_cost_percentage ? $item->food_cost_percentage . '%' : '0%'}}</td>
+                    <td>{{(float) $item->portion_size}}</td>
+                    <td class="food-cost">{{$item->food_cost ? '₱ ' . (float) $item->food_cost : ''}}</td>
+                    <td class="food-cost-percentage">{{$item->food_cost_percentage ? (float) $item->food_cost_percentage . '%' : '0%'}}</td>
                 </tr>
             </tbody>
         </table>
@@ -115,6 +115,10 @@
         const item = {!! json_encode($item) !!};
         const tbody = $('.ingredient-tbody');
         const groupCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
+        for (const key in item) {
+            if (!isNaN(item[key])) item[key] = parseFloat(item[key]);
+        }
+
         for (i of groupCount) {
             const groupedIngredients = ingredients.filter(e => e.ingredient_group == i);
             const isSelected = groupedIngredients.find(e => e.is_selected == 'TRUE');
@@ -122,6 +126,9 @@
             if (isSelected) isSelected.checked = true;
             else groupedIngredients.find(e => e.is_primary == 'TRUE').checked = true;
             groupedIngredients.forEach(groupedIngredient => {
+                for (const key in groupedIngredient) {
+                    if (!isNaN(groupedIngredient[key])) groupedIngredient[key] = parseFloat(groupedIngredient[key])
+                }
                 const tr = $(document.createElement('tr'));
                 const check = $(document.createElement('td'))
                     .text(groupedIngredient.checked ? '✓' : '')
