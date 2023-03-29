@@ -44,7 +44,8 @@ CREATE VIEW MENU_INGREDIENTS_AUTO_COMPUTE AS
 	                    4
 	                )
 	            )
-	        )
+	        ),
+	        4
 	    ) as ingredient_qty,
 	    ROUND(
 	        1 / (

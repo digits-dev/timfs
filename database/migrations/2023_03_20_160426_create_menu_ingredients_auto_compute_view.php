@@ -60,7 +60,8 @@ class CreateMenuIngredientsAutoComputeView extends Migration
                                     4
                                 )
                             )
-                        )
+                        ),
+                        4
                     ) as ingredient_qty,
                     ROUND(
                         1 / (
@@ -114,8 +115,6 @@ class CreateMenuIngredientsAutoComputeView extends Migration
             ; 
     
         ");
-
-            
     }
 
     /**
