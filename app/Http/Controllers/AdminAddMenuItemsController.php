@@ -587,11 +587,13 @@
 				->get()->unique('menu_product_type_description');
 			// Menu Types
 			$data['menu_types'] = DB::table('menu_types')
+				->select('id', DB::raw('REPLACE(menu_type_description, "\t", "") as menu_type_description'))
 				->where('status', 'ACTIVE')
 				->orderBy('menu_type_description')
 				->get()->unique('menu_type_description');
 			// Menu Categories
 			$data['menu_categories'] = DB::table('menu_categories')
+				->select('id', DB::raw('REPLACE(category_description, "\t", "") as category_description'))
 				->where('status', 'ACTIVE')
 				->orderBy('category_description')
 				->get()->unique('category_description');
@@ -602,9 +604,10 @@
 				->get()->unique('menu_segment_column_description');
 			// Menu Subcategories
 			$data['menu_subcategories'] = DB::table('menu_subcategories')
+				->select('id', DB::raw('REPLACE(subcategory_description, "\t", "") as subcategory_description'))
 				->where('status', 'ACTIVE')
 				->orderBy('subcategory_description')
-				->get()->unique('subcategory_description');
+				->get()->unique('subcategory_description');	
 			// Menu Group Choices
 			$data['menu_choices_group'] = DB::table('menu_choice_groups')
 				->where('status', 'ACTIVE')
@@ -644,16 +647,19 @@
 				->get()->unique('menu_product_type_description');
 			// Menu Types
 			$data['menu_types'] = DB::table('menu_types')
+				->select('id', DB::raw('REPLACE(menu_type_description, "\t", "") as menu_type_description'))
 				->where('status', 'ACTIVE')
 				->orderBy('menu_type_description')
 				->get()->unique('menu_type_description');
 			// Menu Categories
 			$data['menu_categories'] = DB::table('menu_categories')
+				->select('id', DB::raw('REPLACE(category_description, "\t", "") as category_description'))
 				->where('status', 'ACTIVE')
 				->orderBy('category_description')
 				->get()->unique('category_description');
 			// Menu Subcategories
 			$data['menu_subcategories'] = DB::table('menu_subcategories')
+				->select('id', DB::raw('REPLACE(subcategory_description, "\t", "") as subcategory_description'))
 				->where('status', 'ACTIVE')
 				->orderBy('subcategory_description')
 				->get()->unique('subcategory_description');	
