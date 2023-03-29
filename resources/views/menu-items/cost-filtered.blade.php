@@ -70,9 +70,9 @@
                 <tr>
                     <td>{{$menu_item->tasteless_menu_code}}</td>
                     <td>{{$menu_item->menu_item_description}}</td>
-                    <td>{{$menu_item->menu_price_dine}}</td>
-                    <td>{{$menu_item->food_cost ? $menu_item->food_cost : '0'}}</td>
-                    <td>{{$menu_item->food_cost_percentage ? $menu_item->food_cost_percentage : '0.00'}}%</td>
+                    <td>{{(float) $menu_item->menu_price_dine}}</td>
+                    <td>{{$menu_item->food_cost ? (float) $menu_item->food_cost : '0'}}</td>
+                    <td>{{$menu_item->food_cost_percentage ? (float) $menu_item->food_cost_percentage : '0.00'}}%</td>
                     <td class="action">
                         <a href="{{ CRUDBooster::adminPath('menu_items/detail') . "/$menu_item->id" }}" target="_blank">
                             <i class="fa fa-eye button"></i>
