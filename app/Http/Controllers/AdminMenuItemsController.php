@@ -758,11 +758,8 @@
 					'menu_items.tasteless_menu_code',
 					'menu_items.menu_price_dine',
 					'menu_items.portion_size',
-					'menu_items.menu_item_description',
-					'menu_ingredients_approval.marketing_approval_status',
-					'menu_ingredients_approval.accounting_approval_status')
+					'menu_items.menu_item_description')
 				->where('menu_items.id', $id)
-				->leftJoin('menu_ingredients_approval', 'menu_ingredients_approval.menu_items_id', '=', 'menu_items.id')
 				->first();
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
