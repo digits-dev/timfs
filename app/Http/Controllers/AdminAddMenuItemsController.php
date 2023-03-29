@@ -277,7 +277,26 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-	            $query->orderBy('status', 'asc');
+			$query->orderBy('status', 'asc');
+			
+			if (CRUDBooster::myPrivilegeName() == 'Chef') {
+
+				$concept_access_id = DB::table('user_concept_acess')
+					->where('cms_users_id', CRUDBooster::myID())
+					->get('menu_segmentations_id')
+					->first()
+					->menu_segmentations_id;
+				
+				$concepts = DB::table('menu_segmentations')
+					->whereIn('id', explode(',', $concept_access_id))
+					->get('menu_segment_column_name')->toArray();
+
+					$query->where(function($subQuery) use ($concepts) {
+						foreach($concepts as $concept) {
+							$subQuery->orWhere('menu_items.' . $concept->menu_segment_column_name, '1');
+						}
+					});
+				}
 	    }
 
 	    /*
