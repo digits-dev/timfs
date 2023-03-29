@@ -20,8 +20,8 @@ class CreateMenuFoodCostView extends Migration
                     menu_items.tasteless_menu_code,
                     menu_items.menu_item_description,
                     menu_items.status,
-                    menu_items.ingredient_total_cost,
                     menu_items.portion_size,
+                    menu_items.ingredient_total_cost,
                     menu_items.food_cost,
                     menu_items.food_cost_percentage,
                     ROUND(SUM(subquery.cost), 4) as computed_ingredient_total_cost,
@@ -74,7 +74,7 @@ class CreateMenuFoodCostView extends Migration
                             ig.ingredient_group
                     ) subquery ON subquery.menu_items_id = menu_items.id
                 GROUP BY (subquery.menu_items_id)
-            ;     
+            ;      
     ");
     }
 
