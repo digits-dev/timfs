@@ -371,11 +371,17 @@
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
 
-			if ($column_index == 16) {
+			$old_item_codes = MenuOldCodeMaster::where('status','ACTIVE')
+				->orderBy('menu_old_code_column_description','ASC')
+				->get();
+			
+			$old_item_codes_count = count($old_item_codes);
+
+			if ($column_index == 12 + $old_item_codes_count) {
 				if ($column_value) $column_value = (float) $column_value;
 			}
 
-			if ($column_index == 17) {
+			if ($column_index == 13 + $old_item_codes_count) {
 				if ($column_value) $column_value = (float) $column_value . '%';
 			}
 	    }
