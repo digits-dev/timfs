@@ -1,57 +1,62 @@
-<?php namespace App\Http\Controllers;
+<?php
 
-	use Session;
-	use Illuminate\Http\Request;
-	use DB;
-	use CRUDBooster;
+namespace App\Http\Controllers;
 
-	class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CBController {
+use Session;
+use Illuminate\Http\Request;
+use DB;
+use CRUDBooster;
 
-	public function __construct() {
+class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CBController
+{
+
+	public function __construct()
+	{
 		DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
 	}
-		
-	function cbInit() {
 
-			# START CONFIGURATION DO NOT REMOVE THIS LINE
-			$this->title_field = "segment_column_name";
-			$this->limit = "20";
-			$this->orderby = "id,desc";
-			$this->global_privilege = false;
-			$this->button_table_action = true;
-			$this->button_bulk_action = true;
-			$this->button_action_style = "button_icon";
-			$this->button_add = false;
-			$this->button_edit = true;
-			$this->button_delete = true;
-			$this->button_detail = true;
-			$this->button_show = true;
-			$this->button_filter = true;
-			$this->button_import = false;
-			$this->button_export = false;
-			$this->table = "menu_segmentations";
-			# END CONFIGURATION DO NOT REMOVE THIS LINE
+	function cbInit()
+	{
 
-			# START COLUMNS DO NOT REMOVE THIS LINE
-			$this->col = [];
-			$this->col[] = ["label"=>"Created By","name"=>"created_by"];
-			$this->col[] = ["label"=>"Segment Column Code","name"=>"segment_column_code"];
-			$this->col[] = ["label"=>"Segment Column Description","name"=>"segment_column_description"];
-			$this->col[] = ["label"=>"Segment Column Name","name"=>"segment_column_name"];
-			$this->col[] = ["label"=>"Status","name"=>"status"];
-			# END COLUMNS DO NOT REMOVE THIS LINE
+		# START CONFIGURATION DO NOT REMOVE THIS LINE
+		$this->title_field = "segment_column_name";
+		$this->limit = "20";
+		$this->orderby = "id,desc";
+		$this->global_privilege = false;
+		$this->button_table_action = true;
+		$this->button_bulk_action = true;
+		$this->button_action_style = "button_icon";
+		$this->button_add = false;
+		$this->button_edit = true;
+		$this->button_delete = true;
+		$this->button_detail = true;
+		$this->button_show = true;
+		$this->button_filter = true;
+		$this->button_import = false;
+		$this->button_export = false;
+		$this->table = "menu_segmentations";
+		# END CONFIGURATION DO NOT REMOVE THIS LINE
 
-			# START FORM DO NOT REMOVE THIS LINE
-			$this->form = [];
-			$this->form[] = ['label'=>'Created By','name'=>'created_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Segment Column Code','name'=>'segment_column_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Segment Column Description','name'=>'segment_column_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Segment Column Name','name'=>'segment_column_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Status','name'=>'status','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Updated By','name'=>'updated_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			# END FORM DO NOT REMOVE THIS LINE
+		# START COLUMNS DO NOT REMOVE THIS LINE
+		$this->col = [];
+		$this->col[] = ["label" => "Created By", "name" => "created_by"];
+		$this->col[] = ["label" => "Segment Column Code", "name" => "segment_column_code"];
+		$this->col[] = ["label" => "Segment Column Description", "name" => "segment_column_description"];
+		$this->col[] = ["label" => "Segment Column Name", "name" => "segment_column_name"];
+		$this->col[] = ["label" => "Status", "name" => "status"];
+		# END COLUMNS DO NOT REMOVE THIS LINE
 
-			/* 
+		# START FORM DO NOT REMOVE THIS LINE
+		$this->form = [];
+		$this->form[] = ['label' => 'Created By', 'name' => 'created_by', 'type' => 'number', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
+		$this->form[] = ['label' => 'Segment Column Code', 'name' => 'segment_column_code', 'type' => 'text', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
+		$this->form[] = ['label' => 'Segment Column Description', 'name' => 'segment_column_description', 'type' => 'text', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
+		$this->form[] = ['label' => 'Segment Column Name', 'name' => 'segment_column_name', 'type' => 'text', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
+		$this->form[] = ['label' => 'Status', 'name' => 'status', 'type' => 'text', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
+		$this->form[] = ['label' => 'Updated By', 'name' => 'updated_by', 'type' => 'number', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
+		# END FORM DO NOT REMOVE THIS LINE
+
+		/* 
 	        | ---------------------------------------------------------------------- 
 	        | Sub Module
 	        | ----------------------------------------------------------------------     
@@ -63,10 +68,10 @@
 			| @parent_columns = Sparate with comma, e.g : name,created_at
 	        | 
 	        */
-	        $this->sub_module = array();
+		$this->sub_module = array();
 
 
-	        /* 
+		/* 
 	        | ---------------------------------------------------------------------- 
 	        | Add More Action Button / Menu
 	        | ----------------------------------------------------------------------     
@@ -77,10 +82,10 @@
 	        | @showIf 	   = If condition when action show. Use field alias. e.g : [id] == 1
 	        | 
 	        */
-	        $this->addaction = array();
+		$this->addaction = array();
 
 
-	        /* 
+		/* 
 	        | ---------------------------------------------------------------------- 
 	        | Add More Button Selected
 	        | ----------------------------------------------------------------------     
@@ -90,10 +95,10 @@
 	        | Then about the action, you should code at actionButtonSelected method 
 	        | 
 	        */
-	        $this->button_selected = array();
+		$this->button_selected = array();
 
-	                
-	        /* 
+
+		/* 
 	        | ---------------------------------------------------------------------- 
 	        | Add alert message to this module at overheader
 	        | ----------------------------------------------------------------------     
@@ -101,11 +106,11 @@
 	        | @type    = warning,success,danger,info        
 	        | 
 	        */
-	        $this->alert        = array();
-	                
+		$this->alert        = array();
 
-	        
-	        /* 
+
+
+		/* 
 	        | ---------------------------------------------------------------------- 
 	        | Add more button to header button 
 	        | ----------------------------------------------------------------------     
@@ -114,11 +119,11 @@
 	        | @icon  = Icon from Awesome.
 	        | 
 	        */
-	        $this->index_button = array();
+		$this->index_button = array();
 
 
 
-	        /* 
+		/* 
 	        | ---------------------------------------------------------------------- 
 	        | Customize Table Row Color
 	        | ----------------------------------------------------------------------     
@@ -126,21 +131,21 @@
 	        | @color = Default is none. You can use bootstrap success,info,warning,danger,primary.        
 	        | 
 	        */
-	        $this->table_row_color = array();     	          
+		$this->table_row_color = array();
 
-	        
-	        /*
+
+		/*
 	        | ---------------------------------------------------------------------- 
 	        | You may use this bellow array to add statistic at dashboard 
 	        | ---------------------------------------------------------------------- 
 	        | @label, @count, @icon, @color 
 	        |
 	        */
-	        $this->index_statistic = array();
+		$this->index_statistic = array();
 
 
 
-	        /*
+		/*
 	        | ---------------------------------------------------------------------- 
 	        | Add javascript at body 
 	        | ---------------------------------------------------------------------- 
@@ -148,10 +153,10 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
-	        $this->script_js = NULL;
+		$this->script_js = NULL;
 
 
-            /*
+		/*
 	        | ---------------------------------------------------------------------- 
 	        | Include HTML Code before index table 
 	        | ---------------------------------------------------------------------- 
@@ -159,11 +164,11 @@
 	        | $this->pre_index_html = "<p>test</p>";
 	        |
 	        */
-	        $this->pre_index_html = null;
-	        
-	        
-	        
-	        /*
+		$this->pre_index_html = null;
+
+
+
+		/*
 	        | ---------------------------------------------------------------------- 
 	        | Include HTML Code after index table 
 	        | ---------------------------------------------------------------------- 
@@ -171,11 +176,11 @@
 	        | $this->post_index_html = "<p>test</p>";
 	        |
 	        */
-	        $this->post_index_html = null;
-	        
-	        
-	        
-	        /*
+		$this->post_index_html = null;
+
+
+
+		/*
 	        | ---------------------------------------------------------------------- 
 	        | Include Javascript File 
 	        | ---------------------------------------------------------------------- 
@@ -183,11 +188,11 @@
 	        | $this->load_js[] = asset("myfile.js");
 	        |
 	        */
-	        $this->load_js = array();
-	        
-	        
-	        
-	        /*
+		$this->load_js = array();
+
+
+
+		/*
 	        | ---------------------------------------------------------------------- 
 	        | Add css style at body 
 	        | ---------------------------------------------------------------------- 
@@ -195,11 +200,11 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = NULL;
-	        
-	        
-	        
-	        /*
+		$this->style_css = NULL;
+
+
+
+		/*
 	        | ---------------------------------------------------------------------- 
 	        | Include css File 
 	        | ---------------------------------------------------------------------- 
@@ -207,13 +212,11 @@
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-	        $this->load_css = array();
-	        
-	        
-	    }
+		$this->load_css = array();
+	}
 
 
-	    /*
+	/*
 	    | ---------------------------------------------------------------------- 
 	    | Hook for button selected
 	    | ---------------------------------------------------------------------- 
@@ -221,59 +224,64 @@
 	    | @button_name = the name of button
 	    |
 	    */
-	    public function actionButtonSelected($id_selected,$button_name) {
-	        //Your code here
-	            
-	    }
+	public function actionButtonSelected($id_selected, $button_name)
+	{
+		//Your code here
+
+	}
 
 
-	    /*
+	/*
 	    | ---------------------------------------------------------------------- 
 	    | Hook for manipulate query of index result 
 	    | ---------------------------------------------------------------------- 
 	    | @query = current sql query 
 	    |
 	    */
-	    public function hook_query_index(&$query) {
-	        //Your code here
-	            
-	    }
+	public function hook_query_index(&$query)
+	{
+		//Your code here
 
-	    /*
+	}
+
+	/*
 	    | ---------------------------------------------------------------------- 
 	    | Hook for manipulate row of index table html 
 	    | ---------------------------------------------------------------------- 
 	    |
-	    */    
-	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code here
-	    }
+	    */
+	public function hook_row_index($column_index, &$column_value)
+	{
+		//Your code here
+	}
 
-	    /*
+	/*
 	    | ---------------------------------------------------------------------- 
 	    | Hook for manipulate data input before add data is execute
 	    | ---------------------------------------------------------------------- 
 	    | @arr
 	    |
 	    */
-	    public function hook_before_add(&$postdata) {        
-	        //Your code here
+	public function hook_before_add(&$postdata)
+	{
+		//Your code here
 
-	    }
+	}
 
-	    /* 
+	/* 
 	    | ---------------------------------------------------------------------- 
 	    | Hook for execute command after add public static function called 
 	    | ---------------------------------------------------------------------- 
 	    | @id = last insert id
 	    | 
 	    */
-	    public function hook_after_add($id) {        
-	        //Your code here
+	public function hook_after_add($id)
+	{
+		//Your code here
 
-	    }
+	}
 
-	    /* 
+	/* 
 	    | ---------------------------------------------------------------------- 
 	    | Hook for manipulate data input before update data is execute
 	    | ---------------------------------------------------------------------- 
@@ -281,193 +289,197 @@
 	    | @id       = current id 
 	    | 
 	    */
-	    public function hook_before_edit(&$postdata,$id) {        
-	        //Your code here
+	public function hook_before_edit(&$postdata, $id)
+	{
+		//Your code here
 
-	    }
+	}
 
-	    /* 
+	/* 
 	    | ---------------------------------------------------------------------- 
 	    | Hook for execute command after edit public static function called
 	    | ----------------------------------------------------------------------     
 	    | @id       = current id 
 	    | 
 	    */
-	    public function hook_after_edit($id) {
-	        //Your code here 
+	public function hook_after_edit($id)
+	{
+		//Your code here 
 
-	    }
+	}
 
-	    /* 
+	/* 
 	    | ---------------------------------------------------------------------- 
 	    | Hook for execute command before delete public static function called
 	    | ----------------------------------------------------------------------     
 	    | @id       = current id 
 	    | 
 	    */
-	    public function hook_before_delete($id) {
-	        //Your code here
+	public function hook_before_delete($id)
+	{
+		//Your code here
 
-	    }
+	}
 
-	    /* 
+	/* 
 	    | ---------------------------------------------------------------------- 
 	    | Hook for execute command after delete public static function called
 	    | ----------------------------------------------------------------------     
 	    | @id       = current id 
 	    | 
 	    */
-	    public function hook_after_delete($id) {
-	        //Your code here
+	public function hook_after_delete($id)
+	{
+		//Your code here
 
-	    }
+	}
 
 
 
-	    //By the way, you can still create your own method in here... :) 
+	//By the way, you can still create your own method in here... :) 
 
-		public function getIndex($low_cost_value = 30) {
-			$low_cost_value = (float) $low_cost_value;
+	public function getIndex($low_cost_value = 30)
+	{
+		$low_cost_value = (float) $low_cost_value;
 
-			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
-			$data = [];
+		if (!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
+		$data = [];
 
-			$data['concepts'] = DB::table('menu_segmentations')
-				->where('status', 'ACTIVE')
-				->orderBy('menu_segment_column_description')
-				->select('menu_segment_column_description', 'menu_segment_column_name', 'id')
-				->get()
-				->toArray();
+		$data['concepts'] = DB::table('menu_segmentations')
+			->where('status', 'ACTIVE')
+			->orderBy('menu_segment_column_description')
+			->select('menu_segment_column_description', 'menu_segment_column_name', 'id')
+			->get()
+			->toArray();
 
-			$segmentation_columns = [];
-			foreach ($data['concepts'] as $index => $value) {
-				$segmentation_columns[$index] = $value->menu_segment_column_name;
-			}
-			
-			$menu_items = DB::table('menu_items')
-				->where('status', 'ACTIVE')
-				->select(DB::raw('id,
+		$segmentation_columns = [];
+		foreach ($data['concepts'] as $index => $value) {
+			$segmentation_columns[$index] = $value->menu_segment_column_name;
+		}
+
+		$menu_items = DB::table('menu_items')
+			->where('status', 'ACTIVE')
+			->select(DB::raw('id,
 					status,
 					menu_price_dine,
 					menu_price_dlv,
 					menu_price_take,
 					food_cost,
 					food_cost_percentage,
-					menu_item_description,' 
-					. implode(', ', $segmentation_columns)))
-				->get()
-				->toArray();
-			
-			$concept_access_id = DB::table('user_concept_acess')
-				->where('cms_users_id', CRUDBooster::myID())
-				->get('menu_segmentations_id')
-				->first()
-				->menu_segmentations_id;
-			
-			$concepts = DB::table('menu_segmentations')
-				->whereIn('id', explode(',', $concept_access_id))
-				->get('menu_segment_column_name')
-				->toArray();
-			$concept_column_names = [];
+					menu_item_description,'
+				. implode(', ', $segmentation_columns)))
+			->get()
+			->toArray();
 
-			foreach ($concepts as $index => $value) {
-				$concept_column_names[$index] = $value->menu_segment_column_name;
-			}
+		$concept_access_id = DB::table('user_concept_acess')
+			->where('cms_users_id', CRUDBooster::myID())
+			->get('menu_segmentations_id')
+			->first()
+			->menu_segmentations_id;
 
-			if (CRUDBooster::myPrivilegeName() == 'Chef' && $concept_column_names) {
-				$menu_items = DB::table('menu_items')
-					->where(function($subQuery) use ($concept_column_names) {
-						foreach ($concept_column_names as $concept_column_name) {
-							$subQuery->orWhere($concept_column_name, '1');
-						}
-					})
-					->where('status', 'ACTIVE')
-					->select(DB::raw('id,
+		$concepts = DB::table('menu_segmentations')
+			->whereIn('id', explode(',', $concept_access_id))
+			->get('menu_segment_column_name')
+			->toArray();
+		$concept_column_names = [];
+
+		foreach ($concepts as $index => $value) {
+			$concept_column_names[$index] = $value->menu_segment_column_name;
+		}
+
+		if (CRUDBooster::myPrivilegeName() == 'Chef' && $concept_column_names) {
+			$menu_items = DB::table('menu_items')
+				->where(function ($subQuery) use ($concept_column_names) {
+					foreach ($concept_column_names as $concept_column_name) {
+						$subQuery->orWhere($concept_column_name, '1');
+					}
+				})
+				->where('status', 'ACTIVE')
+				->select(DB::raw('id,
 						status,
 						menu_price_dine,
 						menu_price_dlv,
 						menu_price_take,
 						food_cost,
 						food_cost_percentage,
-						menu_item_description,' 
-						. implode(', ', $segmentation_columns)))
-					->get()
-					->toArray();
-
-				$data['concepts'] = DB::table('menu_segmentations')
-					->where('status', 'ACTIVE')
-					->whereIn('menu_segment_column_name', $concept_column_names)
-					->get();
-
-			}
-
-			$data['low_cost_value'] = $low_cost_value;
-			$data['concept_column_names'] = $concept_column_names;
-			$data['menu_items'] = array_map(fn ($object) =>(object) array_filter((array) $object), $menu_items);
-
-			return $this->view('menu-items/food-cost', $data);
-		}
-
-		public function filterByCost($concept_id, $filter, $low_cost) {
-			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
-			$privilege = CRUDBooster::myPrivilegeName();
-			$data = [];
-			$concept;
-			$menu_items;
-			$column_name;
-
-			$concepts = DB::table('menu_segmentations')
-				->where('status', 'ACTIVE')
-				->orderBy('menu_segment_column_description')
-				->select('menu_segment_column_description', 'menu_segment_column_name', 'id')
+						menu_item_description,'
+					. implode(', ', $segmentation_columns)))
 				->get()
 				->toArray();
 
-			$segmentation_columns = [];
-			foreach ($concepts as $index => $value) {
-				$segmentation_columns[$index] = $value->menu_segment_column_name;
-			}
+			$data['concepts'] = DB::table('menu_segmentations')
+				->where('status', 'ACTIVE')
+				->whereIn('menu_segment_column_name', $concept_column_names)
+				->get();
+		}
 
-			$concept_access_id = DB::table('user_concept_acess')
-				->where('cms_users_id', CRUDBooster::myID())
-				->get('menu_segmentations_id')
-				->first()
-				->menu_segmentations_id;
+		$data['low_cost_value'] = $low_cost_value;
+		$data['concept_column_names'] = $concept_column_names;
+		$data['menu_items'] = array_map(fn ($object) => (object) array_filter((array) $object), $menu_items);
 
-			$concepts = DB::table('menu_segmentations')
-				->whereIn('id', explode(',', $concept_access_id))
-				->get('menu_segment_column_name')
+		return $this->view('menu-items/food-cost', $data);
+	}
+
+	public function filterByCost($concept_id, $filter, $low_cost)
+	{
+		if (!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
+		$privilege = CRUDBooster::myPrivilegeName();
+		$data = [];
+		$concept = null;
+		$menu_items = null;
+		$column_name = null;
+
+		$concepts = DB::table('menu_segmentations')
+			->where('status', 'ACTIVE')
+			->orderBy('menu_segment_column_description')
+			->select('menu_segment_column_description', 'menu_segment_column_name', 'id')
+			->get()
+			->toArray();
+
+		$segmentation_columns = [];
+		foreach ($concepts as $index => $value) {
+			$segmentation_columns[$index] = $value->menu_segment_column_name;
+		}
+
+		$concept_access_id = DB::table('user_concept_acess')
+			->where('cms_users_id', CRUDBooster::myID())
+			->get('menu_segmentations_id')
+			->first()
+			->menu_segmentations_id;
+
+		$concepts = DB::table('menu_segmentations')
+			->whereIn('id', explode(',', $concept_access_id))
+			->get('menu_segment_column_name')
+			->toArray();
+		$concept_column_names = [];
+
+		foreach ($concepts as $index => $value) {
+			$concept_column_names[$index] = $value->menu_segment_column_name;
+		}
+
+		if ($concept_id != 'all') {
+			$concept = DB::table('menu_segmentations')->where('id', $concept_id)->first();
+			$column_name = $concept->menu_segment_column_name;
+			$menu_items = DB::table('menu_items')
+				->where($column_name, '1')
+				->where('status', 'ACTIVE')
+				->get()
 				->toArray();
-			$concept_column_names = [];
+		} else {
+			$menu_items = DB::table('menu_items')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
 
-			foreach ($concepts as $index => $value) {
-				$concept_column_names[$index] = $value->menu_segment_column_name;
-			}
-			
-			if ($concept_id != 'all') {
-				$concept = DB::table('menu_segmentations')->where('id', $concept_id)->first();
-				$column_name = $concept->menu_segment_column_name;
+			if (CRUDBooster::myPrivilegeName() == 'Chef' && $concept_column_names) {
 				$menu_items = DB::table('menu_items')
-					->where($column_name, '1')
+					->where(function ($subQuery) use ($concept_column_names) {
+						foreach ($concept_column_names as $concept_column_name) {
+							$subQuery->orWhere($concept_column_name, '1');
+						}
+					})
 					->where('status', 'ACTIVE')
-					->get()
-					->toArray();
-
-			} else {
-				$menu_items = DB::table('menu_items')
-					->where('status', 'ACTIVE')
-					->get()
-					->toArray();
-
-				if (CRUDBooster::myPrivilegeName() == 'Chef' && $concept_column_names) {
-					$menu_items = DB::table('menu_items')
-						->where(function($subQuery) use ($concept_column_names) {
-							foreach ($concept_column_names as $concept_column_name) {
-								$subQuery->orWhere($concept_column_name, '1');
-							}
-						})
-						->where('status', 'ACTIVE')
-						->select(DB::raw('id,
+					->select(DB::raw('id,
 							status,
 							menu_price_dine,
 							menu_price_dlv,
@@ -475,43 +487,42 @@
 							food_cost,
 							food_cost_percentage,
 							menu_item_description,
-							tasteless_menu_code,' 
-							. implode(', ', $segmentation_columns)))
-						->get()
-						->toArray();
-				}
+							tasteless_menu_code,'
+						. implode(', ', $segmentation_columns)))
+					->get()
+					->toArray();
 			}
-			
-
-			if ($filter == 'low'){
-				$menu_items = array_filter(
-					$menu_items,
-					fn ($obj) => (
-						 (float) $obj->food_cost_percentage <= (float) $low_cost ||
-						 $obj->menu_price_dine == 0 ||
-						 $obj->menu_price_dine == null
-					) && $obj->food_cost	
-				);
-			}
-
-			if ($filter == 'high') {
-				$menu_items = array_filter(
-					$menu_items,
-					fn ($obj) => (float) $obj->food_cost_percentage > (float) $low_cost && $obj->food_cost	
-				);
-			}
-
-			if ($filter == 'no') {
-				$menu_items = array_filter(
-					$menu_items,
-					fn ($obj) => $obj->food_cost == 0 || $obj->food_cost == null
-				);
-			}
-
-			$data['filter'] = $filter;
-			$data['concept'] = $concept;
-			$data['column_name'] = $column_name;
-			$data['menu_items'] = $menu_items;
-			return $this->view('menu-items/cost-filtered', $data);
 		}
+
+
+		if ($filter == 'low') {
+			$menu_items = array_filter(
+				$menu_items,
+				fn ($obj) => ((float) $obj->food_cost_percentage <= (float) $low_cost ||
+					$obj->menu_price_dine == 0 ||
+					$obj->menu_price_dine == null
+				) && $obj->food_cost
+			);
+		}
+
+		if ($filter == 'high') {
+			$menu_items = array_filter(
+				$menu_items,
+				fn ($obj) => (float) $obj->food_cost_percentage > (float) $low_cost && $obj->food_cost
+			);
+		}
+
+		if ($filter == 'no') {
+			$menu_items = array_filter(
+				$menu_items,
+				fn ($obj) => $obj->food_cost == 0 || $obj->food_cost == null
+			);
+		}
+
+		$data['filter'] = $filter;
+		$data['concept'] = $concept;
+		$data['column_name'] = $column_name;
+		$data['menu_items'] = $menu_items;
+		return $this->view('menu-items/cost-filtered', $data);
 	}
+}

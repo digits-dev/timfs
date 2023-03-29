@@ -1,6 +1,7 @@
 @push('head')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
 <style>
     th, td {
         text-align: center;
@@ -11,17 +12,24 @@
         font-weight: bold;
     }
 
-    .total-cost {
+    .total-cost, .food-cost-percentage, .food-cost {
         font-weight: bold
     }
 
     .note {
         color: blue;
         font-weight: bold;
+        margin-top: 10px;
     }
 
     .label-secondary {
         background: #7e57c2;
+    }
+
+    .date-updated {
+        font-size: 11px;
+        font-style: italic;
+        color: slategrey;
     }
 </style>
 @endpush
@@ -47,13 +55,19 @@
                     <th scope="col">Menu Item Code</th>
                     <th scope="col">Menu Item Description</th>
                     <th scope="col">Menu Item SRP</th>
+                    <th scope="col">Portion Size</th>
+                    <th scope="col">Food Cost</th>
+                    <th scope="col">Food Cost Percentage</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>{{$item->tasteless_menu_code}}</td>
                     <td>{{$item->menu_item_description}}</td>
-                    <td class="peso">{{$item->menu_price_dine}}</td>
+                    <td class="peso">{{'₱ ' . $item->menu_price_dine}}</td>
+                    <td>{{(float) $item->portion_size}}</td>
+                    <td class="food-cost">{{$item->food_cost ? '₱ ' . (float) $item->food_cost : ''}}</td>
+                    <td class="food-cost-percentage">{{$item->food_cost_percentage ? (float) $item->food_cost_percentage . '%' : '0%'}}</td>
                 </tr>
             </tbody>
         </table>
@@ -69,8 +83,13 @@
                             <th scope="col">From</th>
                             <th scope="col">Tasteless Code</th>
                             <th scope="col">Ingredient</th>
-                            <th scope="col">Quantity</th>
+                            <th scope="col">Packaging Size</th>
+                            <th scope="col">Preparation Qty</th>
                             <th scope="col">UOM</th>
+                            <th scope="col">Preparation</th>
+                            <th scope="col">Yield</th>
+                            <th scope="col">TTP</th>
+                            <th scope="col">Ingredient Qty</th>
                             <th scope="col">Cost</th>
                         </tr>
                     </thead>
@@ -79,7 +98,7 @@
                 </table>
             </div>
         </div>
-        <p class="note">** Highlighted ingredient names are primary ingredients.</p>
+        <p class="note" style="display: none">** Highlighted ingredient names are primary ingredients.</p>
     </div>
     <div class="panel-footer">
         <a class="btn btn-primary" href="{{ CRUDBooster::mainpath() }}" type="button" id="export"> <i class="fa fa-arrow-left" ></i> Back </a>
@@ -90,10 +109,17 @@
 @push('bottom')
 <script>
     $(document).ready(function() {
+        $('body').addClass('sidebar-collapse');
+        
         const ingredients = {!! json_encode($ingredients) !!};
         const item = {!! json_encode($item) !!};
+        document.title = 'View Ingredients: ' + item.menu_item_description;
         const tbody = $('.ingredient-tbody');
         const groupCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
+        for (const key in item) {
+            if (!isNaN(item[key])) item[key] = parseFloat(item[key]);
+        }
+
         for (i of groupCount) {
             const groupedIngredients = ingredients.filter(e => e.ingredient_group == i);
             const isSelected = groupedIngredients.find(e => e.is_selected == 'TRUE');
@@ -101,6 +127,9 @@
             if (isSelected) isSelected.checked = true;
             else groupedIngredients.find(e => e.is_primary == 'TRUE').checked = true;
             groupedIngredients.forEach(groupedIngredient => {
+                for (const key in groupedIngredient) {
+                    if (!isNaN(groupedIngredient[key])) groupedIngredient[key] = parseFloat(groupedIngredient[key]) || true;
+                }
                 const tr = $(document.createElement('tr'));
                 const check = $(document.createElement('td'))
                     .text(groupedIngredient.checked ? '✓' : '')
@@ -121,16 +150,17 @@
                         groupedIngredient.ingredient_name
                     ).css('background', groupedIngredient.checked ? 'yellow' : '');
                 ingredient.html(ingredientSpan);
-                const quantity = $(document.createElement('td'))
-                    .text(groupedIngredient.qty);
-                const uom = $(document.createElement('td'))
-                    .text(groupedIngredient.uom_description || groupedIngredient.uom_name);
-                const cost = $(document.createElement('td'));
-                const costSpan = $(document.createElement('span'))
-                    .text(groupedIngredient.cost)
-                    .css('font-weight', groupedIngredient.checked ? 'bold' : '')
-                    .addClass(groupedIngredient.checked ? 'peso cost' : 'peso');
-                cost.html(costSpan);
+                const packagingSize = $(document.createElement('td')).text(groupedIngredient.packaging_size)
+                const preparationQty = $(document.createElement('td')).text(groupedIngredient.prep_qty);
+                const uom = $(document.createElement('td')).text(groupedIngredient.uom_description);
+                const preparation = $(document.createElement('td')).text(groupedIngredient.preparation_desc);
+                const yield = $(document.createElement('td')).text(groupedIngredient.yield + '%');
+                const ttpSpan = $(document.createElement('span'))
+                    .addClass('date-updated')
+                    .text(groupedIngredient.item_masters_id ? timeago.format(groupedIngredient.updated_at || groupedIngredient.created_at) : '')
+                const ttp = $(document.createElement('td')).html('₱ ' + (groupedIngredient.ttp || '0.00') + '<br/>').append(ttpSpan);
+                const ingredientQty = $(document.createElement('td')).text(groupedIngredient.ingredient_qty);
+                const cost = $(document.createElement('td')).text('₱ ' + groupedIngredient.cost);
 
                 if (groupedIngredient.full_item_description || groupedIngredient.item_masters_id)
                     from.html('<span class="label label-info">IMFS</span>')
@@ -145,44 +175,46 @@
                     status.html('<span class="label label-success">ACTIVE</span>')
                 else if (groupedIngredient.menu_item_status == 'ALTERNATIVE' || groupedIngredient.item_status == 'ALTERNATIVE')
                     status.html('<span class="label label-primary">ALTERNATIVE</span>')
-                tr.append(check, status, from, tastelessCode, ingredient, quantity, uom, cost);
+                tr.append(
+                    check,
+                    status,
+                    from,
+                    tastelessCode,
+                    ingredient,
+                    packagingSize,
+                    preparationQty,
+                    uom,
+                    preparation,
+                    yield,
+                    ttp,
+                    ingredientQty,
+                    cost
+                );
                 $('.ingredient-tbody').append(tr);
             });
         }
 
-        const totalCostTR = $(document.createElement('tr'));
-        const totalCostLabelTD = $(document.createElement('td'));
-        const totalCostValueTD = $(document.createElement('td'));
-        totalCostLabelTD.attr('colspan', '7');
-        totalCostLabelTD.addClass('total-cost-label');
-        totalCostLabelTD.text('Food Cost');
-        totalCostValueTD.addClass('total-cost peso');
-        totalCostTR.append(totalCostLabelTD, totalCostValueTD);        
-
-        $('.ingredient-tbody').append(totalCostTR);
+        const lastRow = $(document.createElement('tr')).css('font-weight', 'bold');
+        const totalCostLabel = $(document.createElement('td'))
+            .text('Total Cost')
+            .attr('colspan', 12)
+            .addClass('total-cost-label');
+        const totalCostValue = $(document.createElement('td')).text('₱ ' + item.ingredient_total_cost);
+        lastRow.append(totalCostLabel, totalCostValue);       
+        $('.ingredient-tbody').append(lastRow);
 
         if (!ingredients.length) {
             $('.no-ingredient-warning').css('display', '');
         } else {
             $('.with-ingredient').css('display', '');
+            $('.note').css('display', '');
         }
-
-        const costsElems = jQuery.makeArray($('.cost'))
-        const totalCostElem = $('.total-cost');
-        const totalCost = costsElems.reduce((total, cost) => total + Number($(cost).text().replace(/[^0-9.]/g, '')), 0);
-        const percentage = (totalCost / item.menu_price_dine * 100).toFixed(2);
         const lowCost = Number(localStorage.getItem('lowCost')) || 30;
-        $(totalCostElem).text(totalCost);
-        percentageSpan = $(document.createElement('span')).text(`(${item.menu_price_dine == 0 ? '0' : percentage}%)`).addClass('percentage-text');
-        percentageSpan.css('color', item.menu_price_dine != 0 && percentage > lowCost ? 'red' : '');
-        totalCostLabelTD.text(`Total Cost `).append(percentageSpan);
-        function formatNumbers() {
-            const elems = jQuery.makeArray($('.peso'));
-            elems.forEach(elem => $(elem).text('₱ ' + Number($(elem).text()).toLocaleString(undefined, {maximumFractionDigits: 4})))
-        }
 
-        formatNumbers();
-        $('table th, table td').css('border', '1px solid #aaaaaa');
+        if (item.menu_price_dine > 0 && item.food_cost_percentage > lowCost) {
+            $('.food-cost-percentage').css('color', 'red');
+        }
+        $('table th, table td').css('border', '1px solid #aaaaaa').css('vertical-align', 'middle');
         $('table thead').css('background', '#deeaee');
     });
     
