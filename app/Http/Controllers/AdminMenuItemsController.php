@@ -370,6 +370,14 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
+
+			if ($column_index == 16) {
+				if ($column_value) $column_value = (float) $column_value;
+			}
+
+			if ($column_index == 17) {
+				if ($column_value) $column_value = (float) $column_value . '%';
+			}
 	    }
 
 	    /*
