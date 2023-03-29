@@ -27,7 +27,7 @@ class ConvertAllFloatToDecimalForConsistency extends Migration
             $table->decimal('ingredient_total_cost', 18, 4)->nullable()->change();
             $table->decimal('portion_size', 18, 4)->nullable()->default('1')->change();
             $table->decimal('food_cost', 18, 4)->nullable()->change();
-            $table->decimal('food_cost_percentage', 18, 4)->nullable()->change();
+            $table->decimal('food_cost_percentage', 18, 2)->nullable()->change();
         });
     }
 

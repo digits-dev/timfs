@@ -811,7 +811,7 @@
             });
             sum = math.round(sum, 4);
             const foodCost = math.round(sum / portionSize, 4);
-            const percentage = menuItemSRP > 0 ? (foodCost / menuItem.menu_price_dine * 100).toFixed(2) : 0;
+            const percentage = menuItemSRP > 0 ? math.round(foodCost / menuItem.menu_price_dine * 100, 2) : 0;
             $('.total-cost').val(sum);
             $('.food-cost').val(foodCost);
             $(percentageText).text(`${percentage}%`);
