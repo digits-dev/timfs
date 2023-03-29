@@ -127,7 +127,7 @@
             else groupedIngredients.find(e => e.is_primary == 'TRUE').checked = true;
             groupedIngredients.forEach(groupedIngredient => {
                 for (const key in groupedIngredient) {
-                    if (!isNaN(groupedIngredient[key])) groupedIngredient[key] = parseFloat(groupedIngredient[key])
+                    if (!isNaN(groupedIngredient[key])) groupedIngredient[key] = parseFloat(groupedIngredient[key]) || true;
                 }
                 const tr = $(document.createElement('tr'));
                 const check = $(document.createElement('td'))
