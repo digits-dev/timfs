@@ -274,7 +274,6 @@
     }
 
 </style>
-
 @endpush
 
 @extends('crudbooster::admin_template')
@@ -591,10 +590,11 @@
 @push('bottom')
 
 <script>
-        const currentIngredients = {!! json_encode($current_ingredients) !!};
-        let savedIngredients = currentIngredients;
-        const menuItem = {!! json_encode($item) !!};
-        const privilege = {!! json_encode($privilege) !!};
+    const currentIngredients = {!! json_encode($current_ingredients) !!};
+    let savedIngredients = currentIngredients;
+    const menuItem = {!! json_encode($item) !!};
+    document.title = 'Edit Ingredients: ' + menuItem.menu_item_description;
+    const privilege = {!! json_encode($privilege) !!};
 
     $(document).ready(function() {
         $('body').addClass('sidebar-collapse');

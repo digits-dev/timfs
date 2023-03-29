@@ -110,9 +110,10 @@
 <script>
     $(document).ready(function() {
         $('body').addClass('sidebar-collapse');
-
+        
         const ingredients = {!! json_encode($ingredients) !!};
         const item = {!! json_encode($item) !!};
+        document.title = 'View Ingredients: ' + item.menu_item_description;
         const tbody = $('.ingredient-tbody');
         const groupCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
         for (const key in item) {

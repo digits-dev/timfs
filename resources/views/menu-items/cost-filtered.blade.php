@@ -98,6 +98,9 @@
 
 @push('bottom')
 <script type="text/javascript">
+    const concept = {!! json_encode($concept) !!};
+    const filter = {!! json_encode($filter) !!};
+    document.title = `${concept ? concept.menu_segment_column_description.toUpperCase() : 'ALL'}: ${filter.toUpperCase()} COST`
     $(document).ready(function() {
         $('.loading-label').remove();
         const tbody = $('tbody');

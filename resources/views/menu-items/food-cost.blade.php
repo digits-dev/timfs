@@ -108,7 +108,8 @@
 @endsection
 
 @push('bottom')
-<script>    
+<script> 
+    document.title = 'Food Cost';
     $(document).ready(function() {
 
         $('.loading-label').remove();
