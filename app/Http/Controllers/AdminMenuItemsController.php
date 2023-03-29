@@ -899,19 +899,19 @@
 			//getting all menu items where computed value(s) is/are not equal to the saved ones
 			$to_update = DB::table('menu_computed_food_cost')
 				->where(
-					DB::raw('CAST(computed_food_cost AS DECIMAL(8, 4))'),
+					DB::raw('CAST(computed_food_cost AS DECIMAL(18, 4))'),
 					'!=',
-					DB::raw('CAST(food_cost AS DECIMAL(8, 4))')
+					DB::raw('CAST(food_cost AS DECIMAL(18, 4))')
 				)
 				->orWhere(
-					DB::raw('CAST(computed_food_cost_percentage AS DECIMAL(8, 4))'),
+					DB::raw('CAST(computed_food_cost_percentage AS DECIMAL(18, 4))'),
 					'!=',
-					DB::raw('CAST(food_cost_percentage AS DECIMAL(8, 4))')
+					DB::raw('CAST(food_cost_percentage AS DECIMAL(18, 4))')
 				)
 				->orWhere(
-					DB::raw('CAST(computed_ingredient_total_cost AS DECIMAL(8, 4))'),
+					DB::raw('CAST(computed_ingredient_total_cost AS DECIMAL(18, 4))'),
 					'!=',
-					DB::raw('CAST(ingredient_total_cost AS DECIMAL(8, 4))')
+					DB::raw('CAST(ingredient_total_cost AS DECIMAL(18, 4))')
 				)
 				->get('id')
 				->toArray();
@@ -1062,19 +1062,19 @@
 			//another array of menu to be updated
 			$to_update = DB::table('menu_computed_food_cost')
 				->where(
-					DB::raw('CAST(computed_food_cost AS DECIMAL(8, 4))'),
+					DB::raw('CAST(computed_food_cost AS DECIMAL(18, 4))'),
 					'!=',
-					DB::raw('CAST(food_cost AS DECIMAL(8, 4))')
+					DB::raw('CAST(food_cost AS DECIMAL(18, 4))')
 				)
 				->orWhere(
-					DB::raw('CAST(computed_food_cost_percentage AS DECIMAL(8, 4))'),
+					DB::raw('CAST(computed_food_cost_percentage AS DECIMAL(18, 4))'),
 					'!=',
-					DB::raw('CAST(food_cost_percentage AS DECIMAL(8, 4))')
+					DB::raw('CAST(food_cost_percentage AS DECIMAL(18, 4))')
 				)
 				->orWhere(
-					DB::raw('CAST(computed_ingredient_total_cost AS DECIMAL(8, 4))'),
+					DB::raw('CAST(computed_ingredient_total_cost AS DECIMAL(18, 4))'),
 					'!=',
-					DB::raw('CAST(ingredient_total_cost AS DECIMAL(8, 4))')
+					DB::raw('CAST(ingredient_total_cost AS DECIMAL(18, 4))')
 				)
 				->get('id')
 				->toArray();
