@@ -753,7 +753,13 @@
             });
 
             $('.ttp').keyup(function() {
+                const ttp = $(this);
                 const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
+                const [int, dec] = ttp.val().split('.');
+                if (dec && dec.length > 4) {
+                    const value = `${int}.${dec.slice(0,4)}`;
+                    ttp.val(value);
+                }
                 $.fn.computeIngredientCost(entry);
             });
 
