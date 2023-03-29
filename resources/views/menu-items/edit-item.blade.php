@@ -781,13 +781,18 @@
                     entry.find('.yield').attr('readonly', true);
                     entry.find('.ttp').attr('readonly', true);
                 }
-            })
+            });
 
             $('.portion').keyup(function() {
                 const value = $(this).val();
                 if (value && value > 0) $.fn.sumCost();
                 else return;
-            })
+            });
+
+            $('.ingredient_name').keyup(function() {
+                const value = $(this).val();
+                $(this).val(value.toUpperCase());
+            });
         }
 
         $.fn.sumCost = function() {
