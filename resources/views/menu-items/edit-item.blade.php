@@ -567,7 +567,7 @@
                 </div>
                 <div class="total-cost-section">
                     <label class="portion-label"><span class="required-star">*</span> Portion Size
-                        <input type="number" class="form-control portion" value="{{$item->portion_size}}" required>
+                        <input type="number" class="form-control portion" value="{{(float) $item->portion_size}}" required>
                     </label>
                     <label class="total-cost-label"> Total Cost
                         <input type="text" class="form-control total-cost" value="{{$item->total_ingredient_cost}}" readonly>
@@ -678,15 +678,15 @@
                     );
                     element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
                     element.find('.ingredient_name').val(savedIngredient.ingredient_name);
-                    element.find('.pack-size').val(savedIngredient.packaging_size);
-                    element.find('.prep-quantity').val(savedIngredient.prep_qty || 0).attr('readonly', false);
+                    element.find('.pack-size').val(parseFloat(savedIngredient.packaging_size));
+                    element.find('.prep-quantity').val(parseFloat(savedIngredient.prep_qty) || 0).attr('readonly', false);
                     element.find('.uom').val(savedIngredient.uom_id);
                     element.find('.uom_name').val(savedIngredient.uom_name);
                     element.find('.display-uom').val(savedIngredient.packaging_description);
                     element.find('.preparation option').attr('selected', false);
                     element.find('.preparation').val(savedIngredient.menu_ingredients_preparations_id)
-                    element.find('.yield').val(savedIngredient.yield || 0);
-                    element.find('.ttp').val(savedIngredient.ttp || 0).attr('packaging_size', savedIngredient.packaging_size);
+                    element.find('.yield').val(parseFloat(savedIngredient.yield) || 0);
+                    element.find('.ttp').val(parseFloat(savedIngredient.ttp) || 0).attr('packaging_size', savedIngredient.packaging_size);
 
                     $.fn.computeIngredientCost(element);
                     element.css('display', '');
@@ -880,7 +880,7 @@
                 li.addClass('list-item dropdown-item');
                 li.attr({
                     item_id: e.item_masters_id,
-                    ttp: e.ttp || e.food_cost || 0,
+                    ttp: parseFloat(e.ttp) || parseFloat(e.food_cost) || 0,
                     packaging_size: e.packaging_size || 1,
                     uom: e.packagings_id || e.uoms_id,
                     uom_desc: e.packaging_description || e.uom_description,
