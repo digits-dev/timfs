@@ -255,7 +255,7 @@
                 </div>
             </div>
             <div class="panel-footer">
-                <a href='http://127.0.0.1:8000/admin/add_menu_items' class='btn btn-default'>Cancel</a>
+                <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
                 <input type='submit' class='btn btn-primary pull-right' value='Add Menu' onclick=""/>
             </div>
         </form>

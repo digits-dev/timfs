@@ -45,6 +45,15 @@
                         <a href="{{ route('getUpdateItemsSkuLegend') }}" target="_parent"><button class="btn btn-primary" style="width:80%">Item SKU Legend Import</button></a>
                     </td>
                 </tr>
+
+                <tr>
+                    <th scope="row">4</th>
+                    <td>Item cost price bulk import (Update)</td>
+                    <td>Item cost price bulk update</td>
+                    <td style="text-align: center">
+                        <a href="{{ route('getUpdateItemsCostPrice') }}" target="_parent"><button class="btn btn-primary" style="width:80%">Item Cost Price Import</button></a>
+                    </td>
+                </tr>
                 
             </tbody>
         </table>
