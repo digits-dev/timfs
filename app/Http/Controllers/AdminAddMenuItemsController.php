@@ -65,9 +65,7 @@
 			$this->col[] = ["label"=>"Menu Category","name"=>"menu_categories_id","join"=>"menu_categories,category_description"];
 			$this->col[] = ["label"=>"Menu Subcategory","name"=>"menu_subcategories_id","join"=>"menu_subcategories,subcategory_description"];
 			// $this->col[] = ["label"=>"Menu Product Type","name"=>"menu_product_types_id","join"=>"menu_product_types,menu_product_type_description"];
-			$this->col[] = ["label"=>"Menu Product Type Name",
-				"name"=>"menu_product_types_name"
-				];
+			$this->col[] = ["label"=>"Menu Product Type", 'name'=> 'menu_product_types_name'];
 			$this->col[] = ["label"=>"Menu Type","name"=>"menu_types_id","join"=>"menu_types,menu_type_description"];
 			foreach($prices as $price){
 				$this->col[] = ["label"=>ucwords(strtolower($price->menu_price_column_description)),"name"=>$price->menu_price_column_name];
@@ -279,7 +277,26 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-	            $query->orderBy('status', 'asc');
+			$query->orderBy('status', 'asc');
+			
+			if (CRUDBooster::myPrivilegeName() == 'Chef') {
+
+				$concept_access_id = DB::table('user_concept_acess')
+					->where('cms_users_id', CRUDBooster::myID())
+					->get('menu_segmentations_id')
+					->first()
+					->menu_segmentations_id;
+				
+				$concepts = DB::table('menu_segmentations')
+					->whereIn('id', explode(',', $concept_access_id))
+					->get('menu_segment_column_name')->toArray();
+
+					$query->where(function($subQuery) use ($concepts) {
+						foreach($concepts as $concept) {
+							$subQuery->orWhere('menu_items.' . $concept->menu_segment_column_name, '1');
+						}
+					});
+				}
 	    }
 
 	    /*
@@ -289,15 +306,39 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code here
+	    	//Your code 
+
+			if($column_index == '2'){
+
+				$tasteless_menu_code_id = DB::table('menu_items')
+					->where('status', 'ACTIVE')
+					->where('tasteless_menu_code', $column_value)
+					->first();
+		
+				$product_type_name = DB::table('menu_product_types')
+					->where('id', $tasteless_menu_code_id->menu_product_types_id)
+					->select('menu_product_type_description')
+					->value('menu_product_type_description');
+
+				if($tasteless_menu_code_id->menu_product_types_name == null){
+					$update = DB::table('menu_items')
+					->where('tasteless_menu_code', $tasteless_menu_code_id->tasteless_menu_code)
+					->update([
+						'menu_product_types_name' => $product_type_name
+					]);
+				}
+								
+			}
 
 			if($column_index == '18'){
+
 				if($column_value == 'INACTIVE'){
 					$column_value = '<span class="label label-danger">INACTIVE</span>';
 				}else{
 					$column_value = '<span class="label label-success">ACTIVE</span>';
 				}
 			}
+
 	    }
 
 	    /*
@@ -313,9 +354,9 @@
 
 			// Tasteless menu code
 			$promo_id = DB::table('menu_types')
-			->select('id')
-			->where('status', 'ACTIVE')
-			->where('menu_type_description', 'PROMO')->value('id');
+				->select('id')
+				->where('status', 'ACTIVE')
+				->where('menu_type_description', 'PROMO')->value('id');
 
 			if($returnInputs['menu_type'] == $promo_id){
 				$tasteless_menu_code = (int) DB::table('menu_items')->where('tasteless_menu_code','like',"5%")
@@ -416,9 +457,9 @@
 
 			$menu_segment_names = [];
 			$user_menu_segmentations = DB::table('menu_segmentations')
-			->where('status','ACTIVE')
-			->select('menu_segment_column_name')
-			->get();
+				->where('status','ACTIVE')
+				->select('menu_segment_column_name')
+				->get();
 			$menu_segments = Arr::pluck($user_menu_segmentations, 'menu_segment_column_name');
 
 			// Price Delivery
@@ -546,11 +587,13 @@
 				->get()->unique('menu_product_type_description');
 			// Menu Types
 			$data['menu_types'] = DB::table('menu_types')
+				->select('id', DB::raw('REPLACE(menu_type_description, "\t", "") as menu_type_description'))
 				->where('status', 'ACTIVE')
 				->orderBy('menu_type_description')
 				->get()->unique('menu_type_description');
 			// Menu Categories
 			$data['menu_categories'] = DB::table('menu_categories')
+				->select('id', DB::raw('REPLACE(category_description, "\t", "") as category_description'))
 				->where('status', 'ACTIVE')
 				->orderBy('category_description')
 				->get()->unique('category_description');
@@ -561,9 +604,10 @@
 				->get()->unique('menu_segment_column_description');
 			// Menu Subcategories
 			$data['menu_subcategories'] = DB::table('menu_subcategories')
+				->select('id', DB::raw('REPLACE(subcategory_description, "\t", "") as subcategory_description'))
 				->where('status', 'ACTIVE')
 				->orderBy('subcategory_description')
-				->get()->unique('subcategory_description');
+				->get()->unique('subcategory_description');	
 			// Menu Group Choices
 			$data['menu_choices_group'] = DB::table('menu_choice_groups')
 				->where('status', 'ACTIVE')
@@ -603,16 +647,19 @@
 				->get()->unique('menu_product_type_description');
 			// Menu Types
 			$data['menu_types'] = DB::table('menu_types')
+				->select('id', DB::raw('REPLACE(menu_type_description, "\t", "") as menu_type_description'))
 				->where('status', 'ACTIVE')
 				->orderBy('menu_type_description')
 				->get()->unique('menu_type_description');
 			// Menu Categories
 			$data['menu_categories'] = DB::table('menu_categories')
+				->select('id', DB::raw('REPLACE(category_description, "\t", "") as category_description'))
 				->where('status', 'ACTIVE')
 				->orderBy('category_description')
 				->get()->unique('category_description');
 			// Menu Subcategories
 			$data['menu_subcategories'] = DB::table('menu_subcategories')
+				->select('id', DB::raw('REPLACE(subcategory_description, "\t", "") as subcategory_description'))
 				->where('status', 'ACTIVE')
 				->orderBy('subcategory_description')
 				->get()->unique('subcategory_description');	
@@ -662,20 +709,20 @@
 			$data = [];
 			$data['page_title'] = 'Detail Data';
 			$data['row'] = DB::table('menu_items')->where('menu_items.id',$id)
-			->leftjoin('menu_types', 'menu_items.menu_types_id', '=', 'menu_types.id')
-			->leftjoin('menu_categories', 'menu_items.menu_categories_id', '=', 'menu_categories.id')
-			->leftjoin('menu_subcategories', 'menu_items.menu_subcategories_id', '=', 'menu_subcategories.id')
-			->select('*',
-				'menu_types.menu_type_description as menu_type',
-				'menu_categories.category_description as main_category',
-				'menu_subcategories.subcategory_description as sub_category',
-				'menu_items.status as status')
+				->leftjoin('menu_types', 'menu_items.menu_types_id', '=', 'menu_types.id')
+				->leftjoin('menu_categories', 'menu_items.menu_categories_id', '=', 'menu_categories.id')
+				->leftjoin('menu_subcategories', 'menu_items.menu_subcategories_id', '=', 'menu_subcategories.id')
+				->select('*',
+					'menu_types.menu_type_description as menu_type',
+					'menu_categories.category_description as main_category',
+					'menu_subcategories.subcategory_description as sub_category',
+					'menu_items.status as status')
 			->first();
 			// Menu Segmentations
 			$data['menu_segmentations'] = DB::table('menu_segmentations')
-			->where('status','ACTIVE')
-			->orderBy('menu_segment_column_description')
-			->get();
+				->where('status','ACTIVE')
+				->orderBy('menu_segment_column_description')
+				->get();
 			// Choices Group
 			$data['menu_choices_group'] = DB::table('menu_choice_groups')
 				->where('status', 'ACTIVE')
@@ -701,7 +748,6 @@
 					}
 				}
 			}
-
 			// Menu Group SKU
 			$menu_item_value = [];
 			$menu_item_key = [];
