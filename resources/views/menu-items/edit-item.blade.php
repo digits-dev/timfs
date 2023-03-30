@@ -682,7 +682,7 @@
                     element.find('.prep-quantity').val(parseFloat(savedIngredient.prep_qty) || 0).attr('readonly', false);
                     element.find('.uom').val(savedIngredient.uom_id);
                     element.find('.uom_name').val(savedIngredient.uom_name);
-                    element.find('.display-uom').val(savedIngredient.packaging_description);
+                    element.find('.display-uom').val(savedIngredient.uom_description);
                     element.find('.preparation option').attr('selected', false);
                     element.find('.preparation').val(savedIngredient.menu_ingredients_preparations_id)
                     element.find('.yield').val(parseFloat(savedIngredient.yield) || 0);
