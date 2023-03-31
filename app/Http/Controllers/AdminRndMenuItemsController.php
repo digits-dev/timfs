@@ -1,7 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
 
@@ -355,6 +355,32 @@
 				->toArray();
 
 			return $this->view('rnd-menu/add-item', $data);
+		}
+
+		public function addNewRNDMenu(Request $request) {
+			$rnd_menu_description = $request->get('rnd_menu_description');
+			$food_cost = $request->get('food_cost');
+			$portion_size = $request->get('portion_size');
+			$ingredient_total_cost = $request->get('ingredient_total_cost');
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+
+			//inserting new rnd menu item
+			$id = DB::table('rnd_menu_items')
+				->insertGetId([
+					'rnd_menu_description' => $rnd_menu_description,
+					'created_by' => $action_by,
+					'created_at' => $time_stamp
+				]);
+
+			/*
+			
+				TODO: 
+					create migration and table in db
+					insert the submitted ingredients with the rnd_menu_items_id = $id
+			*/
+
+			dd($id);
 		}
 
 	}

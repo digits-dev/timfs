@@ -15,6 +15,7 @@ use App\Http\Controllers\AdminAddMenuItemsController;
 use App\Http\Controllers\AdminMenuItemsController;
 use App\Http\Controllers\AdminFoodCostController;
 use App\Http\Controllers\AdminExperimentalMenuItemsController;
+use App\Http\Controllers\AdminRndMenuItemsController;
 
 Route::get('/', function () {
     return redirect('admin/login');
@@ -96,5 +97,8 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/add_menu_items', [AdminAddMenuItemsController::class, 'groupSku']);
     Route::get('/admin/add_menu_items/edit/{id}', [AdminAddMenuItemsController::class, 'getEdit']);
     Route::get('/admin/add_menu_items/detail/{id}', [AdminAddMenuItemsController::class, 'getDetail']);
+
+    //rnd menu items
+    Route::post('/admin/rnd_menu_items/', [AdminRndMenuItemsController::class, 'addNewRNDMenu'])->name('add_new_rnd_menu');
 
 });

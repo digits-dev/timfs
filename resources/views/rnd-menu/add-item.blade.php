@@ -847,7 +847,7 @@
             const result = JSON.stringify(ingredientsArray);
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
-                .attr('action', "{{ route('edit_menu_item') }}")
+                .attr('action', "{{ route('add_new_rnd_menu') }}")
                 .css('display', 'none');
 
             const csrf = $(document.createElement('input'))
@@ -860,7 +860,9 @@
                 .attr('name', 'ingredients')
                 .val(result);
 
-            const 
+            const rndMenuDescriptionData = $(document.createElement('input'))
+                .attr('name', 'rnd_menu_description')
+                .val($('.rnd_menu_description').val());
             
             const foodCostData = $(document.createElement('input'))
                 .attr('name', 'food_cost')
@@ -874,13 +876,11 @@
                 .attr('name', 'ingredient_total_cost')
                 .val($('.total-cost').val().replace(/[^0-9.]/g, ''));
 
-
             form.append(
                 csrf,
                 ingredientsData,
-                menuItemData,
+                rndMenuDescriptionData,
                 foodCostData,
-                percentageData,
                 portionData,
                 totalCostData,
             );
