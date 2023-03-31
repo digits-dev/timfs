@@ -324,6 +324,7 @@
 	    */
 	    public function hook_after_delete($id) {
 	        //Your code here
+			DB::table('rnd_menu_items')->where('id', $id)->update(['status' => 'INACTIVE']);
 
 	    }
 
@@ -357,6 +358,36 @@
 			return $this->view('rnd-menu/add-item', $data);
 		}
 
+		public function getEdit($id) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+			
+			$data = [];
+
+			$data['item'] = DB::table('rnd_menu_items')
+				->where('id', $id)
+				->first();
+
+			$data['preparations'] = DB::table('menu_ingredients_preparations')
+				->where('status', 'ACTIVE')
+				->select('id', 'preparation_desc')
+				->orderBy('preparation_desc', 'ASC')
+				->get()
+				->toArray();
+
+			$data['uoms'] = DB::table('uoms')
+				->where('status', 'ACTIVE')
+				->select('id', 'uom_description')
+				->orderBy('uom_description')
+				->get()
+				->toArray();
+
+			return $this->view('rnd-menu/add-item', $data);
+		}
+
 		public function addNewRNDMenu(Request $request) {
 			$rnd_menu_description = $request->get('rnd_menu_description');
 			$food_cost = $request->get('food_cost');
@@ -364,11 +395,16 @@
 			$ingredient_total_cost = $request->get('ingredient_total_cost');
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
+			$max_rnd_code = DB::table('rnd_menu_items')->max('rnd_code');
+			$rnd_code_int = (int) explode('-', $max_rnd_code)[1] + 1;
+			$rnd_code = 'RND-' . str_pad("$rnd_code_int", 5, '0', STR_PAD_LEFT);
+			
 
 			//inserting new rnd menu item
 			$id = DB::table('rnd_menu_items')
 				->insertGetId([
 					'rnd_menu_description' => $rnd_menu_description,
+					'rnd_code' => $rnd_code,
 					'created_by' => $action_by,
 					'created_at' => $time_stamp
 				]);
@@ -380,7 +416,13 @@
 					insert the submitted ingredients with the rnd_menu_items_id = $id
 			*/
 
-			dd($id);
+			// dd($id);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => 'New RND Item Created!'
+				]);
 		}
 
 	}

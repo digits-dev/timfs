@@ -476,7 +476,7 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input type="text" class="form-control rnd_menu_description" placeholder="RND Menu Item Description">
+                            <input value="{{$item ? $item->rnd_menu_description : ''}}" type="text" class="form-control rnd_menu_description" placeholder="RND Menu Item Description">
                         </div>
                     </div>
                 </div>
@@ -487,7 +487,7 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input type="text" class="form-control rnd_code" placeholder="RND-XXXXX" readonly>
+                            <input value="{{$item ? $item->rnd_code : ''}}" type="text" class="form-control rnd_code" placeholder="RND-XXXXX" readonly>
                         </div>
                     </div>
                 </div>
@@ -498,7 +498,7 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input type="text" class="form-control rnd_tasteless_code" placeholder="XXXXXX" readonly>
+                            <input value="{{$item ? $item->menu_items_code : ''}}" type="text" class="form-control rnd_tasteless_code" placeholder="XXXXXX" readonly>
                         </div>
                     </div>
                 </div>
