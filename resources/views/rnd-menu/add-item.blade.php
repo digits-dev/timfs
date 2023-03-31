@@ -476,7 +476,7 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input type="text" class="form-control menu_item_description" placeholder="RND Menu Item Description">
+                            <input type="text" class="form-control rnd_menu_description" placeholder="RND Menu Item Description">
                         </div>
                     </div>
                 </div>
@@ -562,7 +562,7 @@
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-		<button class="btn btn-primary pull-right"><i class="fa fa-save" ></i> Save</button>
+		<button class="btn btn-primary pull-right" id="save-btn"><i class="fa fa-save" ></i> Save</button>
 		<button class="btn btn-success pull-right" style="margin-right: 10px"><i class="fa fa-upload" ></i> Publish</button>
     </div>
 </div>
@@ -592,6 +592,7 @@
                 if (callNow) func.apply(context, args);
             }
         }
+
         $.fn.reload = function() {
             if($('.ingredient-wrapper').length == 1) {
                 $('.no-ingredient-warning').css('display', '')
@@ -825,7 +826,6 @@
                     ingredientObject.is_selected = (ingredientMember.attr('primary') == 'true').toString().toUpperCase();
                     ingredientObject.row_id = memberIndex;
                     ingredientObject.ingredient_group = groupIndex;
-                    ingredientObject.menu_items_id = menuItem.id;
                     ingredientObject.item_masters_id = ingredientMember.find('.ingredient').attr('item_id');
                     ingredientObject.menu_as_ingredient_id = ingredientMember.find('.ingredient').attr('menu_item_id');
                     ingredientObject.ingredient_name = ingredientMember.find('.ingredient_name').val()?.trim().toUpperCase();
@@ -860,17 +860,11 @@
                 .attr('name', 'ingredients')
                 .val(result);
 
-            const menuItemData = $(document.createElement('input'))
-                .attr('name', 'menu_items_id')
-                .val("{{ $item->id }}");
+            const 
             
             const foodCostData = $(document.createElement('input'))
                 .attr('name', 'food_cost')
                 .val($('.food-cost').val().replace(/[^0-9.]/g, ''));
-
-            const percentageData = $(document.createElement('input'))
-                .attr('name', 'food_cost_percentage')
-                .val($('.percentage').text().replace(/[^0-9.]/g, ''));
             
             const portionData = $(document.createElement('input'))
                 .attr('name', 'portion_size')
@@ -894,11 +888,11 @@
             form.submit();
         }
 
-        $(document).on('click', '#save-edit', function(event) {
-            const formValues = $('#form input, #form select');
+        $(document).on('click', '#save-btn', function(event) {
+            const formValues = $('.ingredient-section input, .ingredient-section select');
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('#form .cost')).every(e => !!$(e).val().replace(/[^0-9.]/g, '')) &&
-                $('.portion').val() > 0;
+                $('.portion').val() > 0 && $('.rnd_menu_description').val();
             if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
@@ -918,9 +912,10 @@
                     title: 'Oops...',
                     text: 'Please fill out all fields!',
                 }).then(() => {
-                    $('#form input:invalid, #form select:invalid').css('outline', '2px solid red');
-                    $('#form .ingredient:invalid').parents('.ingredient-entry').find('.display-ingredient').css('outline', '2px solid red');
+                    $('.ingredient-section input:invalid, .ingredient-section select:invalid').css('outline', '2px solid red');
+                    $('.ingredient-section .ingredient:invalid').parents('.ingredient-entry').find('.display-ingredient').css('outline', '2px solid red');
                     if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
+					if (!$('.rnd_menu_description').val()) $('.rnd_menu_description').css('outline', '2px solid red');
                 });
             }
         }); 
