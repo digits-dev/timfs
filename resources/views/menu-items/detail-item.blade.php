@@ -160,7 +160,7 @@
                     .text(groupedIngredient.item_masters_id ? timeago.format(groupedIngredient.updated_at || groupedIngredient.created_at) : '')
                 const ttp = $(document.createElement('td')).html('₱ ' + (groupedIngredient.ttp || '0.00') + '<br/>').append(ttpSpan);
                 const ingredientQty = $(document.createElement('td')).text(groupedIngredient.ingredient_qty);
-                const cost = $(document.createElement('td')).text('₱ ' + groupedIngredient.cost);
+                const cost = $(document.createElement('td')).text('₱ ' + (groupedIngredient.cost || '0.00'));
 
                 if (groupedIngredient.full_item_description || groupedIngredient.item_masters_id)
                     from.html('<span class="label label-info">IMFS</span>')
