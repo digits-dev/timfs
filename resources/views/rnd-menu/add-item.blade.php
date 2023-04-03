@@ -685,6 +685,11 @@
                 const value = $(this).val();
                 $(this).val(value.toUpperCase());
             });
+
+            $('.rnd_menu_description').keyup(function() {
+                const value = $(this).val();
+                $(this).val(value.toUpperCase());
+            });
         }
 
         $.fn.sumCost = function() {
