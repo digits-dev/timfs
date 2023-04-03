@@ -115,10 +115,10 @@ class ItemSegmentationUploadController extends Controller
 
             $oldItemDetail = ItemMaster::where('tasteless_code', (string)$value['tasteless_code'])->first();							
             $itemHistory = [];
-            $collection = collect($value->keys());
+            // $collection = collect($value->keys());
             foreach($segment_cols as $k_seg => $seg){
-                if($collection->search($seg, true) != false)
-                {
+                // if($collection->search($seg, true) != false)
+                // {
                     if($value[$seg] != $oldItemDetail->$k_seg){
                         array_push($itemHistory, [
                             'fullname' 	=> $seg, 
@@ -127,7 +127,7 @@ class ItemSegmentationUploadController extends Controller
                             'new' 		=> $value[$seg]
                         ]);
                     }
-                }
+                // }
             }
 
             if(count($itemHistory) > 0){

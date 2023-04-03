@@ -28,8 +28,7 @@ class ItemSegmentationImport implements ToModel, WithHeadingRow, WithChunkReadin
             if(!is_null($row[$seg])){
                 if(in_array($row[$seg],$sku_datas)){
                     $data_segments[$k_seg] = $row[$seg];
-                }
-                    
+                }                    
             }
         }
 
