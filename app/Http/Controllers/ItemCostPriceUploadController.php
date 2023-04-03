@@ -25,7 +25,7 @@ class ItemCostPriceUploadController extends Controller
     {
         $data['page_title'] = 'Upload Items Prices';
         $data['uploadRoute'] = route('uploadCostPrice');
-        $data['uploadTemplate'] = route('downloadPriceTemplate');
+        $data['uploadTemplate'] = route('downloadCostPriceTemplate');
         return view("upload.uploader", $data);
     }
 

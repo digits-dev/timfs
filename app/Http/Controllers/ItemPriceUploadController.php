@@ -34,7 +34,7 @@ class ItemPriceUploadController extends Controller
     public function create()
     {
         $data['page_title'] = 'Upload Items Prices';
-        $data['uploadRoute'] = route('uploadCostPrice');
+        $data['uploadRoute'] = route('uploadItemPrice');
         $data['uploadTemplate'] = route('downloadPriceTemplate');
         return view("upload.uploader", $data);
     }

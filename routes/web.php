@@ -72,7 +72,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/item_masters/download-sku-template','ItemSegmentationUploadController@downloadSKULegendTemplate')->name('downloadSKULegendTemplate');
     
     //bulk upload cost
-    Route::post('/admin/item_masters/upload-items-costing','ItemPriceUploadController@store')->name('uploadCostPrice');
+    Route::post('/admin/item_masters/upload-items-costing','ItemPriceUploadController@store')->name('uploadItemPrice');
     Route::get('/admin/item_masters/update-items-price','ItemPriceUploadController@create')->name('getUpdateItemsPrice');
     Route::get('/admin/item_masters/download-price-template','ItemPriceUploadController@downloadPriceTemplate')->name('downloadPriceTemplate');
 
@@ -80,7 +80,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
 
     Route::post('/admin/item_masters/upload-items-cost-price','ItemCostPriceUploadController@store')->name('uploadCostPrice');
     Route::get('/admin/item_masters/update-items-cost-price','ItemCostPriceUploadController@create')->name('getUpdateItemsCostPrice');
-    Route::get('/admin/item_masters/download-cost-price-template','ItemCostPriceUploadController@downloadPriceTemplate')->name('downloadPriceTemplate');
+    Route::get('/admin/item_masters/download-cost-price-template','ItemCostPriceUploadController@downloadPriceTemplate')->name('downloadCostPriceTemplate');
 
     //menu items
     Route::post('/admin/menu_items/edit', [AdminMenuItemsController::class, 'submitEdit'])->name('edit_menu_item');
