@@ -430,6 +430,8 @@
 
 			$rnd_menu_description = $request->get('rnd_menu_description');
 			$food_cost = $request->get('food_cost');
+			$food_cost_percentage = $request->get('food_cost_percentage');
+			$rnd_menu_srp = $request->get('rnd_menu_srp');
 			$portion_size = $request->get('portion_size');
 			$ingredient_total_cost = $request->get('ingredient_total_cost');
 			$ingredients = json_decode($request->get('ingredients'));
@@ -445,6 +447,8 @@
 				->insertGetId([
 					'rnd_menu_description' => $rnd_menu_description,
 					'rnd_code' => $rnd_code,
+					'portion_size' => $portion_size,
+					'rnd_menu_srp' => $rnd_menu_srp,
 					'created_by' => $action_by,
 					'created_at' => $time_stamp
 				]);
@@ -470,6 +474,91 @@
 
 					//finally, inserting ingredients to the table
 					DB::table('rnd_menu_ingredients_details')->insert($ingredient);
+				}
+			}
+			
+
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => 'New RND Item Created!'
+				]);
+		}
+
+		public function editRNDMenu(Request $request) {
+
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$food_cost = $request->get('food_cost');
+			$food_cost_percentage = $request->get('food_cost_percentage');
+			$rnd_menu_srp = $request->get('rnd_menu_srp');
+			$portion_size = $request->get('portion_size');
+			$ingredient_total_cost = $request->get('ingredient_total_cost');
+			$ingredients = json_decode($request->get('ingredients'));
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+
+			//update status for rnd menu item
+			DB::table('rnd_menu_items')
+				->where('id', $rnd_menu_id)
+				->update([
+					'updated_at' => $time_stamp,
+					'updated_by' => $action_by
+				]);
+
+			//inactivating all active ingredients of menu item
+			DB::table('rnd_menu_ingredients_details')
+				->where('status', 'ACTIVE')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update([
+					'status' => 'INACTIVE',
+					'row_id' => null,
+					'deleted_at' => date('Y-m-d H:i:s')
+				]);
+
+			//looping through the nested ingredients by their ingredient_group
+			foreach ($ingredients as $group) {
+				foreach ($group as $ingredient) {
+					$ingredient = (array) $ingredient;
+
+					//checking if the ingredient already exists
+					$is_existing = DB::table('rnd_menu_ingredients_details')
+						->where([
+							'rnd_menu_items_id' => $rnd_menu_items_id,
+							'item_masters_id' => $ingredient['item_masters_id'],
+							'ingredient_name' => $ingredient['ingredient_name'],
+							'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
+						])->exists();
+					
+					if ($is_existing) {
+						$ingredient['updated_at'] = $time_stamp;
+						$ingredient['updated_by'] = $action_by;
+					} else {
+						$ingredient['created_at'] = $time_stamp;
+						$ingredient['created_by'] = $action_by;
+					}
+					
+					$ingredient['status'] = 'ACTIVE';
+					$ingredient['deleted_at'] = null;
+
+					//unsetting ingredients details that may be outdated in the future
+					unset(
+						$ingredient['qty'], 
+						$ingredient['cost'], 
+						$ingredient['total_cost'], 
+					);
+
+					if ($ingredient['is_existing'] == 'TRUE') {
+						unset($ingredient['ttp']);
+					}
+
+					//finally, inserting ingredients to the table
+					DB::table('rnd_menu_ingredients_details')->updateOrInsert([
+						'rnd_menu_items_id' => $rnd_menu_items_id,
+						'item_masters_id' => $ingredient['item_masters_id'],
+						'ingredient_name' => $ingredient['ingredient_name'],
+						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
+					], $ingredient);
 				}
 			}
 			

@@ -469,9 +469,9 @@
     <div class="panel-body">
         <form action="" id="form" class="form">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <div class="form-group">
-                        <label for="" class="control-label">RND Menu Item Description</label>
+                        <label for="" class="control-label"><span class="required-star">*</span> RND Menu Item Description</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
@@ -480,7 +480,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label"><span class="required-star">*</span> RND Menu SRP</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <span class="custom-icon"><strong>₱</strong></span>
+                            </div>
+                            <input value="{{$item ? (float) $item->rnd_menu_srp : ''}}" type="number" class="form-control rnd_menu_srp" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="" class="control-label">RND Menu Item Code</label>
                         <div class="input-group">
@@ -491,9 +502,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label">Tasteless Menu Item Code</label>
+                        <label for="" class="control-label">Tasteless Menu Code</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
@@ -525,12 +536,12 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="" class="control-label">Portion Size</label>
+                            <label for="" class="control-label"><span class="required-star">*</span> Portion Size</label>
                             <div class="input-group">
                                 <div class="input-group-addon">
                                     <span class="custom-icon"><strong>÷</strong></span>
                                 </div>
-                                <input type="text" class="form-control portion" placeholder="Portion Size">
+                                <input value="{{$item ? (float) $item->portion_size : '1'}}" type="text" class="form-control portion" placeholder="Portion Size">
                             </div>
                         </div>
                     </div>
@@ -547,7 +558,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="" class="control-label">Food Cost</label>
+                            <label for="" class="control-label">Food Cost (<span class="percentage"></span>)</label>
                             <div class="input-group">
                                 <div class="input-group-addon">
                                     <span class="custom-icon"><strong>₱</strong></span>
@@ -574,7 +585,8 @@
 <script>
     document.title = 'Add New RND Menu Item Description';
     $('body').addClass('sidebar-collapse');
-    const savedIngredients = {!! json_encode($ingredients) !!};
+    const savedIngredients = {!! json_encode($ingredients) !!} || [];
+    const rndMenuItem = {!! json_encode($item) !!};
     $(document).ready(function() {
 
         const debounce = (func, wait, immediate)=> {
@@ -595,6 +607,8 @@
         }
 
         $.fn.firstLoad = function() {
+            if (savedIngredients) $('.no-ingredient-warning').hide();
+
             const entryCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
             const section = $('.ingredient-section');
             for (i of entryCount) {
@@ -772,12 +786,19 @@
                 const value = $(this).val();
                 $(this).val(value.toUpperCase());
             });
+
+            $('.rnd_menu_srp').keyup(function() {
+                $.fn.sumCost();
+            });
         }
 
         $.fn.sumCost = function() {
             const wrappers = jQuery.makeArray($('.ingredient-wrapper, .new-ingredient-wrapper'));
             const lowCost = Number(localStorage.getItem('lowCost')) || 30;
             const portionInput = $('.portion');
+            const srpInput = $('.rnd_menu_srp');
+            const srp = srpInput.val() || 0;
+            const percentageText = $('.percentage');
             if (portionInput.val() <= 0) portionInput.val('1');
             const portionSize = portionInput.val();
             let sum = 0;
@@ -796,6 +817,17 @@
             $('.total-cost').val(sum);
             $('.food-cost').val(foodCost);
             
+            const percentage = srp > 0 ? math.round(foodCost / srp * 100, 2) : 0;
+
+            $(percentageText).text(`${percentage}%`);
+            if (percentage > lowCost) {
+                $(percentageText).css('color', 'red');
+                $('.food-cost').css({'color': 'red', 'outline': '2px solid red', 'font-weight': 'bold',});
+            } else {
+                $(percentageText).css('color', '');
+                $('.food-cost').css({'color': '', 'outline': '', 'font-weight': 'normal'});    
+            }
+
             $.fn.formatNumbers();
         }
 
@@ -934,7 +966,7 @@
             const result = JSON.stringify(ingredientsArray);
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
-                .attr('action', "{{ route('add_new_rnd_menu') }}")
+                .attr('action', rndMenuItem ? "{{ route('edit_rnd_menu') }}" : "{{ route('add_rnd_menu') }}")
                 .css('display', 'none');
 
             const csrf = $(document.createElement('input'))
@@ -950,10 +982,22 @@
             const rndMenuDescriptionData = $(document.createElement('input'))
                 .attr('name', 'rnd_menu_description')
                 .val($('.rnd_menu_description').val());
+
+            const rndMenuIdData = $(document.createElement('input'))
+                .attr('name', 'rnd_menu_items_id')
+                .val(rndMenuItem?.id);
+
+            const srpData = $(document.createElement('input'))
+                .attr('name', 'rnd_menu_srp')
+                .val($('.rnd_menu_srp').val());
             
             const foodCostData = $(document.createElement('input'))
                 .attr('name', 'food_cost')
                 .val($('.food-cost').val().replace(/[^0-9.]/g, ''));
+
+            const foodCostPercentageData = $(document.createElement('input'))
+                .attr('name', 'food_cost_percentage')
+                .val($('.percentage').text().replace(/[^0-9.]/g, ''));
             
             const portionData = $(document.createElement('input'))
                 .attr('name', 'portion_size')
@@ -967,7 +1011,10 @@
                 csrf,
                 ingredientsData,
                 rndMenuDescriptionData,
+                rndMenuIdData,
+                srpData,
                 foodCostData,
+                foodCostPercentageData,
                 portionData,
                 totalCostData,
             );
@@ -979,7 +1026,7 @@
             const formValues = $('.ingredient-section input, .ingredient-section select');
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('#form .cost')).every(e => !!$(e).val().replace(/[^0-9.]/g, '')) &&
-                $('.portion').val() > 0 && $('.rnd_menu_description').val();
+                $('.portion').val() > 0 && $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() > 0;
             if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
@@ -1003,6 +1050,7 @@
                     $('.ingredient-section .ingredient:invalid').parents('.ingredient-entry').find('.display-ingredient').css('outline', '2px solid red');
                     if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
 					if (!$('.rnd_menu_description').val()) $('.rnd_menu_description').css('outline', '2px solid red');
+					if (!$('.rnd_menu_srp').val() || $('.rnd_menu_srp').val() <= 0) $('.rnd_menu_srp').css('outline', '2px solid red');
                 });
             }
         }); 

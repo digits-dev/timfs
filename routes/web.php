@@ -99,6 +99,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/add_menu_items/detail/{id}', [AdminAddMenuItemsController::class, 'getDetail']);
 
     //rnd menu items
-    Route::post('/admin/rnd_menu_items/', [AdminRndMenuItemsController::class, 'addNewRNDMenu'])->name('add_new_rnd_menu');
+    Route::post('/admin/rnd_menu_items/add', [AdminRndMenuItemsController::class, 'addNewRNDMenu'])->name('add_rnd_menu');
+    Route::post('/admin/rnd_menu_items/edit', [AdminRndMenuItemsController::class, 'editRNDMenu'])->name('edit_rnd_menu');
 
 });
