@@ -574,6 +574,7 @@
 <script>
     document.title = 'Add New RND Menu Item Description';
     $('body').addClass('sidebar-collapse');
+    const savedIngredients = {!! json_encode($ingredients) !!};
     $(document).ready(function() {
 
         const debounce = (func, wait, immediate)=> {
@@ -590,6 +591,87 @@
                 clearTimeout(timeout);
                 timeout = setTimeout(later, wait);
                 if (callNow) func.apply(context, args);
+            }
+        }
+
+        $.fn.firstLoad = function() {
+            const entryCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
+            const section = $('.ingredient-section');
+            for (i of entryCount) {
+                const groupedIngredients = savedIngredients.filter(e => e.ingredient_group == i);
+                const wrapperTemplate = $(document.createElement('div'));
+                wrapperTemplate
+                    .addClass('ingredient-wrapper')
+                    .append($('.add-sub-btn').eq(0).clone())
+                    .append($('.new-add-sub-btn').eq(0).clone());
+
+                groupedIngredients.forEach(savedIngredient => {
+                    let element;
+                    if (savedIngredient.is_primary == 'TRUE') {
+                        if (savedIngredient.is_existing == 'TRUE') {
+                            //primary and existing
+                            element = $('.ingredient-wrapper .ingredient-entry').eq(0).clone();
+                        } else {
+                            //primary and new
+                            element = $('.new-ingredient-wrapper .ingredient-entry').eq(0).clone();
+                            element.find('.ttp').attr('readonly', false);
+                        }
+                    } else {
+                        if (savedIngredient.is_existing == 'TRUE') {
+                            //substitute and existing
+                            element = $('.substitute').eq(0).clone();
+                            if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
+                        } else {
+                            //substitute and new
+                            element = $('.new-substitute').eq(0).clone();
+                            if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
+                        }
+                    }
+                    if (savedIngredient.menu_status == 'INACTIVE' || savedIngredient.item_status == 'INACTIVE') 
+                        element.find('.label-danger').text('⚠️INACTIVE');
+
+                    if (savedIngredient.item_masters_id && !savedIngredient.menu_as_ingredient_id)
+                        element.find('.item-from').addClass('label label-info').text('IMFS');
+
+                    if (savedIngredient.menu_as_ingredient_id && !savedIngredient.item_masters_id)
+                        element.find('.item-from').addClass('label-warning').text('MIMF');
+
+                    const ingredientInput = element.find('.ingredient');
+                    ingredientInput.val(savedIngredient.item_masters_id || savedIngredient.menu_as_ingredient_id);
+                    ingredientInput.attr({
+                        cost: savedIngredient.ingredient_cost || savedIngredient.food_cost,
+                        uom: savedIngredient.uom_id,
+                        item_id: savedIngredient.item_masters_id,
+                        menu_item_id: savedIngredient.menu_as_ingredient_id,
+                    });
+
+                    if (savedIngredient.item_masters_id) element.find('.date-updated').html(
+                        savedIngredient.updated_at ? `${timeago.format(savedIngredient.updated_at)}` :
+                        savedIngredient.created_at ? `${timeago.format(savedIngredient.created_at)}` :
+                        ''
+                    );
+                    element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
+                    element.find('.ingredient_name').val(savedIngredient.ingredient_name);
+                    element.find('.pack-size').val(parseFloat(savedIngredient.packaging_size));
+                    element.find('.prep-quantity').val(parseFloat(savedIngredient.prep_qty) || 0).attr('readonly', false);
+                    element.find('.uom').val(savedIngredient.uom_id);
+                    element.find('.uom_name').val(savedIngredient.uom_name);
+                    element.find('.display-uom').val(savedIngredient.uom_description);
+                    element.find('.preparation option').attr('selected', false);
+                    element.find('.preparation').val(savedIngredient.menu_ingredients_preparations_id)
+                    element.find('.yield').val(parseFloat(savedIngredient.yield) || 0);
+                    element.find('.ttp').val(parseFloat(savedIngredient.ttp) || 0).attr('packaging_size', savedIngredient.packaging_size);
+
+                    $.fn.computeIngredientCost(element);
+                    element.css('display', '');
+                    wrapperTemplate.append(element);
+                });
+
+                wrapperTemplate
+                    .find('.preparation, .yield')
+                    .attr('readonly', false)
+                    .attr('disabled', false);
+                section.append(wrapperTemplate);
             }
         }
 
@@ -1119,6 +1201,7 @@
 
 
         $('.loading-label').remove();
+        $.fn.firstLoad();
         $.fn.reload();
         $.fn.formatSelected();
         $.fn.sumCost();
