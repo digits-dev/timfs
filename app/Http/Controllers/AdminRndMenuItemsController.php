@@ -389,19 +389,21 @@
 		}
 
 		public function addNewRNDMenu(Request $request) {
+
 			$rnd_menu_description = $request->get('rnd_menu_description');
 			$food_cost = $request->get('food_cost');
 			$portion_size = $request->get('portion_size');
 			$ingredient_total_cost = $request->get('ingredient_total_cost');
+			$ingredients = json_decode($request->get('ingredients'));
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 			$max_rnd_code = DB::table('rnd_menu_items')->max('rnd_code');
 			$rnd_code_int = (int) explode('-', $max_rnd_code)[1] + 1;
-			$rnd_code = 'RND-' . str_pad("$rnd_code_int", 5, '0', STR_PAD_LEFT);
+			$rnd_code = 'RND-' . str_pad($rnd_code_int, 5, '0', STR_PAD_LEFT);
 			
 
 			//inserting new rnd menu item
-			$id = DB::table('rnd_menu_items')
+			$rnd_menu_items_id = DB::table('rnd_menu_items')
 				->insertGetId([
 					'rnd_menu_description' => $rnd_menu_description,
 					'rnd_code' => $rnd_code,
@@ -409,14 +411,31 @@
 					'created_at' => $time_stamp
 				]);
 
-			/*
-			
-				TODO: 
-					create migration and table in db
-					insert the submitted ingredients with the rnd_menu_items_id = $id
-			*/
+			//looping through the nested ingredients by their ingredient_group
+			foreach ($ingredients as $group) {
+				foreach ($group as $ingredient) {
+					$ingredient = (array) $ingredient;
+					$ingredient['rnd_menu_items_id'] = $rnd_menu_items_id;
+					$ingredient['created_by'] = $action_by;
+					$ingredient['created_at'] = $time_stamp;
+					
+					//unsetting ingredients details that may be outdated in the future
+					unset(
+						$ingredient['qty'], 
+						$ingredient['cost'], 
+						$ingredient['total_cost'], 
+					);
 
-			// dd($id);
+					if ($ingredient['is_existing'] == 'TRUE') {
+						unset($ingredient['ttp']);
+					}
+
+					//finally, inserting ingredients to the table
+					DB::table('rnd_menu_ingredients_details')->insert($ingredient);
+				}
+			}
+			
+
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
