@@ -15,12 +15,12 @@ class CreateRndMenuItemsTable extends Migration
     {
         Schema::create('rnd_menu_items', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('rnd_menu_statuses_id')->length(10)->unsigned()->nullable();
             $table->string('rnd_menu_description')->nullable();
             $table->string('rnd_code')->length(30)->nullable();
             $table->string('rnd_tasteless_code')->length(20)->nullable();
             $table->decimal('portion_size', 18, 4)->length(20)->nullable();
             $table->decimal('rnd_menu_srp', 18, 4)->unsigned()->nullable();
-            $table->decimal('food_cost', 18, 4)->unsigned()->nullable();
             $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE')->nullable();
             $table->integer('created_by')->length(10)->unsigned()->nullable();
             $table->integer('updated_by')->length(10)->unsigned()->nullable();
