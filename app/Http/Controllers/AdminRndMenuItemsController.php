@@ -362,7 +362,7 @@
 				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_computed_food_cost.id', '=', 'rnd_menu_items.id')
 				->first();
 
-			$data['ingredients'] = DB::table('rnd_menu_ingredients_auto_compute')
+			$ingredients = DB::table('rnd_menu_ingredients_auto_compute')
 			->where('rnd_menu_items_id', $id)
 			->where('rnd_menu_ingredients_auto_compute.status', 'ACTIVE')
 			->select('tasteless_code',
@@ -395,6 +395,8 @@
 			->orderby('row_id', 'asc')
 			->get()
 			->toArray();
+
+			$data['ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $ingredients);
 
 			return $this->view('rnd-menu/detail-item', $data);
 
