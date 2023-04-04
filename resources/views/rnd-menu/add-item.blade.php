@@ -587,6 +587,7 @@
     $('body').addClass('sidebar-collapse');
     const savedIngredients = {!! json_encode($ingredients) !!} || [];
     const rndMenuItem = {!! json_encode($item) !!};
+    const action = '{!! CRUDBooster::getCurrentMethod() !!}'
     $(document).ready(function() {
 
         const debounce = (func, wait, immediate)=> {
@@ -1029,7 +1030,7 @@
                 $('.portion').val() > 0 && $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() > 0;
             if (isValid) {
                 Swal.fire({
-                    title: 'Do you want to save the changes?',
+                    title: action == 'getAdd' ? 'Do you want to save this item?' : 'Do you want to save the changes?',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
