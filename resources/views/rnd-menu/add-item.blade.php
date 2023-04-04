@@ -587,7 +587,7 @@
     $('body').addClass('sidebar-collapse');
     const savedIngredients = {!! json_encode($ingredients) !!} || [];
     const rndMenuItem = {!! json_encode($item) !!};
-    const action = '{!! CRUDBooster::getCurrentMethod() !!}'
+    const action = '{!! CRUDBooster::getCurrentMethod() !!}';
     $(document).ready(function() {
 
         const debounce = (func, wait, immediate)=> {
@@ -992,21 +992,9 @@
                 .attr('name', 'rnd_menu_srp')
                 .val($('.rnd_menu_srp').val());
             
-            const foodCostData = $(document.createElement('input'))
-                .attr('name', 'food_cost')
-                .val($('.food-cost').val().replace(/[^0-9.]/g, ''));
-
-            const foodCostPercentageData = $(document.createElement('input'))
-                .attr('name', 'food_cost_percentage')
-                .val($('.percentage').text().replace(/[^0-9.]/g, ''));
-            
             const portionData = $(document.createElement('input'))
                 .attr('name', 'portion_size')
                 .val($('.portion').val());
-
-            const totalCostData = $(document.createElement('input'))
-                .attr('name', 'ingredient_total_cost')
-                .val($('.total-cost').val().replace(/[^0-9.]/g, ''));
 
             form.append(
                 csrf,
@@ -1014,10 +1002,7 @@
                 rndMenuDescriptionData,
                 rndMenuIdData,
                 srpData,
-                foodCostData,
-                foodCostPercentageData,
                 portionData,
-                totalCostData,
             );
             $('.panel-body').append(form);
             form.submit();
