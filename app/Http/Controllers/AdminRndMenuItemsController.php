@@ -34,6 +34,11 @@
 			$this->col[] = ["label"=>"Rnd Code","name"=>"rnd_code"];
 			$this->col[] = ["label"=>"Rnd Tasteless Code","name"=>"rnd_tasteless_code"];
 			$this->col[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description"];
+			$this->col[] = ["label"=>"SRP","name"=>"rnd_menu_srp"];
+			$this->col[] = ["label"=>"Portion Size","name"=>"portion_size"];
+			$this->col[] = ["label"=>"Ingredient Total Cost","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_ingredient_total_cost","join_id"=>"id"];
+			$this->col[] = ["label"=>"Food Cost","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_food_cost","join_id"=>"id"];
+			$this->col[] = ["label"=>"Food Cost Percentage","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_food_cost_percentage","join_id"=>"id"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
@@ -489,6 +494,7 @@
 		public function editRNDMenu(Request $request) {
 
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$rnd_menu_description = $request->get('rnd_menu_description');
 			$food_cost = $request->get('food_cost');
 			$food_cost_percentage = $request->get('food_cost_percentage');
 			$rnd_menu_srp = $request->get('rnd_menu_srp');
@@ -498,10 +504,13 @@
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 
-			//update status for rnd menu item
+			//update details for rnd menu item
 			DB::table('rnd_menu_items')
-				->where('id', $rnd_menu_id)
+				->where('id', $rnd_menu_items_id)
 				->update([
+					'rnd_menu_description' => $rnd_menu_description,
+					'rnd_menu_srp' => $rnd_menu_srp,
+					'portion_size' => $portion_size,
 					'updated_at' => $time_stamp,
 					'updated_by' => $action_by
 				]);

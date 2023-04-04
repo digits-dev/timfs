@@ -981,7 +981,7 @@
 
             const rndMenuDescriptionData = $(document.createElement('input'))
                 .attr('name', 'rnd_menu_description')
-                .val($('.rnd_menu_description').val());
+                .val($('.rnd_menu_description').val().trim());
 
             const rndMenuIdData = $(document.createElement('input'))
                 .attr('name', 'rnd_menu_items_id')
