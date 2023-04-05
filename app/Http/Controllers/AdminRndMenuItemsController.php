@@ -497,81 +497,6 @@
 			return self::getEdit($id, 'publish');
 		}
 
-		public function addNewRNDMenu(Request $request) {
-			// dd('heeey');
-
-			$rnd_menu_description = $request->get('rnd_menu_description');
-			$food_cost = $request->get('food_cost');
-			$food_cost_percentage = $request->get('food_cost_percentage');
-			$rnd_menu_srp = $request->get('rnd_menu_srp');
-			$portion_size = $request->get('portion_size');
-			$ingredient_total_cost = $request->get('ingredient_total_cost');
-			$ingredients = json_decode($request->get('ingredients'));
-			$time_stamp = date('Y-m-d H:i:s');
-			$rnd_menu_approval_status = 'SAVED';
-			$action_by = CRUDBooster::myId();
-			$max_rnd_code = DB::table('rnd_menu_items')->max('rnd_code');
-			$rnd_code_int = (int) explode('-', $max_rnd_code)[1] + 1;
-			$rnd_code = 'RND-' . str_pad($rnd_code_int, 5, '0', STR_PAD_LEFT);
-			
-
-			//inserting new rnd menu item
-			$rnd_menu_items_id = DB::table('rnd_menu_items')
-				->insertGetId([
-					'rnd_menu_description' => $rnd_menu_description,
-					'rnd_code' => $rnd_code,
-					'portion_size' => $portion_size,
-					'rnd_menu_srp' => $rnd_menu_srp,
-					'created_by' => $action_by,
-					'created_at' => $time_stamp
-				]);
-
-			//looping through the nested ingredients by their ingredient_group
-			foreach ($ingredients as $group) {
-				foreach ($group as $ingredient) {
-					$ingredient = (array) $ingredient;
-					$ingredient['rnd_menu_items_id'] = $rnd_menu_items_id;
-					$ingredient['created_by'] = $action_by;
-					$ingredient['created_at'] = $time_stamp;
-					
-					//unsetting ingredients details that may be outdated in the future
-					unset(
-						$ingredient['qty'], 
-						$ingredient['cost'], 
-						$ingredient['total_cost'], 
-					);
-
-					if ($ingredient['is_existing'] == 'TRUE') {
-						unset($ingredient['ttp']);
-					}
-
-					//finally, inserting ingredients to the table
-					DB::table('rnd_menu_ingredients_details')->updateOrInsert([
-						'rnd_menu_items_id' => $rnd_menu_items_id,
-						'item_masters_id' => $ingredient['item_masters_id'],
-						'ingredient_name' => $ingredient['ingredient_name'],
-						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
-					], $ingredient);
-				}
-			}
-
-			//updating the approval status
-			DB::table('rnd_menu_approvals')
-				->insert([
-					'rnd_menu_items_id' => $rnd_menu_items_id,
-					'approval_status' => $rnd_menu_approval_status,
-					'created_at' => $time_stamp,
-				]);
-			
-
-
-			return redirect(CRUDBooster::mainpath())
-				->with([
-					'message_type' => 'success',
-					'message' => '✔️ New RND Item Created!'
-				]);
-		}
-
 		public function editRNDMenu(Request $request) {
 
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
@@ -585,9 +510,11 @@
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 			$rnd_menu_approval_status = 'SAVED';
+			$max_rnd_code = DB::table('rnd_menu_items')->max('rnd_code');
+			$rnd_code_int = (int) explode('-', $max_rnd_code)[1] + 1;
+			$rnd_code = 'RND-' . str_pad($rnd_code_int, 5, '0', STR_PAD_LEFT);
 
 			if (!$rnd_menu_items_id) {
-
 				// inserting new rnd menu item and getting the id
 				$rnd_menu_items_id = DB::table('rnd_menu_items')
 				->insertGetId([
@@ -611,8 +538,7 @@
 					]);
 			}
 
-
-			//inactivating all active ingredients of menu item
+			//inactivating all active ingredients of rnd menu item
 			DB::table('rnd_menu_ingredients_details')
 				->where('status', 'ACTIVE')
 				->where('rnd_menu_items_id', $rnd_menu_items_id)
@@ -668,6 +594,7 @@
 				}
 			}
 			
+			//updating approval status
 			DB::table('rnd_menu_approvals')
 				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
 					'rnd_menu_items_id' => $rnd_menu_items_id,
@@ -730,6 +657,35 @@
 				->first();
 
 			return $this->view('rnd-menu/add-packaging', $data);
+		}
+
+		public function getDetailMarketing($id) {
+			$data = [];
+
+			$data['item'] = DB::table('rnd_menu_items')
+				->where('rnd_menu_items.id', $id)
+				->select(
+					'rnd_menu_items.id as rnd_menu_items_id',
+					'rnd_menu_items.rnd_menu_description',
+					'rnd_code',
+					'rnd_tasteless_code',
+					'rnd_menu_items.portion_size',
+					'rnd_menu_items.rnd_menu_srp',
+					'approval_status',
+					'computed_ingredient_total_cost',
+					'computed_food_cost',
+					'computed_food_cost_percentage',
+					'publisher.name as published_by',
+					'published_at'
+				)
+				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
+				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
+				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
+				->first();
+
+			$data['page_title'] = 'Details: ' . $data['item']->rnd_menu_description;
+
+			return $this->view('rnd-menu/marketing-hide-ingredients', $data);
 		}
 
 	}

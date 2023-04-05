@@ -350,6 +350,17 @@
 
 	    //By the way, you can still create your own method in here... :) 
 
+		public function getDetail($id) {
+
+			if (!CRUDBooster::isRead())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+			
+			return (new AdminRndMenuItemsController)->getDetailMarketing($id);
+
+		}
 
 		public function getEdit($id) {
 
@@ -362,5 +373,7 @@
 			return (new AdminRndMenuItemsController)->getPackagingCost($id);
 		}
 
+		public function submitPackagingCost(Request $request) {
 
+		}
 	}
