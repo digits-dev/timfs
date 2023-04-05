@@ -779,7 +779,7 @@
             const result = JSON.stringify(ingredientsArray);
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
-                .attr('action', rndMenuItem ? "{{ route('edit_rnd_menu') }}" : "{{ route('add_rnd_menu') }}")
+                .attr('action', "{{ route('edit_rnd_menu') }}")
                 .css('display', 'none');
 
             const csrf = $(document.createElement('input'))

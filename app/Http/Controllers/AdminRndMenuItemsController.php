@@ -249,7 +249,8 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-	            
+	        
+			$query->where('rnd_menu_approvals.approval_status', '=', 'SAVED');
 	    }
 
 	    /*
@@ -263,7 +264,7 @@
 
 			if (is_numeric($column_value)) $column_value = (float) $column_value;
 			if ($column_index == 2) {
-				if ($column_value == 'SAVED') $column_value = "<span class='label label-success'>$column_value</span>";
+				if ($column_value == 'SAVED') $column_value = "<span class='label label-info'>$column_value</span>";
 				if ($column_value == 'PENDING') $column_value = "<span class='label label-warning'>$column_value</span>";
 			}
 	    }
@@ -346,6 +347,8 @@
 
 	    //By the way, you can still create your own method in here... :) 
 
+
+		//for chef
 		public function getDetail($id) {
 			if (!CRUDBooster::isRead())
 				CRUDBooster::redirect(
@@ -416,23 +419,7 @@
 					trans('crudbooster.denied_access')
 				);
 
-			$data = [];
-
-			$data['preparations'] = DB::table('menu_ingredients_preparations')
-				->where('status', 'ACTIVE')
-				->select('id', 'preparation_desc')
-				->orderBy('preparation_desc', 'ASC')
-				->get()
-				->toArray();
-
-			$data['uoms'] = DB::table('uoms')
-				->where('status', 'ACTIVE')
-				->select('id', 'uom_description')
-				->orderBy('uom_description')
-				->get()
-				->toArray();
-
-			return $this->view('rnd-menu/add-item', $data);
+			return self::getEdit(null);
 		}
 
 		public function getEdit($id, $action = null) {
@@ -511,6 +498,7 @@
 		}
 
 		public function addNewRNDMenu(Request $request) {
+			// dd('heeey');
 
 			$rnd_menu_description = $request->get('rnd_menu_description');
 			$food_cost = $request->get('food_cost');
@@ -558,7 +546,12 @@
 					}
 
 					//finally, inserting ingredients to the table
-					DB::table('rnd_menu_ingredients_details')->insert($ingredient);
+					DB::table('rnd_menu_ingredients_details')->updateOrInsert([
+						'rnd_menu_items_id' => $rnd_menu_items_id,
+						'item_masters_id' => $ingredient['item_masters_id'],
+						'ingredient_name' => $ingredient['ingredient_name'],
+						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
+					], $ingredient);
 				}
 			}
 
@@ -593,16 +586,31 @@
 			$action_by = CRUDBooster::myId();
 			$rnd_menu_approval_status = 'SAVED';
 
-			//update details for rnd menu item
-			DB::table('rnd_menu_items')
-				->where('id', $rnd_menu_items_id)
-				->update([
+			if (!$rnd_menu_items_id) {
+
+				// inserting new rnd menu item and getting the id
+				$rnd_menu_items_id = DB::table('rnd_menu_items')
+				->insertGetId([
 					'rnd_menu_description' => $rnd_menu_description,
-					'rnd_menu_srp' => $rnd_menu_srp,
+					'rnd_code' => $rnd_code,
 					'portion_size' => $portion_size,
-					'updated_at' => $time_stamp,
-					'updated_by' => $action_by
+					'rnd_menu_srp' => $rnd_menu_srp,
+					'created_by' => $action_by,
+					'created_at' => $time_stamp
 				]);
+			} else {
+				//update details for rnd menu item
+				DB::table('rnd_menu_items')
+					->where('id', $rnd_menu_items_id)
+					->update([
+						'rnd_menu_description' => $rnd_menu_description,
+						'rnd_menu_srp' => $rnd_menu_srp,
+						'portion_size' => $portion_size,
+						'updated_at' => $time_stamp,
+						'updated_by' => $action_by
+					]);
+			}
+
 
 			//inactivating all active ingredients of menu item
 			DB::table('rnd_menu_ingredients_details')
@@ -684,6 +692,8 @@
 				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
 					'rnd_menu_items_id' => $rnd_menu_items_id,
 					'approval_status' => $rnd_menu_approval_status,
+					'published_by' => $action_by,
+					'published_at' => $time_stamp,
 					'created_at' => $time_stamp,
 				]);
 
@@ -692,6 +702,34 @@
 					'message_type' => 'success',
 					'message' => "✔️ $rnd_menu_description for Pending!"
 				]);
+		}
+
+		// for marketing
+		public function getPackagingCost($id) {
+			$data = [];
+
+			$data['item'] = DB::table('rnd_menu_items')
+				->where('rnd_menu_items.id', $id)
+				->select(
+					'rnd_menu_items.id as rnd_menu_items_id',
+					'rnd_menu_items.rnd_menu_description',
+					'rnd_code',
+					'rnd_tasteless_code',
+					'rnd_menu_items.portion_size',
+					'rnd_menu_items.rnd_menu_srp',
+					'approval_status',
+					'computed_ingredient_total_cost',
+					'computed_food_cost',
+					'computed_food_cost_percentage',
+					'publisher.name as published_by',
+					'published_at'
+				)
+				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
+				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
+				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
+				->first();
+
+			return $this->view('rnd-menu/add-packaging', $data);
 		}
 
 	}
