@@ -1,0 +1,196 @@
+.date-updated {
+    font-size: 12px;
+    color: gray;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.label-secondary {
+    background: #7e57c2;
+}
+
+.dropdown-menu {
+    overflow-y: auto;
+    max-height: 255px;
+    max-width: 700px;
+}
+
+.ingredient-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ingredient-wrapper, .new-ingredient-wrapper {
+    position: relative;
+    margin-bottom: 10px;
+    border: 2px solid grey;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.ingredient-entry {
+    padding: 15px;
+    position: relative;
+    display: flex;
+    gap: 5px;
+}
+
+.ingredient-entry .actions {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.ingredient-entry > *, .substitute > *, .new-substitute {
+    display:inline-block;
+}
+
+.ingredient-inputs {
+    display: flex;
+    width: 100%;
+    overflow: auto;
+}
+
+.ingredient-inputs::-webkit-scrollbar {
+    height: 3px;
+}
+
+.ingredient-inputs > * {
+    margin-right: 10px;
+}
+
+.required-star {
+    color: red;
+    font-size: 15px;
+}
+
+#add-row {
+    margin-bottom: 10px;
+}
+
+.swal2-popup, .swal2-modal, .swal2-icon-warning .swal2-show {
+    font-size: 1.6rem !important;
+}
+
+.ingredient {
+    display: none;
+}
+
+.item-list {
+    position: absolute;
+}
+
+.ingredient-section label {
+    margin-bottom: 10px;
+    white-space: nowrap;
+}
+
+.label-wide {
+    min-width: 110px;
+}
+
+.ingredient-label {
+    min-width: 300px;
+}
+
+.menu-item-label {
+    display: block;
+}
+
+.list-item a {
+    color: #555 !important;
+}
+
+.list-item a:hover {
+    background: #1E90FF !important;
+    color: #eee !important;
+}
+
+.no-ingredient-warning {
+    color: grey;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.section-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ingredient-section input, .ingredient-section button, .ingredient-section select {
+    font-weight: normal;
+    margin-top: 3px; 
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    -moz-appearance:textfield; /* Firefox */
+}
+
+.substitute, .new-substitute {
+    border: 1px dashed grey;
+    border-radius: 5px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    padding: 10px;
+    margin-left: 50px;
+    margin-bottom: 10px;
+}
+
+.substitute .actions, .new-substitute .actions {
+    display: flex;
+    gap: 3px;
+}
+
+.substitute .actions > * {
+    margin: 1px;
+}
+
+.add-sub-btn, .new-add-sub-btn {
+    font-size: 14;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    color: white;
+    position: absolute;
+    bottom: -15px;
+    cursor: pointer;
+    transition: 200ms;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-sub-btn {
+    background-color: #367fa9;
+    left: 10px;
+}
+
+.new-add-sub-btn {
+    background-color: #008d4c;
+    left: 50px;
+}
+
+.add-sub-btn:hover,  .new-add-sub-btn:hover {
+    transform: scale(1.2);
+    /* rotate: 90deg; */
+    transition: 200ms;
+}
+
+.food-cost-label {
+    font-size: 18px !important;
+}
+
+.swal2-html-container {
+    line-height: 3rem;
+}
