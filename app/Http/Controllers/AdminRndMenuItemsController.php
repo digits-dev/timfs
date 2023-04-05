@@ -31,6 +31,7 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
+			$this->col[] = ["label"=>"Approval Status","name"=>"id","join"=>"rnd_menu_approvals,approval_status","join_id"=>"rnd_menu_items_id"];
 			$this->col[] = ["label"=>"Rnd Code","name"=>"rnd_code"];
 			$this->col[] = ["label"=>"Rnd Tasteless Code","name"=>"rnd_tasteless_code"];
 			$this->col[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description"];
@@ -88,7 +89,7 @@
 	        | 
 	        */
 	        $this->addaction = array();
-
+			$this->addaction[] = ['title'=>'Publish','url'=>CRUDBooster::mainpath('publish/[id]'),'icon'=>'fa fa-upload', 'color'=>'-'];
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -217,7 +218,9 @@
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-	        $this->load_css = array();
+	        $this->load_css = [
+				asset('css/custom.css')
+			];
 	        
 	        
 	    }
@@ -259,6 +262,10 @@
 	    	//Your code here
 
 			if (is_numeric($column_value)) $column_value = (float) $column_value;
+			if ($column_index == 2) {
+				if ($column_value == 'SAVED') $column_value = "<span class='label label-success'>$column_value</span>";
+				if ($column_value == 'PENDING') $column_value = "<span class='label label-warning'>$column_value</span>";
+			}
 	    }
 
 	    /*
@@ -428,14 +435,16 @@
 			return $this->view('rnd-menu/add-item', $data);
 		}
 
-		public function getEdit($id) {
+		public function getEdit($id, $action = null) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
 				);
-			
+
 			$data = [];
+
+			$data['action'] = $action;
 
 			$data['item'] = DB::table('rnd_menu_items')
 				->where('id', $id)
@@ -492,8 +501,13 @@
 				->orderBy('row_id', 'ASC')
 				->get()
 				->toArray();
+			
 
 			return $this->view('rnd-menu/add-item', $data);
+		}
+
+		public function getPublish($id) {
+			return self::getEdit($id, 'publish');
 		}
 
 		public function addNewRNDMenu(Request $request) {
@@ -506,6 +520,7 @@
 			$ingredient_total_cost = $request->get('ingredient_total_cost');
 			$ingredients = json_decode($request->get('ingredients'));
 			$time_stamp = date('Y-m-d H:i:s');
+			$rnd_menu_approval_status = 'SAVED';
 			$action_by = CRUDBooster::myId();
 			$max_rnd_code = DB::table('rnd_menu_items')->max('rnd_code');
 			$rnd_code_int = (int) explode('-', $max_rnd_code)[1] + 1;
@@ -546,13 +561,21 @@
 					DB::table('rnd_menu_ingredients_details')->insert($ingredient);
 				}
 			}
+
+			//updating the approval status
+			DB::table('rnd_menu_approvals')
+				->insert([
+					'rnd_menu_items_id' => $rnd_menu_items_id,
+					'approval_status' => $rnd_menu_approval_status,
+					'created_at' => $time_stamp,
+				]);
 			
 
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
-					'message' => 'New RND Item Created!'
+					'message' => '✔️ New RND Item Created!'
 				]);
 		}
 
@@ -568,6 +591,7 @@
 			$ingredients = json_decode($request->get('ingredients'));
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
+			$rnd_menu_approval_status = 'SAVED';
 
 			//update details for rnd menu item
 			DB::table('rnd_menu_items')
@@ -636,12 +660,37 @@
 				}
 			}
 			
-
+			DB::table('rnd_menu_approvals')
+				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
+					'rnd_menu_items_id' => $rnd_menu_items_id,
+					'approval_status' => $rnd_menu_approval_status,
+					'created_at' => $time_stamp,
+				]);
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
-					'message' => 'New RND Item Created!'
+					'message' => "✔️ RND Menu Item Details of $rnd_menu_description Updated!"
+				]);
+		}
+
+		public function publishRNDMenu(Request $request) {
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$rnd_menu_approval_status = 'PENDING';
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			
+			DB::table('rnd_menu_approvals')
+				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
+					'rnd_menu_items_id' => $rnd_menu_items_id,
+					'approval_status' => $rnd_menu_approval_status,
+					'created_at' => $time_stamp,
+				]);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "✔️ $rnd_menu_description for Pending!"
 				]);
 		}
 

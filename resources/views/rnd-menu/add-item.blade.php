@@ -573,8 +573,11 @@
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
+        @if (CRUDBooster::getCurrentMethod() != 'getPublish')
 		<button class="btn btn-primary pull-right" id="save-btn"><i class="fa fa-save" ></i> Save</button>
-		<button class="btn btn-success pull-right" style="margin-right: 10px"><i class="fa fa-upload" ></i> Publish</button>
+        @else
+		<button class="btn btn-success pull-right" id="publish-btn" style="margin-right: 10px;"><i class="fa fa-upload" ></i> Publish</button>
+        @endif
     </div>
 </div>
 
@@ -687,6 +690,13 @@
                     .attr('readonly', false)
                     .attr('disabled', false);
                 section.append(wrapperTemplate);
+            }
+
+            if (action == 'getPublish') {
+                $('#form input').attr('readonly', true);
+                $('#form select').attr('disabled', true);
+                $('#form button').hide();
+                $('#form .add-sub-btn, #form .new-add-sub-btn').hide();
             }
         }
 
@@ -1040,6 +1050,41 @@
                 });
             }
         }); 
+
+        $(document).on('click', '#publish-btn', function(event) {
+                Swal.fire({
+                    title: 'Do you want to publish this item?',
+                    html: '🟠  Doing so will turn the status of this item to <span class="label label-warning">PENDING</span>.<br/>' +
+                        `📄  You won't be able to edit this item again.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Publish'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = $(document.createElement('form'))
+                            .attr('method', 'POST')
+                            .attr('action', "{{ route('publish_rnd_menu') }}")
+                            .css('display', 'none');
+
+                        const csrf = $(document.createElement('input'))
+                            .attr({
+                                type: 'hidden',
+                                name: '_token',
+                            }).val("{{ csrf_token() }}");
+
+                        const rndMenuId = $(document.createElement('input'))
+                            .attr('name', 'rnd_menu_items_id')
+                            .val(rndMenuItem?.id);
+                        
+                        form.append(csrf, rndMenuId)
+                        $('.panel-body').append(form);
+                        form.submit();
+                    }    
+                });
+
+        });
 
         $(document).on('click', '.list-item', function(event) {
             const item = $(this);
