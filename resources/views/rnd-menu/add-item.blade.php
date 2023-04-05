@@ -464,7 +464,7 @@
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <i class="fa fa-plus"></i><strong> Add RND Menu Item</strong>
+        <i class="fa fa-pencil"></i><strong> {{str_replace('get', '', CRUDBooster::getCurrentMethod())}} RND Menu Item</strong>
     </div>
     <div class="panel-body">
         <form action="" id="form" class="form">
