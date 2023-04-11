@@ -375,10 +375,13 @@
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-        @if (CRUDBooster::getCurrentMethod() != 'getPublish')
+        @if ($action == 'edit')
 		<button class="btn btn-primary pull-right" id="save-btn"><i class="fa fa-save" ></i> Save</button>
-        @else
+        @elseif ($action == 'publish')
 		<button class="btn btn-success pull-right" id="publish-btn" style="margin-right: 10px;"><i class="fa fa-upload" ></i> Publish</button>
+        @elseif ($action == 'approve')
+        <button class="btn btn-success pull-right" id="approve-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-up" ></i> Approve</button>
+        <button class="btn btn-danger pull-right" id="reject-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-down" ></i> Reject</button>
         @endif
     </div>
 </div>
@@ -392,7 +395,8 @@
     $('body').addClass('sidebar-collapse');
     const savedIngredients = {!! json_encode($ingredients) !!} || [];
     const rndMenuItem = {!! json_encode($item) !!};
-    const action = '{!! CRUDBooster::getCurrentMethod() !!}';
+    const action = "{{$action}}";
+    const privilege = "{{$privilege}}";
     $(document).ready(function() {
 
         const debounce = (func, wait, immediate)=> {
@@ -494,7 +498,7 @@
                 section.append(wrapperTemplate);
             }
 
-            if (action == 'getPublish') {
+            if (action == 'publish' || action == 'approve') {
                 $('#form input').attr('readonly', true);
                 $('#form select').attr('disabled', true);
                 $('#form button').hide();
@@ -886,6 +890,49 @@
                     }    
                 });
 
+        });
+
+        $(document).on('click', '#approve-btn, #reject-btn', function(event) {
+            const approvedIsClicked = $(this).is('#approve-btn');
+            Swal.fire({
+                    title: `Do you want to ${approvedIsClicked ? 'approve' : 'reject'} this item?`,
+                    html: approvedIsClicked ?
+                        ('🟠  Doing so will turn the status of this item to <span class="label label-info">FOR APPROVAL (PURCHASING)</span>.<br/>' +
+                        `📄  You won't be able to revert this.`) : 
+                        ('🔴  Doing so will turn the status of this item to <span class="label label-danger">REJECTED</span>.<br/>' +
+                        `📄  You won't be able to revert this.`),
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: approvedIsClicked ? 'Approve' : 'Reject',
+                    width: '650px',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = $(document.createElement('form'))
+                            .attr('method', 'POST')
+                            .attr('action', "{{ route('approve_by_marketing') }}")
+                            .css('display', 'none');
+
+                        const csrf = $(document.createElement('input'))
+                            .attr({
+                                type: 'hidden',
+                                name: '_token',
+                            }).val("{{ csrf_token() }}");
+
+                        const rndMenuId = $(document.createElement('input'))
+                            .attr('name', 'rnd_menu_items_id')
+                            .val(rndMenuItem?.id);
+
+                        const action = $(document.createElement('input'))
+                            .attr('name', 'action')
+                            .val(approvedIsClicked ? 'approved' : 'clicked');
+                        
+                        form.append(csrf, rndMenuId, action)
+                        $('.panel-body').append(form);
+                        form.submit();
+                    }    
+                });
         });
 
         $(document).on('click', '.list-item', function(event) {

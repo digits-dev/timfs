@@ -7,6 +7,12 @@
 
 	class AdminRndMenuItemsForApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
 
+		public function __construct() {
+			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+
+			$this->mainController = new AdminRndMenuItemsController;
+		}
+
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -94,7 +100,6 @@
 	        | 
 	        */
 	        $this->addaction = array();
-			$this->addaction[] = ['title'=>'Approve (Marketing)','url'=>CRUDBooster::mainpath('marketing-approve/[id]'),'icon'=>'fa fa-plus', 'color'=>'-', 'showIf'=>"[rnd_menu_approvals.id] == '1'"];
 
 
 
@@ -256,7 +261,9 @@
 	    public function hook_query_index(&$query) {
 	        //Your code here
 	        
-			$query->where('rnd_menu_approvals.approval_status', '!=', 'SAVED');
+			$query
+				->where('rnd_menu_approvals.approval_status', '!=', 'SAVED')
+				->where('rnd_menu_approvals.approval_status', '!=', 'REJECTED');
 	    }
 
 	    /*
@@ -361,7 +368,7 @@
 					trans('crudbooster.denied_access')
 				);
 			
-			return (new AdminRndMenuItemsController)->getDetailMarketing($id);
+			return $this->mainController->getDetailMarketing($id);
 
 		}
 
@@ -379,7 +386,11 @@
 				->approval_status;
 
 			if ($status == 'PENDING') {
-				return (new AdminRndMenuItemsController)->getPackagingCost($id);
+				return $this->mainController->getPackagingCost($id);
+			} else if ($status == 'FOR APPROVAL (MARKETING)') {
+				return $this->mainController->getApproveByMarketing($id);
+			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
+				return $this->mainController->getApproveByPurchasing($id);
 			}
 		}
 
@@ -390,6 +401,16 @@
 					trans('crudbooster.denied_access')
 				);
 
-			return (new AdminRndMenuItemsController)->submitPackagingCost($request);
+			return $this->mainController->submitPackagingCost($request);
+		}
+
+		public function approveByMarketing(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->approveByMarketing($request);
 		}
 	}

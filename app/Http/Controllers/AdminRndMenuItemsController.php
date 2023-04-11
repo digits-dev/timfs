@@ -7,6 +7,10 @@
 
 	class AdminRndMenuItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
+		public function __construct() {
+			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+		}
+
 	    public function cbInit() {
 	    	# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->table 			   = "rnd_menu_items";	        
@@ -250,7 +254,7 @@
 	    public function hook_query_index(&$query) {
 	        //Your code here
 	        
-			$query->where('rnd_menu_approvals.approval_status', '=', 'SAVED');
+			$query->whereIn('rnd_menu_approvals.approval_status', ['SAVED', 'REJECTED']);
 	    }
 
 	    /*
@@ -266,6 +270,7 @@
 			if ($column_index == 2) {
 				if ($column_value == 'SAVED') $column_value = "<span class='label label-info'>$column_value</span>";
 				if ($column_value == 'PENDING') $column_value = "<span class='label label-warning'>$column_value</span>";
+				if ($column_value == 'REJECTED') $column_value = "<span class='label label-danger'>$column_value</span>";
 			}
 	    }
 
@@ -422,7 +427,7 @@
 			return self::getEdit(null);
 		}
 
-		public function getEdit($id, $action = null) {
+		public function getEdit($id, $action = 'edit') {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
@@ -672,6 +677,7 @@
 					'rnd_tasteless_code',
 					'rnd_menu_items.portion_size',
 					'rnd_menu_items.rnd_menu_srp',
+					'rnd_menu_items.packaging_cost',
 					'approval_status',
 					'computed_ingredient_total_cost',
 					'computed_food_cost',
@@ -719,6 +725,44 @@
 					'message_type' => 'success',
 					'message' => "✔️ Packaging Cost for $rnd_menu_description saved!"
 				]);
+		}
+
+		public function getApproveByMarketing($id) {
+			
+			return self::getEdit($id, 'approve');
+		}
+
+		public function approveByMarketing(Request $request) {
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$approval_status = null;
+
+			if ($request->get('action') == 'approved') {
+				$approval_status = 'FOR APPROVAL (PURCHASING)';
+			} else {
+				$approval_status = 'REJECTED';
+			}
+
+			DB::table('rnd_menu_approvals')
+				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
+					'rnd_menu_items_id' => $rnd_menu_items_id,
+					'approval_status' => $approval_status,
+					'marketing_approved_by' => $action_by,
+					'marketing_approved_at' => $time_stamp,
+				]);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "✔️ Approved!"
+				]);
+
+		}
+
+		// for purchasing
+		public function getApproveByPurchasing($id) {
+			
 		}
 
 	}
