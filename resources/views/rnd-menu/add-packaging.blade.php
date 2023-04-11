@@ -3,6 +3,15 @@
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
+
+<style>
+    #form input:valid {
+        outline: 2px solid green;
+    }
+    #form input:invalid {
+        outline: 2px solid red;
+    }
+</style>
 @endpush
 
 @extends('crudbooster::admin_template')
@@ -115,7 +124,7 @@
                         <div class="input-group-addon">
                             <span class="custom-icon"><strong>₱</strong></span>
                         </div>
-                        <input type="number" class="form-control" placeholder="Enter Packaging Cost">
+                        <input value="{{$item->packaging_cost ? (float) $item->packaging_cost : ''}}" type="number" class="form-control packaging-cost" placeholder="Enter Packaging Cost" required step="any" min="0.00001" max="100000">
                     </div>
                 </div>
             </div>
@@ -130,11 +139,65 @@
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-        @if (CRUDBooster::getCurrentMethod() != 'getPublish')
 		<button class="btn btn-primary pull-right" id="save-btn"><i class="fa fa-save" ></i> Save</button>
-        @else
-		<button class="btn btn-success pull-right" id="publish-btn" style="margin-right: 10px;"><i class="fa fa-upload" ></i> Publish</button>
-        @endif
     </div>
 </div>
 @endsection
+
+@push('bottom')
+<script>
+    const item = {!! json_encode($item) !!};
+    $(document).ready(function() {
+        $(document).on('click', '#save-btn', function(event) {
+            const packagingCostInput = $('.packaging-cost');
+            const value = packagingCostInput.val();
+
+            if (value && value > 0) {
+                Swal.fire({
+                    title: 'Do u want to save the changes?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Save'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = $(document.createElement('form'))
+                            .attr('method', 'POST')
+                            .attr('action', "{{route('submit_packaging_cost')}}")
+                            .hide();
+
+                        const csrf = $(document.createElement('input'))
+                            .attr({
+                                type: 'hidden',
+                                name: '_token',
+                            }).val("{{ csrf_token() }}");
+
+                        const rndMenuItemsId = $(document.createElement('input'))
+                            .attr('name', 'rnd_menu_items_id')
+                            .val(item.rnd_menu_items_id);
+
+                        const packagingCost = $(document.createElement('input'))
+                            .attr('name', 'packaging_cost')
+                            .val(value);
+
+                        form.append(csrf, rndMenuItemsId, packagingCost);
+                        $('.panel-body').append(form);
+                        form.submit();
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please fill out all fields!',
+                })
+            }
+        });
+    });
+
+</script>
+
+
+
+@endpush

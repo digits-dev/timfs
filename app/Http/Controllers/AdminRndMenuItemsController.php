@@ -649,7 +649,8 @@
 					'computed_food_cost',
 					'computed_food_cost_percentage',
 					'publisher.name as published_by',
-					'published_at'
+					'published_at',
+					'rnd_menu_items.packaging_cost'
 				)
 				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
 				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
@@ -686,6 +687,38 @@
 			$data['page_title'] = 'Details: ' . $data['item']->rnd_menu_description;
 
 			return $this->view('rnd-menu/marketing-hide-ingredients', $data);
+		}
+
+		public function submitPackagingCost(Request $request) {
+
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$packaging_cost = $request->get('packaging_cost');
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$approval_status = 'FOR APPROVAL (MARKETING)';
+
+			if ($rnd_menu_items_id) {
+				//updating the packaging cost
+				DB::table('rnd_menu_items')
+					->where('id', $rnd_menu_items_id)
+					->update(['packaging_cost' => $packaging_cost]);
+
+				//updating the approval status
+				DB::table('rnd_menu_approvals')
+					->where('id', $rnd_menu_items_id)
+					->update([
+						'updated_at' => $time_stamp,
+						'pack_cost_updated_at' => $time_stamp,
+						'pack_cost_updated_by' => $action_by,
+						'approval_status' => $approval_status,
+					]);
+			}
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "✔️ Packaging Cost for $rnd_menu_description saved!"
+				]);
 		}
 
 	}

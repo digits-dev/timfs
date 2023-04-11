@@ -1,7 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
 
@@ -94,6 +94,8 @@
 	        | 
 	        */
 	        $this->addaction = array();
+			$this->addaction[] = ['title'=>'Approve (Marketing)','url'=>CRUDBooster::mainpath('marketing-approve/[id]'),'icon'=>'fa fa-plus', 'color'=>'-', 'showIf'=>"[rnd_menu_approvals.id] == '1'"];
+
 
 
 	        /* 
@@ -270,6 +272,7 @@
 			if ($column_index == 2) {
 				if ($column_value == 'SAVED') $column_value = "<span class='label label-success'>$column_value</span>";
 				if ($column_value == 'PENDING') $column_value = "<span class='label label-warning'>$column_value</span>";
+				if (str_contains($column_value, 'APPROVAL')) $column_value = "<span class='label label-info'>$column_value</span>";
 			}
 	    }
 
@@ -370,10 +373,23 @@
 					trans('crudbooster.denied_access')
 				);
 
-			return (new AdminRndMenuItemsController)->getPackagingCost($id);
+			$status = DB::table('rnd_menu_approvals')
+				->where('rnd_menu_items_id', $id)
+				->first()
+				->approval_status;
+
+			if ($status == 'PENDING') {
+				return (new AdminRndMenuItemsController)->getPackagingCost($id);
+			}
 		}
 
 		public function submitPackagingCost(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
 
+			return (new AdminRndMenuItemsController)->submitPackagingCost($request);
 		}
 	}

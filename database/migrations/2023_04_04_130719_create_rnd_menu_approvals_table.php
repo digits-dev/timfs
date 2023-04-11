@@ -19,6 +19,8 @@ class CreateRndMenuApprovalsTable extends Migration
             $table->string('approval_status')->length(100)->nullable();
             $table->integer('published_by')->length(10)->unsigned()->nullable();
             $table->timestamp('published_at')->nullable();
+            $table->integer('pack_cost_updated_by')->length(10)->unsigned()->nullable();
+            $table->timestamp('pack_cost_updated_at')->nullable();
             $table->integer('marketing_approved_by')->length(10)->unsigned()->nullable();
             $table->timestamp('marketing_approved_at')->nullable();
             $table->integer('purchasing_approved_by')->length(10)->unsigned()->nullable();
