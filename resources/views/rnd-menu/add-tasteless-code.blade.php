@@ -353,6 +353,7 @@
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
 		<button class="btn btn-primary pull-right" id="save-btn"><i class="fa fa-save" ></i> Save</button>
+		<button class="btn btn-success pull-right" id="submit-btn" style="margin-right: 10px"><i class="fa fa-upload" ></i> Submit</button>
     </div>
 </div>
 
@@ -636,7 +637,7 @@
             $.fn.sumCost();
         }
 
-        $.fn.submitForm = function() {
+        $.fn.submitForm = function(action = 'save') {
             const ingredientsArray = [];
             const ingredientGroups = jQuery.makeArray($('#form .ingredient-wrapper, #form .new-ingredient-wrapper'));
             ingredientGroups.forEach((ingredientGroup, groupIndex) => {
@@ -672,7 +673,7 @@
             const result = JSON.stringify(ingredientsArray);
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
-                .attr('action', "{{ route('submit_edit_by_purchasing') }}")
+                .attr('action', action == 'save' ? "{{ route('edit_by_purchasing') }}" : "{{ route('submit_by_purchasing') }}")
                 .css('display', 'none');
 
             const csrf = $(document.createElement('input'))
@@ -808,6 +809,37 @@
             $.fn.computeIngredientCost(entry);
             $.fn.reload();
         }); 
+
+        $(document).on('click', '#submit-btn', function(event) {
+            const entries = jQuery.makeArray($('#form .ingredient-entry, #form .substitute, #form .new-substitute'));
+            const isValid = entries.every(entry => $(entry).attr('isExisting') == 'true');
+            const invalids = entries.filter(entry => $(entry).attr('isExisting') != 'true');
+            if (isValid) {
+                Swal.fire({
+                    title: 'Do you want to submit this item?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Save'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.fn.submitForm('submit');
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please make sure all ingredients are from IMFS / MIMF!',
+                }).then(() => {
+
+                    invalids.forEach(entry => {
+                        $(entry).find('.ingredient_name').css('border', '2px solid red');
+                    });
+                });
+            }
+        });
 
         $('.loading-label').remove();
         $.fn.firstLoad();

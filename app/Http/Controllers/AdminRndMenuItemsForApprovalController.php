@@ -380,6 +380,8 @@
 				return $this->mainController->getDetailMarketingApprover($id);
 			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
 				return $this->mainController->getDetailPurchasing($id);
+			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
+				return $this->mainController->getDetailAccounting($id);
 			}
 			
 
@@ -404,6 +406,8 @@
 				return $this->mainController->getApproveByMarketing($id);
 			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
 				return $this->mainController->getEditByPurchasing($id);
+			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
+				return $this->mainController->getEditAccounting($id);
 			}
 		}
 
@@ -427,13 +431,23 @@
 			return $this->mainController->approveByMarketing($request);
 		}
 
-		public function submitEditByPurchasing(Request $request) {
+		public function editByPurchasing(Request $request) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
 				);
 
-			return $this->mainController->submitEditByPurchasing($request);
+			return $this->mainController->editByPurchasing($request);
+		}
+
+		public function submitByPurchasing(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->submitByPurchasing($request);
 		}
 	}

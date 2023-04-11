@@ -840,7 +840,7 @@
 			return $this->view('rnd-menu/add-tasteless-code', $data);
 		}
 
-		public function submitEditByPurchasing(Request $request) {
+		public function editByPurchasing(Request $request) {
 			
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
 			$rnd_menu_description = $request->get('rnd_menu_description');
@@ -907,6 +907,33 @@
 					'message_type' => 'success',
 					'message' => "✔️ RND Menu Item Details of $rnd_menu_description Updated!"
 				]);
+		}
+
+		public function submitByPurchasing(Request $request) {
+
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$approval_status = 'FOR APPROVAL (ACCOUNTING)';
+
+			self::editByPurchasing($request);
+
+			DB::table('rnd_menu_approvals')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update(['approval_status' => $approval_status]);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "✔️ RND Menu Item Details of $rnd_menu_description Updated!"
+				]);
+		}
+
+		//for accounting
+		public function getDetailAccounting($id) {
+			return self::getDetailMarketing($id);
+		}
+
+		public function getEditAccounting($id) {
+			return self::getPackagingCost($id);
 		}
 
 	}
