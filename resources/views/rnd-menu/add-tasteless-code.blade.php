@@ -1,7 +1,7 @@
 @push('head')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js" integrity="sha512-jVMFsAksn8aljb9IJ+3OCAq38dJpquMBjgEuz7Q5Oqu5xenfin/jxdbKw4P5eKjUF4xiG/GPT5CvCX3Io54gyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
 <link rel="stylesheet" href="{{asset('css/edit-rnd-menu.css')}}">
 @endpush
@@ -20,7 +20,7 @@
                 <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
                 <div>
                     <input value="" type="text" name="ingredient[]" class="ingredient form-control" required/>
-                    <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                    <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search by Item Desc, Brand or Item Code" required readonly/>
                     <div class="item-list">
                     </div>
                 </div>
@@ -61,17 +61,6 @@
                 <input value="" name="cost[]" class="form-control cost" type="text" readonly required>
             </label>
         </div>
-        <div class="actions">
-            <button class="btn btn-info move-up" title="Move Up" type="button"> <i class="fa fa-arrow-up" ></i></button>
-            <button class="btn btn-info move-down" title="Move Down" type="button"> <i class="fa fa-arrow-down" ></i></button>
-            <button class="btn btn-danger delete" title="Delete Ingredient" type="button"> <i class="fa fa-trash" ></i></button>
-        </div>
-    </div>
-    <div class="add-sub-btn" title="Add Existing Substitute Ingredient">
-        <i class="fa fa-plus"></i>
-    </div>
-    <div class="new-add-sub-btn" title="Add New Substitute Ingredient">
-        <i class="fa fa-plus"></i>
     </div>
 </div>
 
@@ -88,7 +77,7 @@
             </label>
             <label>
                 <span class="required-star">*</span> Packaging Size
-                <input value="" name="pack-size[]" class="form-control pack-size" type="number" required>
+                <input value="" name="pack-size[]" class="form-control pack-size" type="number" required readonly>
             </label>
             <label>
                 <span class="required-star">*</span> Preparation Qty
@@ -96,7 +85,7 @@
             </label>
             <label>
                 <span class="required-star">*</span> Ingredient UOM
-                <select class="form-control uom">
+                <select class="form-control uom" disabled>
                     @foreach ($uoms as $uom)
                     <option {{$uom->uom_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->uom_description}}</option>
                     @endforeach
@@ -104,7 +93,7 @@
             </label>
             <label class="label-wide">
                 <span class="required-star">*</span> Preparation
-                <select class="form-control preparation">
+                <select class="form-control preparation" disabled>
                     @foreach ($preparations as $preparation)
                     <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
                     @endforeach
@@ -127,17 +116,6 @@
                 <input value="" name="cost[]" class="form-control cost" type="text" readonly required>
             </label>
         </div>
-        <div class="actions">
-            <button class="btn btn-info move-up" title="Move Up" type="button"> <i class="fa fa-arrow-up" ></i></button>
-            <button class="btn btn-info move-down" title="Move Down" type="button"> <i class="fa fa-arrow-down" ></i></button>
-            <button class="btn btn-danger delete" title="Delete Ingredient" type="button"> <i class="fa fa-trash" ></i></button>
-        </div>
-    </div>
-    <div class="add-sub-btn" title="Add Existing Substitute Ingredient">
-        <i class="fa fa-plus"></i>
-    </div>
-    <div class="new-add-sub-btn" title="Add New Substitute Ingredient">
-        <i class="fa fa-plus"></i>
     </div>
 </div>
 
@@ -147,7 +125,7 @@
             <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
             <div>
                 <input value="" type="text" name="ingredient[]" class="ingredient form-control" required/>
-                <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search by Item Desc, Brand or Item Code" readonly required/>
                 <div class="item-list">
                 </div>
             </div>
@@ -188,10 +166,6 @@
             <input value="" name="cost[]" class="form-control cost" type="text" readonly required>
         </label>
     </div>
-    <div class="actions">
-        <button class="btn btn-info set-primary" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
-        <button class="btn btn-danger delete-sub" title="Delete Ingredient" type="button"> <i class="fa fa-minus" ></i></button>
-    </div>
 </div> 
 
 <div class="new-substitute" style="display: none;" isExisting="false">
@@ -206,7 +180,7 @@
         </label>
         <label>
             <span class="required-star">*</span> Packaging Size
-            <input value="" name="pack-size[]" class="form-control pack-size" type="number" required>
+            <input value="" name="pack-size[]" class="form-control pack-size" type="number" required readonly>
         </label>
         <label>
             <span class="required-star">*</span> Preparation Qty
@@ -214,7 +188,7 @@
         </label>
         <label>
             <span class="required-star">*</span> Ingredient UOM
-            <select class="form-control uom">
+            <select class="form-control uom" disabled>
                 @foreach ($uoms as $uom)
                 <option {{$uom->uom_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->uom_description}}</option>
                 @endforeach
@@ -222,7 +196,7 @@
         </label>
         <label class="label-wide">
             <span class="required-star">*</span> Preparation
-            <select class="form-control preparation">
+            <select class="form-control preparation" disabled>
                 @foreach ($preparations as $preparation)
                 <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
                 @endforeach
@@ -244,10 +218,6 @@
             <span class="required-star">*</span> Ingredient Cost
             <input value="" name="cost[]" class="form-control cost" type="text" readonly required>
         </label>
-    </div>
-    <div class="actions">
-        <button class="btn btn-info set-primary" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
-        <button class="btn btn-danger delete-sub" title="Delete Ingredient" type="button"> <i class="fa fa-minus" ></i></button>
     </div>
 </div> 
 
@@ -278,7 +248,7 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input value="{{$item ? $item->rnd_menu_description : ''}}" type="text" class="form-control rnd_menu_description" placeholder="RND Menu Item Description">
+                            <input value="{{$item ? $item->rnd_menu_description : ''}}" type="text" class="form-control rnd_menu_description" placeholder="RND Menu Item Description" readonly>
                         </div>
                     </div>
                 </div>
@@ -289,7 +259,7 @@
                             <div class="input-group-addon">
                                 <span class="custom-icon"><strong>₱</strong></span>
                             </div>
-                            <input value="{{$item ? (float) $item->rnd_menu_srp : ''}}" type="number" class="form-control rnd_menu_srp" placeholder="0.00">
+                            <input value="{{$item ? (float) $item->rnd_menu_srp : ''}}" type="number" class="form-control rnd_menu_srp" placeholder="0.00" readonly>
                         </div>
                     </div>
                 </div>
@@ -322,7 +292,7 @@
                             <div class="input-group-addon">
                                 <span class="custom-icon"><strong>₱</strong></span>
                             </div>
-                            <input value="{{$item->packaging_cost ? (float) $item->packaging_cost : ''}}" type="text" class="form-control rnd_packaging_cost" placeholder="0.00" readonly>
+                            <input value="{{$item->packaging_cost ? (float) $item->packaging_cost : ''}}" type="text" class="form-control rnd_packaging_cost"readonly>
                         </div>
                     </div>
                 </div>
@@ -341,10 +311,6 @@
                 </div>
             </section>
             <section class="section-footer">
-                <div class="add-buttons">
-                    <button class="btn btn-primary" id="add-existing" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add existing ingredient</button>
-                    <button class="btn btn-success" id="add-new" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add new ingredient</button>
-                </div>
                 <hr>
                 <div class="row">
                     <div class="col-md-4">
@@ -354,7 +320,7 @@
                                 <div class="input-group-addon">
                                     <span class="custom-icon"><strong>÷</strong></span>
                                 </div>
-                                <input value="{{$item ? (float) $item->portion_size : '1'}}" type="text" class="form-control portion" placeholder="Portion Size">
+                                <input value="{{$item ? (float) $item->portion_size : '1'}}" type="text" class="form-control portion" placeholder="Portion Size" readonly>
                             </div>
                         </div>
                     </div>
@@ -386,14 +352,7 @@
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-        @if ($action == 'edit')
 		<button class="btn btn-primary pull-right" id="save-btn"><i class="fa fa-save" ></i> Save</button>
-        @elseif ($action == 'publish')
-		<button class="btn btn-success pull-right" id="publish-btn" style="margin-right: 10px;"><i class="fa fa-upload" ></i> Publish</button>
-        @elseif ($action == 'approve')
-        <button class="btn btn-success pull-right" id="approve-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-up" ></i> Approve</button>
-        <button class="btn btn-danger pull-right" id="reject-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-down" ></i> Reject</button>
-        @endif
     </div>
 </div>
 
@@ -435,10 +394,7 @@
             for (i of entryCount) {
                 const groupedIngredients = savedIngredients.filter(e => e.ingredient_group == i);
                 const wrapperTemplate = $(document.createElement('div'));
-                wrapperTemplate
-                    .addClass('ingredient-wrapper')
-                    .append($('.add-sub-btn').eq(0).clone())
-                    .append($('.new-add-sub-btn').eq(0).clone());
+                wrapperTemplate.addClass('ingredient-wrapper')
 
                 groupedIngredients.forEach(savedIngredient => {
                     let element;
@@ -449,7 +405,6 @@
                         } else {
                             //primary and new
                             element = $('.new-ingredient-wrapper .ingredient-entry').eq(0).clone();
-                            element.find('.ttp').attr('readonly', false);
                         }
                     } else {
                         if (savedIngredient.is_existing == 'TRUE') {
@@ -488,7 +443,7 @@
                     element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
                     element.find('.ingredient_name').val(savedIngredient.ingredient_name);
                     element.find('.pack-size').val(parseFloat(savedIngredient.packaging_size));
-                    element.find('.prep-quantity').val(parseFloat(savedIngredient.prep_qty) || 0).attr('readonly', false);
+                    element.find('.prep-quantity').val(parseFloat(savedIngredient.prep_qty) || 0)
                     element.find('.uom').val(savedIngredient.uom_id);
                     element.find('.uom_name').val(savedIngredient.uom_name);
                     element.find('.display-uom').val(savedIngredient.uom_description);
@@ -501,11 +456,6 @@
                     element.css('display', '');
                     wrapperTemplate.append(element);
                 });
-
-                wrapperTemplate
-                    .find('.preparation, .yield')
-                    .attr('readonly', false)
-                    .attr('disabled', false);
                 section.append(wrapperTemplate);
             }
 
@@ -522,8 +472,8 @@
                 $('.no-ingredient-warning').css('display', '')
             }
 
-            $('.display-ingredient').keyup(debounce(function() {
-                const entry = $(this).parents('.ingredient-entry, .substitute');
+            $('.display-ingredient, .ingredient_name').keyup(debounce(function() {
+                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
                 const query = $(this).val().trim().toLowerCase().split(' ').filter(e => !!e);
                 const itemList = entry.find('.item-list');
                 let searchResult  = [];
@@ -546,78 +496,6 @@
                     }  
                 });
             }, 750));
-
-            $(window).keydown(function(event) {
-                if (event.keyCode == 13) {
-                    event.preventDefault();
-                    return false;
-                }
-            });
-
-            $('#form input, #form select').keyup(function() {
-                $('#form input:valid, #form select:valid').css('outline', 'none');
-            });
-
-            $('.prep-quantity').keyup(function() {
-                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
-                $.fn.computeIngredientCost(entry);
-            });
-
-            $('.yield').keyup(function() {
-                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
-                $.fn.computeIngredientCost(entry);
-            });
-
-            $('.ttp').keyup(function() {
-                const ttp = $(this);
-                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
-                const [int, dec] = ttp.val().split('.');
-                if (dec && dec.length > 4) {
-                    const value = `${int}.${dec.slice(0,4)}`;
-                    ttp.val(value);
-                }
-                $.fn.computeIngredientCost(entry);
-            });
-
-            $('.cost').keyup(function() {
-                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
-                $.fn.computeIngredientCost(entry);
-            });
-
-            $('.pack-size').keyup(function() {
-                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
-                const value = $(this).val();
-                if (value && value > 0) {
-                    entry.find('.prep-quantity').attr('readonly', false);
-                    entry.find('.yield').attr('readonly', false);
-                    entry.find('.ttp').attr('readonly', false);
-                    $.fn.computeIngredientCost(entry);
-                } else {
-                    entry.find('.prep-quantity').attr('readonly', true);
-                    entry.find('.yield').attr('readonly', true);
-                    entry.find('.ttp').attr('readonly', true);
-                }
-            });
-
-            $('.portion').keyup(function() {
-                const value = $(this).val();
-                if (value && value > 0) $.fn.sumCost();
-                else return;
-            });
-
-            $('.ingredient_name').keyup(function() {
-                const value = $(this).val();
-                $(this).val(value.toUpperCase());
-            });
-
-            $('.rnd_menu_description').keyup(function() {
-                const value = $(this).val();
-                $(this).val(value.toUpperCase());
-            });
-
-            $('.rnd_menu_srp').keyup(function() {
-                $.fn.sumCost();
-            });
         }
 
         $.fn.sumCost = function() {
@@ -794,7 +672,7 @@
             const result = JSON.stringify(ingredientsArray);
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
-                .attr('action', "{{ route('edit_rnd_menu') }}")
+                .attr('action', "{{ route('submit_edit_by_purchasing') }}")
                 .css('display', 'none');
 
             const csrf = $(document.createElement('input'))
@@ -868,88 +746,18 @@
             }
         }); 
 
-        $(document).on('click', '#publish-btn', function(event) {
-                Swal.fire({
-                    title: 'Do you want to publish this item?',
-                    html: '🟠  Doing so will turn the status of this item to <span class="label label-warning">PENDING</span>.<br/>' +
-                        `📄  You won't be able to edit this item again.`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Publish'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = $(document.createElement('form'))
-                            .attr('method', 'POST')
-                            .attr('action', "{{ route('publish_rnd_menu') }}")
-                            .css('display', 'none');
-
-                        const csrf = $(document.createElement('input'))
-                            .attr({
-                                type: 'hidden',
-                                name: '_token',
-                            }).val("{{ csrf_token() }}");
-
-                        const rndMenuId = $(document.createElement('input'))
-                            .attr('name', 'rnd_menu_items_id')
-                            .val(rndMenuItem?.id);
-                        
-                        form.append(csrf, rndMenuId)
-                        $('.panel-body').append(form);
-                        form.submit();
-                    }    
-                });
-
-        });
-
-        $(document).on('click', '#approve-btn, #reject-btn', function(event) {
-            const approvedIsClicked = $(this).is('#approve-btn');
-            Swal.fire({
-                    title: `Do you want to ${approvedIsClicked ? 'approve' : 'reject'} this item?`,
-                    html: approvedIsClicked ?
-                        ('🔵  Doing so will turn the status of this item to <span class="label label-info">FOR APPROVAL (PURCHASING)</span>.<br/>' +
-                        `📄  You won't be able to revert this.`) : 
-                        ('🔴  Doing so will turn the status of this item to <span class="label label-danger">REJECTED</span>.<br/>' +
-                        `📄  You won't be able to revert this.`),
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: approvedIsClicked ? 'Approve' : 'Reject',
-                    width: '650px',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = $(document.createElement('form'))
-                            .attr('method', 'POST')
-                            .attr('action', "{{ route('approve_by_marketing') }}")
-                            .css('display', 'none');
-
-                        const csrf = $(document.createElement('input'))
-                            .attr({
-                                type: 'hidden',
-                                name: '_token',
-                            }).val("{{ csrf_token() }}");
-
-                        const rndMenuId = $(document.createElement('input'))
-                            .attr('name', 'rnd_menu_items_id')
-                            .val(rndMenuItem?.id);
-
-                        const action = $(document.createElement('input'))
-                            .attr('name', 'action')
-                            .val(approvedIsClicked ? 'approved' : 'clicked');
-                        
-                        form.append(csrf, rndMenuId, action)
-                        $('.panel-body').append(form);
-                        form.submit();
-                    }    
-                });
-        });
-
         $(document).on('click', '.list-item', function(event) {
             const item = $(this);
-            const entry = item.parents('.substitute, .ingredient-entry');
+            const entry = item.parents('.substitute, .ingredient-entry, .new-substitute').attr('isExisting', true);
+            const preparationQty = entry.find('.prep-quantity').val();
+            const preparation = entry.find('.preparation').val();
+            const yield = entry.find('.yield').val();
+            const ingredientInputs = $('.ingredient-inputs').eq(0).clone();
+            entry.append(ingredientInputs);
+            item.parents('.ingredient-inputs').remove();
+            
             const ingredient = entry.find('.ingredient');
+            
 
             if (!item.attr('item_id') && !item.attr('menu_item_id')) return;
             if (item.attr('item_id') && !item.attr('menu_item_id')) {
@@ -983,12 +791,9 @@
                 .val(item.attr('ttp'))
                 .attr('ttp', item.attr('ttp'))
                 .attr('packaging_size', item.attr('packaging_size'));
-            entry.find('.yield').val('100').attr('readonly', false);
-            entry.find('.preparation').attr('disabled', false);
-            entry.find('.ing-quantity').val('1');
-            entry.find('.prep-quantity')
-                .val('1')
-                .attr('readonly', false);
+            entry.find('.yield').val(yield);
+            entry.find('.preparation').val(preparation);
+            entry.find('.prep-quantity').val(preparationQty);
             if (item.attr('item_id')) {
                 entry.find('.date-updated').text(
                     item.attr('date_updated') ?
@@ -996,148 +801,13 @@
                     ''
                 );
             }
+            entry.find('.display-ingredient').attr('readonly', false);
             $('#form input:valid, #form select:valid').css('outline', 'none');
             $('.item-list').html('');  
             $('.item-list').fadeOut();
             $.fn.computeIngredientCost(entry);
-        });
-
-        $(document).on('click', '.move-up', function() {
-            const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper');
-            const sibling = entry.prev()[0];
-            if (!sibling) return;
-            $(sibling).animate(
-                {
-                    top: `+=${$(entry).outerHeight()}`,
-                },
-                {
-                    duration: 300,
-                    queue: false,
-                    done: function() {
-                        $(sibling).css('top', '0');
-                    }
-                }
-            );
-
-            entry.animate(
-                {
-                    top: `-=${$(sibling).outerHeight()}`
-                },
-                {
-                    duration: 300,
-                    queue: false,
-                    done: function() {
-                        entry.css('top', '0');
-                        entry.insertBefore($(entry).prev());
-                    }
-                }
-            );
-        });
-
-        $(document).on('click', '.move-down', function() {
-            const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper');
-            const sibling = entry.next()[0];
-            if (!sibling) return;
-
-            $(sibling).animate(
-                {
-                    top: `-=${$(entry).outerHeight()}`,
-                },
-                {
-                    duration: 300,
-                    queue: false,
-                    done: function() {
-                        $(sibling).css('top', '0');
-                    }
-                }
-            );
-
-            entry.animate(
-                {
-                    top: `+=${$(sibling).outerHeight()}`
-                },
-                {
-                    duration: 300,
-                    queue: false,
-                    done: function() {
-                        entry.css('top', '0');
-                        entry.insertAfter($(entry).next());
-                    }
-                }
-            );
-            
-        });
-
-        $(document).on('click', '#add-existing', function() {
-            const section = $($('.ingredient-wrapper').eq(0).clone());
-            section.find('input').val('');
-            section.find('.ingredient').val('');
-            section.find('.display-ingredient').val('');
-            section.find('.ingredient').val('');
-            section.find('.prep-quantity').val('');
-            section.find('.uom').val('');
-            section.find('.cost').val('');
-            section.css('display', '');
-            $('.ingredient-section').append(section);
-            $('.item-list').fadeOut();
-            $('.no-ingredient-warning').remove();
             $.fn.reload();
-        });
-
-        $(document).on('click', '#add-new', function() {
-            const section = $($('.new-ingredient-wrapper').eq(0).clone());
-            section.css('display', '');
-            $('.ingredient-section').append(section);
-            $('.item-list').fadeOut();
-            $('.no-ingredient-warning').remove();
-            $.fn.reload();
-        });
-
-        $(document).on('click', '.delete', function(event) {
-            const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper');
-            entry.hide(300, function() {
-                $(this).remove();
-                $.fn.sumCost();
-            });
         }); 
-
-        $(document).on('click', '.add-sub-btn', function(event) {
-            const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper');
-            const substitute = $('.substitute').eq(0).clone();
-            substitute.css('display', '');
-            entry.append($(substitute));
-            $.fn.reload();
-        });
-
-        $(document).on('click', '.new-add-sub-btn', function(event) {
-            const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper');
-            const substitute = $('.new-substitute').eq(0).clone();
-            substitute.css('display', '');
-            entry.append($(substitute));
-            $.fn.reload();
-        });
-
-        $(document).on('click', '.set-primary', function(event) {
-            const sub = $(this).parents('.substitute, .new-substitute');
-            const ingredientWrapper = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper');
-            const isPrimary = sub.attr('primary') == 'true';
-            ingredientWrapper.find('.substitute, .new-substitute').attr('primary', false);
-            if (!isPrimary) {
-                sub.attr('primary', true);
-            }
-            $.fn.formatSelected();
-            $.fn.sumCost();
-
-        });
-
-        $(document).on('click', '.delete-sub', function(event) {
-            const subEntry = $(this).parents('.substitute, .new-substitute');
-            subEntry.hide('fast', function() {
-                $(this).remove();
-                $.fn.sumCost();
-            });
-        });
-
 
         $('.loading-label').remove();
         $.fn.firstLoad();

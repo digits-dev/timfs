@@ -45,6 +45,7 @@
 			$this->col[] = ["label"=>"Ingredient Total Cost","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_ingredient_total_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"Food Cost","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_food_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"Food Cost Percentage","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_food_cost_percentage","join_id"=>"id"];
+			$this->col[] = ["label"=>"Packaging Cost","name"=>"packaging_cost"];
 			$this->col[] = ["label"=>"Published By","name"=>"rnd_menu_approvals.published_by","join"=>"cms_users,name","join_id"=>"id"];
 			$this->col[] = ["label"=>"Published Date","name"=>"rnd_menu_approvals.published_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
@@ -367,8 +368,20 @@
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
 				);
+
+			$status = DB::table('rnd_menu_approvals')
+				->where('rnd_menu_items_id', $id)
+				->first()
+				->approval_status;
+
+			if ($status == 'PENDING') {
+				return $this->mainController->getDetailMarketing($id);
+			} else if ($status == 'FOR APPROVAL (MARKETING)') {
+				return $this->mainController->getDetailMarketingApprover($id);
+			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
+				return $this->mainController->getDetailPurchasing($id);
+			}
 			
-			return $this->mainController->getDetailMarketing($id);
 
 		}
 
@@ -390,7 +403,7 @@
 			} else if ($status == 'FOR APPROVAL (MARKETING)') {
 				return $this->mainController->getApproveByMarketing($id);
 			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
-				return $this->mainController->getApproveByPurchasing($id);
+				return $this->mainController->getEditByPurchasing($id);
 			}
 		}
 
@@ -412,5 +425,15 @@
 				);
 
 			return $this->mainController->approveByMarketing($request);
+		}
+
+		public function submitEditByPurchasing(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->submitEditByPurchasing($request);
 		}
 	}

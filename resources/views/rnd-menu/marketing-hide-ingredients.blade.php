@@ -31,8 +31,8 @@
                     <th scope="col">RND Menu SRP</th>
                     <th scope="col">Portion Size</th>
                     <th scope="col">Food Cost</th>
-                    <th scope="col">Packaging Cost</th>
                     <th scope="col">Food Cost Percentage</th>
+                    <th scope="col">Packaging Cost</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,8 +42,8 @@
                     <td class="peso">{{'₱ ' . (float) $item->rnd_menu_srp}}</td>
                     <td>{{(float) $item->portion_size}}</td>
                     <td class="food-cost">{{$item->computed_food_cost ? '₱ ' . (float) $item->computed_food_cost : '0'}}</td>
-                    <td class="food-cost">{{$item->packaging_cost ? '₱ ' . (float) $item->packaging_cost : '0'}}</td>
                     <td class="food-cost-percentage">{{$item->computed_food_cost_percentage ? (float) $item->computed_food_cost_percentage . '%' : '0%'}}</td>
+                    <td>{{$item->packaging_cost ? '₱ ' . (float) $item->packaging_cost : '0'}}</td>
                 </tr>
             </tbody>
         </table>

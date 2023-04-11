@@ -369,6 +369,7 @@
 					'rnd_code',
 					'rnd_menu_items.rnd_menu_srp',
 					'rnd_menu_items.rnd_menu_description',
+					'rnd_menu_items.packaging_cost',
 					'rnd_menu_items.portion_size',
 					'computed_ingredient_total_cost',
 					'computed_food_cost',
@@ -695,6 +696,10 @@
 			return $this->view('rnd-menu/marketing-hide-ingredients', $data);
 		}
 
+		public function getDetailMarketingApprover($id) {
+			return self::getDetail($id);
+		}
+
 		public function submitPackagingCost(Request $request) {
 
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
@@ -761,8 +766,147 @@
 		}
 
 		// for purchasing
-		public function getApproveByPurchasing($id) {
+		public function getDetailPurchasing($id) {
+			return self::getDetail($id);
+		}
+
+		public function getEditByPurchasing($id) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$data = [];
+
+			$data['action'] = $action;
+
+			$data['item'] = DB::table('rnd_menu_items')
+				->where('id', $id)
+				->first();
+
+			$data['preparations'] = DB::table('menu_ingredients_preparations')
+				->where('status', 'ACTIVE')
+				->select('id', 'preparation_desc')
+				->orderBy('preparation_desc', 'ASC')
+				->get()
+				->toArray();
+
+			$data['uoms'] = DB::table('uoms')
+				->where('status', 'ACTIVE')
+				->select('id', 'uom_description')
+				->orderBy('uom_description')
+				->get()
+				->toArray();
+
+			$data['privilege'] = CRUDBooster::myPrivilegeName();
+
+			$data['ingredients'] = DB::table('rnd_menu_ingredients_auto_compute')
+				->where('rnd_menu_items_id', $id)
+				->where('rnd_menu_ingredients_auto_compute.status', 'ACTIVE')
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'ingredient_name',
+					'menu_as_ingredient_id',
+					'rnd_menu_ingredients_auto_compute.menu_item_description',
+					'is_selected',
+					'is_primary',
+					'is_existing',
+					'rnd_menu_ingredients_auto_compute.packaging_size',
+					'ingredient_qty',
+					'cost',
+					'menu_items.food_cost',
+					'ingredient_group',
+					'uom_id',
+					'uom_description',
+					'packaging_description',
+					'prep_qty',
+					'menu_ingredients_preparations_id',
+					'yield',
+					'rnd_menu_ingredients_auto_compute.ttp',
+					'rnd_menu_ingredients_auto_compute.ttp as ingredient_cost',
+					'item_masters.full_item_description',
+					'sku_status_description as item_status',
+					'menu_items.status as menu_status',
+					'item_masters.updated_at',
+					'item_masters.created_at')
+				->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_ingredients_auto_compute.item_masters_id')
+				->leftJoin('menu_items', 'rnd_menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
+				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->orderBy('ingredient_group', 'ASC')
+				->orderBy('row_id', 'ASC')
+				->get()
+				->toArray();
+
+			return $this->view('rnd-menu/add-tasteless-code', $data);
+		}
+
+		public function submitEditByPurchasing(Request $request) {
 			
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$rnd_menu_description = $request->get('rnd_menu_description');
+			$ingredients = json_decode($request->get('ingredients'));
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+
+			DB::table('rnd_menu_ingredients_details')
+				->where('status', 'ACTIVE')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update([
+					'status' => 'INACTIVE',
+					'row_id' => null,
+					'deleted_at' => date('Y-m-d H:i:s')
+				]);
+
+			foreach ($ingredients as $group) {
+				foreach ($group as $ingredient) {
+					$ingredient = (array) $ingredient;
+
+					//checking if the ingredient already exists
+					$is_existing = DB::table('rnd_menu_ingredients_details')
+						->where([
+							'rnd_menu_items_id' => $rnd_menu_items_id,
+							'item_masters_id' => $ingredient['item_masters_id'],
+							'ingredient_name' => $ingredient['ingredient_name'],
+							'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
+						])->exists();
+					
+					if ($is_existing) {
+						$ingredient['updated_at'] = $time_stamp;
+						$ingredient['updated_by'] = $action_by;
+					} else {
+						$ingredient['created_at'] = $time_stamp;
+						$ingredient['created_by'] = $action_by;
+					}
+					
+					$ingredient['status'] = 'ACTIVE';
+					$ingredient['deleted_at'] = null;
+
+					//unsetting ingredients details that may be outdated in the future
+					unset(
+						$ingredient['qty'], 
+						$ingredient['cost'], 
+						$ingredient['total_cost'], 
+					);
+
+					if ($ingredient['is_existing'] == 'TRUE') {
+						unset($ingredient['ttp']);
+					}
+
+					//finally, inserting ingredients to the table
+					DB::table('rnd_menu_ingredients_details')->updateOrInsert([
+						'rnd_menu_items_id' => $rnd_menu_items_id,
+						'item_masters_id' => $ingredient['item_masters_id'],
+						'ingredient_name' => $ingredient['ingredient_name'],
+						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
+					], $ingredient);
+				}
+			}
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "✔️ RND Menu Item Details of $rnd_menu_description Updated!"
+				]);
 		}
 
 	}
