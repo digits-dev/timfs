@@ -450,4 +450,14 @@
 
 			return $this->mainController->submitByPurchasing($request);
 		}
+
+		public function approveByAccounting(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+				return $this->mainController->approveByAccounting($request);
+		}
 	}

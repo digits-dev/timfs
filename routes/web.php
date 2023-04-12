@@ -107,4 +107,5 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/rnd_menu_items_for_approval/approve_by_marketing', [AdminRndMenuItemsForApprovalController::class, 'approveByMarketing'])->name('approve_by_marketing');
     Route::post('/admin/rnd_menu_items_for_approval/edit-by-purchasing', [AdminRndMenuItemsForApprovalController::class, 'editByPurchasing'])->name('edit_by_purchasing');
     Route::post('/admin/rnd_menu_items_for_approval/submit-by-purchasing', [AdminRndMenuItemsForApprovalController::class, 'submitByPurchasing'])->name('submit_by_purchasing');
+    Route::post('/admin/rnd_menu_items_for_approval/approve-by-accounting', [AdminRndMenuItemsForApprovalController::class, 'approveByAccounting'])->name('approve_by_accounting');
 });

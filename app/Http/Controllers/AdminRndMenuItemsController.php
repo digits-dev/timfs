@@ -923,7 +923,7 @@
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
-					'message' => "✔️ RND Menu Item Details of $rnd_menu_description Updated!"
+					'message' => "✔️ RND Menu Item Details Updated!"
 				]);
 		}
 
@@ -933,7 +933,58 @@
 		}
 
 		public function getEditAccounting($id) {
-			return self::getPackagingCost($id);
+			$data = [];
+
+			$data['item'] = DB::table('rnd_menu_items')
+				->where('rnd_menu_items.id', $id)
+				->select(
+					'rnd_menu_items.id as rnd_menu_items_id',
+					'rnd_menu_items.rnd_menu_description',
+					'rnd_code',
+					'rnd_tasteless_code',
+					'rnd_menu_items.portion_size',
+					'rnd_menu_items.rnd_menu_srp',
+					'approval_status',
+					'computed_ingredient_total_cost',
+					'computed_food_cost',
+					'computed_food_cost_percentage',
+					'publisher.name as published_by',
+					'published_at',
+					'rnd_menu_items.packaging_cost'
+				)
+				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
+				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
+				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
+				->first();
+
+			return $this->view('rnd-menu/edit-accounting', $data);
+		}
+
+		public function approveByAccounting(Request $request) {
+			$action = $request->get('action');
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$packaging_cost = $request->get('packaging_cost');
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+
+			if ($action == 'approve') {
+				$approval_status = 'APPROVED';
+				$db_column_by = 'accounting_approved_by';
+				$db_column_at = 'accounting_approved_at';
+			} else {
+				$approval_status = 'REJECTED';
+				$db_column_by = 'rejected_by';
+				$db_column_at = 'rejected_at';
+			}
+
+			DB::table('rnd_menu_approvals')
+				->where('id', $rnd_menu_items_id)
+				->update([
+					'approval_status' => $approval_status,
+					'updated_at' => $time_stamp,
+					$db_column_at => $time_stamp,
+					$db_column_by => $action_by,
+				]);
 		}
 
 	}
