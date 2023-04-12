@@ -132,6 +132,20 @@
                 <div class="col-md-2"><strong>Published at:</strong></div>
                 <div class="col-md-3">{{$item->published_at}}</div>
             </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-2"><strong>Approved by (Marketing):</strong></div>
+                <div class="col-md-3">{{$item->marketing_approver}}</div>
+                <div class="col-md-2"><strong>Approved at (Marketing):</strong></div>
+                <div class="col-md-3">{{$item->marketing_approved_at}}</div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-2"><strong>Approved by (Purchasing):</strong></div>
+                <div class="col-md-3">{{$item->purchasing_approver}}</div>
+                <div class="col-md-2"><strong>Approved at (Purchasing):</strong></div>
+                <div class="col-md-3">{{$item->purchasing_approved_at}}</div>
+            </div>
         </form>
     </div>
     <div class="panel-footer">

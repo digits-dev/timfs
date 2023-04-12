@@ -627,7 +627,7 @@
 					'approval_status' => $rnd_menu_approval_status,
 					'published_by' => $action_by,
 					'published_at' => $time_stamp,
-					'created_at' => $time_stamp,
+					'updated_at' => $time_stamp,
 				]);
 
 			return redirect(CRUDBooster::mainpath())
@@ -712,7 +712,11 @@
 				//updating the packaging cost
 				DB::table('rnd_menu_items')
 					->where('id', $rnd_menu_items_id)
-					->update(['packaging_cost' => $packaging_cost]);
+					->update([
+						'packaging_cost' => $packaging_cost,
+						'updated_by' => $action_by,
+						'updated_at' => $time_stamp,
+					]);
 
 				//updating the approval status
 				DB::table('rnd_menu_approvals')
@@ -745,16 +749,20 @@
 
 			if ($request->get('action') == 'approved') {
 				$approval_status = 'FOR APPROVAL (PURCHASING)';
+				$db_column_at = 'marketing_approved_at';
+				$db_column_by = 'marketing_approved_by';
 			} else {
 				$approval_status = 'REJECTED';
+				$db_column_at = 'rejected_at';
+				$db_column_by = 'rejected_by';
 			}
 
 			DB::table('rnd_menu_approvals')
 				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
 					'rnd_menu_items_id' => $rnd_menu_items_id,
 					'approval_status' => $approval_status,
-					'marketing_approved_by' => $action_by,
-					'marketing_approved_at' => $time_stamp,
+					$db_column_by => $action_by,
+					$db_column_at => $time_stamp,
 				]);
 
 			return redirect(CRUDBooster::mainpath())
@@ -848,6 +856,7 @@
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 
+			// inactivating all ingredients
 			DB::table('rnd_menu_ingredients_details')
 				->where('status', 'ACTIVE')
 				->where('rnd_menu_items_id', $rnd_menu_items_id)
@@ -913,12 +922,18 @@
 
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
 			$approval_status = 'FOR APPROVAL (ACCOUNTING)';
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
 
 			self::editByPurchasing($request);
 
 			DB::table('rnd_menu_approvals')
 				->where('rnd_menu_items_id', $rnd_menu_items_id)
-				->update(['approval_status' => $approval_status]);
+				->update([
+					'approval_status' => $approval_status,
+					'purchasing_approved_at' => $time_stamp,
+					'purchasing_approved_by' => $action_by,
+				]);
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
@@ -950,11 +965,20 @@
 					'computed_food_cost_percentage',
 					'publisher.name as published_by',
 					'published_at',
+					'marketing_approver.name as marketing_approver',
+					'marketing_approved_at',
+					'purchasing_approver.name as purchasing_approver',
+					'purchasing_approved_at',
+					'accounting_approver.name as accounting_approver',
+					'accounting_approved_at',
 					'rnd_menu_items.packaging_cost'
 				)
 				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
 				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
 				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
+				->leftJoin('cms_users as marketing_approver', 'rnd_menu_approvals.marketing_approved_by', '=', 'marketing_approver.id')
+				->leftJoin('cms_users as purchasing_approver', 'rnd_menu_approvals.purchasing_approved_by', '=', 'purchasing_approver.id')
+				->leftJoin('cms_users as accounting_approver', 'rnd_menu_approvals.accounting_approved_by', '=', 'accounting_approver.id')
 				->first();
 
 			return $this->view('rnd-menu/edit-accounting', $data);
@@ -984,6 +1008,12 @@
 					'updated_at' => $time_stamp,
 					$db_column_at => $time_stamp,
 					$db_column_by => $action_by,
+				]);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "✔️ RND Menu Item Details Updated!"
 				]);
 		}
 

@@ -816,12 +816,14 @@
             const invalids = entries.filter(entry => $(entry).attr('isExisting') != 'true');
             if (isValid) {
                 Swal.fire({
+                    width: '600px',
                     title: 'Do you want to submit this item?',
+                    html:  `Doing so will turn the status of this item to <label class="label label-info">FOR APPROVAL (ACCOUNTING)</label>.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Save'
+                    confirmButtonText: 'Submit'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.fn.submitForm('submit');

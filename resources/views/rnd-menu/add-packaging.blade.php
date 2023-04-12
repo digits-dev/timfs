@@ -11,6 +11,9 @@
     #form input:invalid {
         outline: 2px solid red;
     }
+    .swal2-html-container {
+        line-height: 3rem;
+    }
 </style>
 @endpush
 
@@ -154,12 +157,14 @@
 
             if (value && value > 0) {
                 Swal.fire({
+                    width: '600px',
                     title: 'Do u want to save the changes?',
+                    html: `Doing so will turn the status of this item to <label class="label label-info">FOR APPROVAL (MARKETING)</label>.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Save'
+                    confirmButtonText: 'Save',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const form = $(document.createElement('form'))
