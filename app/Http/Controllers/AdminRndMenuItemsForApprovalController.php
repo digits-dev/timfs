@@ -24,7 +24,7 @@
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
-			$this->button_edit = true;
+			$this->button_edit = false;
 			$this->button_delete = false;
 			$this->button_detail = true;
 			$this->button_show = true;
@@ -102,6 +102,7 @@
 	        */
 	        $this->addaction = array();
 
+			$this->addaction[] = ['title'=>'Edit','url'=> CRUDBooster::mainpath('edit/[id]'), 'icon'=>'fa fa-pencil', 'showIf' => "[approval_status] == 'PENDING'", 'color' => 'warning'];
 
 
 	        /* 
@@ -115,7 +116,6 @@
 	        | 
 	        */
 	        $this->button_selected = array();
-
 	                
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -263,6 +263,7 @@
 	        //Your code here
 	        
 			$query
+				->addSelect('rnd_menu_approvals.approval_status as approval_status')
 				->where('rnd_menu_approvals.approval_status', '!=', 'SAVED')
 				->where('rnd_menu_approvals.approval_status', '!=', 'REJECTED');
 	    }
