@@ -281,6 +281,7 @@
 				if ($column_value == 'SAVED') $column_value = "<span class='label label-success'>$column_value</span>";
 				if ($column_value == 'PENDING') $column_value = "<span class='label label-warning'>$column_value</span>";
 				if (str_contains($column_value, 'APPROVAL')) $column_value = "<span class='label label-info'>$column_value</span>";
+				if ($column_value == 'APPROVED') $column_value = "<span class='label label-success'>$column_value</span>";
 			}
 	    }
 

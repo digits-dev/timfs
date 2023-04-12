@@ -1001,6 +1001,11 @@
 				$db_column_at = 'rejected_at';
 			}
 
+			$item = DB::table('rnd_menu_items')
+				->where('rnd_menu_items.id', $rnd_menu_items_id)
+				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
+				->first();
+
 			DB::table('rnd_menu_approvals')
 				->where('id', $rnd_menu_items_id)
 				->update([
@@ -1009,6 +1014,13 @@
 					$db_column_at => $time_stamp,
 					$db_column_by => $action_by,
 				]);
+
+			CRUDBooster::sendEmail([
+				'to' => 'fillinorgunio@digits.ph',
+				'from' => 'noreply@digits.ph',
+				'data' => (array) $item,
+				'template' => 'rnd_menu_creation',
+			]);
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
