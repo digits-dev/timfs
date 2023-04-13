@@ -159,7 +159,8 @@
                 Swal.fire({
                     width: '600px',
                     title: 'Do u want to save the changes?',
-                    html: `Doing so will turn the status of this item to <label class="label label-info">FOR APPROVAL (MARKETING)</label>.`,
+                    html: `🔵 Doing so will turn the status of this item to <label class="label label-info">FOR APPROVAL (MARKETING)</label>.` + 
+                        `<br/> 📄 You won't be able to revert this.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',

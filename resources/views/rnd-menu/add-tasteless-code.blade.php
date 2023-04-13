@@ -816,9 +816,10 @@
             const invalids = entries.filter(entry => $(entry).attr('isExisting') != 'true');
             if (isValid) {
                 Swal.fire({
-                    width: '600px',
+                    width: '630px',
                     title: 'Do you want to submit this item?',
-                    html:  `Doing so will turn the status of this item to <label class="label label-info">FOR APPROVAL (ACCOUNTING)</label>.`,
+                    html:  `🔵 Doing so will turn the status of this item to <label class="label label-info">FOR APPROVAL (ACCOUNTING)</label>.` +
+                        `<br/> 📄 You won't be able to revert this.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
