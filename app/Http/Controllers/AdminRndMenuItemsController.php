@@ -678,17 +678,26 @@
 					'rnd_tasteless_code',
 					'rnd_menu_items.portion_size',
 					'rnd_menu_items.rnd_menu_srp',
-					'rnd_menu_items.packaging_cost',
 					'approval_status',
 					'computed_ingredient_total_cost',
 					'computed_food_cost',
 					'computed_food_cost_percentage',
 					'publisher.name as published_by',
-					'published_at'
+					'published_at',
+					'marketing_approver.name as marketing_approver',
+					'marketing_approved_at',
+					'purchasing_approver.name as purchasing_approver',
+					'purchasing_approved_at',
+					'accounting_approver.name as accounting_approver',
+					'accounting_approved_at',
+					'rnd_menu_items.packaging_cost'
 				)
 				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
 				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
 				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
+				->leftJoin('cms_users as marketing_approver', 'rnd_menu_approvals.marketing_approved_by', '=', 'marketing_approver.id')
+				->leftJoin('cms_users as purchasing_approver', 'rnd_menu_approvals.purchasing_approved_by', '=', 'purchasing_approver.id')
+				->leftJoin('cms_users as accounting_approver', 'rnd_menu_approvals.accounting_approved_by', '=', 'accounting_approver.id')
 				->first();
 
 			$data['page_title'] = 'Details: ' . $data['item']->rnd_menu_description;
