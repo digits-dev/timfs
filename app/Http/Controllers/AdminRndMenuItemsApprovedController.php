@@ -272,7 +272,7 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
-
+			if (is_numeric($column_value)) $column_value = (float) $column_value;
 			if ($column_index == 2) {
 				if ($column_value == 'SAVED') $column_value = "<span class='label label-success'>$column_value</span>";
 				if ($column_value == 'PENDING') $column_value = "<span class='label label-warning'>$column_value</span>";
