@@ -1,11 +1,11 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Illuminate\Http\Request;
+	use Request;
 	use DB;
 	use CRUDBooster;
 
-	class AdminRndMenuItemsForApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
+	class AdminRndMenuItemsApprovedController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
@@ -24,7 +24,7 @@
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
-			$this->button_edit = true;
+			$this->button_edit = false;
 			$this->button_delete = false;
 			$this->button_detail = true;
 			$this->button_show = true;
@@ -52,25 +52,27 @@
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Rnd Menu Description','name'=>'rnd_menu_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Rnd Code','name'=>'rnd_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Rnd Tasteless Code','name'=>'rnd_tasteless_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Portion Size','name'=>'portion_size','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Rnd Menu Srp','name'=>'rnd_menu_srp','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Status','name'=>'status','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$this->form[] = ['label'=>'Created By','name'=>'created_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Packaging Cost','name'=>'packaging_cost','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Portion Size','name'=>'portion_size','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Rnd Code','name'=>'rnd_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Rnd Menu Description','name'=>'rnd_menu_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Rnd Menu Srp','name'=>'rnd_menu_srp','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Rnd Tasteless Code','name'=>'rnd_tasteless_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Status','name'=>'status','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$this->form[] = ['label'=>'Updated By','name'=>'updated_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Rnd Code","name"=>"rnd_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Rnd Tasteless Code","name"=>"rnd_tasteless_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Portion Size","name"=>"portion_size","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Rnd Menu Srp","name"=>"rnd_menu_srp","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
 			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			//$this->form[] = ["label"=>"Packaging Cost","name"=>"packaging_cost","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Portion Size","name"=>"portion_size","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Rnd Code","name"=>"rnd_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Rnd Menu Srp","name"=>"rnd_menu_srp","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Rnd Tasteless Code","name"=>"rnd_tasteless_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
 			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
 			# OLD END FORM
 
@@ -102,8 +104,6 @@
 	        */
 	        $this->addaction = array();
 
-			// $this->addaction[] = ['title'=>'Edit','url'=> CRUDBooster::mainpath('edit/[id]'), 'icon'=>'fa fa-pencil', 'showIf' => "[approval_status] == 'PENDING'", 'color' => 'warning'];
-
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -116,6 +116,7 @@
 	        | 
 	        */
 	        $this->button_selected = array();
+
 	                
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -231,10 +232,9 @@
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-	        $this->load_css = [
-				asset('css/custom.css')
-			];
-
+	        $this->load_css = array();
+	        
+	        
 	    }
 
 
@@ -261,10 +261,7 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-	        
-			$query
-				->addSelect('rnd_menu_approvals.approval_status as approval_status')
-				->whereNotIn('rnd_menu_approvals.approval_status', ['SAVED', 'REJECTED', 'APPROVED']);
+	        $query->where('approval_status', '=', 'APPROVED');
 	    }
 
 	    /*
@@ -276,7 +273,6 @@
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
 
-			if (is_numeric($column_value)) $column_value = (float) $column_value;
 			if ($column_index == 2) {
 				if ($column_value == 'SAVED') $column_value = "<span class='label label-success'>$column_value</span>";
 				if ($column_value == 'PENDING') $column_value = "<span class='label label-warning'>$column_value</span>";
@@ -361,104 +357,7 @@
 
 
 	    //By the way, you can still create your own method in here... :) 
-
 		public function getDetail($id) {
-
-			if (!CRUDBooster::isRead())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-
-			$status = DB::table('rnd_menu_approvals')
-				->where('rnd_menu_items_id', $id)
-				->first()
-				->approval_status;
-
-			if ($status == 'PENDING') {
-				return $this->mainController->getDetailMarketing($id);
-			} else if ($status == 'FOR APPROVAL (MARKETING)') {
-				return $this->mainController->getDetailMarketingApprover($id);
-			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
-				return $this->mainController->getDetailPurchasing($id);
-			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
-				return $this->mainController->getDetailAccounting($id);
-			}
-			
-
-		}
-
-		public function getEdit($id) {
-
-			if (!CRUDBooster::isUpdate())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-
-			$status = DB::table('rnd_menu_approvals')
-				->where('rnd_menu_items_id', $id)
-				->first()
-				->approval_status;
-
-			if ($status == 'PENDING') {
-				return $this->mainController->getPackagingCost($id);
-			} else if ($status == 'FOR APPROVAL (MARKETING)') {
-				return $this->mainController->getApproveByMarketing($id);
-			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
-				return $this->mainController->getEditByPurchasing($id);
-			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
-				return $this->mainController->getEditAccounting($id);
-			}
-		}
-
-		public function submitPackagingCost(Request $request) {
-			if (!CRUDBooster::isUpdate())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-
-			return $this->mainController->submitPackagingCost($request);
-		}
-
-		public function approveByMarketing(Request $request) {
-			if (!CRUDBooster::isUpdate())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-
-			return $this->mainController->approveByMarketing($request);
-		}
-
-		public function editByPurchasing(Request $request) {
-			if (!CRUDBooster::isUpdate())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-
-			return $this->mainController->editByPurchasing($request);
-		}
-
-		public function submitByPurchasing(Request $request) {
-			if (!CRUDBooster::isUpdate())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-
-			return $this->mainController->submitByPurchasing($request);
-		}
-
-		public function approveByAccounting(Request $request) {
-			if (!CRUDBooster::isUpdate())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-
-				return $this->mainController->approveByAccounting($request);
+			return $this->mainController->getDetail($id);
 		}
 	}
