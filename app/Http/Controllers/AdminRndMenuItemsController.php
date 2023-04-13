@@ -760,10 +760,13 @@
 				$approval_status = 'FOR APPROVAL (PURCHASING)';
 				$db_column_at = 'marketing_approved_at';
 				$db_column_by = 'marketing_approved_by';
+				$message = '✔️ Item Approved!';
 			} else {
 				$approval_status = 'REJECTED';
 				$db_column_at = 'rejected_at';
 				$db_column_by = 'rejected_by';
+				$message = '✖️ item Rejected!';
+				self::notifyForRejection($rnd_menu_items_id);
 			}
 
 			DB::table('rnd_menu_approvals')
@@ -777,7 +780,7 @@
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
-					'message' => "✔️ Approved!"
+					'message' => $message,
 				]);
 
 		}
@@ -1004,10 +1007,15 @@
 				$approval_status = 'APPROVED';
 				$db_column_by = 'accounting_approved_by';
 				$db_column_at = 'accounting_approved_at';
+				$message = '✔️ Item Approved!';
+				$send_email = true;
 			} else {
 				$approval_status = 'REJECTED';
 				$db_column_by = 'rejected_by';
 				$db_column_at = 'rejected_at';
+				$message = '✖️ Item Rejected!';
+				self::notifyForRejection($rnd_menu_items_id);
+				$send_email = false;
 			}
 
 			$item = DB::table('rnd_menu_items')
@@ -1024,18 +1032,39 @@
 					$db_column_by => $action_by,
 				]);
 
-			CRUDBooster::sendEmail([
-				'to' => 'fillinorgunio@digits.ph',
-				'from' => 'noreply@digits.ph',
-				'data' => (array) $item,
-				'template' => 'rnd_menu_creation',
-			]);
+			if ($send_email) {
+				CRUDBooster::sendEmail([
+					'to' => 'fillinorgunio@digits.ph',
+					'from' => 'noreply@digits.ph',
+					'data' => (array) $item,
+					'template' => 'rnd_menu_creation',
+				]);
+			}
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
-					'message' => "✔️ RND Menu Item Details Updated!"
+					'message' => $message,
 				]);
+		}
+
+		function notifyForRejection($id) {
+			$item = DB::table('rnd_menu_items')
+				->where('rnd_menu_items.id', $id)
+				->leftJoin('rnd_menu_approvals', 'rnd_menu_approvals.rnd_menu_items_id', 'rnd_menu_items.id')
+				->first();
+
+			$to_notify = [$item->published_by];
+
+			$myPrvilegeName = CRUDBooster::myPrivilegeName();
+			
+			$config = [
+				'content' => "<strong>RND menu item: $item->rnd_menu_description</strong> has been rejected by $myPrvilegeName",
+				'to' => CRUDBooster::adminPath("rnd_menu_items/detail/$id"),
+				'id_cms_users' => $to_notify,
+			];
+
+			CRUDBooster::sendNotification($config);
 		}
 
 	}
