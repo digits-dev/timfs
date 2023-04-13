@@ -831,9 +831,13 @@
                 });
             } else {
                 Swal.fire({
+                    width: '600px',
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Please make sure all ingredients are from IMFS / MIMF!',
+                    html: '⚠️ Please make sure all ingredients are from ' +
+                            `<label class="label label-info">IMFS</label> or <label class="label label-warning">MIMF</label>` + 
+                            `<br/>📄 <strong>Direction:</strong> Create new item in item master for ingredients with label <label class="label label-purple">USER</label>,` +
+                            ' go back to this page and overwrite the ingredient.',
                 }).then(() => {
 
                     invalids.forEach(entry => {

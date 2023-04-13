@@ -67,13 +67,22 @@
             <div class="col-md-3">{{$item->marketing_approved_at}}</div>
         </div>
         @endif
-        @if ($item->marketing_approved_at)
+        @if ($item->purchasing_approved_at)
         <hr>
         <div class="row">
             <div class="col-md-2"><strong>Approved by (Purchasing):</strong></div>
             <div class="col-md-3">{{$item->purchasing_approver}}</div>
             <div class="col-md-2"><strong>Approved at (Purchasing):</strong></div>
             <div class="col-md-3">{{$item->purchasing_approved_at}}</div>
+        </div>
+        @endif
+        @if ($item->accounting_approved_at)
+        <hr>
+        <div class="row">
+            <div class="col-md-2"><strong>Approved by (Accounting):</strong></div>
+            <div class="col-md-3">{{$item->accounting_approver}}</div>
+            <div class="col-md-2"><strong>Approved at (Accounting):</strong></div>
+            <div class="col-md-3">{{$item->accounting_approved_at}}</div>
         </div>
         @endif
     </div>

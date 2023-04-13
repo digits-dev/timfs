@@ -120,7 +120,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group"></div>
                     <label for="" class="control-label">* Packaging Cost</label>
                     <div class="input-group">
