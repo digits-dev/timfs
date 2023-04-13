@@ -198,7 +198,7 @@
 
         const lastRow = $(document.createElement('tr')).css('font-weight', 'bold');
         const totalCostLabel = $(document.createElement('td'))
-            .text('Total Cost')
+            .text('Total Ingredient Cost')
             .attr('colspan', 12)
             .addClass('total-cost-label');
         const totalCostValue = $(document.createElement('td')).text('₱ ' + item.computed_ingredient_total_cost);
