@@ -19,7 +19,6 @@ class CreateRndMenuItemsTable extends Migration
             $table->string('rnd_code')->length(30)->nullable();
             $table->string('rnd_tasteless_code')->length(20)->nullable();
             $table->decimal('portion_size', 18, 4)->unsigned()->nullable();
-            $table->decimal('packaging_cost', 18, 4)->unsigned()->nullable();
             $table->decimal('rnd_menu_srp', 18, 4)->unsigned()->nullable();
             $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE')->nullable();
             $table->integer('created_by')->length(10)->unsigned()->nullable();

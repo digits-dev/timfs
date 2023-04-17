@@ -84,7 +84,7 @@
             <label class="ingredient-label">
                 <span class="required-star">*</span> Ingredient <span class="item-from label label-secondary">USER</span>
                 <div>
-                    <input value="" type="text" class="ingredient_name form-control" required/>
+                    <input value="" type="text" class="ingredient-name form-control" required/>
                     <div class="item-list">
                     </div>
                 </div>
@@ -202,7 +202,7 @@
         <label class="ingredient-label">
             <span class="required-star">*</span> Ingredient <span class="item-from label label-secondary">USER</span>
             <div>
-                <input value="" type="text" class="ingredient_name form-control" required/>
+                <input value="" type="text" class="ingredient-name form-control" required/>
                 <div class="item-list">
                 </div>
             </div>
@@ -324,7 +324,7 @@
             <label class="packaging-label">
                 <span class="required-star">*</span> Packaging <span class="item-from label label-secondary">USER</span>
                 <div>
-                    <input value="" type="text" class="packaging_name form-control" required/>
+                    <input value="" type="text" class="packaging-name form-control" required/>
                     <div class="item-list">
                     </div>
                 </div>
@@ -442,7 +442,7 @@
         <label class="packaging-label">
             <span class="required-star">*</span> Packaging <span class="item-from label label-secondary">USER</span>
             <div>
-                <input value="" type="text" class="packaging_name form-control" required/>
+                <input value="" type="text" class="packaging-name form-control" required/>
                 <div class="item-list">
                 </div>
             </div>
@@ -600,7 +600,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="display: none;">
                         <div class="form-group">
                             <label for="" class="control-label">Total Ingredient Cost</label>
                             <div class="input-group">
@@ -682,6 +682,7 @@
     document.title = 'Add New RND Menu Item Description';
     $('body').addClass('sidebar-collapse');
     const savedIngredients = {!! json_encode($ingredients) !!} || [];
+    const savedPackagings = {!! json_encode($packagings) !!} || [];
     const rndMenuItem = {!! json_encode($item) !!};
     const action = "{{$action}}";
     const privilege = "{{$privilege}}";
@@ -706,11 +707,15 @@
         }
 
         $.fn.firstLoad = function() {
-            if (savedIngredients) $('.no-ingredient-warning').hide();
+            if (savedIngredients) $('.no-ingredient-warning').remove();
+            if (savedPackagings) $('.no-packaging-warning').remove();
 
-            const entryCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
-            const section = $('.ingredient-section');
-            for (i of entryCount) {
+            const ingredientGroupCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
+            const ingredientSection = $('.ingredient-section');
+            const packagingGroupCount = [...new Set([...savedPackagings.map(e => e.packaging_group)])];
+            const packagingSection = $('.packaging-section');
+            //looping through saved ingredients
+            for (i of ingredientGroupCount) {
                 const groupedIngredients = savedIngredients.filter(e => e.ingredient_group == i);
                 const wrapperTemplate = $(document.createElement('div'));
                 wrapperTemplate
@@ -732,11 +737,11 @@
                     } else {
                         if (savedIngredient.is_existing == 'TRUE') {
                             //substitute and existing
-                            element = $('.substitute').eq(0).clone();
+                            element = $('.substitute-ingredient').eq(0).clone();
                             if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
                         } else {
                             //substitute and new
-                            element = $('.new-substitute').eq(0).clone();
+                            element = $('.new-substitute-ingredient').eq(0).clone();
                             if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
                         }
                     }
@@ -764,7 +769,7 @@
                         ''
                     );
                     element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
-                    element.find('.ingredient_name').val(savedIngredient.ingredient_name);
+                    element.find('.ingredient-name').val(savedIngredient.ingredient_name);
                     element.find('.pack-size').val(parseFloat(savedIngredient.packaging_size));
                     element.find('.prep-quantity').val(parseFloat(savedIngredient.prep_qty) || 0).attr('readonly', false);
                     element.find('.uom').val(savedIngredient.uom_id);
@@ -784,7 +789,84 @@
                     .find('.preparation, .yield')
                     .attr('readonly', false)
                     .attr('disabled', false);
-                section.append(wrapperTemplate);
+                ingredientSection.append(wrapperTemplate);
+            }
+
+            //looping through saved packagings
+            for (i of ingredientGroupCount) {
+                const groupedPackaging = savedPackagings.filter(e => e.packaging_group == i);
+                const wrapperTemplate = $(document.createElement('div'));
+                wrapperTemplate
+                    .addClass('packaging-wrapper')
+                    .append($('.add-sub-btn').eq(0).clone())
+                    .append($('.new-add-sub-btn').eq(0).clone());
+
+                groupedPackaging.forEach(savedPackaging => {
+                    let element;
+                    if (savedPackaging.is_primary == 'TRUE') {
+                        if (savedPackaging.is_existing == 'TRUE') {
+                            //primary and existing
+                            element = $('.packaging-wrapper .packaging-entry').eq(0).clone();
+                        } else {
+                            //primary and new
+                            element = $('.new-packaging-wrapper .packaging-entry').eq(0).clone();
+                            element.find('.ttp').attr('readonly', false);
+                        }
+                    } else {
+                        if (savedPackaging.is_existing == 'TRUE') {
+                            //substitute and existing
+                            element = $('.substitute-packaging').eq(0).clone();
+                            if (savedPackaging.is_selected == 'TRUE') element.attr('primary', true);
+                        } else {
+                            //substitute and new
+                            element = $('.new-substitute-packaging').eq(0).clone();
+                            if (savedPackaging.is_selected == 'TRUE') element.attr('primary', true);
+                        }
+                    }
+                    if (savedPackaging.menu_status == 'INACTIVE' || savedPackaging.item_status == 'INACTIVE') 
+                        element.find('.label-danger').text('⚠️INACTIVE');
+
+                    if (savedPackaging.item_masters_id && !savedPackaging.menu_as_ingredient_id)
+                        element.find('.item-from').addClass('label label-info').text('IMFS');
+
+                    if (savedPackaging.menu_as_ingredient_id && !savedPackaging.item_masters_id)
+                        element.find('.item-from').addClass('label-warning').text('MIMF');
+
+                    const packagingInput = element.find('.packaging');
+                    packagingInput.val(savedPackaging.item_masters_id);
+                    packagingInput.attr({
+                        cost: savedPackaging.packaging_cost,
+                        uom: savedPackaging.uom_id,
+                        item_id: savedPackaging.item_masters_id,
+                    });
+
+                    if (savedPackaging.item_masters_id) element.find('.date-updated').html(
+                        savedPackaging.updated_at ? `${timeago.format(savedPackaging.updated_at)}` :
+                        savedPackaging.created_at ? `${timeago.format(savedPackaging.created_at)}` :
+                        ''
+                    );
+                    element.find('.display-packaging').val(savedPackaging.full_item_description);
+                    element.find('.packaging-name').val(savedPackaging.ingredient_name);
+                    element.find('.pack-size').val(parseFloat(savedPackaging.packaging_size));
+                    element.find('.prep-quantity').val(parseFloat(savedPackaging.prep_qty) || 0).attr('readonly', false);
+                    element.find('.uom').val(savedPackaging.uom_id);
+                    element.find('.uom_name').val(savedPackaging.uom_name);
+                    element.find('.display-uom').val(savedPackaging.uom_description);
+                    element.find('.preparation option').attr('selected', false);
+                    element.find('.preparation').val(savedPackaging.menu_ingredients_preparations_id)
+                    element.find('.yield').val(parseFloat(savedPackaging.yield) || 0);
+                    element.find('.ttp').val(parseFloat(savedPackaging.ttp) || 0).attr('packaging_size', savedPackaging.packaging_size);
+
+                    $.fn.computeIngredientOrPackagingCost(element);
+                    element.css('display', '');
+                    wrapperTemplate.append(element);
+                });
+
+                wrapperTemplate
+                    .find('.preparation, .yield')
+                    .attr('readonly', false)
+                    .attr('disabled', false);
+                packagingSection.append(wrapperTemplate);
             }
 
             if (action == 'publish' || action == 'approve') {
@@ -882,7 +964,14 @@
             });
 
             $('.pack-size').keyup(function() {
-                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
+                const entry = $(this).parents(`
+                    .ingredient-entry, 
+                    .substitute-ingredient, 
+                    .new-substitute-ingredient,
+                    .packaging-entry,
+                    .substitute-packaging, 
+                    .new-substitute-packaging
+                `);
                 const value = $(this).val();
                 if (value && value > 0) {
                     entry.find('.prep-quantity').attr('readonly', false);
@@ -902,7 +991,7 @@
                 else return;
             });
 
-            $('.ingredient_name').keyup(function() {
+            $('.ingredient-name, .packaging-name').keyup(function() {
                 const value = $(this).val();
                 $(this).val(value.toUpperCase());
             });
@@ -973,8 +1062,7 @@
             });
             packagingSum = math.round(packagingSum, 4);
             $('.packaging-cost').val(packagingSum);
-
-            const totalCost = packagingSum + foodCost;
+            const totalCost = math.round(packagingSum + foodCost, 4);
             totalCostInput.val(totalCost);
 
         }
@@ -1000,7 +1088,7 @@
         $.fn.renderSearchResult = function(entry, itemList, searchResult) {
             const current_ingredients = {item_id: [], menu_item_id: []};
 
-            $('#form .ingredient, #form .packaging').each(function(ingredientIndex) {
+            $('form .ingredient, form .packaging').each(function(ingredientIndex) {
                 const ingredient = $(this);
                 if (ingredientIndex != $('#form .ingredient').index(entry.find('.ingredient'))) {
                     if (ingredient.attr('item_id'))  current_ingredients.item_id.push(ingredient.attr('item_id'));
@@ -1075,12 +1163,14 @@
         }
 
         $.fn.submitForm = function() {
+            
+            // for ingredients
             const ingredientsArray = [];
-            const ingredientGroups = jQuery.makeArray($('#form .ingredient-wrapper, #form .new-ingredient-wrapper'));
+            const ingredientGroups = jQuery.makeArray($('#form-ingredient .ingredient-wrapper, #form-ingredient .new-ingredient-wrapper'));
             ingredientGroups.forEach((ingredientGroup, groupIndex) => {
                 const group = $(ingredientGroup);
                 const ingredientArray = [];
-                const ingredients = jQuery.makeArray(group.find('.ingredient-entry, .substitute, .new-substitute'));
+                const ingredients = jQuery.makeArray(group.find('.ingredient-entry, .substitute-ingredient, .new-substitute-ingredient'));
                 ingredients.forEach((ingredient, memberIndex) => {
                     const ingredientMember = $(ingredient);
                     const ingredientObject = {};
@@ -1091,7 +1181,7 @@
                     ingredientObject.ingredient_group = groupIndex;
                     ingredientObject.item_masters_id = ingredientMember.find('.ingredient').attr('item_id');
                     ingredientObject.menu_as_ingredient_id = ingredientMember.find('.ingredient').attr('menu_item_id');
-                    ingredientObject.ingredient_name = ingredientMember.find('.ingredient_name').val()?.trim().toUpperCase();
+                    ingredientObject.ingredient_name = ingredientMember.find('.ingredient-name').val()?.trim().toUpperCase();
                     ingredientObject.packaging_size = ingredientMember.find('.pack-size').val();
                     ingredientObject.prep_qty = ingredientMember.find('.prep-quantity').val();
                     ingredientObject.uom_id = ingredientMember.find('.uom').val();
@@ -1107,7 +1197,42 @@
                     ingredientsArray.push(ingredientArray);
                 }
             });
-            const result = JSON.stringify(ingredientsArray);
+
+            // for packagings
+            const packagingsArray = [];
+            const packagingGroups = jQuery.makeArray($('#form-packaging .packaging-wrapper, #form-packaging .new-packaging-wrapper'));
+            packagingGroups.forEach((packagingGroup, groupIndex) => {
+                const group = $(packagingGroup);
+                const packagingArray = [];
+                const packagings = jQuery.makeArray(group.find('.packaging-entry, .substitute-packaging, .new-substitute-packaging'));
+                packagings.forEach((packaging, memberIndex) => {
+                    const packagingMember = $(packaging);
+                    const packagingObject = {};
+                    packagingObject.is_existing = (packagingMember.attr('isExisting') == 'true').toString().toUpperCase();
+                    packagingObject.is_primary = (packagingMember.hasClass('packaging-entry')).toString().toUpperCase();
+                    packagingObject.is_selected = (packagingMember.attr('primary') == 'true').toString().toUpperCase();
+                    packagingObject.row_id = memberIndex;
+                    packagingObject.packaging_group = groupIndex;
+                    packagingObject.item_masters_id = packagingMember.find('.packaging').attr('item_id');
+                    packagingObject.packaging_name = packagingMember.find('.packaging-name').val()?.trim().toUpperCase();
+                    packagingObject.packaging_size = packagingMember.find('.pack-size').val();
+                    packagingObject.prep_qty = packagingMember.find('.prep-quantity').val();
+                    packagingObject.uom_id = packagingMember.find('.uom').val();
+                    packagingObject.uom_name = packagingMember.find('.uom_name').val()?.trim().toUpperCase();
+                    packagingObject.menu_ingredients_preparations_id = packagingMember.find('.preparation').val();
+                    packagingObject.yield = packagingMember.find('.yield').val();
+                    packagingObject.ttp = packagingMember.find('.ttp').val();
+                    packagingObject.qty = packagingMember.find('.ing-quantity').val();
+                    packagingObject.cost = packagingMember.find('.cost').val().replace(/[^0-9.]/g, '');
+                    packagingArray.push(packagingObject);
+                });
+                if (packagingArray.length) {
+                    packagingsArray.push(packagingArray);
+                }
+            });
+            const ingredientsJSON = JSON.stringify(ingredientsArray);
+            const packagingsJSON = JSON.stringify(packagingsArray);
+
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
                 .attr('action', "{{ route('edit_rnd_menu') }}")
@@ -1121,7 +1246,11 @@
 
             const ingredientsData = $(document.createElement('input'))
                 .attr('name', 'ingredients')
-                .val(result);
+                .val(ingredientsJSON);
+
+            const packagingsData = $(document.createElement('input'))
+                .attr('name', 'packagings')
+                .val(packagingsJSON);
 
             const rndMenuDescriptionData = $(document.createElement('input'))
                 .attr('name', 'rnd_menu_description')
@@ -1142,6 +1271,7 @@
             form.append(
                 csrf,
                 ingredientsData,
+                packagingsData,
                 rndMenuDescriptionData,
                 rndMenuIdData,
                 srpData,
@@ -1152,7 +1282,12 @@
         }
 
         $(document).on('click', '#save-btn', function(event) {
-            const formValues = $('.ingredient-section input, .ingredient-section select');
+            const formValues = $(`
+                .ingredient-section input, 
+                .ingredient-section select,
+                .packaging-section input, 
+                .packaging-section select
+            `);
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('#form .cost')).every(e => !!$(e).val().replace(/[^0-9.]/g, '')) &&
                 $('.portion').val() > 0 && $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() > 0;
@@ -1175,8 +1310,16 @@
                     title: 'Oops...',
                     text: 'Please fill out all fields!',
                 }).then(() => {
-                    $('.ingredient-section input:invalid, .ingredient-section select:invalid').css('outline', '2px solid red');
-                    $('.ingredient-section .ingredient:invalid').parents('.ingredient-entry').find('.display-ingredient').css('outline', '2px solid red');
+                    $(`
+                        .ingredient-section input:invalid, 
+                        .ingredient-section select:invalid,
+                        .packaging-section input:invalid, 
+                        .packaging-section select:invalid
+                    `).css('outline', '2px solid red');
+                    $('.ingredient-section .ingredient:invalid, .packaging-section .packaging:invalid')
+                        .parents('.ingredient-entry, .packaging-entry')
+                        .find('.display-ingredient, .display-packaging')
+                        .css('outline', '2px solid red');
                     if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
 					if (!$('.rnd_menu_description').val()) $('.rnd_menu_description').css('outline', '2px solid red');
 					if (!$('.rnd_menu_srp').val() || $('.rnd_menu_srp').val() <= 0) $('.rnd_menu_srp').css('outline', '2px solid red');
@@ -1406,6 +1549,7 @@
                     $('.no-packaging-warning').remove();
                 }
                 section.append(wrapper.show());
+                wrapper.find('.display-ingredient, .display-packaging, .ingredient-name, .packaging-name').focus();
                 $.fn.reload();
         });
 
@@ -1430,6 +1574,12 @@
                 substitute = $(`.new-substitute-${slug}`).eq(0).clone();
             }
             entry.append(substitute.css('display', ''));
+            substitute.find(`
+                .display-ingredient,
+                .display-packaging,
+                .ingredient-name,
+                .packaging-name
+            `).focus();
             $.fn.reload();
         });
 

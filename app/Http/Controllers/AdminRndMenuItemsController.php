@@ -494,7 +494,38 @@
 				->orderBy('row_id', 'ASC')
 				->get()
 				->toArray();
-			
+
+			$data['packagings'] = DB::table('rnd_menu_packagings_auto_compute')
+				->where('rnd_menu_items_id', $id)
+				->where('rnd_menu_packagings_auto_compute.status', 'ACTIVE')
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'packaging_name',
+					'is_selected',
+					'is_primary',
+					'is_existing',
+					'rnd_menu_packagings_auto_compute.packaging_size',
+					'packaging_qty',
+					'cost',
+					'packaging_group',
+					'uom_id',
+					'uom_description',
+					'packaging_description',
+					'prep_qty',
+					'menu_ingredients_preparations_id',
+					'yield',
+					'rnd_menu_packagings_auto_compute.ttp',
+					'rnd_menu_packagings_auto_compute.ttp as packaging_cost',
+					'item_masters.full_item_description',
+					'sku_status_description as item_status',
+					'item_masters.updated_at',
+					'item_masters.created_at')
+				->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_packagings_auto_compute.item_masters_id')
+				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->orderBy('packaging_group', 'ASC')
+				->orderBy('row_id', 'ASC')
+				->get()
+				->toArray();
+
 
 			return $this->view('rnd-menu/add-item', $data);
 		}
@@ -513,6 +544,7 @@
 			$portion_size = $request->get('portion_size');
 			$ingredient_total_cost = $request->get('ingredient_total_cost');
 			$ingredients = json_decode($request->get('ingredients'));
+			$packagings = json_decode($request->get('packagings'));
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 			$rnd_menu_approval_status = 'SAVED';
@@ -551,7 +583,17 @@
 				->update([
 					'status' => 'INACTIVE',
 					'row_id' => null,
-					'deleted_at' => date('Y-m-d H:i:s')
+					'deleted_at' => $time_stamp
+				]);
+
+			//inactivating all active packagings of rnd menu item
+			DB::table('rnd_menu_packagings_details')
+				->where('status', 'ACTIVE')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update([
+					'status' => 'INACTIVE',
+					'row_id' => null,
+					'deleted_at' => $time_stamp
 				]);
 
 			//looping through the nested ingredients by their ingredient_group
@@ -597,6 +639,51 @@
 						'ingredient_name' => $ingredient['ingredient_name'],
 						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
 					], $ingredient);
+				}
+			}
+
+			//looping through nested packagings
+			foreach ($packagings as $group) {
+				foreach ($group as $packaging) {
+					$packaging = (array) $packaging;
+
+					//checking if the packaging already exists
+					$is_existing = DB::table('rnd_menu_packagings_details')
+						->where([
+							'rnd_menu_items_id' => $rnd_menu_items_id,
+							'item_masters_id' => $packaging['item_masters_id'],
+							'packaging_name' => $packaging['packaging_name'],
+						])->exists();
+
+					if ($is_existing) {
+						$packaging['updated_at'] = $time_stamp;
+						$packaging['updated_by'] = $action_by;
+					} else {
+						$packaging['created_at'] = $time_stamp;
+						$packaging['created_by'] = $action_by;
+					}
+
+					$packaging['status'] = 'ACTIVE';
+					$packaging['deleted_at'] = null;
+
+					//unsetting packagings details that may be outdated in the future
+					unset(
+						$packaging['qty'], 
+						$packaging['cost'], 
+						$packaging['total_cost'], 
+					);
+
+					if ($packaging['is_existing'] == 'TRUE') {
+						unset($packaging['ttp']);
+					}
+
+					//finally, inserting packaging to the table
+					DB::table('rnd_menu_packagings_details')->updateOrInsert([
+						'rnd_menu_items_id' => $rnd_menu_items_id,
+						'item_masters_id' => $packaging['item_masters_id'],
+						'packaging_name' => $packaging['packaging_name'],
+					], $packaging);
+						
 				}
 			}
 			
