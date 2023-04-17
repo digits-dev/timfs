@@ -663,9 +663,8 @@
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-        @if ($action == 'edit')
+        @if ($action == 'edit' || $action == 'add')
 		<button class="btn btn-primary pull-right" id="save-btn"><i class="fa fa-save" ></i> Save</button>
-        @elseif ($action == 'publish')
 		<button class="btn btn-success pull-right" id="publish-btn" style="margin-right: 10px;"><i class="fa fa-upload" ></i> Publish</button>
         @elseif ($action == 'approve')
         <button class="btn btn-success pull-right" id="approve-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-up" ></i> Approve</button>
@@ -1162,7 +1161,7 @@
             $.fn.sumCost();
         }
 
-        $.fn.submitForm = function() {
+        $.fn.submitForm = function(buttonClicked) {
             
             // for ingredients
             const ingredientsArray = [];
@@ -1235,7 +1234,7 @@
 
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
-                .attr('action', "{{ route('edit_rnd_menu') }}")
+                .attr('action', buttonClicked == 'save' ? "{{ route('edit_rnd_menu') }}" : "{{ route('publish_rnd_menu') }}")
                 .css('display', 'none');
 
             const csrf = $(document.createElement('input'))
@@ -1281,31 +1280,23 @@
             form.submit();
         }
 
-        $(document).on('click', '#save-btn', function(event) {
+        $.fn.checkFormValidity = function() {
             const formValues = $(`
                 .ingredient-section input, 
                 .ingredient-section select,
                 .packaging-section input, 
                 .packaging-section select
             `);
+
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('#form .cost')).every(e => !!$(e).val().replace(/[^0-9.]/g, '')) &&
                 $('.portion').val() > 0 && $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() > 0;
-            if (isValid) {
-                Swal.fire({
-                    title: action == 'getAdd' ? 'Do you want to save this item?' : 'Do you want to save the changes?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Save'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.fn.submitForm();
-                    }
-                });
-            } else {
-                Swal.fire({
+            
+            return isValid;
+        }
+
+        $.fn.formatInvalidInputs = function() {
+            Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Please fill out all fields!',
@@ -1324,13 +1315,34 @@
 					if (!$('.rnd_menu_description').val()) $('.rnd_menu_description').css('outline', '2px solid red');
 					if (!$('.rnd_menu_srp').val() || $('.rnd_menu_srp').val() <= 0) $('.rnd_menu_srp').css('outline', '2px solid red');
                 });
+        }
+
+        $(document).on('click', '#save-btn', function(event) {
+            const isValid = $.fn.checkFormValidity();
+            if (isValid) {
+                Swal.fire({
+                    title: action == 'add' ? 'Do you want to save this item?' : 'Do you want to save the changes?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Save'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.fn.submitForm('save');
+                    }
+                });
+            } else {
+                $.fn.formatInvalidInputs();
             }
         }); 
 
         $(document).on('click', '#publish-btn', function(event) {
+            const isValid = $.fn.checkFormValidity();
+            if (isValid) {
                 Swal.fire({
                     title: 'Do you want to publish this item?',
-                    html: '🟠  Doing so will turn the status of this item to <span class="label label-warning">PENDING</span>.<br/>' +
+                    html: '🟠  Doing so will forward this item to <span class="label label-warning">MARKETING   </span>.<br/>' +
                         `📄  You won't be able to edit this item again.`,
                     icon: 'warning',
                     showCancelButton: true,
@@ -1339,26 +1351,12 @@
                     confirmButtonText: 'Publish'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        const form = $(document.createElement('form'))
-                            .attr('method', 'POST')
-                            .attr('action', "{{ route('publish_rnd_menu') }}")
-                            .css('display', 'none');
-
-                        const csrf = $(document.createElement('input'))
-                            .attr({
-                                type: 'hidden',
-                                name: '_token',
-                            }).val("{{ csrf_token() }}");
-
-                        const rndMenuId = $(document.createElement('input'))
-                            .attr('name', 'rnd_menu_items_id')
-                            .val(rndMenuItem?.id);
-                        
-                        form.append(csrf, rndMenuId)
-                        $('.panel-body').append(form);
-                        form.submit();
+                        $.fn.submitForm('publish');
                     }    
                 });
+            } else {
+                $.fn.formatInvalidInputs();
+            }
 
         });
 

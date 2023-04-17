@@ -93,7 +93,6 @@
 	        | 
 	        */
 	        $this->addaction = array();
-			$this->addaction[] = ['title'=>'Publish','url'=>CRUDBooster::mainpath('publish/[id]'),'icon'=>'fa fa-upload', 'color'=>'-'];
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -369,7 +368,6 @@
 					'rnd_code',
 					'rnd_menu_items.rnd_menu_srp',
 					'rnd_menu_items.rnd_menu_description',
-					'rnd_menu_items.packaging_cost',
 					'rnd_menu_items.portion_size',
 					'computed_ingredient_total_cost',
 					'computed_food_cost',
@@ -425,7 +423,7 @@
 					trans('crudbooster.denied_access')
 				);
 
-			return self::getEdit(null);
+			return self::getEdit(null, 'add');
 		}
 
 		public function getEdit($id, $action = 'edit') {
@@ -528,10 +526,6 @@
 
 
 			return $this->view('rnd-menu/add-item', $data);
-		}
-
-		public function getPublish($id) {
-			return self::getEdit($id, 'publish');
 		}
 
 		public function editRNDMenu(Request $request) {
@@ -707,6 +701,8 @@
 			$rnd_menu_approval_status = 'PENDING';
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
+
+			self::editRNDMenu($request);
 			
 			DB::table('rnd_menu_approvals')
 				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
@@ -742,8 +738,7 @@
 					'computed_food_cost',
 					'computed_food_cost_percentage',
 					'publisher.name as published_by',
-					'published_at',
-					'rnd_menu_items.packaging_cost'
+					'published_at'
 				)
 				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
 				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
@@ -776,8 +771,7 @@
 					'purchasing_approver.name as purchasing_approver',
 					'purchasing_approved_at',
 					'accounting_approver.name as accounting_approver',
-					'accounting_approved_at',
-					'rnd_menu_items.packaging_cost'
+					'accounting_approved_at'
 				)
 				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
 				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
@@ -1069,8 +1063,7 @@
 					'purchasing_approver.name as purchasing_approver',
 					'purchasing_approved_at',
 					'accounting_approver.name as accounting_approver',
-					'accounting_approved_at',
-					'rnd_menu_items.packaging_cost'
+					'accounting_approved_at'
 				)
 				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
 				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
