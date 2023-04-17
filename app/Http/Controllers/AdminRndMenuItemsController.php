@@ -523,14 +523,14 @@
 			if (!$rnd_menu_items_id) {
 				// inserting new rnd menu item and getting the id
 				$rnd_menu_items_id = DB::table('rnd_menu_items')
-				->insertGetId([
-					'rnd_menu_description' => $rnd_menu_description,
-					'rnd_code' => $rnd_code,
-					'portion_size' => $portion_size,
-					'rnd_menu_srp' => $rnd_menu_srp,
-					'created_by' => $action_by,
-					'created_at' => $time_stamp
-				]);
+					->insertGetId([
+						'rnd_menu_description' => $rnd_menu_description,
+						'rnd_code' => $rnd_code,
+						'portion_size' => $portion_size,
+						'rnd_menu_srp' => $rnd_menu_srp,
+						'created_by' => $action_by,
+						'created_at' => $time_stamp
+					]);
 			} else {
 				//update details for rnd menu item
 				DB::table('rnd_menu_items')
