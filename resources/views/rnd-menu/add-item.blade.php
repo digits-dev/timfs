@@ -1342,7 +1342,7 @@
             if (isValid) {
                 Swal.fire({
                     title: 'Do you want to publish this item?',
-                    html: '🟠  Doing so will forward this item to <span class="label label-warning">MARKETING   </span>.<br/>' +
+                    html: '🟠  Doing so will forward this item to <span class="label label-warning">MARKETING</span>.<br/>' +
                         `📄  You won't be able to edit this item again.`,
                     icon: 'warning',
                     showCancelButton: true,
