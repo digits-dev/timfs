@@ -150,7 +150,7 @@
                     </fieldset>
                     <fieldset>
                         <legend><span id="required">*</span> Menu Description</legend>
-                        <input type="text" name="menu_item_description" placeholder="Enter menu description" required oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" name="menu_item_description" value="{{$item->rnd_menu_description ? $item->rnd_menu_description : ''}}" placeholder="Enter menu description" required oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
                         <legend><span id="required">*</span> Product Type</legend>
@@ -225,7 +225,7 @@
                     </fieldset>
                     <fieldset>
                         <legend><span id="required">*</span> Price - Dine In</legend>
-                        <input type="number" name="price_dine_in" placeholder="Enter price - dine in" required oninput="this.value = this.value.toUpperCase()">
+                        <input type="number" name="price_dine_in" value="{{$item->rnd_menu_srp ? (float) $item->rnd_menu_srp : ''}}" placeholder="Enter price - dine in" required oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
                         <legend> Price - Delivery</legend>

@@ -4,6 +4,7 @@
 	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
+	use Illuminate\Support\Facades\Request as Input;
 
 	class AdminRndMenuItemsForApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -292,7 +293,84 @@
 	    |
 	    */
 	    public function hook_before_add(&$postdata) {        
-	        //Your code here
+	        
+			$returnInputs = Input::all();
+
+			// Tasteless menu code
+			$promo_id = DB::table('menu_types')
+				->select('id')
+				->where('status', 'ACTIVE')
+				->where('menu_type_description', 'PROMO')->value('id');
+
+			if($returnInputs['menu_type'] == $promo_id){
+				$tasteless_menu_code = (int) DB::table('menu_items')->where('tasteless_menu_code','like',"5%")
+				->select('tasteless_menu_code')
+				->max('tasteless_menu_code');
+			}else{
+				$tasteless_menu_code = (int) DB::table('menu_items')->where('tasteless_menu_code','like',"6%")
+				->select('tasteless_menu_code')
+				->max('tasteless_menu_code');
+			}
+
+			// Price Delivery
+			if($returnInputs['price_delivery'] == null){
+				$price_delivery = $returnInputs['price_dine_in'];
+			}else{
+				$price_delivery = $returnInputs['price_delivery'];
+			}
+
+			if($returnInputs['price_take_out'] == null){
+				$price_take_out = $returnInputs['price_dine_in'];
+			}else{
+				$price_take_out = $returnInputs['price_take_out'];
+			}
+			
+			$choices_group = DB::table('menu_choice_groups')
+				->select('id')
+				->where('status', 'ACTIVE')
+				->get();
+
+			// Add data to database
+			$data['tasteless_menu_code'] = $tasteless_menu_code+1;
+			$data['old_code_1'] = $returnInputs['pos_item_code_1'];
+			$data['old_code_2'] = $returnInputs['pos_item_code_2'];
+			$data['old_code_3'] = $returnInputs['pos_item_code_3'];
+			$data['menu_item_description'] = $returnInputs['menu_item_description'];
+			for($i=0; $i<count($choices_group); $i++){
+				$choices_group_str = 'choices_group_'.(string)($i+1);
+				$choices_skugroup_str = 'choices_skugroup_'.(string)($i+1);
+				$data[$choices_group_str] = $returnInputs[$choices_group_str];
+				if($returnInputs[$choices_skugroup_str] != null){
+					$data[$choices_skugroup_str] = implode(', ',$returnInputs[$choices_skugroup_str]);
+				}
+			}
+			$data['menu_types_id'] = $returnInputs['menu_type'];
+			$data['menu_price_dine'] = $returnInputs['price_dine_in'];
+			$data['menu_price_dlv'] = $price_delivery;
+			$data['menu_price_take'] = $price_take_out;
+			$data['original_concept'] = $returnInputs['original_concept'];
+			$data['pos_old_item_description'] = $returnInputs['pos_item_description'];
+			$data['menu_product_types_name'] = $returnInputs['product_type'];
+			$data['menu_categories_id'] = $returnInputs['menu_categories'];
+			$data['menu_subcategories_id'] = $returnInputs['sub_category'];
+			$data['status'] = $returnInputs['status'];
+			$data['created_by'] = CRUDBooster::myid();
+			$data['created_at'] = date('Y-m-d H:i:s');
+			// Get store list column name
+			if($returnInputs['menu_segment_column_description'] != null){
+				foreach($returnInputs['menu_segment_column_description'] as $menu_segments_id){
+					$menu_segmentations_column_name = DB::table('menu_segmentations')
+						->where('id', $menu_segments_id)
+						->select('menu_segment_column_name')
+						->value('menu_segment_column_name');
+					$data[$menu_segmentations_column_name] = 1;
+				}
+			}
+
+			$inserted_id = DB::table('menu_items')
+				->insertGetId($data);
+			
+			
 
 	    }
 

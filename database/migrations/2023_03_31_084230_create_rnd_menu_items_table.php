@@ -15,6 +15,7 @@ class CreateRndMenuItemsTable extends Migration
     {
         Schema::create('rnd_menu_items', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('menu_items_id')->length(10)->unsigned()->nullable();
             $table->string('rnd_menu_description')->nullable();
             $table->string('rnd_code')->length(30)->nullable();
             $table->string('rnd_tasteless_code')->length(20)->nullable();

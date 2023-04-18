@@ -572,10 +572,12 @@
 
 
 	    //By the way, you can still create your own method in here... :) 
-		public function getAdd() {
+		public function getAdd($table = 'menu_items', $item = null) {
 			//Create an Auth
-			if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {    
-				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			if ($table = 'menu_items') {
+				if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {    
+					CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+				}
 			}
 			
 			$data = [];
@@ -613,6 +615,10 @@
 				->where('status', 'ACTIVE')
 				->orderBy('menu_choice_group_column_description')
 				->get()->unique('menu_choice_group_column_description');
+
+			if ($item) {
+				$data['item'] = $item;
+			}
 				
 			return $this->view('menu-items.add-menu-items',$data);
 		}

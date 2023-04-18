@@ -528,7 +528,7 @@
 			return $this->view('rnd-menu/add-item', $data);
 		}
 
-		public function editRNDMenu(Request $request) {
+		public function editRNDMenu(Request $request, $action = 'save') {
 
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
 			$rnd_menu_description = $request->get('rnd_menu_description');
@@ -688,6 +688,10 @@
 					'approval_status' => $rnd_menu_approval_status,
 					'created_at' => $time_stamp,
 				]);
+			
+			if ($action == 'publish') {
+				return $rnd_menu_items_id;
+			}
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
@@ -697,12 +701,11 @@
 		}
 
 		public function publishRNDMenu(Request $request) {
-			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
 			$rnd_menu_approval_status = 'PENDING';
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 
-			self::editRNDMenu($request);
+			$rnd_menu_items_id = self::editRNDMenu($request, 'publish');
 			
 			DB::table('rnd_menu_approvals')
 				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
@@ -724,7 +727,7 @@
 		public function getPackagingCost($id) {
 			$data = [];
 
-			$data['item'] = DB::table('rnd_menu_items')
+			$item = DB::table('rnd_menu_items')
 				->where('rnd_menu_items.id', $id)
 				->select(
 					'rnd_menu_items.id as rnd_menu_items_id',
@@ -745,7 +748,8 @@
 				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
 				->first();
 
-			return $this->view('rnd-menu/add-packaging', $data);
+			// return $this->view('rnd-menu/add-packaging', $data);
+			return (new AdminAddMenuItemsController)->getAdd('rnd_menu_items', $item);
 		}
 
 		public function getDetailMarketing($id) {
