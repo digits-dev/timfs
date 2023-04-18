@@ -704,7 +704,7 @@
 			$rnd_menu_approval_status = 'FOR MENU CREATION';
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
-
+			$rnd_menu_description = $request->get('rnd_menu_description');
 			$rnd_menu_items_id = self::editRNDMenu($request, 'publish');
 			
 			DB::table('rnd_menu_approvals')
@@ -719,7 +719,7 @@
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
-					'message' => "✔️ $rnd_menu_description for Pending!"
+					'message' => "✔️ $rnd_menu_description forwarded to Marketing for Menu Creation!"
 				]);
 		}
 
@@ -750,6 +750,33 @@
 
 			// return $this->view('rnd-menu/add-packaging', $data);
 			return (new AdminAddMenuItemsController)->getAdd('rnd_menu_items', $item);
+		}
+
+		public function getSetCosting($id) {
+			$data = [];
+
+			$data['item'] = DB::table('rnd_menu_items')
+				->where('rnd_menu_items.id', $id)
+				->select(
+					'rnd_menu_items.id as rnd_menu_items_id',
+					'rnd_menu_items.rnd_menu_description',
+					'rnd_code',
+					'rnd_tasteless_code',
+					'rnd_menu_items.portion_size',
+					'rnd_menu_items.rnd_menu_srp',
+					'approval_status',
+					'computed_ingredient_total_cost',
+					'computed_food_cost',
+					'computed_food_cost_percentage',
+					'publisher.name as published_by',
+					'published_at'
+				)
+				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
+				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
+				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
+				->first();
+
+			return $this->view('rnd-menu/add-costing', $data);
 		}
 
 		public function saveNewMenu($returnInputs) {
