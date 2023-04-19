@@ -901,10 +901,30 @@
 			$rnd_menu_data = (array) json_decode($request->get('rnd_menu_data'));
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
+			$approval_status = 'FOR APPROVAL (MARKETING)';
+
+			$rnd_menu_data['updated_at'] = $time_stamp;
+			$rnd_menu_data['updated_by'] = $action_by;
 
 			DB::table('rnd_menu_items')
 				->where('id', $rnd_menu_items_id)
 				->update($rnd_menu_data);
+
+			DB::table('rnd_menu_approvals')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update([
+					'approval_status' => $approval_status,
+					'costing_updated_at' => $time_stamp,
+					'costing_updated_by' => $action_by,
+					'updated_at' => $time_stamp,
+				]);
+			
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "✔️ Costing Updated!"
+				]);
 		}
 
 		public function getDetailMarketing($id) {
