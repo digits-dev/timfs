@@ -930,38 +930,15 @@
 		public function getDetailMarketing($id) {
 			$data = [];
 
-			$data['item'] = DB::table('rnd_menu_items')
-				->where('rnd_menu_items.id', $id)
-				->select(
-					'rnd_menu_items.id as rnd_menu_items_id',
-					'rnd_menu_items.rnd_menu_description',
-					'rnd_code',
-					'rnd_menu_items.portion_size',
-					'rnd_menu_items.rnd_menu_srp',
-					'approval_status',
-					'computed_ingredient_total_cost',
-					'computed_food_cost',
-					'computed_food_cost_percentage',
-					'publisher.name as published_by',
-					'published_at',
-					'marketing_approver.name as marketing_approver',
-					'marketing_approved_at',
-					'purchasing_approver.name as purchasing_approver',
-					'purchasing_approved_at',
-					'accounting_approver.name as accounting_approver',
-					'accounting_approved_at'
-				)
-				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
-				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
-				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
-				->leftJoin('cms_users as marketing_approver', 'rnd_menu_approvals.marketing_approved_by', '=', 'marketing_approver.id')
-				->leftJoin('cms_users as purchasing_approver', 'rnd_menu_approvals.purchasing_approved_by', '=', 'purchasing_approver.id')
-				->leftJoin('cms_users as accounting_approver', 'rnd_menu_approvals.accounting_approved_by', '=', 'accounting_approver.id')
+			$data['item'] = DB::table('rnd_menu_costing')
+				->where('rnd_menu_costing.rnd_menu_items_id', $id)
+				->leftJoin('rnd_menu_approvals', 'rnd_menu_approvals.rnd_menu_items_id', '=', 'rnd_menu_costing.rnd_menu_items_id')
 				->first();
+				// dd($data['item']);
 
 			$data['page_title'] = 'Details: ' . $data['item']->rnd_menu_description;
 
-			return $this->view('rnd-menu/marketing-hide-ingredients', $data);
+			return $this->view('rnd-menu/hide-ingredients', $data);
 		}
 
 		public function getDetailMarketingApprover($id) {

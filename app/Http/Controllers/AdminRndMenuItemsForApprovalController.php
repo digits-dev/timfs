@@ -390,7 +390,7 @@
 			} else if ($status == 'FOR COSTING') {
 				// return $this->mainContoller->getCosting($id);
 			} else if ($status == 'FOR APPROVAL (MARKETING)') {
-				return $this->mainController->getDetailMarketingApprover($id);
+				return $this->mainController->getDetailMarketing($id);
 			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
 				return $this->mainController->getDetailPurchasing($id);
 			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
