@@ -426,6 +426,17 @@
 			}
 		}
 
+		public function addNewMenu(Request $request) {
+			
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->saveNewMenu($request);
+		}
+
 		public function submitPackagingCost(Request $request) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(

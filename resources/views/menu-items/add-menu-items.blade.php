@@ -128,7 +128,7 @@
   <div class='panel panel-default'>
     <div class='panel-heading'>Add Menu Items</div>
     <div class='panel-body'>
-        <form method="POST" action="{{CRUDBooster::mainpath('add-save')}}" id="form-add">
+        <form method="POST" action="{{$item->rnd_menu_items_id ? route('add_new_menu') : CRUDBooster::mainpath('add-save')}}" id="form-add">
             @csrf
             @if ($item->rnd_menu_items_id) 
             <input type="text" class="hidden" name="rnd_menu_items_id" value="{{$item->rnd_menu_items_id}}">

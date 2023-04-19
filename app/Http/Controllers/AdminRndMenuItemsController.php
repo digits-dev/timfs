@@ -4,6 +4,7 @@
 	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
+	use Illuminate\Support\Facades\Request as Input;
 
 	class AdminRndMenuItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -781,7 +782,8 @@
 			return $this->view('rnd-menu/add-costing', $data);
 		}
 
-		public function saveNewMenu($returnInputs) {
+		public function saveNewMenu(Request $request) {
+			$returnInputs = Input::all();
 			$rnd_menu_items_id = $returnInputs['rnd_menu_items_id'];
 			$approval_status = 'FOR COSTING';
 			$action_by = CRUDBooster::myId();
