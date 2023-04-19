@@ -186,8 +186,7 @@
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-		<button class="btn btn-success pull-right" id="approve-btn"><i class="fa fa-thumbs-up" ></i> Approve</button>
-		<button class="btn btn-danger pull-right" style="margin-right: 10px;" id="reject-btn"><i class="fa fa-thumbs-down" ></i> Reject</button>
+		<button class="btn btn-primary pull-right" id="save-btn"><i class="fa fa-save" ></i> Save</button>
     </div>
 </div>
 
