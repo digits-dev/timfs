@@ -845,7 +845,7 @@
                         ''
                     );
                     element.find('.display-packaging').val(savedPackaging.full_item_description);
-                    element.find('.packaging-name').val(savedPackaging.ingredient_name);
+                    element.find('.packaging-name').val(savedPackaging.packaging_name);
                     element.find('.pack-size').val(parseFloat(savedPackaging.packaging_size));
                     element.find('.prep-quantity').val(parseFloat(savedPackaging.prep_qty) || 0).attr('readonly', false);
                     element.find('.uom').val(savedPackaging.uom_id);
@@ -918,8 +918,8 @@
                 }
             });
 
-            $('#form input, #form select').keyup(function() {
-                $('#form input:valid, #form select:valid').css('outline', 'none');
+            $('form input, form select').keyup(function() {
+                $('form input:valid, #form select:valid').css('outline', 'none');
             });
 
             $('.prep-quantity').keyup(function() {
@@ -948,7 +948,14 @@
 
             $('.ttp').keyup(function() {
                 const ttp = $(this);
-                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
+                const entry = $(this).parents(`
+                    .ingredient-entry,
+                    .substitute-ingredient,
+                    .new-substitute-ingredient,
+                    .packaging-entry,
+                    .substitute-packaging,
+                    .new-substitute-packaging
+                `);
                 const [int, dec] = ttp.val().split('.');
                 if (dec && dec.length > 4) {
                     const value = `${int}.${dec.slice(0,4)}`;
@@ -958,7 +965,14 @@
             });
 
             $('.cost').keyup(function() {
-                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
+                const entry = $(this).parents(`
+                    .ingredient-entry,
+                    .substitute-ingredient,
+                    .new-substitute-ingredient,
+                    .packaging-entry,
+                    .substitute-packaging,
+                    .new-substitute-packaging
+                `);
                 $.fn.computeIngredientOrPackagingCost(entry);
             });
 

@@ -41,9 +41,9 @@
 			$this->col[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description"];
 			$this->col[] = ["label"=>"SRP","name"=>"rnd_menu_srp"];
 			$this->col[] = ["label"=>"Portion Size","name"=>"portion_size"];
-			$this->col[] = ["label"=>"Ingredient Total Cost","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_ingredient_total_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"Food Cost","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_food_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"Food Cost Percentage","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_food_cost_percentage","join_id"=>"id"];
+			$this->col[] = ["label"=>"Packaging Cost","name"=>"id","join"=>"rnd_menu_computed_packaging_cost,computed_packaging_total_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
@@ -733,7 +733,6 @@
 					'rnd_menu_items.id as rnd_menu_items_id',
 					'rnd_menu_items.rnd_menu_description',
 					'rnd_code',
-					'rnd_tasteless_code',
 					'rnd_menu_items.portion_size',
 					'rnd_menu_items.rnd_menu_srp',
 					'approval_status',
@@ -761,7 +760,6 @@
 					'rnd_menu_items.id as rnd_menu_items_id',
 					'rnd_menu_items.rnd_menu_description',
 					'rnd_code',
-					'rnd_tasteless_code',
 					'rnd_menu_items.portion_size',
 					'rnd_menu_items.rnd_menu_srp',
 					'rnd_menu_approvals.approval_status',
@@ -892,7 +890,6 @@
 					'rnd_menu_items.id as rnd_menu_items_id',
 					'rnd_menu_items.rnd_menu_description',
 					'rnd_code',
-					'rnd_tasteless_code',
 					'rnd_menu_items.portion_size',
 					'rnd_menu_items.rnd_menu_srp',
 					'approval_status',
@@ -1184,7 +1181,6 @@
 					'rnd_menu_items.id as rnd_menu_items_id',
 					'rnd_menu_items.rnd_menu_description',
 					'rnd_code',
-					'rnd_tasteless_code',
 					'rnd_menu_items.portion_size',
 					'rnd_menu_items.rnd_menu_srp',
 					'approval_status',
