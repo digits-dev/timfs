@@ -387,9 +387,7 @@
 
 			if ($status == 'FOR MENU CREATION') {
 				return $this->mainController->getDetailMarketing($id);
-			} else if ($status == 'FOR COSTING') {
-				// return $this->mainContoller->getCosting($id);
-			} else if ($status == 'FOR APPROVAL (MARKETING)') {
+			} else if ($status == 'FOR APPROVAL (MARKETING)' || $status == 'FOR COSTING') {
 				return $this->mainController->getDetailMarketing($id);
 			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
 				return $this->mainController->getDetailPurchasing($id);

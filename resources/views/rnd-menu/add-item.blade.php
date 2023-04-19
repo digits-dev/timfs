@@ -792,7 +792,7 @@
             }
 
             //looping through saved packagings
-            for (i of ingredientGroupCount) {
+            for (i of packagingGroupCount) {
                 const groupedPackaging = savedPackagings.filter(e => e.packaging_group == i);
                 const wrapperTemplate = $(document.createElement('div'));
                 wrapperTemplate
@@ -1070,7 +1070,7 @@
                 if (!!markedSub.length) {
                     packagingSum += Number($(markedSub[0]).find('.cost').val().replace(/[^0-9.]/g, ''));
                 } else {
-                    packagingSum += Number(primary.find('.cost').val().replace(/[^0-9.]/g, ''));
+                    packagingSum += Number(primary.find('.cost').val()?.replace(/[^0-9.]/g, ''));
                 }
             });
             packagingSum = math.round(packagingSum, 4);
@@ -1203,7 +1203,7 @@
                     ingredientObject.yield = ingredientMember.find('.yield').val();
                     ingredientObject.ttp = ingredientMember.find('.ttp').val();
                     ingredientObject.qty = ingredientMember.find('.ing-quantity').val();
-                    ingredientObject.cost = ingredientMember.find('.cost').val().replace(/[^0-9.]/g, '');
+                    ingredientObject.cost = ingredientMember.find('.cost').val()?.replace(/[^0-9.]/g, '');
                     ingredientArray.push(ingredientObject);
                 });
                 if (ingredientArray.length) {
@@ -1236,7 +1236,7 @@
                     packagingObject.yield = packagingMember.find('.yield').val();
                     packagingObject.ttp = packagingMember.find('.ttp').val();
                     packagingObject.qty = packagingMember.find('.ing-quantity').val();
-                    packagingObject.cost = packagingMember.find('.cost').val().replace(/[^0-9.]/g, '');
+                    packagingObject.cost = packagingMember.find('.cost').val()?.replace(/[^0-9.]/g, '');
                     packagingArray.push(packagingObject);
                 });
                 if (packagingArray.length) {
@@ -1303,7 +1303,7 @@
             `);
 
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
-                jQuery.makeArray($('#form .cost')).every(e => !!$(e).val().replace(/[^0-9.]/g, '')) &&
+                jQuery.makeArray($('#form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
                 $('.portion').val() > 0 && $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() > 0;
             
             return isValid;
