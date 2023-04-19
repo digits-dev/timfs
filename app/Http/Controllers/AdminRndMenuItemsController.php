@@ -752,36 +752,6 @@
 			return (new AdminAddMenuItemsController)->getAdd('rnd_menu_items', $item);
 		}
 
-		public function getSetCosting($id) {
-			$data = [];
-
-			$data['item'] = DB::table('rnd_menu_items')
-				->where('rnd_menu_items.id', $id)
-				->select(
-					'rnd_menu_items.id as rnd_menu_items_id',
-					'rnd_menu_items.rnd_menu_description',
-					'rnd_code',
-					'rnd_menu_items.portion_size',
-					'rnd_menu_items.rnd_menu_srp',
-					'rnd_menu_approvals.approval_status',
-					'computed_ingredient_total_cost',
-					'computed_food_cost',
-					'computed_food_cost_percentage',
-					'publisher.name as published_by',
-					'published_at',
-					'menu_items.tasteless_menu_code',
-					'rnd_menu_computed_packaging_cost.computed_packaging_total_cost'
-				)
-				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
-				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
-				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
-				->leftJoin('menu_items', 'menu_items.id', 'rnd_menu_items.menu_items_id')
-				->leftJoin('rnd_menu_computed_packaging_cost', 'rnd_menu_computed_packaging_cost.id', '=', 'rnd_menu_items.id')
-				->first();
-
-			return $this->view('rnd-menu/add-costing', $data);
-		}
-
 		public function saveNewMenu(Request $request) {
 			$returnInputs = Input::all();
 			$rnd_menu_items_id = $returnInputs['rnd_menu_items_id'];
@@ -892,6 +862,49 @@
 					'message_type' => 'success',
 					'message' => "✔️ New menu: $rnd_menu_description created."
 				]);
+		}
+
+		public function getSetCosting($id) {
+			$data = [];
+
+			$data['item'] = DB::table('rnd_menu_items')
+				->where('rnd_menu_items.id', $id)
+				->select(
+					'rnd_menu_items.id as rnd_menu_items_id',
+					'rnd_menu_items.rnd_menu_description',
+					'rnd_code',
+					'rnd_menu_items.portion_size',
+					'rnd_menu_items.rnd_menu_srp',
+					'rnd_menu_items.buffer',
+					'rnd_menu_items.ideal_food_cost',
+					'rnd_menu_approvals.approval_status',
+					'computed_ingredient_total_cost',
+					'computed_food_cost',
+					'computed_food_cost_percentage',
+					'publisher.name as published_by',
+					'published_at',
+					'menu_items.tasteless_menu_code',
+					'rnd_menu_computed_packaging_cost.computed_packaging_total_cost'
+				)
+				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
+				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
+				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
+				->leftJoin('menu_items', 'menu_items.id', 'rnd_menu_items.menu_items_id')
+				->leftJoin('rnd_menu_computed_packaging_cost', 'rnd_menu_computed_packaging_cost.id', '=', 'rnd_menu_items.id')
+				->first();
+
+			return $this->view('rnd-menu/add-costing', $data);
+		}
+
+		public function submitCosting(Request $request) {
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$rnd_menu_data = (array) json_decode($request->get('rnd_menu_data'));
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+
+			DB::table('rnd_menu_items')
+				->where('id', $rnd_menu_items_id)
+				->update($rnd_menu_data);
 		}
 
 		public function getDetailMarketing($id) {

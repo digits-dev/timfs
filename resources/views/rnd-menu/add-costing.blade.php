@@ -71,6 +71,7 @@
                 </div>
             </div>
             <hr>
+            <h3 class="text-center">RND MENU COSTING</h3>
             <div class="row">
                 <div class="col-md-4">
                     <table class="table table-striped table-bordered">
@@ -84,25 +85,25 @@
                             <tr>
                                 <td class="text-center text-bold">Portion Size</td>
                                 <td class="text-center">
-                                    <input type="number" class="form-control portion-size" placeholder="Portion Size">
+                                    <input type="number" class="form-control portion-size" placeholder="Portion Size" step="any" required readonly>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="text-center text-bold">Recipe Cost Without Buffer</td>
                                 <td class="text-center">
-                                    <input type="number" class="form-control recipe-cost-wo-buffer" placeholder="Recipe Cost Without Buffer" readonly>
+                                    <input type="number" class="form-control recipe-cost-wo-buffer" placeholder="Recipe Cost Without Buffer" step="any" readonly>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="text-center text-bold">Buffer</td>
+                                <td class="text-center text-bold">% Buffer</td>
                                 <td class="text-center">
-                                    <input type="number" class="form-control buffer" placeholder="Buffer">
+                                    <input type="number" class="form-control buffer" placeholder="Buffer" step="any" required>
                                 </td>
                             </tr>
                             <tr style="border-top: 2px solid #ddd;">
                                 <td class="text-center text-bold">Final Recipe Cost</td>
                                 <td class="text-center">
-                                    <input type="number" class="form-control final-recipe-cost" placeholder="Final Recipe Cost" readonly>
+                                    <input type="number" class="form-control final-recipe-cost" placeholder="Final Recipe Cost" step="any" readonly>
                                 </td>
                             </tr>
                         </tbody>
@@ -120,19 +121,19 @@
                             <tr>
                                 <td class="text-center text-bold">Packaging Cost</td>
                                 <td class="text-center">
-                                    <input type="number" class="form-control packaging-cost" placeholder="Packaging Cost" readonly>
+                                    <input type="number" class="form-control packaging-cost" placeholder="Packaging Cost" step="any" readonly>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="text-center text-bold">% Ideal Food Cost</td>
                                 <td class="text-center">
-                                    <input type="number" class="form-control ideal-food-cost" placeholder="Ideal Food Cost">
+                                    <input type="number" class="form-control ideal-food-cost" placeholder="Ideal Food Cost" step="any" required>
                                 </td>
                             </tr>
-                            <tr  style="border-top: 2px solid #ddd;">
+                            <tr style="border-top: 2px solid #ddd;">
                                 <td class="text-center text-bold">Suggested Final SRP With VAT</td>
                                 <td class="text-center">
-                                    <input type="number" class="form-control suggested-final-srp-w-vat" placeholder="Suggested Final SRP With VAT" readonly>
+                                    <input type="number" class="form-control suggested-final-srp-w-vat" placeholder="Suggested Final SRP With VAT" step="any" readonly>
                                 </td>
                             </tr>
                         </tbody>
@@ -150,31 +151,31 @@
                             <tr>
                                 <td class="text-center text-bold">Final SRP without VAT</td>
                                 <td class="text-center">
-                                    <input type="number" class="form-control final-srp-wo-vat" placeholder="Final SRP without VAT" readonly>
+                                    <input type="number" class="form-control final-srp-wo-vat" placeholder="Final SRP without VAT" step="any" readonly>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="text-center text-bold">Final SRP with VAT</td>
                                 <td class="text-center">
-                                    <input type="number" class="form-control final-srp-w-vat" placeholder="Final SRP with VAT">
+                                    <input type="number" class="form-control final-srp-w-vat" placeholder="Final SRP with VAT" step="any" required>
                                 </td>
                             </tr>
                             <tr style="border-top: 2px solid #ddd;">
                                 <td class="text-center text-bold">% Cost Packaging From Final SRP</td>
                                 <td class="text-center">
-                                    <input type="number" class="form-control cost-packaging-from-final-srp" placeholder="% Cost Packaging From Final SRP" readonly>
+                                    <input type="number" class="form-control cost-packaging-from-final-srp" placeholder="% Cost Packaging From Final SRP" step="any" readonly>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="text-center text-bold">% Food Cost from Final SRP</td>
                                 <td class="text-center">
-                                    <input type="number" class="form-control food-cost-from-final-srp" placeholder="% Food Cost from Final SRP" readonly>
+                                    <input type="number" class="form-control food-cost-from-final-srp" placeholder="% Food Cost from Final SRP" step="any" readonly>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="text-center text-bold">% Total Cost</td>
                                 <td class="text-center">
-                                    <input type="number" class="form-control total-cost" placeholder="% Total Cost" readonly>
+                                    <input type="number" class="form-control total-cost" placeholder="% Total Cost" step="any" readonly>
                                 </td>
                             </tr>
                         </tbody>
@@ -242,8 +243,62 @@
             $('.total-cost').val(totalCost);
         }
 
+        function submitForm() {
+            const rnd_menu_items_id = item.rnd_menu_items_id;
+            const buffer = $('.buffer').val();
+            const ideal_food_cost = $('.ideal-food-cost').val();
+            const rnd_menu_srp = $('.final-srp-w-vat').val();
+
+            const dataObj = {buffer, ideal_food_cost, rnd_menu_srp};
+
+            const form = $(document.createElement('form'))
+                .attr('method', 'POST')
+                .attr('action', "{{route('submit_costing')}}")
+                .hide();
+
+            const csrf = $(document.createElement('input'))
+                .attr('name', '_token')
+                .val("{{ csrf_token() }}");
+
+            const idInput = $(document.createElement('input'))
+                .attr('name', 'rnd_menu_items_id')
+                .val(rnd_menu_items_id);
+
+            const rndMenuData = $(document.createElement('input'))
+                .attr('name', 'rnd_menu_data')
+                .val(JSON.stringify(dataObj));
+
+            form.append(csrf, idInput, rndMenuData);
+            $('.panel-body').append(form);
+            form.submit();
+        }
+
         $(document).on('keyup', 'input', function() {
             computeFormula();
+        });
+
+        $('#save-btn').on('click', function() {
+            const isValid = jQuery.makeArray($('input')).every(e => !!$(e).val());
+            if (isValid) {
+                Swal.fire({
+                    title: 'Do you want to save the changes?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Save'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        submitForm();
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: 'Oops..',
+                    text: 'Please fill out all fields.',
+                    icon: 'error',
+                });
+            }
         });
         firstLoad();
         computeFormula();
