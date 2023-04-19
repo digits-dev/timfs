@@ -874,12 +874,23 @@
 					'menu_items_id' => $inserted_id,
 					'rnd_menu_description' => $rnd_menu_description,
 					'rnd_menu_srp' => $rnd_menu_srp,
+					'updated_by' => $action_by,
+					'updated_at' => $time_stamp,
 				]);
 
 			DB::table('rnd_menu_approvals')
 				->where('rnd_menu_items_id', $rnd_menu_items_id)
 				->update([
-					'approval_status' => $approval_status
+					'approval_status' => $approval_status,
+					'updated_at' => $time_stamp,
+					'menu_created_by' => $action_by,
+					'menu_created_at' => $time_stamp
+				]);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "✔️ New menu: $rnd_menu_description created."
 				]);
 		}
 
