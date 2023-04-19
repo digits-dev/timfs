@@ -764,16 +764,20 @@
 					'rnd_tasteless_code',
 					'rnd_menu_items.portion_size',
 					'rnd_menu_items.rnd_menu_srp',
-					'approval_status',
+					'rnd_menu_approvals.approval_status',
 					'computed_ingredient_total_cost',
 					'computed_food_cost',
 					'computed_food_cost_percentage',
 					'publisher.name as published_by',
-					'published_at'
+					'published_at',
+					'menu_items.tasteless_menu_code',
+					'rnd_menu_computed_packaging_cost.computed_packaging_total_cost'
 				)
 				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
 				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
 				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
+				->leftJoin('menu_items', 'menu_items.id', 'rnd_menu_items.menu_items_id')
+				->leftJoin('rnd_menu_computed_packaging_cost', 'rnd_menu_computed_packaging_cost.id', '=', 'rnd_menu_items.id')
 				->first();
 
 			return $this->view('rnd-menu/add-costing', $data);
