@@ -372,9 +372,11 @@
 					'rnd_menu_items.portion_size',
 					'computed_ingredient_total_cost',
 					'computed_food_cost',
-					'computed_food_cost_percentage'
+					'computed_food_cost_percentage',
+					'computed_packaging_total_cost'
 				)
 				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_computed_food_cost.id', '=', 'rnd_menu_items.id')
+				->leftJoin('rnd_menu_computed_packaging_cost', 'rnd_menu_computed_packaging_cost.id', '=', 'rnd_menu_items.id')
 				->first();
 
 			$ingredients = DB::table('rnd_menu_ingredients_auto_compute')
@@ -410,9 +412,41 @@
 			->orderby('row_id', 'asc')
 			->get()
 			->toArray();
-
-			$data['ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $ingredients);
-
+			
+			$packagings = DB::table('rnd_menu_packagings_auto_compute')
+				->where('rnd_menu_items_id', $id)
+				->where('rnd_menu_packagings_auto_compute.status', 'ACTIVE')
+				->select('tasteless_code',
+				'sku_statuses.sku_status_description as item_status',
+				'item_masters_id',
+				'packaging_name',
+				'prep_qty',
+				'packaging_group',
+				'row_id',
+				'is_primary',
+				'is_selected',
+				'rnd_menu_packagings_auto_compute.packaging_size',
+				'rnd_menu_packagings_auto_compute.full_item_description',
+				'menu_ingredients_preparations.preparation_desc',
+				'packaging_qty',
+				'rnd_menu_packagings_auto_compute.uom_description',
+				'yield',
+				'rnd_menu_packagings_auto_compute.ttp',
+				'cost',
+				'item_masters.updated_at',
+				'item_masters.created_at')
+			->leftJoin('item_masters', 'rnd_menu_packagings_auto_compute.item_masters_id', '=', 'item_masters.id')
+			->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+			->leftJoin('menu_ingredients_preparations', 'rnd_menu_packagings_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
+			->orderby('packaging_group', 'asc')
+			->orderby('row_id', 'asc')
+			->get()
+			->toArray();
+			
+			$rnd_menu_description = $data['item']->rnd_menu_description;
+			$data['ingredients'] = array_map(fn ($object) => (object) array_filter((array) $object), $ingredients);
+			$data['packagings'] = array_map(fn ($object) => (object) array_filter((array) $object), $packagings);
+			$data['page_title'] = "Detail RND Menu Item: $rnd_menu_description";
 			return $this->view('rnd-menu/detail-item', $data);
 
 		}
