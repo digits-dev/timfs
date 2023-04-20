@@ -7,6 +7,10 @@
         background: rgb(213, 211, 211);
     }
 
+    .swal2-html-container {
+        line-height: 3rem;
+    }
+
 </style>
 @endpush
 
@@ -282,6 +286,7 @@
             if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
+                    html: '🔵 Doing so will forward this item to <label class="label label-info">MARKETING APPROVER</label>.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
