@@ -445,16 +445,6 @@
 			return $this->mainController->submitCosting($request);
 		}
 
-		public function submitPackagingCost(Request $request) {
-			if (!CRUDBooster::isUpdate())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-
-			return $this->mainController->submitPackagingCost($request);
-		}
-
 		public function approveByMarketing(Request $request) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(

@@ -782,7 +782,6 @@
 				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
 				->first();
 
-			// return $this->view('rnd-menu/add-packaging', $data);
 			return (new AdminAddMenuItemsController)->getAdd('rnd_menu_items', $item);
 		}
 
@@ -968,7 +967,6 @@
 				->where('rnd_menu_costing.rnd_menu_items_id', $id)
 				->leftJoin('rnd_menu_approvals', 'rnd_menu_approvals.rnd_menu_items_id', '=', 'rnd_menu_costing.rnd_menu_items_id')
 				->first();
-				// dd($data['item']);
 
 			$data['page_title'] = 'Details: ' . $data['item']->rnd_menu_description;
 
@@ -979,54 +977,27 @@
 			return self::getDetail($id);
 		}
 
-		public function submitPackagingCost(Request $request) {
-
-			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
-			$packaging_cost = $request->get('packaging_cost');
-			$time_stamp = date('Y-m-d H:i:s');
-			$action_by = CRUDBooster::myId();
-			$approval_status = 'FOR APPROVAL (MARKETING)';
-
-			if ($rnd_menu_items_id) {
-				//updating the packaging cost
-				DB::table('rnd_menu_items')
-					->where('id', $rnd_menu_items_id)
-					->update([
-						'packaging_cost' => $packaging_cost,
-						'updated_by' => $action_by,
-						'updated_at' => $time_stamp,
-					]);
-
-				//updating the approval status
-				DB::table('rnd_menu_approvals')
-					->where('id', $rnd_menu_items_id)
-					->update([
-						'updated_at' => $time_stamp,
-						'pack_cost_updated_at' => $time_stamp,
-						'pack_cost_updated_by' => $action_by,
-						'approval_status' => $approval_status,
-					]);
-			}
-
-			return redirect(CRUDBooster::mainpath())
-				->with([
-					'message_type' => 'success',
-					'message' => "✔️ Packaging Cost for $rnd_menu_description saved!"
-				]);
-		}
-
 		public function getApproveByMarketing($id) {
-			
-			return self::getEdit($id, 'approve');
+			$data = [];
+
+			$data['item'] = DB::table('rnd_menu_costing')
+				->where('rnd_menu_items_id', $id)
+				->leftJoin('rnd_menu_items', 'rnd_menu_items.id', '=', 'rnd_menu_costing.rnd_menu_items_id')
+				->first();
+
+			$data['page_title'] = 'For Approval (Marketing): ' . $data['item']->rnd_menu_description;
+
+			return $this->view('rnd-menu/approve-item', $data);
 		}
 
 		public function approveByMarketing(Request $request) {
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$action = $request->get('action');
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 			$approval_status = null;
 
-			if ($request->get('action') == 'approved') {
+			if ($action == 'approve') {
 				$approval_status = 'FOR APPROVAL (PURCHASING)';
 				$db_column_at = 'marketing_approved_at';
 				$db_column_by = 'marketing_approved_by';
@@ -1035,13 +1006,13 @@
 				$approval_status = 'REJECTED';
 				$db_column_at = 'rejected_at';
 				$db_column_by = 'rejected_by';
-				$message = '✖️ item Rejected!';
+				$message = '✖️ Item Rejected!';
 				self::notifyForRejection($rnd_menu_items_id);
 			}
 
 			DB::table('rnd_menu_approvals')
-				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
-					'rnd_menu_items_id' => $rnd_menu_items_id,
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update([
 					'approval_status' => $approval_status,
 					$db_column_by => $action_by,
 					$db_column_at => $time_stamp,
