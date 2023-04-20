@@ -277,7 +277,7 @@
 			if (is_numeric($column_value)) $column_value = (float) $column_value;
 
 			$blue_status = ['SAVED', 'FOR COSTING'];
-			$orange_status = ['FOR MENU CREATION'];
+			$orange_status = ['FOR MENU CREATION', 'FOR ITEM CREATION'];
 			$green_status = ['APPROVED'];
 			
 			if ($column_index == 2) {
@@ -387,7 +387,7 @@
 
 			if ($status == 'FOR MENU CREATION') {
 				return $this->mainController->getDetailMarketing($id);
-			} else if ($status == 'FOR APPROVAL (MARKETING)' || $status == 'FOR COSTING') {
+			} else if ($status == 'FOR APPROVAL (MARKETING)' || $status == 'FOR COSTING' || $status = 'FOR ITEM CREATION') {
 				return $this->mainController->getDetailMarketing($id);
 			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
 				return $this->mainController->getDetailPurchasing($id);
@@ -417,7 +417,7 @@
 				return $this->mainController->getSetCosting($id);
 			} else if ($status == 'FOR APPROVAL (MARKETING)') {
 				return $this->mainController->getApproveByMarketing($id);
-			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
+			} else if ($status == 'FOR ITEM CREATION') {
 				return $this->mainController->getEditByPurchasing($id);
 			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
 				return $this->mainController->getEditAccounting($id);

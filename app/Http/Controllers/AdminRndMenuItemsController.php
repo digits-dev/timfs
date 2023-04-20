@@ -998,7 +998,7 @@
 			$approval_status = null;
 
 			if ($action == 'approve') {
-				$approval_status = 'FOR APPROVAL (PURCHASING)';
+				$approval_status = 'FOR ITEM CREATION';
 				$db_column_at = 'marketing_approved_at';
 				$db_column_by = 'marketing_approved_by';
 				$message = '✔️ Item Approved!';
@@ -1032,72 +1032,26 @@
 		}
 
 		public function getEditByPurchasing($id) {
-			if (!CRUDBooster::isUpdate())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
 
-			$data = [];
-
-			$data['action'] = $action;
-
-			$data['item'] = DB::table('rnd_menu_items')
-				->where('id', $id)
+			$data['item'] = DB::table('rnd_menu_costing')
+				->where('rnd_menu_items_id', $id)
+				->leftJoin('rnd_menu_items', 'rnd_menu_items.id', '=', 'rnd_menu_costing.rnd_menu_items_id')
 				->first();
-
-			$data['preparations'] = DB::table('menu_ingredients_preparations')
-				->where('status', 'ACTIVE')
-				->select('id', 'preparation_desc')
-				->orderBy('preparation_desc', 'ASC')
-				->get()
-				->toArray();
-
-			$data['uoms'] = DB::table('uoms')
-				->where('status', 'ACTIVE')
-				->select('id', 'uom_description')
-				->orderBy('uom_description')
-				->get()
-				->toArray();
-
-			$data['privilege'] = CRUDBooster::myPrivilegeName();
 
 			$data['ingredients'] = DB::table('rnd_menu_ingredients_auto_compute')
 				->where('rnd_menu_items_id', $id)
-				->where('rnd_menu_ingredients_auto_compute.status', 'ACTIVE')
-				->select(\DB::raw('item_masters.id as item_masters_id'),
-					'ingredient_name',
-					'menu_as_ingredient_id',
-					'rnd_menu_ingredients_auto_compute.menu_item_description',
-					'is_selected',
-					'is_primary',
-					'is_existing',
-					'rnd_menu_ingredients_auto_compute.packaging_size',
-					'ingredient_qty',
-					'cost',
-					'menu_items.food_cost',
-					'ingredient_group',
-					'uom_id',
-					'uom_description',
-					'packaging_description',
-					'prep_qty',
-					'menu_ingredients_preparations_id',
-					'yield',
-					'rnd_menu_ingredients_auto_compute.ttp',
-					'rnd_menu_ingredients_auto_compute.ttp as ingredient_cost',
-					'item_masters.full_item_description',
-					'sku_status_description as item_status',
-					'menu_items.status as menu_status',
-					'item_masters.updated_at',
-					'item_masters.created_at')
-				->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_ingredients_auto_compute.item_masters_id')
-				->leftJoin('menu_items', 'rnd_menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
-				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
-				->orderBy('ingredient_group', 'ASC')
-				->orderBy('row_id', 'ASC')
+				->where('status', 'ACTIVE')
+				->where('is_existing', 'FALSE')
 				->get()
 				->toArray();
 
+			$data['packagings'] = DB::table('rnd_menu_packagings_auto_compute')
+				->where('rnd_menu_items_id', $id)
+				->where('status', 'ACTIVE')
+				->where('is_existing', 'FALSE')
+				->get()
+				->toArray();
+			
 			return $this->view('rnd-menu/add-tasteless-code', $data);
 		}
 
