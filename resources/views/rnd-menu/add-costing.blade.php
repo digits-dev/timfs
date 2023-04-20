@@ -268,11 +268,15 @@
                 .attr('name', 'rnd_menu_items_id')
                 .val(rnd_menu_items_id);
 
+            const menuId = $(document.createElement('input'))
+                .attr('name', 'menu_items_id')
+                .val("{{ $item->menu_items_id }}");
+
             const rndMenuData = $(document.createElement('input'))
                 .attr('name', 'rnd_menu_data')
                 .val(JSON.stringify(dataObj));
 
-            form.append(csrf, idInput, rndMenuData);
+            form.append(csrf, idInput, menuId, rndMenuData);
             $('.panel-body').append(form);
             form.submit();
         }

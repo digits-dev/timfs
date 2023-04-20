@@ -917,6 +917,7 @@
 					'publisher.name as published_by',
 					'published_at',
 					'menu_items.tasteless_menu_code',
+					'menu_items_id',
 					'rnd_menu_computed_packaging_cost.computed_packaging_total_cost'
 				)
 				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
@@ -931,7 +932,9 @@
 
 		public function submitCosting(Request $request) {
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$menu_items_id = $request->get('menu_items_id');
 			$rnd_menu_data = (array) json_decode($request->get('rnd_menu_data'));
+			$rnd_menu_srp = $rnd_menu_data['rnd_menu_srp'];
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 			$approval_status = 'FOR APPROVAL (MARKETING)';
@@ -942,6 +945,14 @@
 			DB::table('rnd_menu_items')
 				->where('id', $rnd_menu_items_id)
 				->update($rnd_menu_data);
+
+			DB::table('menu_items')
+				->where('id', $menu_items_id)
+				->update([
+					'menu_price_dine' => $rnd_menu_srp,
+					'menu_price_dlv' => $rnd_menu_srp,
+					'menu_price_take' => $rnd_menu_srp,
+				]);
 
 			DB::table('rnd_menu_approvals')
 				->where('rnd_menu_items_id', $rnd_menu_items_id)
