@@ -524,6 +524,7 @@
 				->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_ingredients_auto_compute.item_masters_id')
 				->leftJoin('menu_items', 'rnd_menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
 				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->leftJoin('item_masters_temp', 'item_masters_temp.id', 'rnd_menu_ingredients_auto_compute.item_masters_temp_id')
 				->orderBy('ingredient_group', 'ASC')
 				->orderBy('row_id', 'ASC')
 				->get()
