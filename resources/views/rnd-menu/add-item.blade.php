@@ -895,7 +895,7 @@
                 const query = $(this).val().toLowerCase().replace(/\s+/g, ' ').trim().split(' ')?.filter(e => e != '');
                 const itemList = entry.find('.item-list');
 
-                if (!query.length) {
+                if (!query.length || isNewItem && !entry.find('.ingredient-name, .packaging-name').is(':focus')) {
                     $('.item-list').html('');
                     return;
                 }
