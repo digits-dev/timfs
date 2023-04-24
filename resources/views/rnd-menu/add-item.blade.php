@@ -881,16 +881,19 @@
                 $('.no-ingredient-warning').css('display', '')
             }
 
-            $('.display-ingredient, .display-packaging').keyup(debounce(function() {
+            $('.display-ingredient, .display-packaging, .ingredient-name, .packaging-name').keyup(debounce(function() {
                 const entry = $(this).parents(`
                     .ingredient-entry,
                     .substitute-ingredient,
                     .packaging-entry,
-                    .substitute-packaging
+                    .substitute-packaging,
+                    .new-substitute-ingredient,
+                    .new-substitute-packaging
                 `);
-                const query = $(this).val().toLowerCase().replace(/\s+/g, ' ').trim().split(' ');
+
+                const isNewItem = entry.attr('isExisting') == 'false';
+                const query = $(this).val().toLowerCase().replace(/\s+/g, ' ').trim().split(' ')?.filter(e => e != '');
                 const itemList = entry.find('.item-list');
-                let searchResult  = [];
 
                 if (!query.length) {
                     $('.item-list').html('');
@@ -899,10 +902,10 @@
 
                 $.ajax({
                     type: 'POST',
-                    url: "{{route('search_ingredient')}}",
+                    url: isNewItem ? "{{ route('search_temp_items') }}" : "{{ route('search_ingredient') }}",
                     data: { content: JSON.stringify(query)},
                     success: function(response) {
-                        searchResult = JSON.parse(response);
+                        const searchResult = JSON.parse(response);
                         $.fn.renderSearchResult(entry, itemList, searchResult);
                     },
                     error: function(response) { 
@@ -1099,18 +1102,27 @@
         }
 
         $.fn.renderSearchResult = function(entry, itemList, searchResult) {
-            const current_ingredients = {item_id: [], menu_item_id: []};
+            const currentItems = {item_id: [], menu_item_id: [], item_id_temp: []};
 
-            $('form .ingredient, form .packaging').each(function(ingredientIndex) {
-                const ingredient = $(this);
-                if (ingredientIndex != $('#form .ingredient').index(entry.find('.ingredient'))) {
-                    if (ingredient.attr('item_id'))  current_ingredients.item_id.push(ingredient.attr('item_id'));
-                    if (ingredient.attr('menu_item_id')) current_ingredients.menu_item_id.push(ingredient.attr('menu_item_id'));
+            $('form .ingredient, form .packaging, form .ingredient-name, form .packaging-name').each(function(index) {
+                const item = $(this);
+                const itemIndex = $(`
+                    form .ingredient, 
+                    form .packaging, 
+                    form .ingredient-name, 
+                    form .packaging-name`
+                ).index(entry.find('.ingredient, .packaging, .ingredient-name, .packaging-name'));
+                if (index != itemIndex) {
+                    if (item.attr('item_id'))  console.log('pumasok'),currentItems.item_id.push(item.attr('item_id'));
+                    if (item.attr('menu_item_id')) currentItems.menu_item_id.push(item.attr('menu_item_id'));
+                    if (item.attr('item_masters_temp_id')) currentItems.item_id_temp.push(item.attr('item_masters_temp_id'))
                 }
             });
 
             const result = [...searchResult]
-                .filter(ingredient => !current_ingredients.item_id.includes(ingredient.item_masters_id?.toString()) && !current_ingredients.menu_item_id.includes(ingredient.menu_item_id?.toString()))
+                .filter(item => !currentItems.item_id.includes(item.item_masters_id?.toString()) && 
+                    !currentItems.menu_item_id.includes(item.menu_item_id?.toString()) &&
+                    !currentItems.item_id_temp.includes(item.item_masters_temp_id?.toString()))
                 .sort((a, b) => (a.full_item_description || a.menu_item_description)
                 ?.localeCompare(b.full_item_description || b.menu_item_description));
 
@@ -1137,17 +1149,19 @@
                 li.addClass('list-item dropdown-item');
                 li.attr({
                     item_id: e.item_masters_id,
+                    menu_item_id: e.menu_item_id,
+                    item_masters_temp_id: e.item_masters_temp_id,
                     ttp: parseFloat(e.ttp) || parseFloat(e.food_cost) || 0,
                     packaging_size: e.packaging_size || 1,
                     uom: e.packagings_id || e.uoms_id,
                     uom_desc: e.packaging_description || e.uom_description,
-                    menu_item_id: e.menu_item_id,
                     food_cost_temp: e.food_cost_temp,
-                    item_desc: e.full_item_description || e.menu_item_description,
+                    item_desc: e.full_item_description || e.menu_item_description || e.item_description,
                     date_updated: e.updated_at || e.created_at,
                 });
                 a.html(e.full_item_description && e.item_masters_id ? `<span class="label label-info">IMFS</span> ${e.full_item_description}`
                     : e.menu_item_description ? `<span class="label label-warning">MIMF</span> ${e.menu_item_description}` 
+                    : e.item_masters_temp_id ? `<span class="label label-purple">USER</span> ${e.item_description}` 
                     : 'No Item Found');
                 li.append(a);
                 ul.append(li);
@@ -1421,16 +1435,26 @@
 
         $(document).on('click', '.list-item', function(event) {
             const item = $(this);
-            const entry = item.parents('.ingredient-entry, .substitute-ingredient, .packaging-entry, .substitute-packaging');
+            let entry = item.parents(`
+                .ingredient-entry, 
+                .substitute-ingredient, 
+                .packaging-entry, 
+                .substitute-packaging,
+                .new-substitute-ingredient,
+                .new-substitute-packaging
+            `);
+            if (entry.hasClass('new-substitute-ingredient')) {
+                entry = $('.substitute-ingredient').eq(0).clone();
+            }
             const ingredient_packaging = entry.find('.ingredient, .packaging');
 
-            if (!item.attr('item_id') && !item.attr('menu_item_id')) return;
+            if (!item.attr('item_id') && !item.attr('menu_item_id') && !item.attr('item_masters_temp_id')) return;
             if (item.attr('item_id') && !item.attr('menu_item_id')) {
                 entry.find('.item-from')
                     .removeClass('label-info label-warning label-success label-secondary label-primary')
                     .addClass('label-info')
                     .text('IMFS');
-            } else {
+            } else if (item.attr('menu_item_id')) {
                 entry.find('.item-from')
                     .removeClass('label-info label-warning label-success label-secondary label-primary')
                     .addClass('label-warning')
@@ -1449,9 +1473,15 @@
             });
             if (!item.attr('item_id')) ingredient_packaging.removeAttr('item_id');
             if (!item.attr('menu_item_id')) ingredient_packaging.removeAttr('menu_item_id');
-            entry.find('.display-ingredient, .display-packaging').val(item.attr('item_desc'));
+            entry.find(`
+                .display-ingredient, 
+                .display-packaging, 
+                .ingredient-name, 
+                .packaging-name
+            `).val(item.attr('item_desc'));
             entry.find('.uom').val(item.attr('uom'));
             entry.find('.display-uom').val(item.attr('uom_desc'));
+            entry.find('uom').val(item.attr('uoms_id'));
             entry.find('.ttp')
                 .val(item.attr('ttp'))
                 .attr('ttp', item.attr('ttp'))
@@ -1469,6 +1499,9 @@
                     ''
                 );
             }
+
+            entry.find('select.uom').attr('disabled', true);
+            entry.find('input.pack-size').parents('label').remove();
             $('#form input:valid, #form select:valid').css('outline', 'none');
             $('.item-list').html('');  
             $('.item-list').fadeOut();

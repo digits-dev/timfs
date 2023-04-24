@@ -1299,4 +1299,21 @@
 			CRUDBooster::sendNotification($config);
 		}
 
+		function searchTempItems(Request $request) {
+			$search_terms = json_decode($request->content);
+
+			$result = DB::table('item_masters_temp')
+				->where('status', 'ACTIVE')
+				->where(function($query) use ($search_terms) {
+					foreach ($search_terms as $search_term) {
+						$query->where('item_description', 'like', "%{$search_term}%");
+					}
+				})
+				->select('*', DB::raw('id as item_masters_temp_id'))
+				->get()
+				->toArray();
+
+			return json_encode($result);
+		}
+
 	}
