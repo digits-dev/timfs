@@ -118,7 +118,7 @@
                 <input value="" class="form-control yield" type="number" readonly required>
             </label>
             <label class="label-wide">
-                <span class="required-star">*</span> TTP
+                <span class="required-star">*</span> TTP <span class="date-updated"></span>
                 <input value="" class="form-control ttp" type="number" readonly required>
             </label>
             <label>
@@ -236,7 +236,7 @@
             <input value="" class="form-control yield" type="number" readonly required>
         </label>
         <label class="label-wide">
-            <span class="required-star">*</span> TTP
+            <span class="required-star">*</span> TTP <span class="date-updated"></span>
             <input value="" class="form-control ttp" type="number" readonly required>
         </label>
         <label>
@@ -358,7 +358,7 @@
                 <input value="" class="form-control yield" type="number" readonly required>
             </label>
             <label class="label-wide">
-                <span class="required-star">*</span> TTP
+                <span class="required-star">*</span> TTP <span class="date-updated"></span>
                 <input value="" class="form-control ttp" type="number" readonly required>
             </label>
             <label>
@@ -476,7 +476,7 @@
             <input value="" class="form-control yield" type="number" readonly required>
         </label>
         <label class="label-wide">
-            <span class="required-star">*</span> TTP
+            <span class="required-star">*</span> TTP <span class="date-updated"></span>
             <input value="" class="form-control ttp" type="number" readonly required>
         </label>
         <label>
@@ -1443,9 +1443,7 @@
                 .new-substitute-ingredient,
                 .new-substitute-packaging
             `);
-            if (entry.hasClass('new-substitute-ingredient')) {
-                entry = $('.substitute-ingredient').eq(0).clone();
-            }
+
             const ingredient_packaging = entry.find('.ingredient, .packaging');
 
             if (!item.attr('item_id') && !item.attr('menu_item_id') && !item.attr('item_masters_temp_id')) return;
@@ -1492,7 +1490,7 @@
             entry.find('.prep-quantity')
                 .val('1')
                 .attr('readonly', false);
-            if (item.attr('item_id')) {
+            if (item.attr('item_id') || item.attr('item_masters_temp_id')) {
                 entry.find('.date-updated').text(
                     item.attr('date_updated') ?
                     `${timeago.format(item.attr('date_updated'))}` :
