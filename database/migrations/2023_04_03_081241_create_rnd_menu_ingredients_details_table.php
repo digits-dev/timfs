@@ -17,6 +17,7 @@ class CreateRndMenuIngredientsDetailsTable extends Migration
             $table->increments('id');
             $table->integer('rnd_menu_items_id')->length(10)->unsigned()->nullable();
             $table->integer('item_masters_id')->length(10)->unsigned()->nullable();
+            $table->integer('item_masters_temp_id')->length(10)->unsigned()->nullable();
             $table->integer('menu_as_ingredient_id')->length(10)->unsigned()->nullable();
             $table->string('ingredient_name')->length(100)->nullable();
             $table->integer('row_id')->length(10)->signed()->nullable();
@@ -43,6 +44,7 @@ class CreateRndMenuIngredientsDetailsTable extends Migration
             $table->increments('id');
             $table->integer('rnd_menu_items_id')->length(10)->unsigned()->nullable();
             $table->integer('item_masters_id')->length(10)->unsigned()->nullable();
+            $table->integer('item_masters_temp_id')->length(10)->unsigned()->nullable();
             $table->string('packaging_name')->length(100)->nullable();
             $table->integer('row_id')->length(10)->signed()->nullable();
             $table->integer('packaging_group')->length(10)->signed()->nullable();

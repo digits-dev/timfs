@@ -596,7 +596,7 @@
                                 <div class="input-group-addon">
                                     <span class="custom-icon"><strong>÷</strong></span>
                                 </div>
-                                <input value="{{$item ? (float) $item->portion_size : '1'}}" type="text" class="form-control portion" placeholder="Portion Size">
+                                <input value="{{$item ? (float) $item->portion_size : '1'}}" type="number" class="form-control portion" placeholder="Portion Size">
                             </div>
                         </div>
                     </div>
@@ -778,7 +778,7 @@
                     element.find('.preparation').val(savedIngredient.menu_ingredients_preparations_id)
                     element.find('.yield').val(parseFloat(savedIngredient.yield) || 0);
                     element.find('.ttp').val(parseFloat(savedIngredient.ttp) || 0).attr('packaging_size', savedIngredient.packaging_size);
-
+                    element.find('.ingredient-name').attr('item_masters_temp_id', savedIngredient.item_masters_temp_id);
                     $.fn.computeIngredientOrPackagingCost(element);
                     element.css('display', '');
                     wrapperTemplate.append(element);
@@ -855,7 +855,7 @@
                     element.find('.preparation').val(savedPackaging.menu_ingredients_preparations_id)
                     element.find('.yield').val(parseFloat(savedPackaging.yield) || 0);
                     element.find('.ttp').val(parseFloat(savedPackaging.ttp) || 0).attr('packaging_size', savedPackaging.packaging_size);
-
+                    element.find('.packaging-name').attr('item_masters_temp_id', savedPackaging.item_masters_temp_id);
                     $.fn.computeIngredientOrPackagingCost(element);
                     element.css('display', '');
                     wrapperTemplate.append(element);
@@ -1193,6 +1193,7 @@
                     ingredientObject.row_id = memberIndex;
                     ingredientObject.ingredient_group = groupIndex;
                     ingredientObject.item_masters_id = ingredientMember.find('.ingredient').attr('item_id');
+                    ingredientObject.item_masters_temp_id = ingredientMember.find('.ingredient-name').attr('item_masters_temp_id');
                     ingredientObject.menu_as_ingredient_id = ingredientMember.find('.ingredient').attr('menu_item_id');
                     ingredientObject.ingredient_name = ingredientMember.find('.ingredient-name').val()?.trim().toUpperCase();
                     ingredientObject.packaging_size = ingredientMember.find('.pack-size').val();
@@ -1227,6 +1228,7 @@
                     packagingObject.row_id = memberIndex;
                     packagingObject.packaging_group = groupIndex;
                     packagingObject.item_masters_id = packagingMember.find('.packaging').attr('item_id');
+                    packagingObject.item_masters_temp_id = packagingMember.find('.packaging-name').attr('item_masters_temp_id');
                     packagingObject.packaging_name = packagingMember.find('.packaging-name').val()?.trim().toUpperCase();
                     packagingObject.packaging_size = packagingMember.find('.pack-size').val();
                     packagingObject.prep_qty = packagingMember.find('.prep-quantity').val();

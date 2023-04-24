@@ -519,7 +519,8 @@
 					'sku_status_description as item_status',
 					'menu_items.status as menu_status',
 					'item_masters.updated_at',
-					'item_masters.created_at')
+					'item_masters.created_at',
+					'rnd_menu_ingredients_auto_compute.item_masters_temp_id')
 				->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_ingredients_auto_compute.item_masters_id')
 				->leftJoin('menu_items', 'rnd_menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
 				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
@@ -551,7 +552,8 @@
 					'item_masters.full_item_description',
 					'sku_status_description as item_status',
 					'item_masters.updated_at',
-					'item_masters.created_at')
+					'item_masters.created_at',
+					'rnd_menu_packagings_auto_compute.item_masters_temp_id')
 				->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_packagings_auto_compute.item_masters_id')
 				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
 				->orderBy('packaging_group', 'ASC')
@@ -650,23 +652,36 @@
 					$ingredient['status'] = 'ACTIVE';
 					$ingredient['deleted_at'] = null;
 
+					// inserting item to item_masters_temp if new ingredient
+					if ($ingredient['is_existing'] != 'TRUE' && !$ingredient['item_masters_temp_id']) {
+						$inserted_item_id = DB::table('item_masters_temp')->insertGetId([
+							'item_description' => $ingredient['ingredient_name'],
+							'packaging_size' => $ingredient['packaging_size'],
+							'uoms_id' => $ingredient['uom_id'],
+							'ttp' => $ingredient['ttp'],
+							'created_by' => $action_by,
+							'created_at' => $time_stamp,
+						]);
+
+						$ingredient['item_masters_temp_id'] = $inserted_item_id;
+						unset($ingredient['ttp']);
+					}
+
 					//unsetting ingredients details that may be outdated in the future
 					unset(
 						$ingredient['qty'], 
 						$ingredient['cost'], 
-						$ingredient['total_cost'], 
+						$ingredient['total_cost'],
+						$ingredient['ttp']
 					);
-
-					if ($ingredient['is_existing'] == 'TRUE') {
-						unset($ingredient['ttp']);
-					}
 
 					//finally, inserting ingredients to the table
 					DB::table('rnd_menu_ingredients_details')->updateOrInsert([
 						'rnd_menu_items_id' => $rnd_menu_items_id,
 						'item_masters_id' => $ingredient['item_masters_id'],
 						'ingredient_name' => $ingredient['ingredient_name'],
-						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
+						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
+						'item_masters_temp_id' => $ingredient['item_masters_temp_id'],
 					], $ingredient);
 				}
 			}
@@ -695,22 +710,35 @@
 					$packaging['status'] = 'ACTIVE';
 					$packaging['deleted_at'] = null;
 
+					// inserting item to item_masters_temp if new packaging
+					if ($packaging['is_existing'] != 'TRUE' && !$packaging['item_masters_temp_id']) {
+						$inserted_item_id = DB::table('item_masters_temp')->insertGetId([
+							'item_description' => $packaging['packaging_name'],
+							'packaging_size' => $packaging['packaging_size'],
+							'uoms_id' => $packaging['uom_id'],
+							'ttp' => $packaging['ttp'],
+							'created_by' => $action_by,
+							'created_at' => $time_stamp,
+						]);
+
+						$packaging['item_masters_temp_id'] = $inserted_item_id;
+						
+					}
+
 					//unsetting packagings details that may be outdated in the future
 					unset(
 						$packaging['qty'], 
 						$packaging['cost'], 
-						$packaging['total_cost'], 
+						$packaging['total_cost'],
+						$packaging['ttp']
 					);
-
-					if ($packaging['is_existing'] == 'TRUE') {
-						unset($packaging['ttp']);
-					}
 
 					//finally, inserting packaging to the table
 					DB::table('rnd_menu_packagings_details')->updateOrInsert([
 						'rnd_menu_items_id' => $rnd_menu_items_id,
 						'item_masters_id' => $packaging['item_masters_id'],
 						'packaging_name' => $packaging['packaging_name'],
+						'item_masters_temp_id' => $packaging['item_masters_temp_id']
 					], $packaging);
 						
 				}

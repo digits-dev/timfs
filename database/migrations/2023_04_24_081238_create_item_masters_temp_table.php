@@ -15,10 +15,13 @@ class CreateItemMastersTempTable extends Migration
     {
         Schema::create('item_masters_temp', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('creation_status')->length(50)->nullable();
+            $table->integer('item_masters_id')->length(10)->nullable();
             $table->string('item_description')->nullable();
             $table->decimal('packaging_size', 16, 2)->unsigned()->nullable();
             $table->integer('uoms_id')->length(10)->unsigned()->nullable();
             $table->decimal('ttp', 16, 2)->unsigned()->nullable();
+            $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE')->nullable();
             $table->decimal('created_by')->length(10)->unsigned()->nullable();
             $table->decimal('updated_by')->length(10)->unsigned()->nullable();
             $table->timestamps();
