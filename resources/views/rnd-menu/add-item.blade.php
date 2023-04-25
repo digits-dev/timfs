@@ -873,13 +873,6 @@
                     .attr('disabled', false);
                 packagingSection.append(wrapperTemplate);
             }
-
-            if (action == 'publish' || action == 'approve') {
-                $('#form input').attr('readonly', true);
-                $('#form select').attr('disabled', true);
-                $('#form button').hide();
-                $('#form .add-sub-btn, #form .new-add-sub-btn').hide();
-            }
         }
 
         $.fn.reload = function() {
@@ -1329,7 +1322,7 @@
             `);
 
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
-                jQuery.makeArray($('#form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
+                jQuery.makeArray($('form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
                 $('.portion').val() > 0 && $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() > 0;
 
             const hasIngredient = $('#form-ingredient .ingredient-wrapper, #form-ingredient .new-ingredient-wrapper').length > 0;

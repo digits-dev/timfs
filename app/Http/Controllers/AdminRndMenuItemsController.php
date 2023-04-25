@@ -561,7 +561,10 @@
 				->orderBy('row_id', 'ASC')
 				->get()
 				->toArray();
-
+			
+			if ($action == 'add-packaging') {
+				return $this->view('rnd-menu/add-packaging', $data);
+			}
 
 			return $this->view('rnd-menu/add-item', $data);
 		}
@@ -765,7 +768,7 @@
 		}
 
 		public function publishRNDMenu(Request $request) {
-			$rnd_menu_approval_status = 'FOR MENU CREATION';
+			$rnd_menu_approval_status = 'FOR PACKAGING';
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 			$rnd_menu_description = $request->get('rnd_menu_description');
@@ -788,7 +791,7 @@
 		}
 
 		// for marketing
-		public function getMenuCreation($id) {
+		public function getSetPackaging($id) {
 			$data = [];
 
 			$item = DB::table('rnd_menu_items')
@@ -811,7 +814,99 @@
 				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
 				->first();
 
-			return (new AdminAddMenuItemsController)->getAdd('rnd_menu_items', $item);
+			return self::getEdit($id, 'add-packaging');
+		}
+
+		public function addPackaging(Request $request) {
+			$approval_status = 'FOR MENU CREATION';
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$packagings = json_decode($request->get('packagings'));
+			$rnd_menu_description = $request->get('rnd_menu_description');
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$rnd_menu_srp = $request->get('rnd_menu_srp');
+
+			//updating rnd menu details
+			DB::table('rnd_menu_items')
+				->where('id', $rnd_menu_items_id)
+				->update([
+					'rnd_menu_description' => $rnd_menu_description,
+					'rnd_menu_srp' => $rnd_menu_srp,
+					'updated_by' => $action_by,
+					'updated_at' => $time_stamp
+				]);
+
+			//inactivating all active packagings
+			DB::table('rnd_menu_packagings_details')
+				->where('status', 'ACTIVE')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update(['status' => 'INACTIVE']);
+
+			//looping through nested packagings
+			foreach ($packagings as $group) {
+				foreach ($group as $packaging) {
+					$packaging = (array) $packaging;
+
+					//checking if the packaging already exists
+					$is_existing = DB::table('rnd_menu_packagings_details')
+						->where([
+							'rnd_menu_items_id' => $rnd_menu_items_id,
+							'item_masters_id' => $packaging['item_masters_id'],
+							'packaging_name' => $packaging['packaging_name'],
+						])->exists();
+
+					if ($is_existing) {
+						$packaging['updated_at'] = $time_stamp;
+						$packaging['updated_by'] = $action_by;
+					} else {
+						$packaging['created_at'] = $time_stamp;
+						$packaging['created_by'] = $action_by;
+					}
+
+					$packaging['status'] = 'ACTIVE';
+					$packaging['deleted_at'] = null;
+
+					// inserting item to item_masters_temp if new packaging
+					if ($packaging['is_existing'] != 'TRUE' && !$packaging['item_masters_temp_id']) {
+						$inserted_item_id = DB::table('item_masters_temp')->insertGetId([
+							'item_description' => $packaging['packaging_name'],
+							'packaging_size' => $packaging['packaging_size'],
+							'uoms_id' => $packaging['uom_id'],
+							'ttp' => $packaging['ttp'],
+							'created_by' => $action_by,
+							'created_at' => $time_stamp,
+						]);
+
+						$packaging['item_masters_temp_id'] = $inserted_item_id;
+						
+					}
+
+					//unsetting packagings details that may be outdated in the future
+					unset(
+						$packaging['qty'], 
+						$packaging['cost'], 
+						$packaging['total_cost'],
+						$packaging['ttp']
+					);
+
+					//finally, inserting packaging to the table
+					DB::table('rnd_menu_packagings_details')->updateOrInsert([
+						'rnd_menu_items_id' => $rnd_menu_items_id,
+						'item_masters_id' => $packaging['item_masters_id'],
+						'packaging_name' => $packaging['packaging_name'],
+						'item_masters_temp_id' => $packaging['item_masters_temp_id']
+					], $packaging);
+						
+				}
+			}
+
+			DB::table('rnd_menu_approvals')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update([
+					'approval_status' => $approval_status,
+
+				]);
+			echo 'done';
 		}
 
 		public function saveNewMenu(Request $request) {

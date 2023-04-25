@@ -277,7 +277,7 @@
 			if (is_numeric($column_value)) $column_value = (float) $column_value;
 
 			$blue_status = ['SAVED', 'FOR COSTING'];
-			$orange_status = ['FOR MENU CREATION', 'FOR ITEM CREATION'];
+			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION'];
 			$green_status = ['APPROVED'];
 			
 			if ($column_index == 2) {
@@ -411,8 +411,8 @@
 				->first()
 				->approval_status;
 
-			if ($status == 'FOR MENU CREATION') {
-				return $this->mainController->getMenuCreation($id);
+			if ($status == 'FOR PACKAGING') {
+				return $this->mainController->getSetPackaging($id);
 			} else if ($status == 'FOR COSTING') {
 				return $this->mainController->getSetCosting($id);
 			} else if ($status == 'FOR APPROVAL (MARKETING)') {
@@ -433,6 +433,16 @@
 				);
 
 			return $this->mainController->saveNewMenu($request);
+		}
+
+		public function addPackaging(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->addPackaging($request);
 		}
 
 		public function submitCosting(Request $request) {
