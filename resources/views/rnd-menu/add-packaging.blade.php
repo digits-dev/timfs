@@ -828,42 +828,42 @@
             });
             const packagingsJSON = JSON.stringify(packagingsArray);
 
-            const form = $(document.createElement('form'))
-                .attr('method', 'POST')
-                .attr('action', "{{ route('add_packaging') }}")
-                .css('display', 'none');
-
-            const csrf = $(document.createElement('input'))
-                .attr({
-                    type: 'hidden',
-                    name: '_token',
-                }).val("{{ csrf_token() }}");
-
-            const packagingsData = $(document.createElement('input'))
-                .attr('name', 'packagings')
-                .val(packagingsJSON);
-
-            const rndMenuDescriptionData = $(document.createElement('input'))
-                .attr('name', 'rnd_menu_description')
-                .val($('.rnd_menu_description').val().trim());
-
-            const rndMenuIdData = $(document.createElement('input'))
-                .attr('name', 'rnd_menu_items_id')
-                .val(rndMenuItem?.id);
-
-            const srpData = $(document.createElement('input'))
-                .attr('name', 'rnd_menu_srp')
-                .val($('.rnd_menu_srp').val());
-
-            form.append(
-                csrf,
-                packagingsData,
-                rndMenuDescriptionData,
-                rndMenuIdData,
-                srpData,
-            );
-            $('.panel-body').append(form);
-            form.submit();
+            $.ajax({
+                type: 'POST',
+                url: "{{ route('add_packaging') }}",
+                data: {
+                    packagings: packagingsJSON,
+                    rnd_menu_description: $('.rnd_menu_description').val().trim(),
+                    rnd_menu_items_id: rndMenuItem?.id,
+                    rnd_menu_srp: $('.rnd_menu_srp').val(),
+                },
+                success: function(response) {
+                    Swal.fire({
+                        title: 'Packagings Saved!',
+                        html: '📄 Do you want to continue to Menu Creation?',
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: 'Not now',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.href = "{{ CRUDBooster::mainPath() }}" + `/edit/${rndMenuItem.id}`;
+                        } else {
+                            location.href = "{{ CRUDBooster::mainPath() }}";
+                        }
+                    });
+                },
+                error: function(response) { 
+                    console.log(response);
+                    Swal.fire({
+                        title: 'Oops',
+                        html: 'Something went wrong.',
+                        icon: 'error'
+                    });
+                }  
+            });
         }
 
         $.fn.checkFormValidity = function() {

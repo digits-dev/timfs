@@ -415,6 +415,8 @@
 				return $this->mainController->getSetPackaging($id);
 			} else if ($status == 'FOR COSTING') {
 				return $this->mainController->getSetCosting($id);
+			} else if ($status == 'FOR MENU CREATION') {
+				return $this->mainController->getCreateNewMenu($id);
 			} else if ($status == 'FOR APPROVAL (MARKETING)') {
 				return $this->mainController->getApproveByMarketing($id);
 			} else if ($status == 'FOR ITEM CREATION') {

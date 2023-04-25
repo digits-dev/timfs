@@ -492,75 +492,78 @@
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 
-			$data['ingredients'] = DB::table('rnd_menu_ingredients_auto_compute')
-				->where('rnd_menu_items_id', $id)
-				->where('rnd_menu_ingredients_auto_compute.status', 'ACTIVE')
-				->select(\DB::raw('item_masters.id as item_masters_id'),
-					'ingredient_name',
-					'menu_as_ingredient_id',
-					'rnd_menu_ingredients_auto_compute.menu_item_description',
-					'is_selected',
-					'is_primary',
-					'is_existing',
-					'rnd_menu_ingredients_auto_compute.packaging_size',
-					'ingredient_qty',
-					'cost',
-					'menu_items.food_cost',
-					'ingredient_group',
-					'uom_id',
-					'uom_description',
-					'packaging_description',
-					'prep_qty',
-					'menu_ingredients_preparations_id',
-					'yield',
-					'rnd_menu_ingredients_auto_compute.ttp',
-					'rnd_menu_ingredients_auto_compute.ttp as ingredient_cost',
-					'item_masters.full_item_description',
-					'sku_status_description as item_status',
-					'menu_items.status as menu_status',
-					'item_masters.updated_at',
-					'item_masters.created_at',
-					'rnd_menu_ingredients_auto_compute.item_masters_temp_id')
-				->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_ingredients_auto_compute.item_masters_id')
-				->leftJoin('menu_items', 'rnd_menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
-				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
-				->leftJoin('item_masters_temp', 'item_masters_temp.id', 'rnd_menu_ingredients_auto_compute.item_masters_temp_id')
-				->orderBy('ingredient_group', 'ASC')
-				->orderBy('row_id', 'ASC')
-				->get()
-				->toArray();
+			if ($id) {
+				$data['ingredients'] = DB::table('rnd_menu_ingredients_auto_compute')
+					->where('rnd_menu_items_id', $id)
+					->where('rnd_menu_ingredients_auto_compute.status', 'ACTIVE')
+					->select(\DB::raw('item_masters.id as item_masters_id'),
+						'ingredient_name',
+						'menu_as_ingredient_id',
+						'rnd_menu_ingredients_auto_compute.menu_item_description',
+						'is_selected',
+						'is_primary',
+						'is_existing',
+						'rnd_menu_ingredients_auto_compute.packaging_size',
+						'ingredient_qty',
+						'cost',
+						'menu_items.food_cost',
+						'ingredient_group',
+						'uom_id',
+						'uom_description',
+						'packaging_description',
+						'prep_qty',
+						'menu_ingredients_preparations_id',
+						'yield',
+						'rnd_menu_ingredients_auto_compute.ttp',
+						'rnd_menu_ingredients_auto_compute.ttp as ingredient_cost',
+						'item_masters.full_item_description',
+						'sku_status_description as item_status',
+						'menu_items.status as menu_status',
+						'item_masters.updated_at',
+						'item_masters.created_at',
+						'rnd_menu_ingredients_auto_compute.item_masters_temp_id')
+					->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_ingredients_auto_compute.item_masters_id')
+					->leftJoin('menu_items', 'rnd_menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
+					->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+					->leftJoin('item_masters_temp', 'item_masters_temp.id', 'rnd_menu_ingredients_auto_compute.item_masters_temp_id')
+					->orderBy('ingredient_group', 'ASC')
+					->orderBy('row_id', 'ASC')
+					->get()
+					->toArray();
+	
+				$data['packagings'] = DB::table('rnd_menu_packagings_auto_compute')
+					->where('rnd_menu_items_id', $id)
+					->where('rnd_menu_packagings_auto_compute.status', 'ACTIVE')
+					->select(\DB::raw('item_masters.id as item_masters_id'),
+						'packaging_name',
+						'is_selected',
+						'is_primary',
+						'is_existing',
+						'rnd_menu_packagings_auto_compute.packaging_size',
+						'packaging_qty',
+						'cost',
+						'packaging_group',
+						'uom_id',
+						'uom_description',
+						'packaging_description',
+						'prep_qty',
+						'menu_ingredients_preparations_id',
+						'yield',
+						'rnd_menu_packagings_auto_compute.ttp',
+						'rnd_menu_packagings_auto_compute.ttp as packaging_cost',
+						'item_masters.full_item_description',
+						'sku_status_description as item_status',
+						'item_masters.updated_at',
+						'item_masters.created_at',
+						'rnd_menu_packagings_auto_compute.item_masters_temp_id')
+					->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_packagings_auto_compute.item_masters_id')
+					->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+					->orderBy('packaging_group', 'ASC')
+					->orderBy('row_id', 'ASC')
+					->get()
+					->toArray();
+			}
 
-			$data['packagings'] = DB::table('rnd_menu_packagings_auto_compute')
-				->where('rnd_menu_items_id', $id)
-				->where('rnd_menu_packagings_auto_compute.status', 'ACTIVE')
-				->select(\DB::raw('item_masters.id as item_masters_id'),
-					'packaging_name',
-					'is_selected',
-					'is_primary',
-					'is_existing',
-					'rnd_menu_packagings_auto_compute.packaging_size',
-					'packaging_qty',
-					'cost',
-					'packaging_group',
-					'uom_id',
-					'uom_description',
-					'packaging_description',
-					'prep_qty',
-					'menu_ingredients_preparations_id',
-					'yield',
-					'rnd_menu_packagings_auto_compute.ttp',
-					'rnd_menu_packagings_auto_compute.ttp as packaging_cost',
-					'item_masters.full_item_description',
-					'sku_status_description as item_status',
-					'item_masters.updated_at',
-					'item_masters.created_at',
-					'rnd_menu_packagings_auto_compute.item_masters_temp_id')
-				->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_packagings_auto_compute.item_masters_id')
-				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
-				->orderBy('packaging_group', 'ASC')
-				->orderBy('row_id', 'ASC')
-				->get()
-				->toArray();
 			
 			if ($action == 'add-packaging') {
 				return $this->view('rnd-menu/add-packaging', $data);
@@ -792,27 +795,6 @@
 
 		// for marketing
 		public function getSetPackaging($id) {
-			$data = [];
-
-			$item = DB::table('rnd_menu_items')
-				->where('rnd_menu_items.id', $id)
-				->select(
-					'rnd_menu_items.id as rnd_menu_items_id',
-					'rnd_menu_items.rnd_menu_description',
-					'rnd_code',
-					'rnd_menu_items.portion_size',
-					'rnd_menu_items.rnd_menu_srp',
-					'approval_status',
-					'computed_ingredient_total_cost',
-					'computed_food_cost',
-					'computed_food_cost_percentage',
-					'publisher.name as published_by',
-					'published_at'
-				)
-				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
-				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
-				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
-				->first();
 
 			return self::getEdit($id, 'add-packaging');
 		}
@@ -821,10 +803,10 @@
 			$approval_status = 'FOR MENU CREATION';
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
-			$packagings = json_decode($request->get('packagings'));
-			$rnd_menu_description = $request->get('rnd_menu_description');
-			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
-			$rnd_menu_srp = $request->get('rnd_menu_srp');
+			$packagings = json_decode($request->packagings);
+			$rnd_menu_description = $request->rnd_menu_description;
+			$rnd_menu_items_id = $request->rnd_menu_items_id;
+			$rnd_menu_srp = $request->rnd_menu_srp;
 
 			//updating rnd menu details
 			DB::table('rnd_menu_items')
@@ -904,9 +886,35 @@
 				->where('rnd_menu_items_id', $rnd_menu_items_id)
 				->update([
 					'approval_status' => $approval_status,
-
+					'packaging_updated_by' => $action_by,
+					'packaging_updated_at' => $time_stamp
 				]);
-			echo 'done';
+			return true;
+		}
+
+		public function getCreateNewMenu($id) {
+
+			$item = DB::table('rnd_menu_items')
+				->where('rnd_menu_items.id', $id)
+				->select(
+					'rnd_menu_items.id as rnd_menu_items_id',
+					'rnd_menu_items.rnd_menu_description',
+					'rnd_code',
+					'rnd_menu_items.portion_size',
+					'rnd_menu_items.rnd_menu_srp',
+					'approval_status',
+					'computed_ingredient_total_cost',
+					'computed_food_cost',
+					'computed_food_cost_percentage',
+					'publisher.name as published_by',
+					'published_at'
+				)
+				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
+				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
+				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
+				->first();
+
+			return (new AdminAddMenuItemsController)->getAdd('rnd_menu_items', $item);
 		}
 
 		public function saveNewMenu(Request $request) {
