@@ -779,6 +779,9 @@
                     element.find('.yield').val(parseFloat(savedIngredient.yield) || 0);
                     element.find('.ttp').val(parseFloat(savedIngredient.ttp) || 0).attr('packaging_size', savedIngredient.packaging_size);
                     element.find('.ingredient-name').attr('item_masters_temp_id', savedIngredient.item_masters_temp_id);
+                    element.find('.ttp').attr('readonly', true);
+                    element.find('.uom').attr('disabled', true);
+                    element.find('.pack-size').parents('label').remove();
                     $.fn.computeIngredientOrPackagingCost(element);
                     element.css('display', '');
                     wrapperTemplate.append(element);
@@ -856,6 +859,9 @@
                     element.find('.yield').val(parseFloat(savedPackaging.yield) || 0);
                     element.find('.ttp').val(parseFloat(savedPackaging.ttp) || 0).attr('packaging_size', savedPackaging.packaging_size);
                     element.find('.packaging-name').attr('item_masters_temp_id', savedPackaging.item_masters_temp_id);
+                    element.find('.ttp').attr('readonly', true);
+                    element.find('.uom').attr('disabled', true);
+                    element.find('.pack-size').parents('label').remove();
                     $.fn.computeIngredientOrPackagingCost(element);
                     element.css('display', '');
                     wrapperTemplate.append(element);
@@ -1356,6 +1362,7 @@
             if (isValid) {
                 Swal.fire({
                     title: action == 'add' ? 'Do you want to save this item?' : 'Do you want to save the changes?',
+                    html: '📄 Newly added ingredients and packagings will be forwarded to <label class="label label-info">PURCHASING</label> for Item Creation in IMFS.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
