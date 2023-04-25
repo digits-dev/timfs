@@ -1331,15 +1331,17 @@
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('#form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
                 $('.portion').val() > 0 && $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() > 0;
+
+            const hasIngredient = $('#form-ingredient .ingredient-wrapper, #form-ingredient .new-ingredient-wrapper').length > 0;
             
-            return isValid;
+            return [isValid, hasIngredient];
         }
 
-        $.fn.formatInvalidInputs = function() {
+        $.fn.formatInvalidInputs = function(isValid) {
             Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Please fill out all fields!',
+                    text: !isValid ? 'Please fill out all fields!' : 'Please add ingredients!',
                 }).then(() => {
                     $(`
                         .ingredient-section input:invalid, 
@@ -1358,7 +1360,7 @@
         }
 
         $(document).on('click', '#save-btn', function(event) {
-            const isValid = $.fn.checkFormValidity();
+            const [isValid, hasIngredient] = $.fn.checkFormValidity();
             if (isValid) {
                 Swal.fire({
                     title: action == 'add' ? 'Do you want to save this item?' : 'Do you want to save the changes?',
@@ -1374,13 +1376,13 @@
                     }
                 });
             } else {
-                $.fn.formatInvalidInputs();
+                $.fn.formatInvalidInputs(isValid);
             }
         }); 
 
         $(document).on('click', '#publish-btn', function(event) {
-            const isValid = $.fn.checkFormValidity();
-            if (isValid) {
+            const [isValid, hasIngredient] = $.fn.checkFormValidity();
+            if (isValid && hasIngredient) {
                 Swal.fire({
                     title: 'Do you want to publish this item?',
                     html: '🟠  Doing so will forward this item to <span class="label label-warning">MARKETING</span>.<br/>' +
@@ -1396,7 +1398,7 @@
                     }    
                 });
             } else {
-                $.fn.formatInvalidInputs();
+                $.fn.formatInvalidInputs(isValid);
             }
 
         });
