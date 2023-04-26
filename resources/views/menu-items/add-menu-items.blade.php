@@ -10,6 +10,13 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
+    .swal2-html-container {
+        line-height: 3rem;
+    }
+
+    .swal2-popup, .swal2-modal, .swal2-icon-warning .swal2-show {
+        font-size: 1.6rem !important;
+    }
 
     .form-column{
     margin: 0 1vw;
@@ -158,14 +165,6 @@
                     <fieldset>
                         <legend><span id="required">*</span> Product Type</legend>
                         <input type="text" name="product_type" placeholder="Enter a product type" required oninput="this.value = this.value.toUpperCase()">
-
-                        {{-- <select class="js-example-basic-single" name="product_type" id="menu_type_select2" required>
-                            <option value="" selected disabled></option>
-                            @foreach ($menu_product_types as $product_type)
-                                <option value="{{ $product_type->id }}">{{ $product_type->menu_product_type_description }}</option>
-                            @endforeach
-                        </select> --}}
-
                     </fieldset>
                     <fieldset>
                         <legend><span id="required">*</span> Menu Type</legend>
@@ -259,13 +258,18 @@
             </div>
             <div class="panel-footer">
                 <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-                <input type='submit' class='btn btn-primary pull-right' value='Add Menu' onclick=""/>
+                <input type="{{$item->rnd_menu_items_id ? 'button' : 'submit'}}" class='btn btn-primary pull-right add-menu' value='Add Menu' onclick=""/>
+                @if ($item->rnd_menu_items_id)
+                <button id="submit-button" type="submit" class="hide">Submit</button>
+                @endif
             </div>
         </form>
     </div>
 </div>
 
 <script>
+    const item = {!! json_encode($item) !!};
+
     $('#menu_type_select1').select2({
         placeholder: "Select a menu segmentation",
         allowClear: true,
@@ -354,53 +358,63 @@
             
         }
     });
-    
 
+    if (item.rnd_menu_items_id) {
+        $(document).on('click', '.add-menu', function() {
+            Swal.fire({
+                title: 'Do you want to save this item?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                returnFocus: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#submit-button').click();
+                }
+            });
+        });
 
+        $('#form-add').submit(function(event) {
+            const formData = $('#form-add').serialize();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('add_new_menu') }}",
+                data: formData,
+                dataType: "json",
+                encode: true,
+                success: function(response) {
+                    Swal.fire({
+                        title: `✔️ New Menu Item Created!`,
+                        html: '📄 Do you want to continue to Costing?',
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: 'Not now',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.href = "{{ CRUDBooster::mainPath() }}" + `/edit/${item.rnd_menu_items_id}`;
+                        } else {
+                            location.href = "{{ CRUDBooster::mainPath() }}";
+                        }
+                    });
+                },
+                error: function(response) { 
+                    console.log(response);
+                    Swal.fire({
+                        title: 'Oops',
+                        html: 'Something went wrong.',
+                        icon: 'error'
+                    });
+                } 
+            });
 
-    // $('.select2-search__field').on('keypress', function(e) {
-    //     console.log('Key pressed: ' + e.which);
-    // })
-
-    // $('#group_1_sku').find('.select2-search__field').on('keypress', function() {
-    //     let txt = $(this).val();
-    //     var ajax_data = 'Patrick Lester'
-    //     $.ajax({
-    //         url: '{{ url('/add_menu_items') }}',
-    //         type: "POST",
-    //         cache: false,
-    //         data: {
-    //             'name': txt,
-    //             _token: '{!! csrf_token() !!}'
-    //         },
-    //         success: function(data){
-    //             // console.log(result.data.ajax_html.map(e => e.tasteless_menu_code));
-
-    //             // let tasteless_menu = result.data.search_tasteless_menu_code;
-    //             // // $("#menu_type_select6").html('');
-    //             // for(i=0; i<tasteless_menu.length; i++){
-
-    //             //     let menu_code = tasteless_menu.map(e => e.tasteless_menu_code)[i];
-    //             //     let menu_description = tasteless_menu.map(e => e.menu_item_description)[i]
-    //             //     // console.log(tasteless_menu[i]);
-    //             //     $("#menu_type_select6").append("<option value='"+menu_code+"'>"+menu_description+"</option>");
-    //             // }
-
-    //             // $.each(data, function (index, value) {
-    //             //     let test = value.search_tasteless_menu_code
-    //             //     for(i=0;i<test.length;i++){
-    //             //         console.log(test[i]['menu_item_description']);
-    //             //         $('#menu_type_select6').append('<option value="' + value.id + '">' + test[i]['menu_item_description'] + '</option>');
-    //             //     }
-    //             // });
-    //         },
-    //         error: function(xhr, status, error) {
-    //             console.log('Error:', error);
-    //         }
-
-    //     })
-    // });
-
+            event.preventDefault();
+        });
+    }
 
 
 </script>

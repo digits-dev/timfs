@@ -1022,6 +1022,8 @@
 					'menu_created_at' => $time_stamp
 				]);
 
+				return true;
+
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',

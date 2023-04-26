@@ -11,6 +11,18 @@
         line-height: 3rem;
     }
 
+    table td + td {
+        border-left: 2px solid #b9b8b8 !important; 
+    }
+
+    table, th {
+        border: 2px solid #b9b8b8 !important; 
+    }
+
+    .divider {
+        border-top: 2px solid #b9b8b8;
+    }
+
 </style>
 @endpush
 
@@ -37,17 +49,6 @@
                                 <i class="fa fa-sticky-note"></i>
                             </div>
                             <input value="{{$item ? $item->rnd_menu_description : ''}}" type="text" class="form-control rnd_menu_description" placeholder="RND Menu Item Description" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">RND Menu SRP</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <span class="custom-icon"><strong>₱</strong></span>
-                            </div>
-                            <input value="{{$item ? (float) $item->rnd_menu_srp : ''}}" type="number" class="form-control rnd_menu_srp" placeholder="0.00" readonly>
                         </div>
                     </div>
                 </div>
@@ -104,7 +105,7 @@
                                     <input type="number" class="form-control buffer" placeholder="Buffer" step="any" required>
                                 </td>
                             </tr>
-                            <tr style="border-top: 2px solid #ddd;">
+                            <tr class="divider">
                                 <td class="text-center text-bold">Final Recipe Cost</td>
                                 <td class="text-center">
                                     <input type="number" class="form-control final-recipe-cost" placeholder="Final Recipe Cost" step="any" readonly>
@@ -134,7 +135,7 @@
                                     <input type="number" class="form-control ideal-food-cost" placeholder="Ideal Food Cost" step="any" required>
                                 </td>
                             </tr>
-                            <tr style="border-top: 2px solid #ddd;">
+                            <tr class="divider">
                                 <td class="text-center text-bold">Suggested Final SRP With VAT</td>
                                 <td class="text-center">
                                     <input type="number" class="form-control suggested-final-srp-w-vat" placeholder="Suggested Final SRP With VAT" step="any" readonly>
@@ -164,7 +165,7 @@
                                     <input type="number" class="form-control final-srp-w-vat" placeholder="Final SRP with VAT" step="any" required>
                                 </td>
                             </tr>
-                            <tr style="border-top: 2px solid #ddd;">
+                            <tr class="divider">
                                 <td class="text-center text-bold">% Cost Packaging From Final SRP</td>
                                 <td class="text-center">
                                     <input type="number" class="form-control cost-packaging-from-final-srp" placeholder="% Cost Packaging From Final SRP" step="any" readonly>
@@ -290,7 +291,8 @@
             if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
-                    html: '🔵 Doing so will forward this item to <label class="label label-info">MARKETING APPROVER</label>.',
+                    html: '🔵 Doing so will forward this item to <label class="label label-info">MARKETING APPROVER</label>.' + 
+                        '<br/> 📄 You won\'t be able to revert this.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
