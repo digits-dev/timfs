@@ -1040,6 +1040,8 @@
 
 			$data['workflow'] = self::getWorkFlowDetails($id);
 
+			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
+
 
 			return $this->view('rnd-menu/add-costing', $data);
 		}
@@ -1428,6 +1430,65 @@
 			->first();
 
 			return $data;
+		}
+
+		function getMenuItemDetails($id) {
+			$data = [];
+
+			$menu_items_data = DB::table('menu_items')
+				->where('menu_items.id', $id)
+				->select(
+					'*',
+					'menu_items.id as menu_items_id',
+				)
+				->leftJoin('menu_categories', 'menu_categories.id', 'menu_items.menu_categories_id')
+				->leftJoin('menu_types', 'menu_types.id', '=', 'menu_items.menu_types_id')
+				->leftJoin('menu_subcategories', 'menu_subcategories.id', '=', 'menu_items.menu_subcategories_id')
+				->get()
+				->first();
+
+			$all_old_codes = DB::table('menu_old_code_masters')
+					->where('status', 'ACTIVE')
+					->get()
+					->toArray();
+
+			$menu_items_data->old_codes = $all_old_codes;
+
+			$all_segmentations = DB::table('menu_segmentations')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
+			$menu_segmentations = [];
+
+			foreach ($all_segmentations as $segmentation) {
+				if ($menu_items_data->{$segmentation->menu_segment_column_name}) {
+					$menu_segmentations[] = $segmentation->menu_segment_column_description;
+				}
+			}
+
+			$menu_items_data->menu_segmentations = $menu_segmentations;
+
+			$all_menu_choices_groups = DB::table('menu_choice_groups')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
+			$menu_items_data->menu_choice_groups = $all_menu_choices_groups;
+
+			foreach($all_menu_choices_groups as $choice_group) {
+				$column_name = 'choices_sku' . $choice_group->menu_choice_group_column_name;
+				$sku_ids = explode(', ', $menu_items_data->{$column_name});
+				$menu_names = DB::table('menu_items')
+					->whereIn('tasteless_menu_code', $sku_ids)
+					->get('menu_item_description')
+					->toArray();
+
+				$menu_names = array_map(fn($obj) => $obj->menu_item_description, $menu_names);
+				$menu_items_data->{$column_name} = $menu_names;
+			}
+			// dd($menu_items_data);
+			return $menu_items_data;
 		}
 
 	}
