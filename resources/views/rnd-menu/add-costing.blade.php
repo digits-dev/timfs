@@ -3,6 +3,22 @@
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <style>
+    .flex {
+        display: flex;
+    }
+
+    .parent {
+        flex-wrap: wrap;
+    }
+
+    .child {
+        min-width: 500px;
+        margin-top: 10px;
+    }
+
+    .child > * {
+        width: 50%;
+    }
     thead {
         background: rgb(213, 211, 211);
     }
@@ -28,7 +44,8 @@
     }
 
     .srp-td {
-        max-width: 70px;
+        width: 30%;
+        margin: auto 3px;
     }
 
     .row-srp {
@@ -71,12 +88,12 @@
             <div class="row">
                 <div class="col-md-5">
                     <div class="form-group">
-                        <label for="" class="control-label">RND Menu Item Description</label>
+                        <label for="" class="control-label">Menu Item Description</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input value="{{$item ? $item->rnd_menu_description : ''}}" type="text" class="form-control rnd_menu_description" placeholder="RND Menu Item Description" readonly>
+                            <input value="{{$item ? $item->menu_item_description : ''}}" type="text" class="form-control rnd_menu_description" placeholder="RND Menu Item Description" readonly>
                         </div>
                     </div>
                 </div>
@@ -142,7 +159,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
@@ -172,7 +189,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-5">
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
@@ -228,14 +245,49 @@
                     </table>
                 </div>
             </div>
-            <hr>
-            <div class="row">
-                <div class="col-md-2 h-5"><strong>Published by:</strong></div>
-                <div class="col-md-3">{{$item->published_by}}</div>
-                <div class="col-md-2"><strong>Published at:</strong></div>
-                <div class="col-md-3">{{$item->published_at}}</div>
-            </div>
         </form>
+        <section class="menu-details">
+            <div class="row">
+                <h3 class="text-center">MENU ITEM DETAILS</h3>
+            </div>
+            
+        </section>
+        <hr>
+        <section class="workflow-details">
+            <h3 class="text-center">WORKFLOW DETAILS</h3>
+            <div class="flex parent">
+                <div class="flex child">
+                    <div class="text-bold">Published by:</div>
+                    <div>{{$workflow->published_by_name}}</div>
+                </div>
+                <div class="flex child">
+                    <div class="text-bold">Published at:</div>
+                    <div>{{$workflow->published_at}}</div>
+                </div>
+            </div>
+            <br>
+            <div class="flex parent">
+                <div class="flex child">
+                    <div class="text-bold">Packaging updated by:</div>
+                    <div>{{$workflow->packaging_updated_by_name}}</div>
+                </div>
+                <div class="flex child">
+                    <div class="text-bold">Packaging updated at:</div>
+                    <div>{{$workflow->packaging_updated_at}}</div>
+                </div>
+            </div>
+            <br>
+            <div class="flex parent">
+                <div class="flex child">
+                    <div class="text-bold">Menu created by:</div>
+                    <div>{{$workflow->menu_created_by_name}}</div>
+                </div>
+                <div class="flex child">
+                    <div class="text-bold">Menu created at:</div>
+                    <div>{{$workflow->menu_created_at}}</div>
+                </div>
+            </div>
+        </section>
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>

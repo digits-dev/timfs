@@ -1038,6 +1038,9 @@
 				->where('rnd_menu_items_id', $id)
 				->first();
 
+			$data['workflow'] = self::getWorkFlowDetails($id);
+
+
 			return $this->view('rnd-menu/add-costing', $data);
 		}
 
@@ -1359,6 +1362,8 @@
 				]);
 		}
 
+		// custom functions
+
 		function notifyForRejection($id) {
 			$item = DB::table('rnd_menu_items')
 				->where('rnd_menu_items.id', $id)
@@ -1393,6 +1398,36 @@
 				->toArray();
 
 			return json_encode($result);
+		}
+
+		function getWorkFlowDetails($id) {
+
+			$data = DB::table('rnd_menu_approvals')
+			->where('rnd_menu_items_id', $id)
+			->select(
+				'published_by.name as published_by_name',
+				'published_at',
+				'packaging_updated_by.name as packaging_updated_by_name',
+				'packaging_updated_at',
+				'menu_created_by.name as menu_created_by_name',
+				'menu_created_at',
+				'costing_updated_by.name as costing_updated_by_name',
+				'costing_updated_at',
+				'marketing_approved_by.name as marketing_approved_by_name',
+				'marketing_approved_at',
+				'rejected_by.name as reject_by_name',
+				'rejected_at'
+			)
+			->leftJoin('cms_users as published_by', 'published_by.id', '=', 'rnd_menu_approvals.published_by')
+			->leftJoin('cms_users as packaging_updated_by', 'packaging_updated_by.id', '=', 'rnd_menu_approvals.packaging_updated_by')
+			->leftJoin('cms_users as menu_created_by', 'menu_created_by.id', '=', 'rnd_menu_approvals.menu_created_by')
+			->leftJoin('cms_users as costing_updated_by', 'costing_updated_by.id', '=', 'rnd_menu_approvals.costing_updated_by')
+			->leftJoin('cms_users as marketing_approved_by', 'marketing_approved_by.id', '=', 'rnd_menu_approvals.marketing_approved_by')
+			->leftJoin('cms_users as accounting_approved_by', 'accounting_approved_by.id', '=', 'rnd_menu_approvals.accounting_approved_by')
+			->leftJoin('cms_users as rejected_by', 'rejected_by.id', '=', 'rnd_menu_approvals.rejected_by')
+			->first();
+
+			return $data;
 		}
 
 	}
