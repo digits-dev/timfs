@@ -11,6 +11,10 @@
         line-height: 3rem;
     }
 
+    td {
+        vertical-align: middle !important;
+    }
+
     table td + td {
         border-left: 2px solid #b9b8b8 !important; 
     }
@@ -21,6 +25,19 @@
 
     .divider {
         border-top: 2px solid #b9b8b8;
+    }
+
+    .srp-td {
+        max-width: 75px;
+        min-width: 58px;
+    }
+
+    .row-srp {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        flex-direction: row;
+        flex-wrap: wrap;
     }
 
 </style>
@@ -161,8 +178,21 @@
                             </tr>
                             <tr>
                                 <td class="text-center text-bold">Final SRP with VAT</td>
-                                <td class="text-center">
-                                    <input type="number" class="form-control final-srp-w-vat" placeholder="Final SRP with VAT" step="any" required>
+                                <td>
+                                    <div class="row-srp">
+                                        <div class="srp-td">
+                                            <p class="text-center text-bold">Dine In</p>
+                                            <input type="text" class="form-control final-srp-w-vat-dine-in" placeholder="0.00">
+                                        </div>
+                                        <div class="srp-td">
+                                            <p class="text-center text-bold">Take Out</p>
+                                            <input type="text" class="form-control" placeholder="0.00">
+                                        </div>
+                                        <div class="srp-td">
+                                            <p class="text-center text-bold">Delivery</p>
+                                            <input type="text" class="form-control" placeholder="0.00">
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             <tr class="divider">
@@ -220,7 +250,7 @@
 
             $('.packaging-cost').val(parseFloat(item.computed_packaging_total_cost || 0));
             $('.ideal-food-cost').val(parseFloat(item.ideal_food_cost || 30));
-            $('.final-srp-w-vat').val(parseFloat(item.rnd_menu_srp || 0));
+            $('.final-srp-w-vat-dine-in').val(parseFloat(item.rnd_menu_srp || 0));
         }
 
         function computeFormula() {
@@ -230,7 +260,7 @@
             
             const packagingCost = $('.packaging-cost').val();
             const idealFoodCost = $('.ideal-food-cost').val();
-            const finalSrpWithVat = $('.final-srp-w-vat').val();
+            const finalSrpWithVat = $('.final-srp-w-vat-dine-in').val();
 
             const finalRecipeCost = math.round((recipeCostWithoutBuffer * (1 + (buffer / 100))) / portionSize, 4);
             const suggestedFinalSrpWithVAT = math.round(finalRecipeCost / (idealFoodCost / 100) * 1.12, 4);
@@ -252,7 +282,7 @@
             const rnd_menu_items_id = item.rnd_menu_items_id;
             const buffer = $('.buffer').val();
             const ideal_food_cost = $('.ideal-food-cost').val();
-            const rnd_menu_srp = $('.final-srp-w-vat').val();
+            const rnd_menu_srp = $('.final-srp-w-vat-dine-in').val();
 
             const dataObj = {buffer, ideal_food_cost, rnd_menu_srp};
 

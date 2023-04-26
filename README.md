@@ -1,4 +1,6 @@
-# TODOS:
+# TIMFS - Tasteless Item Masterfile System
+
+## TODOS:
 
 - [x] Show the SRP of the menu on the front end
 - [x] Add new column `packaging_uom` in item_masters - should not be included on import QB template // Already exists (`packagings_id`)
