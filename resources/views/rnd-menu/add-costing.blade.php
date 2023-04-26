@@ -28,8 +28,7 @@
     }
 
     .srp-td {
-        max-width: 75px;
-        min-width: 58px;
+        max-width: 70px;
     }
 
     .row-srp {
