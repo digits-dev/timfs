@@ -1034,31 +1034,8 @@
 		public function getSetCosting($id) {
 			$data = [];
 
-			$data['item'] = DB::table('rnd_menu_items')
-				->where('rnd_menu_items.id', $id)
-				->select(
-					'rnd_menu_items.id as rnd_menu_items_id',
-					'rnd_menu_items.rnd_menu_description',
-					'rnd_code',
-					'rnd_menu_items.portion_size',
-					'rnd_menu_items.rnd_menu_srp',
-					'rnd_menu_items.buffer',
-					'rnd_menu_items.ideal_food_cost',
-					'rnd_menu_approvals.approval_status',
-					'computed_ingredient_total_cost',
-					'computed_food_cost',
-					'computed_food_cost_percentage',
-					'publisher.name as published_by',
-					'published_at',
-					'menu_items.tasteless_menu_code',
-					'menu_items_id',
-					'rnd_menu_computed_packaging_cost.computed_packaging_total_cost'
-				)
-				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
-				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
-				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
-				->leftJoin('menu_items', 'menu_items.id', 'rnd_menu_items.menu_items_id')
-				->leftJoin('rnd_menu_computed_packaging_cost', 'rnd_menu_computed_packaging_cost.id', '=', 'rnd_menu_items.id')
+			$data['item'] = DB::table('rnd_menu_costing')
+				->where('rnd_menu_items_id', $id)
 				->first();
 
 			return $this->view('rnd-menu/add-costing', $data);
@@ -1068,7 +1045,7 @@
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
 			$menu_items_id = $request->get('menu_items_id');
 			$rnd_menu_data = (array) json_decode($request->get('rnd_menu_data'));
-			$rnd_menu_srp = $rnd_menu_data['rnd_menu_srp'];
+			$menu_item_data  = (array) json_decode($request->get('menu_item_data'));
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 			$approval_status = 'FOR APPROVAL (MARKETING)';
@@ -1082,11 +1059,7 @@
 
 			DB::table('menu_items')
 				->where('id', $menu_items_id)
-				->update([
-					'menu_price_dine' => $rnd_menu_srp,
-					'menu_price_dlv' => $rnd_menu_srp,
-					'menu_price_take' => $rnd_menu_srp,
-				]);
+				->update($menu_item_data);
 
 			DB::table('rnd_menu_approvals')
 				->where('rnd_menu_items_id', $rnd_menu_items_id)

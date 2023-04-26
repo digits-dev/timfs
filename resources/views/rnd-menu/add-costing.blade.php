@@ -39,6 +39,18 @@
         flex-wrap: wrap;
     }
 
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
+    input[type=number] {
+        appearance: textfield;
+        -moz-appearance: textfield; /* Firefox */
+    }
+
 </style>
 @endpush
 
@@ -181,15 +193,15 @@
                                     <div class="row-srp">
                                         <div class="srp-td">
                                             <p class="text-center text-bold">Dine In</p>
-                                            <input type="text" class="form-control final-srp-w-vat-dine-in" placeholder="0.00">
+                                            <input type="number" class="form-control final-srp-w-vat-dine-in" placeholder="0.00">
                                         </div>
                                         <div class="srp-td">
                                             <p class="text-center text-bold">Take Out</p>
-                                            <input type="text" class="form-control" placeholder="0.00">
+                                            <input type="number" class="form-control final-srp-w-vat-take-out" placeholder="0.00">
                                         </div>
                                         <div class="srp-td">
                                             <p class="text-center text-bold">Delivery</p>
-                                            <input type="text" class="form-control" placeholder="0.00">
+                                            <input type="number" class="form-control final-srp-w-vat-delivery" placeholder="0.00">
                                         </div>
                                     </div>
                                 </td>
@@ -239,17 +251,20 @@
 @push('bottom')
 <script>
     const item = {!! json_encode($item) !!};
+    const inputTriggerClasses = '.buffer, .ideal-food-cost, .final-srp-w-vat-dine-in';
     $(document).ready(function() {
         $('body').addClass('sidebar-collapse');
         
         function firstLoad() {
             $('.portion-size').val(parseFloat(item.portion_size) || 0);
-            $('.recipe-cost-wo-buffer').val(parseFloat(item.computed_food_cost || 0));
+            $('.recipe-cost-wo-buffer').val(parseFloat(item.recipe_cost_wo_buffer || 0));
             $('.buffer').val(parseFloat(item.buffer || 6.5));
 
-            $('.packaging-cost').val(parseFloat(item.computed_packaging_total_cost || 0));
+            $('.packaging-cost').val(parseFloat(item.packaging_cost || 0));
             $('.ideal-food-cost').val(parseFloat(item.ideal_food_cost || 30));
-            $('.final-srp-w-vat-dine-in').val(parseFloat(item.rnd_menu_srp || 0));
+            $('.final-srp-w-vat-dine-in').val(parseFloat(item.final_srp_w_vat_dine_in || 0));
+            $('.final-srp-w-vat-take-out').val(parseFloat(item.final_srp_w_vat_take_out || 0));
+            $('.final-srp-w-vat-delivery').val(parseFloat(item.final_srp_w_vat_delivery || 0));
         }
 
         function computeFormula() {
@@ -282,8 +297,16 @@
             const buffer = $('.buffer').val();
             const ideal_food_cost = $('.ideal-food-cost').val();
             const rnd_menu_srp = $('.final-srp-w-vat-dine-in').val();
+            const dineIn = rnd_menu_srp;
+            const takeOut = $('.final-srp-w-vat-take-out').val();
+            const delivery = $('.final-srp-w-vat-delivery').val();
 
-            const dataObj = {buffer, ideal_food_cost, rnd_menu_srp};
+            const rnd_menu_data = {buffer, ideal_food_cost, rnd_menu_srp};
+            const menu_items_data = {
+                menu_price_dine: dineIn,
+                menu_price_take: takeOut,
+                menu_price_dlv: delivery,
+            }
 
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
@@ -304,14 +327,18 @@
 
             const rndMenuData = $(document.createElement('input'))
                 .attr('name', 'rnd_menu_data')
-                .val(JSON.stringify(dataObj));
+                .val(JSON.stringify(rnd_menu_data));
 
-            form.append(csrf, idInput, menuId, rndMenuData);
+            const menuItemData = $(document.createElement('input'))
+                .attr('name', 'menu_item_data')
+                .val(JSON.stringify(menu_items_data));
+
+            form.append(csrf, idInput, menuId, rndMenuData, menuItemData);
             $('.panel-body').append(form);
             form.submit();
         }
 
-        $(document).on('keyup', 'input', function() {
+        $(document).on('keyup', inputTriggerClasses, function() {
             computeFormula();
         });
 

@@ -29,13 +29,24 @@ CREATE VIEW RND_MENU_COSTING AS
 	        4
 	    ) AS suggested_final_srp_w_vat,
 	    ROUND(
-	        rnd_menu_items.rnd_menu_srp / 1.12,
+	        COALESCE(
+	            menu_items.menu_price_dine,
+	            rnd_menu_items.rnd_menu_srp
+	        ) / 1.12,
 	        4
 	    ) AS final_srp_wo_vat,
-	    rnd_menu_items.rnd_menu_srp AS final_srp_w_vat,
+	    COALESCE(
+	        menu_items.menu_price_dine,
+	        rnd_menu_items.rnd_menu_srp
+	    ) AS final_srp_w_vat_dine_in,
+	    menu_items.menu_price_take as final_srp_w_vat_take_out,
+	    menu_items.menu_price_dlv as final_srp_w_vat_delivery,
 	    ROUND(
 	        rnd_menu_computed_packaging_cost.computed_packaging_total_cost / ROUND(
-	            rnd_menu_items.rnd_menu_srp / 1.12,
+	            COALESCE(
+	                menu_items.menu_price_dine,
+	                rnd_menu_items.rnd_menu_srp
+	            ) / 1.12,
 	            4
 	        ) * 100,
 	        2
@@ -47,7 +58,10 @@ CREATE VIEW RND_MENU_COSTING AS
 	            ) / rnd_menu_items.portion_size,
 	            4
 	        ) / ROUND(
-	            rnd_menu_items.rnd_menu_srp / 1.12,
+	            COALESCE(
+	                menu_items.menu_price_dine,
+	                rnd_menu_items.rnd_menu_srp
+	            ) / 1.12,
 	            4
 	        ) * 100,
 	        2
@@ -55,7 +69,10 @@ CREATE VIEW RND_MENU_COSTING AS
 	    ROUND(
 	        ROUND(
 	            rnd_menu_computed_packaging_cost.computed_packaging_total_cost / ROUND(
-	                rnd_menu_items.rnd_menu_srp / 1.12,
+	                COALESCE(
+	                    menu_items.menu_price_dine,
+	                    rnd_menu_items.rnd_menu_srp
+	                ) / 1.12,
 	                4
 	            ) * 100,
 	            2
@@ -66,7 +83,10 @@ CREATE VIEW RND_MENU_COSTING AS
 	                ) / rnd_menu_items.portion_size,
 	                4
 	            ) / ROUND(
-	                rnd_menu_items.rnd_menu_srp / 1.12,
+	                COALESCE(
+	                    menu_items.menu_price_dine,
+	                    rnd_menu_items.rnd_menu_srp
+	                ) / 1.12,
 	                4
 	            ) * 100,
 	            2
