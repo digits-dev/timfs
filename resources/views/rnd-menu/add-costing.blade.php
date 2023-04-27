@@ -312,7 +312,7 @@
                     <hr>
                     <h3 class="text-center">COMMENTS</h3>
                     <div class="chat">
-                        @include('rnd-menu/chat-app', [])
+                        @include('rnd-menu/chat-app', $comments_data)
                     </div>
                 </div>
             </div>
@@ -460,7 +460,7 @@
         });
 
         $('#save-btn').on('click', function() {
-            const isValid = jQuery.makeArray($('input')).every(e => !!$(e).val());
+            const isValid = jQuery.makeArray($('#form input')).every(e => !!$(e).val());
             if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',

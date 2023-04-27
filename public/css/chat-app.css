@@ -18,6 +18,8 @@
   padding: 15px;
   height: 100vh;
   justify-content: space-between;
+  border: 2px solid grey;
+  border-radius: 5px;
 }
 
 .chat-heading {
@@ -43,11 +45,18 @@
 
 .scroll-body {
   overflow-y: auto;
+  flex-grow: 1;
 }
 
 .chat-body {
   justify-content: end;
   padding: 15px;
+  min-height: 100%;
+}
+
+.no-message-note {
+  font-style: italic;
+  color: grey;
 }
 
 .their-message-container {
@@ -95,13 +104,13 @@
 .their-message {
   border-radius: 0 15px 15px 15px;
   margin-right: 100px;
-  background-color: blueviolet;
+  background-color: #69ad4c;
 }
 
 .my-message {
   border-radius: 15px 0 15px 15px;
   margin-left: 120px;
-  background-color: darkmagenta;
+  background-color: #6ca2d5;
 }
 
 .type-message-section {

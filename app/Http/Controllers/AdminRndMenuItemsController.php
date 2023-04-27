@@ -1042,6 +1042,8 @@
 
 			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
 
+			$data['comments_data'] = self::getRNDComments($id);
+
 
 			return $this->view('rnd-menu/add-costing', $data);
 		}
@@ -1365,6 +1367,30 @@
 		}
 
 		// custom functions
+		public function addComment(Request $request) {
+			$comment_content = $request->comment_content;
+			$rnd_menu_items_id = $request->rnd_menu_items_id;
+			$action_by = CRUDBooster::myId();
+			$time_stamp = date('Y-m-d H:i:s');
+
+			$inserted_id = DB::table('rnd_menu_comments')
+				->insertGetId([
+					'rnd_menu_items_id' => $rnd_menu_items_id,
+					'comment_content' => $comment_content,
+					'created_by' => $action_by,
+					'created_at' => $time_stamp,
+				]);
+
+			$response = DB::table('rnd_menu_comments')
+				->where('rnd_menu_comments.id', $inserted_id)
+				->leftJoin('cms_users', 'rnd_menu_comments.created_by', '=', 'cms_users.id')
+				->select('*', 'cms_users.id as cms_users_id', 'rnd_menu_comments.created_at as comment_added_at')
+				->get()
+				->first();
+
+			return json_encode([$response]);
+
+		}
 
 		function notifyForRejection($id) {
 			$item = DB::table('rnd_menu_items')
@@ -1489,6 +1515,30 @@
 			}
 			// dd($menu_items_data);
 			return $menu_items_data;
+		}
+
+		function getRNDComments($id) {
+			$data = [];
+
+			$item = DB::table('rnd_menu_costing')
+				->where('rnd_menu_items_id', $id)
+				->get()
+				->first();
+
+			$data['comments'] = DB::table('rnd_menu_comments')
+				->where('rnd_menu_comments.rnd_menu_items_id', $id)
+				->where('rnd_menu_comments.status', 'ACTIVE')
+				->select('*', 'cms_users.id as cms_users_id', 'rnd_menu_comments.created_at as comment_added_at')
+				->leftJoin('cms_users', 'rnd_menu_comments.created_by', '=', 'cms_users.id')
+				->orderBy('comment_added_at', 'ASC')
+				->get()
+				->toArray();
+
+			$data['rnd_menu_items_id'] = $id;
+
+			$data['menu_item_description'] = $item->menu_item_description;
+
+			return $data;
 		}
 
 	}
