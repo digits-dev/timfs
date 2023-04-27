@@ -1,0 +1,118 @@
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+.relative {
+  position: relative;
+}
+
+.chat-app-container {
+  padding: 15px;
+  height: 100vh;
+  justify-content: space-between;
+}
+
+.chat-heading {
+  justify-content: space-between;
+  border-bottom: 1px solid #f4f4f4;
+  padding-bottom: 10px;
+}
+
+.convo-title {
+  margin: 2px;
+}
+
+.message-counter {
+  display: grid;
+  place-items: center;
+}
+
+.chat-header-divider {
+  border: 1px solid #f4f4f4;
+  width: 100%;
+  margin: 10px;
+}
+
+.scroll-body {
+  overflow-y: auto;
+}
+
+.chat-body {
+  justify-content: end;
+  padding: 15px;
+}
+
+.their-message-container {
+  width: 100%;
+  gap: 15px;
+}
+
+.my-message-container {
+  width: 100%;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+.profile-photo {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: whitesmoke;
+  background-color: rgb(92, 92, 149);
+  font-size: 20px;
+  font-weight: bolder;
+}
+
+.sender-details {
+  gap: 15px;
+}
+
+.my-sender-details {
+  justify-content: flex-end;
+}
+
+.sender-date {
+  font-size: 12px;
+}
+
+.message {
+  max-width: 650px;
+  background-color: rgb(204, 204, 204);
+  padding: 15px;
+  color: #f4f4f4;
+}
+
+.their-message {
+  border-radius: 0 15px 15px 15px;
+  margin-right: 100px;
+  background-color: blueviolet;
+}
+
+.my-message {
+  border-radius: 15px 0 15px 15px;
+  margin-left: 120px;
+  background-color: darkmagenta;
+}
+
+.type-message-section {
+  padding: 10px;
+}
+
+.message-form {
+  justify-content: space-between;
+}
+
+.type-message {
+  width: 100%;
+  margin-right: 10px;
+}

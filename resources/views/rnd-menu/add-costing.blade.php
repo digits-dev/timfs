@@ -246,9 +246,10 @@
                 </div>
             </div>
         </form>
-        <section class="menu-details">
+        <section class="menu-and-comment">
             <div class="row">
                 <div class="col-md-6">
+                    <hr>
                     <h3 class="text-center">MENU ITEM DETAILS</h3>
                     <table class="table table-striped">
                         <tbody>
@@ -307,8 +308,14 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="col-md-6">
+                    <hr>
+                    <h3 class="text-center">COMMENTS</h3>
+                    <div class="chat">
+                        @include('rnd-menu/chat-app', [])
+                    </div>
+                </div>
             </div>
-            
         </section>
         <hr>
         <section class="workflow-details">
