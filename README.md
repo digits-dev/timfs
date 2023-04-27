@@ -1,6 +1,6 @@
-# TIMFS - Tasteless Item Masterfile System
+# 📄 TIMFS - Tasteless Item Masterfile System
 
-## TODOS:
+## ✅ TODOS:
 
 - [x] Show the SRP of the menu on the front end
 - [x] Add new column `packaging_uom` in item_masters - should not be included on import QB template // Already exists (`packagings_id`)
@@ -41,7 +41,7 @@
 
 ---
 
-## Workflow
+## 🔄️ Workflow
 
 - [x] Create various privileges (chef, marketing(approver), accounting(approver))
 
@@ -61,7 +61,7 @@
 
 ---
 
-## Ingredient Cost Formula
+## 🟰 Ingredient Cost Formula
 
 - `uom_qty` = 1
 - `packaging_size` = from the database || from the user if new || 1
@@ -74,7 +74,7 @@
 
 ---
 
-## Files that need to be copied to timfs-prod
+## 📁 Files that need to be copied to timfs-prod
 
 - database\migrations\2023_03_17_085417_create_menu_ingredients_preparations_table.php
 - database\migrations\2023_03_17_132659_add_columns_for_preparation_to_menu_ingredients_details.php
@@ -86,9 +86,9 @@
 
 ---
 
-## RND - Research and Development
+## ✏️ RND - Research and Development
 
-- ### TODOS:
+- ### ✅ TODOS:
 
   - [x] Add packaging page for marketing
   - [x] Remove the RND Menu SRP in the costing page
@@ -101,7 +101,7 @@
   - [ ] Thicken the divider line in the table
   - [ ] Switch the position of percentage and final srp(s)
 
-- ### Tables
+- ### 📅 Tables
 
   - [ ] `rnd_menu_items`
 
@@ -316,9 +316,9 @@
     - `accounting_approved_by`
     - `accounting_approved_at`
 
-- ### RND Workflow
+- ### 🔄️ RND Workflow
 
-  - #### Chef
+  - #### 🧑‍🍳 Chef
 
     - create rnd menu item
     - add / save ingredients
@@ -327,7 +327,7 @@
     - edit the rnd menu if they wish to
     - submit the rnd menu to next step (**publish**)
 
-  - #### Marketing
+  - #### 💹 Marketing
 
     - edit and finalize the packagings that chef inputted
     - view the food cost value only
@@ -335,22 +335,24 @@
     - create the menu
     - add the costing of the menu
 
-  - #### Marketing Approver
+  - #### 👍 Marketing Approver
 
     - can see details about the menu except the ingredients
     - can approve or reject the rnd menu item
 
-  - #### Purchasing (FOR ITEM CREATION) -> different module
+  - #### 💵 Purchasing (FOR ITEM CREATION) -> different module
 
     - should see all new items to be created
     - should not be able to see which menu the items are used
     - should create items in IMFS for new ingredients / packagings
 
-  - #### Accounting
+  - #### 🧾 Accounting
     - same view as marketing
     - approve or reject
     - should not be able to approve until all ingredients and packagings are in IMFS
 
 ---
 
-- Author: Fillinor Gunio
+## 🖋️ Author:
+
+- Fillinor Gunio
