@@ -205,6 +205,24 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td class="text-center text-bold">% Cost Packaging From Final SRP</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control cost-packaging-from-final-srp" placeholder="% Cost Packaging From Final SRP" step="any" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-bold">% Food Cost from Final SRP</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control food-cost-from-final-srp" placeholder="% Food Cost from Final SRP" step="any" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-bold">% Total Cost</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control total-cost" placeholder="% Total Cost" step="any" readonly>
+                                </td>
+                            </tr>
+                            <tr class="divider">
                                 <td class="text-center text-bold">Final SRP with VAT</td>
                                 <td>
                                     <div class="row-srp">
@@ -221,24 +239,6 @@
                                             <input type="number" class="form-control final-srp-w-vat-delivery" placeholder="0.00">
                                         </div>
                                     </div>
-                                </td>
-                            </tr>
-                            <tr class="divider">
-                                <td class="text-center text-bold">% Cost Packaging From Final SRP</td>
-                                <td class="text-center">
-                                    <input type="number" class="form-control cost-packaging-from-final-srp" placeholder="% Cost Packaging From Final SRP" step="any" readonly>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center text-bold">% Food Cost from Final SRP</td>
-                                <td class="text-center">
-                                    <input type="number" class="form-control food-cost-from-final-srp" placeholder="% Food Cost from Final SRP" step="any" readonly>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center text-bold">% Total Cost</td>
-                                <td class="text-center">
-                                    <input type="number" class="form-control total-cost" placeholder="% Total Cost" step="any" readonly>
                                 </td>
                             </tr>
                         </tbody>
