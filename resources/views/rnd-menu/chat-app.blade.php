@@ -116,6 +116,14 @@
             });
     }
 
+    function formatMyMessage() {
+        $('.my-message').each(function() {
+            if (!$(this).attr('_clicked')) {
+                $(this).find('.delete-comment').hide();
+            }
+        })
+    }
+
     $('.type-message').on('keyup', function() {
         const value = $(this).val().trim()
         if (value) $('.send-btn').attr('disabled', false);
@@ -151,6 +159,12 @@
         $('.type-message').val('');
     });
 
+    $(document).on('click', '.my-message', function() {
+        $('.my-message').removeAttr('_clicked');
+        $(this).attr('_clicked', 'true');
+        formatMyMessage();
+    });
+
     $(document).on('mouseenter', '.my-message', function() {
         const deleteButton = $(this).find('.delete-comment');
         deleteButton.show();
@@ -158,8 +172,11 @@
 
     $(document).on('mouseleave', '.my-message', function() {
         const deleteButton = $(this).find('.delete-comment');
-        deleteButton.hide();
+        if (!$(this).attr('_clicked')) {
+            deleteButton.hide();
+        }
     });
+
 
     $(document).on('click', '.delete-comment', function() {
         const messageId = $(this).parents('.message').attr('comment_id');
