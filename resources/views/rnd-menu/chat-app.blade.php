@@ -53,6 +53,7 @@
             const senderName = $(document.createElement('div')).addClass('sender-name text-bold');
             const senderDate = $(document.createElement('div')).attr('datetime', comment.comment_added_at).addClass('sender-date timeago');
             const message = $(document.createElement('p')).addClass('message').text(comment.comment_content);
+            const deleteComment = $(document.createElement('div')).addClass('delete-comment').text('×');
 
             const isMyMessage = comment.cms_users_id == myId;
 
@@ -69,6 +70,7 @@
                 messageContainer.append(profilePhotoSection);
                 senderName.text(sender);
             }
+            message.attr('comment_id', comment.comment_id).append(deleteComment);
             senderDetails.append(senderName, senderDate);
             messageWrapper.append(senderDetails, message);
             messageContainer.append(messageWrapper);
@@ -83,6 +85,7 @@
             refreshTimeAgo();
         } 
     }
+
 
     $('.type-message').on('keyup', function() {
         const value = $(this).val().trim()
@@ -117,6 +120,11 @@
                 }  
             });
         $('.type-message').val('');
+    });
+
+    $(document).on('click', '.delete-comment', function() {
+        const id = $(this).parents('.message').attr('comment_id');
+        
     });
 
     appendComment(savedComments);

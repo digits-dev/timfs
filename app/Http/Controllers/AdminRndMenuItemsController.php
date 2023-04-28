@@ -492,6 +492,8 @@
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 
+			$data['comments_data'] = self::getRNDComments($id);
+
 			if ($id) {
 				$data['ingredients'] = DB::table('rnd_menu_ingredients_auto_compute')
 					->where('rnd_menu_items_id', $id)
@@ -1528,7 +1530,12 @@
 			$data['comments'] = DB::table('rnd_menu_comments')
 				->where('rnd_menu_comments.rnd_menu_items_id', $id)
 				->where('rnd_menu_comments.status', 'ACTIVE')
-				->select('*', 'cms_users.id as cms_users_id', 'rnd_menu_comments.created_at as comment_added_at')
+				->select(
+					'*', 
+					'cms_users.id as cms_users_id', 
+					'rnd_menu_comments.created_at as comment_added_at', 
+					'rnd_menu_comments.id as comment_id'
+				)
 				->leftJoin('cms_users', 'rnd_menu_comments.created_by', '=', 'cms_users.id')
 				->orderBy('comment_added_at', 'ASC')
 				->get()
@@ -1536,7 +1543,7 @@
 
 			$data['rnd_menu_items_id'] = $id;
 
-			$data['menu_item_description'] = $item->menu_item_description;
+			$data['menu_item_description'] = ($item->menu_item_description ? $item->menu_item_description : $item->rnd_menu_description);
 
 			return $data;
 		}
