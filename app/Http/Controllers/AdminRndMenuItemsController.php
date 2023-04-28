@@ -492,8 +492,6 @@
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 
-			$data['comments_data'] = self::getRNDComments($id);
-
 			if ($id) {
 				$data['ingredients'] = DB::table('rnd_menu_ingredients_auto_compute')
 					->where('rnd_menu_items_id', $id)
@@ -752,6 +750,12 @@
 						
 				}
 			}
+
+			//updating the comments
+			DB::table('rnd_menu_comments')
+				->where('created_by', $action_by)
+				->where('rnd_menu_items_id', null)
+				->update(['rnd_menu_items_id' => $rnd_menu_items_id]);
 			
 			//updating approval status
 			DB::table('rnd_menu_approvals')
@@ -1386,12 +1390,31 @@
 			$response = DB::table('rnd_menu_comments')
 				->where('rnd_menu_comments.id', $inserted_id)
 				->leftJoin('cms_users', 'rnd_menu_comments.created_by', '=', 'cms_users.id')
-				->select('*', 'cms_users.id as cms_users_id', 'rnd_menu_comments.created_at as comment_added_at')
+				->select(
+					'*', 
+					'cms_users.id as cms_users_id', 
+					'rnd_menu_comments.created_at as comment_added_at', 
+					'rnd_menu_comments.id as comment_id'
+				)
 				->get()
 				->first();
 
 			return json_encode([$response]);
 
+		}
+
+		public function deleteComment(Request $request) {
+			$comment_id = $request->comment_id;
+			$time_stamp = date('Y-m-d H:i:s');
+
+			$response = DB::table('rnd_menu_comments')
+				->where('id', $comment_id)
+				->update([
+					'status' => 'INACTIVE',
+					'deleted_at' => $time_stamp,
+				]);
+
+			return json_encode($response);
 		}
 
 		function notifyForRejection($id) {

@@ -660,13 +660,6 @@
                 </div>
             </section>
         </form>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="chat">
-                    @include('rnd-menu/chat-app', $comments_data)
-                </div>
-            </div>
-        </div>
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>

@@ -32,7 +32,15 @@
 <script>
     const savedComments =  {!! json_encode($comments) !!}
 
-    function refreshTimeAgo() {
+    function reloadInfo() {
+        const messageCount = $('.message').length;
+        $('.message-counter').text(`${messageCount} Comment(s)`);
+        if (messageCount) {
+            $('.no-message-note').hide();
+        } else {
+            $('.no-message-note').show();
+            return;
+        }
         timeago.cancel();
         const nodes = $('.timeago').get();
         timeago.render(nodes);
@@ -53,15 +61,15 @@
             const senderName = $(document.createElement('div')).addClass('sender-name text-bold');
             const senderDate = $(document.createElement('div')).attr('datetime', comment.comment_added_at).addClass('sender-date timeago');
             const message = $(document.createElement('p')).addClass('message').text(comment.comment_content);
-            const deleteComment = $(document.createElement('div')).addClass('delete-comment').text('×');
+            const deleteComment = $(document.createElement('div')).addClass('delete-comment').text('×').hide();
 
             const isMyMessage = comment.cms_users_id == myId;
 
             if (isMyMessage) {
                 messageContainer.addClass('my-message-container');
                 senderDetails.addClass('my-sender-details');
-                message.addClass('my-message');
-                senderName.text('Me')
+                message.addClass('my-message').append(deleteComment);
+                senderName.text('Me');
 
             } else {
                 messageContainer.addClass('their-message-container');
@@ -70,7 +78,7 @@
                 messageContainer.append(profilePhotoSection);
                 senderName.text(sender);
             }
-            message.attr('comment_id', comment.comment_id).append(deleteComment);
+            message.attr('comment_id', comment.comment_id);
             senderDetails.append(senderName, senderDate);
             messageWrapper.append(senderDetails, message);
             messageContainer.append(messageWrapper);
@@ -78,14 +86,35 @@
             $('.chat-body').append(messageContainer);
         });
         scrollBody.animate({scrollTop: scrollBody.prop('scrollHeight')}, 1000)
-        const messageCount = $('.message').length;
-        $('.message-counter').text(`${messageCount} Comment(s)`);
-        if (messageCount) {
-            $('.no-message-note').remove();
-            refreshTimeAgo();
-        } 
+        reloadInfo();
     }
 
+    function deleteInDB(commentId) {
+        $.ajax({
+                type: 'POST',
+                url: "{{ route('delete_rnd_comment') }}",
+                data: {
+                    comment_id: commentId,
+                },
+                success: function(response) {
+                    response = JSON.parse(response);
+                    $(`.my-message[comment_id="${commentId}"]`)
+                        .parents('.message-wrapper')
+                        .hide(300, function() {
+                            $(this).remove();
+                            reloadInfo();
+                        });
+                },
+                error: function(response) { 
+                    console.log(response);
+                    Swal.fire({
+                        title: 'Oops',
+                        html: 'Something went wrong.',
+                        icon: 'error'
+                    });
+                }  
+            });
+    }
 
     $('.type-message').on('keyup', function() {
         const value = $(this).val().trim()
@@ -100,7 +129,7 @@
         if (!message) return;
         $.ajax({
                 type: 'POST',
-                url: "{{ route('add_comment') }}",
+                url: "{{ route('add_rnd_comment') }}",
                 data: {
                     comment_content: message,
                     rnd_menu_items_id : rndMenuItemsId,
@@ -122,9 +151,31 @@
         $('.type-message').val('');
     });
 
+    $(document).on('mouseenter', '.my-message', function() {
+        const deleteButton = $(this).find('.delete-comment');
+        deleteButton.show();
+    });
+
+    $(document).on('mouseleave', '.my-message', function() {
+        const deleteButton = $(this).find('.delete-comment');
+        deleteButton.hide();
+    });
+
     $(document).on('click', '.delete-comment', function() {
-        const id = $(this).parents('.message').attr('comment_id');
-        
+        const messageId = $(this).parents('.message').attr('comment_id');
+        Swal.fire({
+            title: 'Are you sure you want to delete this message?',
+            html: '📄 You won\'t be able to revert this.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteInDB(messageId);
+            }
+        });
     });
 
     appendComment(savedComments);
