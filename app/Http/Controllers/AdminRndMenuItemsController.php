@@ -1100,32 +1100,37 @@
 				]);
 		}
 
-		public function getDetailMarketing($id) {
-			$data = [];
+		// public function getDetailMarketing($id) {
+		// 	$data = [];
 
-			$data['item'] = DB::table('rnd_menu_costing')
-				->where('rnd_menu_costing.rnd_menu_items_id', $id)
-				->leftJoin('rnd_menu_approvals', 'rnd_menu_approvals.rnd_menu_items_id', '=', 'rnd_menu_costing.rnd_menu_items_id')
-				->first();
+		// 	$data['item'] = DB::table('rnd_menu_costing')
+		// 		->where('rnd_menu_costing.rnd_menu_items_id', $id)
+		// 		->leftJoin('rnd_menu_approvals', 'rnd_menu_approvals.rnd_menu_items_id', '=', 'rnd_menu_costing.rnd_menu_items_id')
+		// 		->first();
 
-			$data['page_title'] = 'Details: ' . $data['item']->rnd_menu_description;
+		// 	$data['page_title'] = 'Details: ' . $data['item']->rnd_menu_description;
 
-			return $this->view('rnd-menu/hide-ingredients', $data);
-		}
+		// 	return $this->view('rnd-menu/hide-ingredients', $data);
+		// }
 
-		public function getDetailMarketingApprover($id) {
-			return self::getDetail($id);
-		}
+		// public function getDetailMarketingApprover($id) {
+		// 	return self::getDetail($id);
+		// }
 
 		public function getApproveByMarketing($id) {
 			$data = [];
 
 			$data['item'] = DB::table('rnd_menu_costing')
 				->where('rnd_menu_items_id', $id)
-				->leftJoin('rnd_menu_items', 'rnd_menu_items.id', '=', 'rnd_menu_costing.rnd_menu_items_id')
 				->first();
+			// dd($data['item']);
 
-			$data['page_title'] = 'For Approval (Marketing): ' . $data['item']->rnd_menu_description;
+			$data['workflow'] = self::getWorkFlowDetails($id);
+
+			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
+
+			$data['comments_data'] = self::getRNDComments($id);
+
 
 			return $this->view('rnd-menu/approve-item', $data);
 		}
@@ -1547,7 +1552,6 @@
 				$menu_names = array_map(fn($obj) => $obj->menu_item_description, $menu_names);
 				$menu_items_data->{$column_name} = $menu_names;
 			}
-			// dd($menu_items_data);
 			return $menu_items_data;
 		}
 
