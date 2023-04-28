@@ -43,7 +43,6 @@
 			$this->col[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description"];
 			$this->col[] = ["label"=>"SRP","name"=>"rnd_menu_srp"];
 			$this->col[] = ["label"=>"Portion Size","name"=>"portion_size"];
-			$this->col[] = ["label"=>"Ingredient Total Cost","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_ingredient_total_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"Food Cost","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_food_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"Food Cost Percentage","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_food_cost_percentage","join_id"=>"id"];
 			$this->col[] = ["label"=>"Published By","name"=>"rnd_menu_approvals.published_by","join"=>"cms_users,name","join_id"=>"id"];
@@ -386,9 +385,9 @@
 				->approval_status;
 
 			if ($status == 'FOR MENU CREATION') {
-				return $this->mainController->getDetailMarketing($id);
+				return $this->mainController->getDetailNoIngredient($id);
 			} else if ($status == 'FOR APPROVAL (MARKETING)' || $status == 'FOR COSTING' || $status = 'FOR ITEM CREATION') {
-				return $this->mainController->getDetailMarketing($id);
+				return $this->mainController->getDetailNoIngredient($id);
 			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
 				return $this->mainController->getDetailPurchasing($id);
 			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
