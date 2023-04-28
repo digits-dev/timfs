@@ -1113,10 +1113,6 @@
 			return $this->view('rnd-menu/hide-ingredients', $data);
 		}
 
-		// public function getDetailMarketingApprover($id) {
-		// 	return self::getDetail($id);
-		// }
-
 		public function getApproveByMarketing($id) {
 			$data = [];
 
