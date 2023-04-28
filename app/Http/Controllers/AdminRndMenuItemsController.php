@@ -1143,7 +1143,7 @@
 			$approval_status = null;
 
 			if ($action == 'approve') {
-				$approval_status = 'FOR ITEM CREATION';
+				$approval_status = 'FOR APPROVAL (ACCOUNTING)';
 				$db_column_at = 'marketing_approved_at';
 				$db_column_by = 'marketing_approved_by';
 				$message = '✔️ Item Approved!';

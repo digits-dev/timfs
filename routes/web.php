@@ -109,7 +109,6 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/for_approval_rnd_menu/edit/add-packaging', [AdminRndMenuItemsForApprovalController::class, 'addPackaging'])->name('add_packaging');
     Route::post('/admin/for_approval_rnd_menu/edit/add-comment', [AdminRndMenuItemsForApprovalController::class, 'addComment'])->name('add_rnd_comment');
     Route::post('/admin/for_approval_rnd_menu/edit/delete-comment', [AdminRndMenuItemsForApprovalController::class, 'deleteComment'])->name('delete_rnd_comment');
-    Route::post('/admin/rnd_menu_items_for_approval/packaging_cost', [AdminRndMenuItemsForApprovalController::class, 'submitPackagingCost'])->name('submit_packaging_cost');
     Route::post('/admin/rnd_menu_items_for_approval/edit-by-purchasing', [AdminRndMenuItemsForApprovalController::class, 'editByPurchasing'])->name('edit_by_purchasing');
     Route::post('/admin/rnd_menu_items_for_approval/submit-by-purchasing', [AdminRndMenuItemsForApprovalController::class, 'submitByPurchasing'])->name('submit_by_purchasing');
     Route::post('/admin/rnd_menu_items_for_approval/approve-by-accounting', [AdminRndMenuItemsForApprovalController::class, 'approveByAccounting'])->name('approve_by_accounting');

@@ -93,14 +93,20 @@
   - [x] Add packaging page for marketing
   - [x] Remove the RND Menu SRP in the costing page
   - [x] Add the details of newly created menu in the costing page
-  - [ ] Add the details of newly created menu in the approver's page
+  - [x] Add the details of newly created menu in the approver's page
   - [x] Restrict the user to publish w/o ingredient(s)
   - [x] Add Final SRP with VAT (Dine In)
   - [x] Add Final SRP with VAT (Take Out)
   - [x] Add Final SRP with VAT (Delivery)
   - [x] Thicken the divider line in the table
   - [x] Switch the position of percentage and final srp(s)
-  - [ ] Add chat-box like comment section
+  - [x] Add chat-box like comment section
+    - [x] Add delete button
+    - Add to different pages
+      - [x] Packaging page
+      - [x] Costing Page
+      - [x] Marketing Approver Page
+      - [ ] Accounting Approver Page
 
 - ### 📅 Tables
 

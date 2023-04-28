@@ -367,7 +367,8 @@
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-		<button class="btn btn-primary pull-right" id="save-btn"><i class="fa fa-save" ></i> Save</button>
+		<button class="btn btn-success pull-right" _action="approve" id="approve-btn"><i class="fa fa-thumbs-up" ></i> Approve</button>
+		<button class="btn btn-danger pull-right" _action="reject" id="reject-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-down" ></i> Reject</button>
     </div>
 </div>
 
@@ -381,6 +382,48 @@
     const item = {!! json_encode($item) !!};
     $(document).ready(function() {
         $('body').addClass('sidebar-collapse');
+
+        function submitActionOfMarketing(action) {
+            const form = $(document.createElement('form'))
+                .attr('method', 'POST')
+                .attr('action', "{{route('approve_by_marketing')}}")
+                .hide();
+
+            const csrf = $(document.createElement('input'))
+                .attr('name', '_token')
+                .val("{{csrf_token()}}");
+
+            const actionInput = $(document.createElement('input'))
+                .attr('name', 'action')
+                .val(action);
+
+            const rndMenuItemsId = $(document.createElement('input'))
+                .attr('name', 'rnd_menu_items_id')
+                .val(item.rnd_menu_items_id);
+
+            form.append(csrf, actionInput, rndMenuItemsId);
+            $('.panel-body').append(form);
+            form.submit();
+        }
+
+        $('#approve-btn, #reject-btn').on('click', function() {
+            const action = $(this).attr('_action');
+            Swal.fire({
+                title: `Do you want to ${action} this item?`,
+                html: action == 'approve' 
+                    ? `🔵 Doing so will forward this item to <label class="label label-info">ACCOUNTING</label>.`
+                    : `🔴 Doing so will turn the status of this item to <label class="label label-danger">REJECTED</label>.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitActionOfMarketing(action);
+                }
+            });
+        });
     });
 
 </script>
