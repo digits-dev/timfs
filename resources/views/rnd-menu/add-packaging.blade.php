@@ -354,6 +354,37 @@
                 </div>
             </section>
         </form>
+        <div class="row">
+            <div class="col-md-6">
+                <hr>
+                <h3 class="text-center">RND MENU DETAILS</h3>
+                <table class="table table-striped">
+                    <tr>
+                        <td class="text-bold">Portion Size:</td>
+                        <td>{{(float) $food_cost_data->portion_size}}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-bold">Food Cost:</td>
+                        <td>{{(float) $food_cost_data->computed_food_cost}}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-bold">Food Cost Percentage:</td>
+                        <td>{{(float) $food_cost_data->computed_food_cost_percentage}} %</td>
+                    </tr>
+                    <tr>
+                        <td class="text-bold">Published By:</td>
+                        <td>{{$workflow_data->published_by_name}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <hr>
+                <h3 class="text-center">COMMENTS</h3>
+                <div class="chat">
+                    @include('rnd-menu/chat-app', $comments_data)
+                </div>
+            </div>
+        </div>
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
@@ -513,8 +544,8 @@
                 });
             }, 750));
 
-            $(window).keydown(function(event) {
-                if (event.keyCode == 13) {
+            $('input').keydown(function(event) {
+                if (event.keyCode == 13 && !$(this).hasClass('type-message')) {
                     event.preventDefault();
                     return false;
                 }
@@ -873,17 +904,18 @@
             `);
 
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
-                $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() > 0 && 
-                $('.packaging-section .packaging-wrapper, .packaging-section .new-packaging-wrapper').length;
+                $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() > 0;
 
-            return [isValid];
+            const hasPackaging = $('.packaging-section .packaging-wrapper, .packaging-section .new-packaging-wrapper').length > 0;
+
+            return [isValid, hasPackaging];
         }
 
         $.fn.formatInvalidInputs = function(isValid) {
             Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: !isValid ? 'Please fill out all fields!' : 'Please add ingredients!',
+                    text: !isValid ? 'Please fill out all fields!' : 'Please add Packaging!',
                 }).then(() => {
                     $(`
                         .ingredient-section input:invalid, 
@@ -902,8 +934,8 @@
         }
 
         $(document).on('click', '#save-btn', function(event) {
-            const [isValid] = $.fn.checkFormValidity();
-            if (isValid) {
+            const [isValid, hasPackaging] = $.fn.checkFormValidity();
+            if (isValid && hasPackaging) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
                     html: '📄 Newly added packagings will be forwarded to <label class="label label-info">PURCHASING</label> for Item Creation in IMFS.',

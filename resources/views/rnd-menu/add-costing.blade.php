@@ -298,7 +298,7 @@
                                 <td>{{ $menu_items_data->original_concept }}</td>
                             </tr>
                             <tr>
-                                <td class="text-bold">Menu Segmentations</td>
+                                <td class="text-bold">Store Segmentation</td>
                                 <td>
                                 @foreach ($menu_items_data->menu_segmentations as $segmentation)
                                 <label class="label label-primary">{{$segmentation}}</label>

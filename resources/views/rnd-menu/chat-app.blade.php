@@ -17,13 +17,13 @@
     </section>
     <div class="scroll-body">
         <section class="chat-body flex flex-column">
-            <div class="no-message-note"><h4 class="text-center">🤷‍♂️ No comments to show...</h4><div>
+            <div class="no-message-note"><h4 class="text-center">💬 No comments to show...</h4><div>
         </section>
     </div>
     <section class="type-message-section">
         <form action="" class="message-form flex">
-            <input type="text" class="type-message form-control" placeholder="Enter comment...">
-            <button class="btn btn-primary send-btn" disabled>Send</button>
+            <input type="text" class="type-message form-control" placeholder="✏️ Type your comment here...">
+            <button class="btn btn-success send-btn" disabled>➡️Send</button>
         </form>
     </section>
 </div> 
@@ -164,7 +164,7 @@
     $(document).on('click', '.delete-comment', function() {
         const messageId = $(this).parents('.message').attr('comment_id');
         Swal.fire({
-            title: 'Are you sure you want to delete this message?',
+            title: 'Are you sure you want to delete this comment?',
             html: '📄 You won\'t be able to revert this.',
             icon: 'warning',
             showCancelButton: true,

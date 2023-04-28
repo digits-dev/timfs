@@ -562,6 +562,15 @@
 					->orderBy('row_id', 'ASC')
 					->get()
 					->toArray();
+
+				$data['food_cost_data'] = DB::table('rnd_menu_computed_food_cost')
+					->where('id', $id)
+					->get()
+					->first();
+
+				$data['comments_data'] = self::getRNDComments($id);
+
+				$data['workflow_data'] = self::getWorkFlowDetails($id);
 			}
 
 			
