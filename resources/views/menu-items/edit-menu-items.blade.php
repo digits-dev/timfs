@@ -4,8 +4,17 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <style>
+    .swal2-html-container {
+        line-height: 3rem;
+    }
+
+    .swal2-popup, .swal2-modal, .swal2-icon-warning .swal2-show {
+        font-size: 1.6rem !important;
+    }
 
     .form-column{
     margin: 0 3vw;
@@ -111,8 +120,11 @@
   <div class='panel panel-default'>
     <div class='panel-heading'>Edit Menu Items</div>
     <div class='panel-body'>
-        <form method="POST" action="{{CRUDBooster::mainpath('edit-save/'.$row->id)}}">
+        <form method="POST" action="{{$table == 'menu_items' ? CRUDBooster::mainpath('edit-save/'.$row->id) : route('edit_new_menu', ['id' => $row->id])}}" id="form-edit">
             @csrf
+            @if ($rnd_menu_items_id)
+            <input type="text" class="hidden" name="rnd_menu_items_id" value="{{$rnd_menu_items_id}}">
+            @endif
             <div class="add-content">
                 <div class="form-column">
                     <label> Tasteless Menu Code</label>
@@ -281,13 +293,17 @@
             </div>
             <div class="panel-footer">
                 <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-                <input type='submit' class='btn btn-primary pull-right' value='Edit Menu' onclick=""/>
+                <input type="{{$table == 'menu_items' ? 'submit' : 'button'}}" id="save-edit-btn" class='btn btn-primary pull-right' value='Edit Menu' onclick=""/>
+                @if($table == 'rnd_menu_items')
+                <button class="edit-new-menu hide" id="submit-button">Save-edit</button>
+                @endif
             </div>
         </form>
     </div>
 </div>
 
 <script>
+const table = {!! json_encode($table) !!};
 
 $('#menu_type_select1').select2({
         placeholder: "Select a menu segmentation",
@@ -404,6 +420,64 @@ $('#menu_type_select1').select2({
             $('#menu_type_select_sku1').attr('required', false)
         }
     }); 
+
+    if (table == 'rnd_menu_items') {
+        $(document).on('click', '#save-edit-btn', function() {
+            Swal.fire({
+                title: 'Do you want to save this item?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                returnFocus: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#submit-button').click();
+                }
+            });
+        });
+
+        $('#form-edit').submit(function(event) {
+            const formData = $('#form-edit').serialize();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('edit_new_menu', ['id' => $row->id]) }}",
+                data: formData,
+                dataType: "json",
+                encode: true,
+                success: function(response) {
+                    Swal.fire({
+                        title: `✔️ New Menu Item Updated!`,
+                        html: '📄 Do you want to continue to Costing?',
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: 'Not now',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            return 
+                            location.href = "{{ CRUDBooster::mainPath() }}" + '/edit/' + "{{ $row->id }}";
+                        } else {
+                            location.href = "{{ CRUDBooster::mainPath() }}";
+                        }
+                    });
+                },
+                error: function(response) { 
+                    console.log(response);
+                    Swal.fire({
+                        title: 'Oops',
+                        html: 'Something went wrong.',
+                        icon: 'error'
+                    });
+                } 
+            });
+
+            event.preventDefault();
+        });
+    }
 
 </script>
 @endsection

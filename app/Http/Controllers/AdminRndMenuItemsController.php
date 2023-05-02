@@ -5,6 +5,7 @@
 	use DB;
 	use CRUDBooster;
 	use Illuminate\Support\Facades\Request as Input;
+	use Illuminate\Support\Arr;
 
 	class AdminRndMenuItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -936,7 +937,7 @@
 				->menu_items_id;
 			
 			if ($menu_items_id) {
-				return (new AdminAddMenuItemsController)->getEdit($menu_items_id);
+				return (new AdminAddMenuItemsController)->getEdit($menu_items_id, 'rnd_menu_items', $id);
 			}
 
 			return (new AdminAddMenuItemsController)->getAdd('rnd_menu_items', $item);
@@ -1054,6 +1055,119 @@
 					'message_type' => 'success',
 					'message' => "✔️ New menu: $rnd_menu_description created."
 				]);
+		}
+
+		public function editNewMenu(Request $request, $id) {
+			$returnInputs = Input::all();
+			$rnd_menu_items_id = $returnInputs['rnd_menu_items_id'];
+			$approval_status = 'FOR COSTING';
+			$action_by = CRUDBooster::myId();
+			$time_stamp = date('Y-m-d H:i:s');
+			$rnd_menu_srp = $returnInputs['price_dine_in'];
+			$rnd_menu_description = $returnInputs['menu_item_description'];
+
+
+			//------> START CODE FROM PAT'S CONTROLLER
+			$menu_segment_names = [];
+			$user_menu_segmentations = DB::table('menu_segmentations')
+				->where('status','ACTIVE')
+				->select('menu_segment_column_name')
+				->get();
+			$menu_segments = Arr::pluck($user_menu_segmentations, 'menu_segment_column_name');
+
+			// Price Delivery
+			if($returnInputs['price_delivery'] == null){
+				$price_delivery = $returnInputs['price_dine_in'];
+			}else{
+				$price_delivery = $returnInputs['price_delivery'];
+			}
+
+			if($returnInputs['price_take_out'] == null){
+				$price_take_out = $returnInputs['price_dine_in'];
+			}else{
+				$price_take_out = $returnInputs['price_take_out'];
+			}
+
+			// Choices Group
+			$choices_group = DB::table('menu_choice_groups')
+				->select('id')
+				->where('status', 'ACTIVE')
+				->get();
+
+			// Add data to database
+			$data['old_code_1'] = $returnInputs['pos_item_code_1'];
+			$data['old_code_2'] = $returnInputs['pos_item_code_2'];
+			$data['old_code_3'] = $returnInputs['pos_item_code_3'];
+			$data['menu_item_description'] = $returnInputs['menu_item_description'];
+			for($i=0; $i<count($choices_group); $i++){
+				$choices_group_str = 'choices_group_'.(string)($i+1);
+				$choices_skugroup_str = 'choices_skugroup_'.(string)($i+1);
+				$data[$choices_group_str] = $returnInputs[$choices_group_str];
+				if($returnInputs[$choices_skugroup_str] != null){
+					$data[$choices_skugroup_str] = implode(', ',$returnInputs[$choices_skugroup_str]);
+				}else{
+					$data[$choices_skugroup_str] = null;
+				}
+			}
+			$data['menu_types_id'] = $returnInputs['menu_type'];
+			$data['menu_price_dine'] = $returnInputs['price_dine_in'];
+			$data['menu_price_dlv'] = $price_delivery;
+			$data['menu_price_take'] = $price_take_out;
+			$data['original_concept'] = $returnInputs['original_concept'];
+			$data['pos_old_item_description'] = $returnInputs['pos_item_description'];
+			$data['menu_product_types_name'] = $returnInputs['product_type'];
+			$data['menu_categories_id'] = $returnInputs['menu_categories'];
+			$data['menu_subcategories_id'] = $returnInputs['sub_category'];
+			$data['status'] = $returnInputs['status'];
+			$data['updated_by'] = CRUDBooster::myid();
+			// Update Store List
+			if($returnInputs['menu_segment_column_description'] != null){
+				// Reset Store List
+				foreach($menu_segments as $segments){
+					$data[$segments] = null;
+				}
+				foreach($returnInputs['menu_segment_column_description'] as $menu_segments_id){
+					$menu_segmentations_column_name = DB::table('menu_segmentations')
+						->where('id', $menu_segments_id)
+						->select('menu_segment_column_name')
+						->value('menu_segment_column_name');
+					$data[$menu_segmentations_column_name] = 1;
+					array_push($menu_segment_names, $menu_segmentations_column_name);
+				}
+			}else{
+				foreach($menu_segments as $segments){
+					$data[$segments] = null;
+				}				
+			}
+
+			//------> END CODE FROM PAT'S CONTROLLER
+
+			$is_updated = DB::table('menu_items')
+				->where('id', $id)
+				->update($data);
+
+			// updating the details of rnd menu in db
+			DB::table('rnd_menu_items')
+				->where('id', $rnd_menu_items_id)
+				->update([
+					'rnd_menu_description' => $rnd_menu_description,
+					'rnd_menu_srp' => $rnd_menu_srp,
+					'updated_by' => $action_by,
+					'updated_at' => $time_stamp,
+				]);
+
+			DB::table('rnd_menu_approvals')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update([
+					'approval_status' => $approval_status,
+					'updated_at' => $time_stamp,
+					'menu_created_by' => $action_by,
+					'menu_created_at' => $time_stamp
+				]);
+
+			return true;
+
+			return json_encode($is_updated);
 		}
 
 		public function getSetCosting($id) {

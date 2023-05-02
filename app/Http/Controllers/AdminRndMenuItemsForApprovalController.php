@@ -436,6 +436,10 @@
 			return $this->mainController->saveNewMenu($request);
 		}
 
+		public function editNewMenu(Request $request, $id) {
+			return $this->mainController->editNewMenu($request, $id);
+		}
+
 		public function addPackaging(Request $request) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(

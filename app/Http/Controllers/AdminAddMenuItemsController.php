@@ -574,7 +574,7 @@
 	    //By the way, you can still create your own method in here... :) 
 		public function getAdd($table = 'menu_items', $item = null) {
 			//Create an Auth
-			if ($table = 'menu_items') {
+			if ($table == 'menu_items') {
 				if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {    
 					CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
 				}
@@ -637,10 +637,12 @@
 
 		}
 
-		public function getEdit($id) {
+		public function getEdit($id, $table = 'menu_items', $rnd_menu_items_id = null) {
 			//Create an Auth
-			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE || $this->button_edit==FALSE) {    
-				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			if ($table == 'menu_items') {
+				if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE || $this->button_edit==FALSE) {    
+					CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+				}
 			}
 			
 			$data = [];
@@ -702,6 +704,9 @@
 				->get();
 				array_push($data['store_list_id'], $store_list[0]->id);
 			}
+
+			$data['table'] = $table;
+			$data['rnd_menu_items_id'] = $rnd_menu_items_id;
 			
 			return $this->view('menu-items.edit-menu-items',$data);
 		}
