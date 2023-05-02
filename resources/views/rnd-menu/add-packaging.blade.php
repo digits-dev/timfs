@@ -375,6 +375,10 @@
                         <td class="text-bold">Published By:</td>
                         <td>{{$workflow_data->published_by_name}}</td>
                     </tr>
+                    <tr>
+                        <td class="text-bold">Published At:</td>
+                        <td>{{$workflow_data->published_at}}</td>
+                    </tr>
                 </table>
             </div>
             <div class="col-md-6">
