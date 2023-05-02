@@ -928,6 +928,16 @@
 				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
 				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
 				->first();
+				
+			$menu_items_id = DB::table('rnd_menu_items')
+				->where('id', $id)
+				->get()
+				->first()
+				->menu_items_id;
+			
+			if ($menu_items_id) {
+				return (new AdminAddMenuItemsController)->getEdit($menu_items_id);
+			}
 
 			return (new AdminAddMenuItemsController)->getAdd('rnd_menu_items', $item);
 		}
