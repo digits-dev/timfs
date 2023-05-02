@@ -162,8 +162,12 @@
     });
 
     $(document).on('click', '.my-message', function() {
-        $('.my-message').removeAttr('_clicked');
-        $(this).attr('_clicked', 'true');
+        if ($(this).attr('_clicked')) {
+            $('.my-message').removeAttr('_clicked');
+        } else {
+            $('.my-message').removeAttr('_clicked');
+            $(this).attr('_clicked', 'true');
+        }
         formatMyMessage();
     });
 
