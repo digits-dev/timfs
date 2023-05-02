@@ -1437,7 +1437,7 @@
 
 			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
 
-			$data['comments_data'] = self::getRNDComments($id);
+			$data['comments_data'] = self::getRNDComments($id, false);
 
 
 			return $this->view('rnd-menu/detail-approvers', $data);
@@ -1569,7 +1569,7 @@
 			return $menu_items_data;
 		}
 
-		function getRNDComments($id) {
+		function getRNDComments($id, $to_comment = true) {
 			$data = [];
 
 			$item = DB::table('rnd_menu_costing')
@@ -1594,6 +1594,8 @@
 			$data['rnd_menu_items_id'] = $id;
 
 			$data['menu_item_description'] = ($item->menu_item_description ? $item->menu_item_description : $item->rnd_menu_description);
+
+			$data['to_comment'] = $to_comment;
 
 			return $data;
 		}

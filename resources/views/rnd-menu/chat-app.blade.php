@@ -20,12 +20,14 @@
             <div class="no-message-note"><h4 class="text-center">💬 No comments to show...</h4><div>
         </section>
     </div>
+    @if ($to_comment)
     <section class="type-message-section">
         <form action="" class="message-form flex">
             <input type="text" class="type-message form-control" placeholder="✏️ Type your comment here...">
             <button class="btn btn-success send-btn" disabled>➡️Send</button>
         </form>
     </section>
+    @endif
 </div> 
 
 @push('bottom')
