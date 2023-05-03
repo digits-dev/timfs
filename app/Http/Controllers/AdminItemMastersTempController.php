@@ -266,7 +266,20 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code here
+	    	$blue_status = [];
+			$orange_status = ['FOR ITEM CREATION'];
+			$green_status = ['ITEM CREATED'];
+			
+			if ($column_index == 2) {
+				if (in_array($column_value, $blue_status)) {
+					$column_value = "<span class='label label-info'>$column_value</span>";
+				} else if (in_array($column_value, $orange_status)) {
+					$column_value = "<span class='label label-warning'>$column_value</span>";
+				} else if (in_array($column_value, $green_status)) {
+					$column_value = "<span class='label label-success'>$column_value</span>";
+				}
+				
+			}
 	    }
 
 	    /*
