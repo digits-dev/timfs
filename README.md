@@ -109,10 +109,10 @@
       - [x] Marketing Approver Page
       - [ ] Accounting Approver Page
   - [x] Use Add page of Patrick for menu creation
-  - [ ] Use Edit page of Patrick for editing the menu
+  - [x] Use Edit page of Patrick for editing the menu
   - [ ] Copy RND menu ingredient(s) to menu item ingredient(s) after menu creation
-  - [ ] Create new module for Purchasing
-    - [ ] Create page for adding new item
+  - [x] Create new module for Purchasing
+    - [x] Create page for adding new item
     - [ ] Implement update to chef's ingredient when item is created
   - [ ] Create page for the approval of accounting
 
