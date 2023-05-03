@@ -166,7 +166,7 @@
                 <div class="col-md-2">
                     <div class="form-group">
                         <label class="control-label">* Supplier Cost</label>
-                        <input type="number" id="supplier-cost" class="form-control" placeholder="Supplier Cost">
+                        <input type="number" value="{{$item->ttp}}" id="supplier-cost" class="form-control" placeholder="Supplier Cost">
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -453,8 +453,10 @@
             fulfillment_type_id: fulfillmentType,
             uoms_id: uom,
             uoms_set_id: uomSet,
+            packagings_id: uomSet,
             currencies_id: currency,
             purchase_price: supplierCost,
+            ttp: supplierCost,
             landed_cost: landedCost,
             suppliers_id: preferredVendor,
             reorder_pt: reorderPt,
