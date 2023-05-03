@@ -38,6 +38,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"Creation Status","name"=>"creation_status"];
+			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
 			$this->col[] = ["label"=>"Packaging Size","name"=>"packaging_size"];
 			$this->col[] = ["label"=>"Uoms Id","name"=>"uoms_id","join"=>"uoms,uom_description"];
@@ -449,7 +450,6 @@
 				->first();
 
 			$item_data['tasteless_code'] = self::getTastelessCode($group);
-			$item_data["tasteless_code"] = $tasteless_code;
 			$item_data["encoder_privilege_id"] = CRUDBooster::myPrivilegeId();
 			$item_data["created_by"] = $action_by;
 			$item_data["created_at"] = $time_stamp;
