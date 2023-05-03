@@ -41,8 +41,8 @@
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
 			$this->col[] = ["label"=>"Packaging Size","name"=>"packaging_size"];
-			$this->col[] = ["label"=>"Uoms Id","name"=>"uoms_id","join"=>"uoms,uom_description"];
-			$this->col[] = ["label"=>"Ttp","name"=>"ttp"];
+			$this->col[] = ["label"=>"UOM","name"=>"uoms_id","join"=>"uoms,uom_description"];
+			$this->col[] = ["label"=>"TTP","name"=>"ttp"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created by","name"=>"created_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Created at","name"=>"created_at"];
