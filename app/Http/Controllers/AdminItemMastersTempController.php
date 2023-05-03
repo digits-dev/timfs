@@ -359,6 +359,25 @@
 
 
 	    //By the way, you can still create your own method in here... :) 
+		public function getDetail($id) {
+			if (!CRUDBooster::isRead())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$item_masters_id = DB::table('item_masters_temp')
+				->where('id', $id)
+				->get()
+				->first()
+				->item_masters_id;
+
+			if ($item_masters_id) {
+				return (new AdminItemMastersController)->getDetail($item_masters_id);
+			} else {
+				return parent::getDetail($id);
+			}
+		}
 
 		public function getEdit($id) {
 			if (!CRUDBooster::isUpdate())
