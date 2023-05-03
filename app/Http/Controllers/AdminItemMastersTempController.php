@@ -466,6 +466,9 @@
 		public function saveNewItem(Request $request) {
 			$item_data = (array) json_decode($request->get('item_data'));
 			$segmentation = (array) json_decode($request->get('segmentation'));
+			$item_description = $item_data['full_item_description'];
+			$ttp = $item_data['purchase_price'];
+			$packaging_size = $item_data['packaging_size'];
 			$item_masters_temp_id = $request->get('item_masters_temp_id');
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
@@ -492,6 +495,9 @@
 				->where('id', $item_masters_temp_id)
 				->update([
 					'item_masters_id' => $inserted_id,
+					'item_description' => $item_description,
+					'ttp' => $ttp,
+					'packaging_size' => $packaging_size,
 					'updated_by' => $action_by,
 					'updated_at' => $time_stamp,
 					'creation_status' => 'ITEM CREATED',
