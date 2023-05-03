@@ -131,10 +131,10 @@
                 <div class="col-md-2">
                     <div class="form-group">
                         <label class="control-label">* U/M</label>
-                        <select name="" id="uom" class="form-control">
+                        <select name="" id="uom" class="form-control" value={{$item->uoms_id}}>
                             <option value=""></option>
                             @foreach($uoms as $uom)
-                            <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                            <option value="{{$uom->id}}" {{$uom->id == $item->uoms_id ? "selected" : ''}}>{{$uom->uom_description}}</option>
                             @endforeach
                         </select>
                     </div>
