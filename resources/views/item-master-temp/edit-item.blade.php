@@ -156,7 +156,7 @@
                         <select name="" id="currency" class="form-control">
                             @foreach($currencies as $currency)
                             <option value=""></option>
-                            <option value="{{$currency->id}}">{{$currency->currency_description}}</option>
+                            <option value="{{$currency->id}}" {{$currency->currency_code == 'PHP' ? 'selected' : ''}}>{{$currency->currency_code}}</option>
                             @endforeach
                         </select>
                     </div>

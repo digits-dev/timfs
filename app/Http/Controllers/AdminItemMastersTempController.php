@@ -401,21 +401,25 @@
 
 			$data['tax_codes'] = DB::table('tax_codes')
 				->where('status', 'ACTIVE')
+				->orderBy('tax_description')
 				->get()
 				->toArray();
 
 			$data['accounts'] = DB::table('accounts')
 				->where('status', 'ACTIVE')
+				->orderBy('group_short_description')
 				->get()
 				->toArray();
 
 			$data['cogs_accounts'] = DB::table('cogs_accounts')
 				->where('status', 'ACTIVE')
+				->orderBy('group_short_description')
 				->get()
 				->toArray();
 
 			$data['asset_accounts'] = DB::table('asset_accounts')
 				->where('status', 'ACTIVE')
+				->orderBy('group_short_description')
 				->get()
 				->toArray();
 
@@ -426,26 +430,31 @@
 
 			$data['uoms'] = DB::table('uoms')
 				->where('status', 'ACTIVE')
+				->orderBy('uom_description')
 				->get()
 				->toArray();
 
 			$data['uoms_set'] = DB::table('uoms_set')
 				->where('status', 'ACTIVE')
+				->orderBy('uom_description')
 				->get()
 				->toArray();
 
 			$data['currencies'] = DB::table('currencies')
 				->where('status', 'ACTIVE')
+				->orderBy('currency_code')
 				->get()
 				->toArray();
 
 			$data['groups'] = DB::table('groups')
 				->where('status', 'ACTIVE')
+				->orderBy('group_description')
 				->get()
 				->toArray();
 
 			$data['categories'] = DB::table('categories')
 				->where('status', 'ACTIVE')
+				->orderBy('category_description')
 				->get()
 				->toArray();
 
@@ -520,17 +529,20 @@
 				$response = DB::table('brands')
 					->where('status', 'ACTIVE')
 					->where('brand_description', 'LIKE', '%'. $term . '%')
+					->orderBy('brand_description')
 					->get()
 					->toArray();
 			} else if ($to_search == 'preferred_vendors') {
 				$response = DB::table('suppliers')
 					->where('last_name', 'LIKE', '%'. $term . '%')
+					->orderBy('last_name')
 					->get()
 					->toArray();
 			} else if ($to_search == 'subcategories') {
 				$response = DB::table('subcategories')
 					->where('categories_id', $id)
 					->where('status', 'ACTIVE')
+					->orderBy('subcategory_description')
 					->get()
 					->toArray();
 			}
