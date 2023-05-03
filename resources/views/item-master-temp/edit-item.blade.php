@@ -252,6 +252,7 @@
                         <h4 class="text-bold">{{$segmentation->segment_column_description}}</h4>
                         <div class="choices per-store" column-name="{{$segmentation->segment_column_name}}">
                             <label class="radio-label"><input type="radio" name="{{$segmentation->segment_column_name}}" value="CORE"> CORE</label>
+                            <label class="radio-label"><input type="radio" name="{{$segmentation->segment_column_name}}" value="DEPLETION"> DEPLETION</label>
                             <label class="radio-label"><input type="radio" name="{{$segmentation->segment_column_name}}" value="NON CORE"> NON CORE</label>
                             <label class="radio-label"><input type="radio" name="{{$segmentation->segment_column_name}}" value="PERISHABLE"> PERISHABLE</label>
                             <label class="radio-label"><input type="radio" name="{{$segmentation->segment_column_name}}" value="ALTERNATIVE"> ALTERNATIVE</label>
