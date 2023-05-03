@@ -17,6 +17,7 @@ use App\Http\Controllers\AdminFoodCostController;
 use App\Http\Controllers\AdminExperimentalMenuItemsController;
 use App\Http\Controllers\AdminRndMenuItemsController;
 use App\Http\Controllers\AdminRndMenuItemsForApprovalController;
+use App\Http\Controllers\AdminItemMastersTempController;
 
 Route::get('/', function () {
     return redirect('admin/login');
@@ -113,4 +114,8 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/rnd_menu_items_for_approval/edit-by-purchasing', [AdminRndMenuItemsForApprovalController::class, 'editByPurchasing'])->name('edit_by_purchasing');
     Route::post('/admin/rnd_menu_items_for_approval/submit-by-purchasing', [AdminRndMenuItemsForApprovalController::class, 'submitByPurchasing'])->name('submit_by_purchasing');
     Route::post('/admin/rnd_menu_items_for_approval/approve-by-accounting', [AdminRndMenuItemsForApprovalController::class, 'approveByAccounting'])->name('approve_by_accounting');
+
+    //item masters temp
+    Route::post('/admin/temp_item_masters/search-data', [AdminItemMastersTempController::class, 'searchData'])->name('search_imfs_data');
+    Route::post('/admin/temp_item_masters/save-new-item', [AdminItemMastersTempController::class, 'saveNewItem'])->name('save_new_item');
 });

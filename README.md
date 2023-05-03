@@ -94,19 +94,27 @@
   - [x] Remove the RND Menu SRP in the costing page
   - [x] Add the details of newly created menu in the costing page
   - [x] Add the details of newly created menu in the approver's page
-  - [x] Restrict the user to publish w/o ingredient(s)
+  - [x] Restrict the chef to publish w/o ingredient(s)
+  - [x] Restrict the marketing to publish w/o packaging(s)
   - [x] Add Final SRP with VAT (Dine In)
   - [x] Add Final SRP with VAT (Take Out)
   - [x] Add Final SRP with VAT (Delivery)
   - [x] Thicken the divider line in the table
   - [x] Switch the position of percentage and final srp(s)
-  - [x] Add chat-box like comment section
+  - [x] Add chat-box-like comment section
     - [x] Add delete button
     - Add to different pages
       - [x] Packaging page
       - [x] Costing Page
       - [x] Marketing Approver Page
       - [ ] Accounting Approver Page
+  - [x] Use Add page of Patrick for menu creation
+  - [ ] Use Edit page of Patrick for editing the menu
+  - [ ] Copy RND menu ingredient(s) to menu item ingredient(s) after menu creation
+  - [ ] Create new module for Purchasing
+    - [ ] Create page for adding new item
+    - [ ] Implement update to chef's ingredient when item is created
+  - [ ] Create page for the approval of accounting
 
 - ### 📅 Tables
 
