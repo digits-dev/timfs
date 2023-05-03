@@ -25,7 +25,7 @@
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
-			$this->button_edit = true;
+			$this->button_edit = false;
 			$this->button_delete = false;
 			$this->button_detail = true;
 			$this->button_show = true;
@@ -99,7 +99,13 @@
 	        | 
 	        */
 	        $this->addaction = array();
-
+			$this->addaction[] = [
+				'title'=>'Edit',
+				'url'=>CRUDBooster::mainpath('edit/[id]'),
+				'icon'=>'fa fa-pencil',
+				'color' => ' ',
+				"showIf"=>"[creation_status] == 'FOR ITEM CREATION'"
+			];
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -468,6 +474,7 @@
 				->get()
 				->first();
 
+			$item_data['sku_statuses_id'] = 1;
 			$item_data['tasteless_code'] = self::getTastelessCode($group);
 			$item_data["encoder_privilege_id"] = CRUDBooster::myPrivilegeId();
 			$item_data["created_by"] = $action_by;
