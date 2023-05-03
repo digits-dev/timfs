@@ -672,6 +672,7 @@
 					// inserting item to item_masters_temp if new ingredient
 					if ($ingredient['is_existing'] != 'TRUE' && !$ingredient['item_masters_temp_id']) {
 						$inserted_item_id = DB::table('item_masters_temp')->insertGetId([
+							'creation_status' => 'FOR ITEM CREATION',
 							'item_description' => $ingredient['ingredient_name'],
 							'packaging_size' => $ingredient['packaging_size'],
 							'uoms_id' => $ingredient['uom_id'],
@@ -730,6 +731,7 @@
 					// inserting item to item_masters_temp if new packaging
 					if ($packaging['is_existing'] != 'TRUE' && !$packaging['item_masters_temp_id']) {
 						$inserted_item_id = DB::table('item_masters_temp')->insertGetId([
+							'creation_status' => 'FOR ITEM CREATION',
 							'item_description' => $packaging['packaging_name'],
 							'packaging_size' => $packaging['packaging_size'],
 							'uoms_id' => $packaging['uom_id'],
@@ -867,6 +869,7 @@
 					// inserting item to item_masters_temp if new packaging
 					if ($packaging['is_existing'] != 'TRUE' && !$packaging['item_masters_temp_id']) {
 						$inserted_item_id = DB::table('item_masters_temp')->insertGetId([
+							'creation_status' => 'FOR ITEM CREATION',
 							'item_description' => $packaging['packaging_name'],
 							'packaging_size' => $packaging['packaging_size'],
 							'uoms_id' => $packaging['uom_id'],
