@@ -249,7 +249,7 @@
                     <h3 class="text-center">STORE SEGMENTATIONS</h3>
                     @foreach($segmentations as $segmentation)
                     <div class="col-sm-3">
-                        <h4 class="text-bold">{{$segmentation->segment_column_description}}</h4>
+                        <h4 class="text-bold">* {{$segmentation->segment_column_description}}</h4>
                         <div class="choices per-store" column-name="{{$segmentation->segment_column_name}}">
                             <label class="radio-label"><input type="radio" name="{{$segmentation->segment_column_name}}" value="CORE"> CORE</label>
                             <label class="radio-label"><input type="radio" name="{{$segmentation->segment_column_name}}" value="DEPLETION"> DEPLETION</label>
@@ -298,54 +298,63 @@
                 },
             },
             placeholder: 'None Selected',
+            width: '100%',
         });
         $('#tax-code').select2({
             placeholder: {
                 id: '',
                 text: 'None Selected'
             },
+            width: '100%',
         });
         $('#account').select2({
             placeholder: {
                 id: '',
                 text: 'None Selected'
             },
+            width: '100%',
         });
         $('#cogs-account').select2({
             placeholder: {
                 id: '',
                 text: 'None Selected'
             },
+            width: '100%',
         });
         $('#asset-account').select2({
             placeholder: {
                 id: '',
                 text: 'None Selected'
             },
+            width: '100%',
         });
         $('#fulfillment-type').select2({
             placeholder: {
                 id: '',
                 text: 'None Selected'
             },
+            width: '100%',
         });
         $('#uom').select2({
             placeholder: {
                 id: '',
                 text: 'None Selected'
             },
+            width: '100%',
         });
         $('#uom-set').select2({
             placeholder: {
                 id: '',
                 text: 'None Selected'
             },
+            width: '100%',
         });
         $('#currency').select2({
             placeholder: {
                 id: '',
                 text: 'None Selected'
             },
+            width: '100%',
         });
         $('#preferred-vendor').select2({
             ajax: {
@@ -372,18 +381,21 @@
                 },
             },
             placeholder: 'None Selected',
+            width: '100%',
         });
         $('#group').select2({
             placeholder: {
                 id: '',
                 text: 'None Selected'
             },
+            width: '100%',
         });
         $('#category-description').select2({
             placeholder: {
                 id: '',
                 text: 'None Selected'
             },
+            width: '100%',
         }).on('change', function() {
             const id = $(this).val();
             $.ajax({
@@ -407,7 +419,29 @@
                 }  
             })
         });
-        $('#subcategory-description').select2({placeholder: 'None Selected'});
+        $('#subcategory-description').select2({
+            placeholder: 'None Selected',
+            width: '100%',
+        });
+    }
+
+    function checkFormValidity(itemDetails, segmentation) {
+        for (const itemDetail in itemDetails) {
+            if (itemDetail == 'packaging_dimension' || itemDetail == 'supplier_item_code') {
+                continue;
+            }
+            if (!itemDetails[itemDetail]) {
+                return [false, itemDetail];
+            }
+        }
+
+        for (const segmentationKey in segmentation) {
+            if (!segmentation[segmentationKey]) {
+                return [false, segmentationKey];
+            }
+        }
+
+        return [true, true]
     }
 
     function submitForm() {
@@ -468,6 +502,17 @@
             packaging_size: packagingSize,
             supplier_item_code: supplierItemCode,
             moq_store: moqStore,
+        }
+
+        const [isValid, field] = checkFormValidity(itemDetails, segmentation);
+        if (!isValid) {
+            console.log(field);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please fill out all required fields!',
+            });
+            return;
         }
 
         const form = $(document.createElement('form'))
