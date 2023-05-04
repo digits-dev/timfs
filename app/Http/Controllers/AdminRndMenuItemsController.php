@@ -1304,49 +1304,32 @@
 		}
 
 		public function approveByAccounting(Request $request) {
-			$action = $request->get('action');
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
-			$packaging_cost = $request->get('packaging_cost');
+			$action = $request->get('action');
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
+			$approval_status = null;
 
 			if ($action == 'approve') {
 				$approval_status = 'APPROVED';
-				$db_column_by = 'accounting_approved_by';
 				$db_column_at = 'accounting_approved_at';
+				$db_column_by = 'accounting_approved_by';
 				$message = '✔️ Item Approved!';
-				$send_email = true;
 			} else {
 				$approval_status = 'REJECTED';
-				$db_column_by = 'rejected_by';
 				$db_column_at = 'rejected_at';
+				$db_column_by = 'rejected_by';
 				$message = '✖️ Item Rejected!';
 				self::notifyForRejection($rnd_menu_items_id);
-				$send_email = false;
 			}
-
-			$item = DB::table('rnd_menu_items')
-				->where('rnd_menu_items.id', $rnd_menu_items_id)
-				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
-				->first();
 
 			DB::table('rnd_menu_approvals')
-				->where('id', $rnd_menu_items_id)
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
 				->update([
 					'approval_status' => $approval_status,
-					'updated_at' => $time_stamp,
-					$db_column_at => $time_stamp,
 					$db_column_by => $action_by,
+					$db_column_at => $time_stamp,
 				]);
-
-			if ($send_email) {
-				CRUDBooster::sendEmail([
-					'to' => 'fillinorgunio@digits.ph',
-					'from' => 'noreply@digits.ph',
-					'data' => (array) $item,
-					'template' => 'rnd_menu_creation',
-				]);
-			}
 
 			return redirect(CRUDBooster::mainpath())
 				->with([

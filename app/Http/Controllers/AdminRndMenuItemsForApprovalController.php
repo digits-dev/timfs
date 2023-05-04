@@ -482,26 +482,6 @@
 			return $this->mainController->approveByMarketing($request);
 		}
 
-		public function editByPurchasing(Request $request) {
-			if (!CRUDBooster::isUpdate())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-
-			return $this->mainController->editByPurchasing($request);
-		}
-
-		public function submitByPurchasing(Request $request) {
-			if (!CRUDBooster::isUpdate())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-
-			return $this->mainController->submitByPurchasing($request);
-		}
-
 		public function approveByAccounting(Request $request) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(
@@ -509,6 +489,6 @@
 					trans('crudbooster.denied_access')
 				);
 
-				return $this->mainController->approveByAccounting($request);
+			return $this->mainController->approveByAccounting($request);
 		}
 	}
