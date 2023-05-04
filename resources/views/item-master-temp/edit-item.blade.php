@@ -134,7 +134,7 @@
                         <select name="" id="uom" class="form-control" value={{$item->uoms_id}}>
                             <option value=""></option>
                             @foreach($uoms as $uom)
-                            <option value="{{$uom->id}}" {{$uom->id == $item->uoms_id ? "selected" : ''}}>{{$uom->uom_description}}</option>
+                            <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -145,7 +145,7 @@
                         <select name="" id="uom-set" class="form-control">
                             <option value=""></option>
                             @foreach($uoms_set as $uom_set)
-                            <option value="{{$uom_set->id}}">{{$uom_set->uom_description}}</option>
+                            <option value="{{$uom_set->id}}" {{$uom_set->id == $item->uoms_id ? "selected" : ''}}>{{$uom_set->uom_description}}</option>
                             @endforeach
                         </select>
                     </div>

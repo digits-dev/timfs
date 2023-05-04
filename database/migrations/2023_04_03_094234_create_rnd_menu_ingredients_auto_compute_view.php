@@ -116,14 +116,15 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                     LEFT JOIN menu_items ON menu_items.id = rnd_menu_ingredients_details.menu_as_ingredient_id
                     LEFT JOIN item_masters_temp ON item_masters_temp.id = rnd_menu_ingredients_details.item_masters_temp_id
                     LEFT JOIN uoms ON rnd_menu_ingredients_details.uom_id = uoms.id
-                    LEFT JOIN packagings ON packagings.id = (
+                    LEFT JOIN packagings ON packagings.id = COALESCE(
+                        item_masters.packagings_id,
                         rnd_menu_ingredients_details.uom_id
-                    )
+                    );
             ;          
         ");
 
         DB::statement("
-            CREATE VIEW rnd_menu_packagings_auto_compute AS
+            CREATE VIEW RND_MENU_PACKAGINGS_AUTO_COMPUTE AS 
                 SELECT
                     rnd_menu_packagings_details.id,
                     rnd_menu_packagings_details.rnd_menu_items_id,
@@ -219,7 +220,8 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                     LEFT JOIN item_masters ON item_masters.id = rnd_menu_packagings_details.item_masters_id
                     LEFT JOIN item_masters_temp ON item_masters_temp.id = rnd_menu_packagings_details.item_masters_temp_id
                     LEFT JOIN uoms ON rnd_menu_packagings_details.uom_id = uoms.id
-                    LEFT JOIN packagings ON packagings.id = (
+                    LEFT JOIN packagings ON packagings.id = COALESCE(
+                        item_masters.packagings_id,
                         rnd_menu_packagings_details.uom_id
                     )
             ; 

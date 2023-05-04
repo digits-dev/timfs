@@ -100,7 +100,8 @@ CREATE VIEW RND_MENU_INGREDIENTS_AUTO_COMPUTE AS
 	    LEFT JOIN menu_items ON menu_items.id = rnd_menu_ingredients_details.menu_as_ingredient_id
 	    LEFT JOIN item_masters_temp ON item_masters_temp.id = rnd_menu_ingredients_details.item_masters_temp_id
 	    LEFT JOIN uoms ON rnd_menu_ingredients_details.uom_id = uoms.id
-	    LEFT JOIN packagings ON packagings.id = (
+	    LEFT JOIN packagings ON packagings.id = COALESCE(
+	        item_masters.packagings_id,
 	        rnd_menu_ingredients_details.uom_id
 	    );
 ; 

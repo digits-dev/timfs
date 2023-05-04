@@ -101,7 +101,7 @@
                 <span class="required-star">*</span> Ingredient UOM
                 <select class="form-control uom">
                     @foreach ($uoms as $uom)
-                    <option {{$uom->uom_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                    <option {{$uom->packaging_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->packaging_description}}</option>
                     @endforeach
                 </select>
             </label>
@@ -219,7 +219,7 @@
             <span class="required-star">*</span> Ingredient UOM
             <select class="form-control uom">
                 @foreach ($uoms as $uom)
-                <option {{$uom->uom_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                <option {{$uom->packaging_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->packaging_description}}</option>
                 @endforeach
             </select>
         </label>
@@ -341,7 +341,7 @@
                 <span class="required-star">*</span> UOM
                 <select class="form-control uom">
                     @foreach ($uoms as $uom)
-                    <option {{$uom->uom_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                    <option {{$uom->packaging_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->packaging_description}}</option>
                     @endforeach
                 </select>
             </label>
@@ -459,7 +459,7 @@
             <span class="required-star">*</span> UOM
             <select class="form-control uom">
                 @foreach ($uoms as $uom)
-                <option {{$uom->uom_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                <option {{$uom->packaging_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->packaging_description}}</option>
                 @endforeach
             </select>
         </label>
@@ -757,7 +757,7 @@
                     ingredientInput.val(savedIngredient.item_masters_id || savedIngredient.menu_as_ingredient_id);
                     ingredientInput.attr({
                         cost: savedIngredient.ingredient_cost || savedIngredient.food_cost,
-                        uom: savedIngredient.uom_id,
+                        uom: savedIngredient.packagings_id,
                         item_id: savedIngredient.item_masters_id,
                         menu_item_id: savedIngredient.menu_as_ingredient_id,
                     });
@@ -771,9 +771,9 @@
                     element.find('.ingredient-name').val(savedIngredient.ingredient_name);
                     element.find('.pack-size').val(parseFloat(savedIngredient.packaging_size));
                     element.find('.prep-quantity').val(parseFloat(savedIngredient.prep_qty) || 0).attr('readonly', false);
-                    element.find('.uom').val(savedIngredient.uom_id);
+                    element.find('.uom').val(savedIngredient.packagings_id);
                     element.find('.uom_name').val(savedIngredient.uom_name);
-                    element.find('.display-uom').val(savedIngredient.uom_description);
+                    element.find('.display-uom').val(savedIngredient.packaging_description);
                     element.find('.preparation option').attr('selected', false);
                     element.find('.preparation').val(savedIngredient.menu_ingredients_preparations_id)
                     element.find('.yield').val(parseFloat(savedIngredient.yield) || 0);

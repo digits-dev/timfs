@@ -484,10 +484,10 @@
 				->get()
 				->toArray();
 
-			$data['uoms'] = DB::table('uoms')
+			$data['uoms'] = DB::table('packagings')
 				->where('status', 'ACTIVE')
-				->select('id', 'uom_description')
-				->orderBy('uom_description')
+				->select('id', 'packaging_description')
+				->orderBy('packaging_description')
 				->get()
 				->toArray();
 
@@ -511,6 +511,7 @@
 						'ingredient_group',
 						'uom_id',
 						'uom_description',
+						'packagings_id',
 						'packaging_description',
 						'prep_qty',
 						'menu_ingredients_preparations_id',
@@ -546,6 +547,7 @@
 						'packaging_group',
 						'uom_id',
 						'uom_description',
+						'packagings_id',
 						'packaging_description',
 						'prep_qty',
 						'menu_ingredients_preparations_id',
