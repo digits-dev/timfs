@@ -1001,7 +1001,8 @@
                 .display-packaging, 
                 .ingredient-name, 
                 .packaging-name
-            `).val(item.attr('item_desc'));
+            `).val(item.attr('item_desc'))
+                .attr('item_masters_temp_id', item.attr('item_masters_temp_id'));
             entry.find('.uom').val(item.attr('uom'));
             entry.find('.display-uom').val(item.attr('uom_desc'));
             entry.find('uom').val(item.attr('uoms_id'));
