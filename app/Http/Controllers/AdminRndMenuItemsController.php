@@ -1051,13 +1051,7 @@
 					'menu_created_at' => $time_stamp
 				]);
 
-				return true;
-
-			return redirect(CRUDBooster::mainpath())
-				->with([
-					'message_type' => 'success',
-					'message' => "✔️ New menu: $rnd_menu_description created."
-				]);
+			return true;
 		}
 
 		public function editNewMenu(Request $request, $id) {
@@ -1169,8 +1163,6 @@
 				]);
 
 			return true;
-
-			return json_encode($is_updated);
 		}
 
 		public function getSetCosting($id) {
