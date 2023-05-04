@@ -512,6 +512,19 @@
 					'creation_status' => 'ITEM CREATED',
 				]);
 
+			DB::table('rnd_menu_ingredients_details')
+				->where('item_masters_temp_id', $item_masters_temp_id)
+				->update([
+					'updated_by' => $action_by,
+					'updated_at' => $time_stamp,
+					'item_masters_id' => $inserted_id,
+					'item_masters_temp_id' => null,
+					'ingredient_name' => null,
+					'is_existing' => 'TRUE',
+					'packaging_size' => null,
+					'uom_id' => $item_data['uoms_id']
+				]);
+
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
