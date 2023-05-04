@@ -1233,7 +1233,7 @@
 			$data['comments_data'] = self::getRNDComments($id);
 
 
-			return $this->view('rnd-menu/approve-item', $data);
+			return $this->view('rnd-menu/approve-item-marketing', $data);
 		}
 
 		public function approveByMarketing(Request $request) {
@@ -1280,13 +1280,27 @@
 				->where('rnd_menu_items_id', $id)
 				->first();
 
+			$no_code_ingredients = DB::table('rnd_menu_ingredients_details')
+				->where('status', 'ACTIVE')
+				->where('rnd_menu_items_id', $id)
+				->where('is_existing', '!=', 'TRUE')
+				->count();
+
+			$no_code_packagings = DB::table('rnd_menu_packagings_details')
+				->where('status', 'ACTIVE')
+				->where('rnd_menu_items_id', $id)
+				->where('is_existing', '!=', 'TRUE')
+				->count();
+
+			$data['no_codes'] = $no_code_ingredients + $no_code_packagings;
+			
 			$data['workflow'] = self::getWorkFlowDetails($id);
 
 			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
 
 			$data['comments_data'] = self::getRNDComments($id);
 
-			return $this->view('rnd-menu/approve-item', $data);
+			return $this->view('rnd-menu/approve-item-accounting', $data);
 		}
 
 		public function approveByAccounting(Request $request) {
