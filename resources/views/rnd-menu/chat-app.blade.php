@@ -171,6 +171,7 @@
         formatMyMessage();
     });
 
+    @if ($to_comment)
     $(document).on('mouseenter', '.my-message', function() {
         const deleteButton = $(this).find('.delete-comment');
         deleteButton.show();
@@ -182,7 +183,6 @@
             deleteButton.hide();
         }
     });
-
 
     $(document).on('click', '.delete-comment', function() {
         const messageId = $(this).parents('.message').attr('comment_id');
@@ -200,6 +200,7 @@
             }
         });
     });
+    @endif
 
     appendComment(savedComments);
 </script>
