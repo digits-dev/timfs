@@ -1594,6 +1594,7 @@
 
 			$result = DB::table('item_masters_temp')
 				->where('status', 'ACTIVE')
+				->where('item_masters_id', null)
 				->where(function($query) use ($search_terms) {
 					foreach ($search_terms as $search_term) {
 						$query->where('item_description', 'like', "%{$search_term}%");
