@@ -384,15 +384,7 @@
 				->first()
 				->approval_status;
 
-			if ($status == 'FOR MENU CREATION') {
-				return $this->mainController->getDetailNoIngredient($id);
-			} else if ($status == 'FOR APPROVAL (MARKETING)' || $status == 'FOR COSTING' || $status = 'FOR ITEM CREATION') {
-				return $this->mainController->getDetailNoIngredient($id);
-			} else if ($status == 'FOR APPROVAL (PURCHASING)') {
-				return $this->mainController->getDetailPurchasing($id);
-			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
-				return $this->mainController->getDetailAccounting($id);
-			}
+			return $this->mainController->getDetailNoIngredient($id);
 			
 
 		}
@@ -421,7 +413,7 @@
 			} else if ($status == 'FOR ITEM CREATION') {
 				return $this->mainController->getEditByPurchasing($id);
 			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
-				return $this->mainController->getEditAccounting($id);
+				return $this->mainController->getApproveByAccounting($id);
 			}
 		}
 

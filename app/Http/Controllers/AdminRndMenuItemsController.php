@@ -1227,19 +1227,6 @@
 				]);
 		}
 
-		public function getDetailMarketing($id) {
-			$data = [];
-
-			$data['item'] = DB::table('rnd_menu_costing')
-				->where('rnd_menu_costing.rnd_menu_items_id', $id)
-				->leftJoin('rnd_menu_approvals', 'rnd_menu_approvals.rnd_menu_items_id', '=', 'rnd_menu_costing.rnd_menu_items_id')
-				->first();
-
-			$data['page_title'] = 'Details: ' . $data['item']->rnd_menu_description;
-
-			return $this->view('rnd-menu/hide-ingredients', $data);
-		}
-
 		public function getApproveByMarketing($id) {
 			$data = [];
 
@@ -1293,167 +1280,21 @@
 
 		}
 
-		// for purchasing
-		public function getDetailPurchasing($id) {
-			return self::getDetail($id);
-		}
-
-		public function getEditByPurchasing($id) {
+		//for accounting
+		public function getApproveByAccounting($id) {
+			$data = [];
 
 			$data['item'] = DB::table('rnd_menu_costing')
 				->where('rnd_menu_items_id', $id)
-				->leftJoin('rnd_menu_items', 'rnd_menu_items.id', '=', 'rnd_menu_costing.rnd_menu_items_id')
 				->first();
 
-			$data['ingredients'] = DB::table('rnd_menu_ingredients_auto_compute')
-				->where('rnd_menu_items_id', $id)
-				->where('status', 'ACTIVE')
-				->where('is_existing', 'FALSE')
-				->get()
-				->toArray();
+			$data['workflow'] = self::getWorkFlowDetails($id);
 
-			$data['packagings'] = DB::table('rnd_menu_packagings_auto_compute')
-				->where('rnd_menu_items_id', $id)
-				->where('status', 'ACTIVE')
-				->where('is_existing', 'FALSE')
-				->get()
-				->toArray();
-			
-			return $this->view('rnd-menu/add-tasteless-code', $data);
-		}
+			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
 
-		public function editByPurchasing(Request $request) {
-			
-			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
-			$rnd_menu_description = $request->get('rnd_menu_description');
-			$ingredients = json_decode($request->get('ingredients'));
-			$time_stamp = date('Y-m-d H:i:s');
-			$action_by = CRUDBooster::myId();
+			$data['comments_data'] = self::getRNDComments($id);
 
-			// inactivating all ingredients
-			DB::table('rnd_menu_ingredients_details')
-				->where('status', 'ACTIVE')
-				->where('rnd_menu_items_id', $rnd_menu_items_id)
-				->update([
-					'status' => 'INACTIVE',
-					'row_id' => null,
-					'deleted_at' => date('Y-m-d H:i:s')
-				]);
-
-			foreach ($ingredients as $group) {
-				foreach ($group as $ingredient) {
-					$ingredient = (array) $ingredient;
-
-					//checking if the ingredient already exists
-					$is_existing = DB::table('rnd_menu_ingredients_details')
-						->where([
-							'rnd_menu_items_id' => $rnd_menu_items_id,
-							'item_masters_id' => $ingredient['item_masters_id'],
-							'ingredient_name' => $ingredient['ingredient_name'],
-							'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
-						])->exists();
-					
-					if ($is_existing) {
-						$ingredient['updated_at'] = $time_stamp;
-						$ingredient['updated_by'] = $action_by;
-					} else {
-						$ingredient['created_at'] = $time_stamp;
-						$ingredient['created_by'] = $action_by;
-					}
-					
-					$ingredient['status'] = 'ACTIVE';
-					$ingredient['deleted_at'] = null;
-
-					//unsetting ingredients details that may be outdated in the future
-					unset(
-						$ingredient['qty'], 
-						$ingredient['cost'], 
-						$ingredient['total_cost'], 
-					);
-
-					if ($ingredient['is_existing'] == 'TRUE') {
-						unset($ingredient['ttp']);
-					}
-
-					//finally, inserting ingredients to the table
-					DB::table('rnd_menu_ingredients_details')->updateOrInsert([
-						'rnd_menu_items_id' => $rnd_menu_items_id,
-						'item_masters_id' => $ingredient['item_masters_id'],
-						'ingredient_name' => $ingredient['ingredient_name'],
-						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
-					], $ingredient);
-				}
-			}
-
-			return redirect(CRUDBooster::mainpath())
-				->with([
-					'message_type' => 'success',
-					'message' => "✔️ RND Menu Item Details of $rnd_menu_description Updated!"
-				]);
-		}
-
-		public function submitByPurchasing(Request $request) {
-
-			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
-			$approval_status = 'FOR APPROVAL (ACCOUNTING)';
-			$time_stamp = date('Y-m-d H:i:s');
-			$action_by = CRUDBooster::myId();
-
-			self::editByPurchasing($request);
-
-			DB::table('rnd_menu_approvals')
-				->where('rnd_menu_items_id', $rnd_menu_items_id)
-				->update([
-					'approval_status' => $approval_status,
-					'purchasing_approved_at' => $time_stamp,
-					'purchasing_approved_by' => $action_by,
-				]);
-
-			return redirect(CRUDBooster::mainpath())
-				->with([
-					'message_type' => 'success',
-					'message' => "✔️ RND Menu Item Details Updated!"
-				]);
-		}
-
-		//for accounting
-		public function getDetailAccounting($id) {
-			return self::getDetailMarketing($id);
-		}
-
-		public function getEditAccounting($id) {
-			$data = [];
-
-			$data['item'] = DB::table('rnd_menu_items')
-				->where('rnd_menu_items.id', $id)
-				->select(
-					'rnd_menu_items.id as rnd_menu_items_id',
-					'rnd_menu_items.rnd_menu_description',
-					'rnd_code',
-					'rnd_menu_items.portion_size',
-					'rnd_menu_items.rnd_menu_srp',
-					'approval_status',
-					'computed_ingredient_total_cost',
-					'computed_food_cost',
-					'computed_food_cost_percentage',
-					'publisher.name as published_by',
-					'published_at',
-					'marketing_approver.name as marketing_approver',
-					'marketing_approved_at',
-					'purchasing_approver.name as purchasing_approver',
-					'purchasing_approved_at',
-					'accounting_approver.name as accounting_approver',
-					'accounting_approved_at'
-				)
-				->leftJoin('rnd_menu_approvals', 'rnd_menu_items.id', '=', 'rnd_menu_approvals.rnd_menu_items_id')
-				->leftJoin('rnd_menu_computed_food_cost', 'rnd_menu_items.id', '=', 'rnd_menu_computed_food_cost.id')
-				->leftJoin('cms_users as publisher', 'rnd_menu_approvals.published_by', '=', 'publisher.id')
-				->leftJoin('cms_users as marketing_approver', 'rnd_menu_approvals.marketing_approved_by', '=', 'marketing_approver.id')
-				->leftJoin('cms_users as purchasing_approver', 'rnd_menu_approvals.purchasing_approved_by', '=', 'purchasing_approver.id')
-				->leftJoin('cms_users as accounting_approver', 'rnd_menu_approvals.accounting_approved_by', '=', 'accounting_approver.id')
-				->first();
-
-			return $this->view('rnd-menu/edit-accounting', $data);
+			return $this->view('rnd-menu/approve-item', $data);
 		}
 
 		public function approveByAccounting(Request $request) {
