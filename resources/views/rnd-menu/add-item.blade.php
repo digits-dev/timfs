@@ -273,7 +273,7 @@
                 <input value="" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
             </label>
             <label>
-                <span class="required-star">*</span> UOM
+                <span class="required-star">*</span> Packaging UOM
                 <div>
                     <input type="text" class="form-control uom" name="uom[]" value="" style="display: none;"/>
                     <input type="text" class="form-control display-uom" value="" readonly>
@@ -300,7 +300,7 @@
                 <input value="" class="form-control pack-quantity" type="number" readonly required>
             </label>
             <label>
-                <span class="required-star">*</span> Cost
+                <span class="required-star">*</span> Packaging Cost
                 <input value="" class="form-control cost" type="text" readonly required>
             </label>
         </div>
@@ -338,7 +338,7 @@
                 <input value="" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
             </label>
             <label>
-                <span class="required-star">*</span> UOM
+                <span class="required-star">*</span> Packaging UOM
                 <select class="form-control uom">
                     @foreach ($uoms as $uom)
                     <option {{$uom->packaging_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->packaging_description}}</option>
@@ -366,7 +366,7 @@
                 <input value="" class="form-control pack-quantity" type="number" readonly required>
             </label>
             <label>
-                <span class="required-star">*</span> Cost
+                <span class="required-star">*</span> Packaging Cost
                 <input value="" class="form-control cost" type="text" readonly required>
             </label>
         </div>
@@ -400,7 +400,7 @@
             <input value="" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
         </label>
         <label>
-            <span class="required-star">*</span> UOM
+            <span class="required-star">*</span> Packaging UOM
             <div>
                 <input type="text" class="form-control uom" name="uom[]" value="" style="display: none;"/>
                 <input type="text" class="form-control display-uom" value="" readonly>
@@ -427,7 +427,7 @@
             <input value="" class="form-control pack-quantity" type="number" readonly required>
         </label>
         <label>
-            <span class="required-star">*</span> Cost
+            <span class="required-star">*</span> Packaging Cost
             <input value="" class="form-control cost" type="text" readonly required>
         </label>
     </div>
@@ -456,7 +456,7 @@
             <input value="" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
         </label>
         <label>
-            <span class="required-star">*</span> UOM
+            <span class="required-star">*</span> Packaging UOM
             <select class="form-control uom">
                 @foreach ($uoms as $uom)
                 <option {{$uom->packaging_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->packaging_description}}</option>
@@ -484,7 +484,7 @@
             <input value="" class="form-control pack-quantity" type="number" readonly required>
         </label>
         <label>
-            <span class="required-star">*</span> Cost
+            <span class="required-star">*</span> Packaging Cost
             <input value="" class="form-control cost" type="text" readonly required>
         </label>
     </div>
