@@ -365,6 +365,28 @@
                     <div>{{$workflow->costing_updated_at}}</div>
                 </div>
             </div>
+            <br>
+            <div class="flex parent">
+                <div class="flex child">
+                    <div class="text-bold">Approved by (Marketing):</div>
+                    <div>{{$workflow->marketing_approved_by_name}}</div>
+                </div>
+                <div class="flex child">
+                    <div class="text-bold">Approved at (Marketing):</div>
+                    <div>{{$workflow->marketing_approved_at}}</div>
+                </div>
+            </div>
+            <br>
+            <div class="flex parent">
+                <div class="flex child">
+                    <div class="text-bold">Approved by (Accounting):</div>
+                    <div>{{$workflow->accounting_approved_by_name}}</div>
+                </div>
+                <div class="flex child">
+                    <div class="text-bold">Approved at (Accounting):</div>
+                    <div>{{$workflow->accounting_approved_at}}</div>
+                </div>
+            </div>
         </section>
     </div>
     <div class="panel-footer">
