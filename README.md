@@ -113,8 +113,11 @@
   - [ ] Copy RND menu ingredient(s) to menu item ingredient(s) after menu creation
   - [x] Create new module for Purchasing
     - [x] Create page for adding new item
-    - [ ] Implement update to chef's ingredient when item is created
+    - [x] Implement update to chef's ingredient when item is created
+    - [x] Implement update to marketing's packaging when item is created
   - [ ] Create page for the approval of accounting
+    - [ ] Restrict accounting to approve until all items have codes
+    - [ ] Change the approval status after approval
 
 - ### 📅 Tables
 
