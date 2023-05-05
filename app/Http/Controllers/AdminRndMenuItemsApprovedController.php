@@ -38,14 +38,18 @@
 			$this->col = [];
 			$this->col[] = ["label"=>"Approval Status","name"=>"id","join"=>"rnd_menu_approvals,approval_status","join_id"=>"rnd_menu_items_id"];
 			$this->col[] = ["label"=>"Rnd Code","name"=>"rnd_code"];
+			$this->col[] = ["label"=>"Rnd Tasteless Code","name"=>"id","join"=>"menu_items,tasteless_menu_code"];
 			$this->col[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description"];
 			$this->col[] = ["label"=>"SRP","name"=>"rnd_menu_srp"];
 			$this->col[] = ["label"=>"Portion Size","name"=>"portion_size"];
-			$this->col[] = ["label"=>"Ingredient Total Cost","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_ingredient_total_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"Food Cost","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_food_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"Food Cost Percentage","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_food_cost_percentage","join_id"=>"id"];
-			$this->col[] = ["label"=>"Published By","name"=>"rnd_menu_approvals.published_by","join"=>"cms_users,name","join_id"=>"id"];
-			$this->col[] = ["label"=>"Published Date","name"=>"rnd_menu_approvals.published_at"];
+			$this->col[] = ["label"=>"Packaging Cost","name"=>"id","join"=>"rnd_menu_computed_packaging_cost,computed_packaging_total_cost","join_id"=>"id"];
+			$this->col[] = ["label"=>"Status","name"=>"status"];
+			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
+			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Updated At","name"=>"updated_at"];
+			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -259,7 +263,7 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-	        $query->where('approval_status', '=', 'APPROVED');
+	        $query->where('rnd_menu_approvals.approval_status', '=', 'APPROVED');
 	    }
 
 	    /*
