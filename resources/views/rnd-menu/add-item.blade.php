@@ -1537,29 +1537,29 @@
         });
 
         $(document).on('click', addButtonsId, function() {
-                const id = $(this).attr('id');
-                let wrapper;
-                let section;
-                if (id == 'add-existing-ingredient') {
-                    wrapper = $('.ingredient-wrapper').eq(0).clone();
-                    section = $('.ingredient-section');
-                    $('.no-ingredient-warning').remove();
-                } else if (id == 'add-new-ingredient') {
-                    wrapper = $('.new-ingredient-wrapper').eq(0).clone();
-                    section = $('.ingredient-section');
-                    $('.no-ingredient-warning').remove();
-                } else if (id == 'add-existing-packaging') {
-                    wrapper = $('.packaging-wrapper').eq(0).clone();
-                    section = $('.packaging-section');
-                    $('.no-packaging-warning').remove();
-                } else {
-                    wrapper = $('.new-packaging-wrapper').eq(0).clone();
-                    section = $('.packaging-section');
-                    $('.no-packaging-warning').remove();
-                }
-                section.append(wrapper.show());
-                wrapper.find('.display-ingredient, .display-packaging, .ingredient-name, .packaging-name').focus();
-                $.fn.reload();
+            const id = $(this).attr('id');
+            let wrapper;
+            let section;
+            if (id == 'add-existing-ingredient') {
+                wrapper = $('.ingredient-wrapper').eq(0).clone();
+                section = $('.ingredient-section');
+                $('.no-ingredient-warning').remove();
+            } else if (id == 'add-new-ingredient') {
+                wrapper = $('.new-ingredient-wrapper').eq(0).clone();
+                section = $('.ingredient-section');
+                $('.no-ingredient-warning').remove();
+            } else if (id == 'add-existing-packaging') {
+                wrapper = $('.packaging-wrapper').eq(0).clone();
+                section = $('.packaging-section');
+                $('.no-packaging-warning').remove();
+            } else {
+                wrapper = $('.new-packaging-wrapper').eq(0).clone();
+                section = $('.packaging-section');
+                $('.no-packaging-warning').remove();
+            }
+            section.append(wrapper.show());
+            wrapper.find('.display-ingredient, .display-packaging, .ingredient-name, .packaging-name').focus();
+            $.fn.reload();
         });
 
         $(document).on('click', '.delete', function(event) {
