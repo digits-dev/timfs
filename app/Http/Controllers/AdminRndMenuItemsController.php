@@ -1366,6 +1366,15 @@
 			DB::table('menu_ingredients_details')
 				->insert($ingredients);
 
+			DB::table('menu_items')
+				->leftJoin('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
+				->where('menu_items.id', $menu_items_id)
+				->update([
+					'menu_items.ingredient_total_cost' => DB::raw('menu_computed_food_cost.computed_ingredient_total_cost'),
+					'menu_items.food_cost' => DB::raw('menu_computed_food_cost.computed_food_cost'),
+					'menu_items.food_cost_percentage' => DB::raw('menu_computed_food_cost.computed_food_cost_percentage')
+				]);
+
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
