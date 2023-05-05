@@ -107,7 +107,7 @@
       - [x] Packaging page
       - [x] Costing Page
       - [x] Marketing Approver Page
-      - [ ] Accounting Approver Page
+      - [x] Accounting Approver Page
   - [x] Use Add page of Patrick for menu creation
   - [x] Use Edit page of Patrick for editing the menu
   - [ ] Copy RND menu ingredient(s) to menu item ingredient(s) after menu creation
@@ -118,6 +118,25 @@
   - [x] Create page for the approval of accounting
     - [x] Restrict accounting to approve until all items have codes
     - [x] Change the approval status after approval
+
+- ### 🟰 RND Menu Costing Formula
+
+  |       |           Particulars           | Value / Input by / Formula | Default Value |         Input Type         |
+  | :---: | :-----------------------------: | :------------------------: | :-----------: | :------------------------: |
+  | **a** |          portion size           |       input by chef        |       1       |         manual set         |
+  | **b** |   recipe cost without buffer    |       input by chef        |               | based on input ingredients |
+  | **c** |             buffer              |     input by marketing     |     6.5%      |         adjustable         |
+  | **d** |        final recipe cost        |    `(b * (1 + c)) / a`     |               |        auto compute        |
+  | **e** |         packaging cost          | input by chef / marketing  |               |  based on input packaging  |
+  | **f** |         ideal food cost         |     input by marketing     |      30%      |         adjustable         |
+  | **g** |  suggested final srp with vat   |       `d / f * 1.12`       |               |        auto compute        |
+  | **h** |      final srp without vat      |         `i / 1.12`         |               |        auto compute        |
+  | **i** |  final srp with vat (dine in)   |     input by marketing     |               |         manual set         |
+  | **j** |  final srp with vat (take out)  |     input by marketing     |               |         manual set         |
+  | **k** |  final srp with vat (delivery)  |     input by marketing     |               |         manual set         |
+  | **l** | % cost packaging from final srp |          `e / h`           |               |        auto compute        |
+  | **m** |   % food cost from final srp    |          `d / h`           |               |        auto compute        |
+  | **n** |          % total cost           |          `l + m`           |               |        auto compute        |
 
 - ### 📅 Tables
 
