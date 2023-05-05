@@ -101,7 +101,7 @@
                 <span class="required-star">*</span> Packaging UOM
                 <select class="form-control uom">
                     @foreach ($uoms as $uom)
-                    <option {{$uom->uom_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                    <option {{$uom->packaging_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->packaging_description}}</option>
                     @endforeach
                 </select>
             </label>
@@ -219,7 +219,7 @@
             <span class="required-star">*</span> Packaging UOM
             <select class="form-control uom">
                 @foreach ($uoms as $uom)
-                <option {{$uom->uom_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                <option {{$uom->packaging_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->packaging_description}}</option>
                 @endforeach
             </select>
         </label>
@@ -443,6 +443,7 @@
                     .append($('.new-add-sub-btn').eq(0).clone());
 
                 groupedPackaging.forEach(savedPackaging => {
+                    console.log(savedPackaging.uom_id)
                     let element;
                     if (savedPackaging.is_primary == 'TRUE') {
                         if (savedPackaging.is_existing == 'TRUE') {
@@ -490,7 +491,7 @@
                     element.find('.packaging-name').val(savedPackaging.packaging_name);
                     element.find('.pack-size').val(parseFloat(savedPackaging.packaging_size));
                     element.find('.prep-quantity').val(parseFloat(savedPackaging.prep_qty) || 0).attr('readonly', false);
-                    element.find('.uom').val(savedPackaging.uom_id);
+                    element.find('.uom').val(savedPackaging.packagings_id || savedPackaging.uom_id);
                     element.find('.uom_name').val(savedPackaging.uom_name);
                     element.find('.display-uom').val(savedPackaging.uom_description);
                     element.find('.preparation option').attr('selected', false);

@@ -771,7 +771,7 @@
                     element.find('.ingredient-name').val(savedIngredient.ingredient_name);
                     element.find('.pack-size').val(parseFloat(savedIngredient.packaging_size));
                     element.find('.prep-quantity').val(parseFloat(savedIngredient.prep_qty) || 0).attr('readonly', false);
-                    element.find('.uom').val(savedIngredient.packagings_id);
+                    element.find('.uom').val(savedIngredient.packagings_id || savedIngredient.uom_id);
                     element.find('.uom_name').val(savedIngredient.uom_name);
                     element.find('.display-uom').val(savedIngredient.packaging_description);
                     element.find('.preparation option').attr('selected', false);
