@@ -1325,6 +1325,7 @@
 				self::notifyForRejection($rnd_menu_items_id);
 			}
 
+			// updating approval status
 			DB::table('rnd_menu_approvals')
 				->where('rnd_menu_items_id', $rnd_menu_items_id)
 				->update([
@@ -1332,6 +1333,38 @@
 					$db_column_by => $action_by,
 					$db_column_at => $time_stamp,
 				]);
+			
+			// getting the foreign key of menu item and rnd menu item
+			$menu_items_id = DB::table('rnd_menu_items')
+				->where('id', $rnd_menu_items_id)
+				->get('menu_items_id')
+				->first()
+				->menu_items_id;
+
+			// getting all the active ingredients of the rnd menu
+			$ingredients = DB::table('rnd_menu_ingredients_details')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+			
+			// preparing every ingredient to be copied as
+			// ingredient of the menu item
+			foreach ($ingredients as $index => $ingredient) {
+				$ingredient = (array) $ingredient;
+				unset(
+					$ingredient['id'],
+					$ingredient['rnd_menu_items_id'],
+					$ingredient['item_masters_temp_id'],
+					$ingredient['deleted_at'],
+				);
+
+				$ingredient['menu_items_id'] = $menu_items_id;
+				$ingredients[$index] = $ingredient;
+			}
+
+			DB::table('menu_ingredients_details')
+				->insert($ingredients);
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
