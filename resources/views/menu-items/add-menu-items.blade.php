@@ -268,7 +268,7 @@
 </div>
 
 <script>
-    const item = {!! json_encode($item) !!};
+    const item = {!! json_encode($item) !!} || {};
 
     $('#menu_type_select1').select2({
         placeholder: "Select a menu segmentation",
@@ -359,6 +359,7 @@
         }
     });
 
+    @if ($item->rnd_menu_items_id)
     if (item.rnd_menu_items_id) {
         $(document).on('click', '.add-menu', function() {
             Swal.fire({
@@ -415,6 +416,7 @@
             event.preventDefault();
         });
     }
+    @endif
 
 
 </script>
