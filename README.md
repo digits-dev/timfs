@@ -115,9 +115,9 @@
     - [x] Create page for adding new item
     - [x] Implement update to chef's ingredient when item is created
     - [x] Implement update to marketing's packaging when item is created
-  - [ ] Create page for the approval of accounting
-    - [ ] Restrict accounting to approve until all items have codes
-    - [ ] Change the approval status after approval
+  - [x] Create page for the approval of accounting
+    - [x] Restrict accounting to approve until all items have codes
+    - [x] Change the approval status after approval
 
 - ### 📅 Tables
 
