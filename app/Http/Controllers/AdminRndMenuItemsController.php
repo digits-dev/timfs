@@ -24,14 +24,14 @@
 			$this->button_table_action = TRUE;   
 			$this->button_action_style = "button_icon";     
 			$this->button_add          = TRUE;
-			$this->button_delete       = TRUE;
-			$this->button_edit         = TRUE;
+			$this->button_delete       = false;
+			$this->button_edit         = false;
 			$this->button_detail       = TRUE;
 			$this->button_show         = TRUE;
 			$this->button_filter       = TRUE;        
 			$this->button_export       = FALSE;	        
 			$this->button_import       = FALSE;
-			$this->button_bulk_action  = TRUE;	
+			$this->button_bulk_action  = false;	
 			$this->sidebar_mode		   = "normal"; //normal,mini,collapse,collapse-mini
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
@@ -95,6 +95,21 @@
 	        | 
 	        */
 	        $this->addaction = array();
+			$this->addaction[] = [
+				'title'=>'Edit',
+				'url'=>CRUDBooster::mainpath('edit/[id]'),
+				'icon'=>'fa fa-pencil',
+				'color' => ' ',
+				"showIf"=>"[approval_status] == 'SAVED'"
+			];
+
+			$this->addaction[] = [
+				'title'=>'Delete',
+				'url' => '#[id]',
+				'icon'=>'fa fa-trash',
+				'color' => ' delete-rnd-menu',
+				"showIf"=>"[approval_status] == 'SAVED'"
+			];
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -164,7 +179,25 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
-	        $this->script_js = NULL;
+			$main_path = CRUDBooster::mainPath();
+	        $this->script_js = "
+			$('.delete-rnd-menu').on('click', function() {
+				const dbId = $(this).attr('href')?.replace('#', '');
+				console.log(dbId);
+				swal({   
+						title: `Are you sure ?`,   
+						text: `You will not be able to recover this record data!`,   
+						type: `warning`,   
+						showCancelButton: true,   
+						confirmButtonColor: `#ff0000`,   
+						confirmButtonText: `Yes!`,  
+						cancelButtonText: `No`,  
+						closeOnConfirm: false 
+					}, 
+					function(){location.href=`$main_path/delete-rnd-menu/` + dbId}
+				);
+			});
+			";
 
 
             /*
@@ -255,7 +288,7 @@
 	    public function hook_query_index(&$query) {
 	        //Your code here
 	        
-			$query->whereIn('rnd_menu_approvals.approval_status', ['SAVED', 'REJECTED']);
+			$query->addSelect('rnd_menu_approvals.approval_status');
 	    }
 
 	    /*
@@ -268,10 +301,21 @@
 	    	//Your code here
 
 			if (is_numeric($column_value)) $column_value = (float) $column_value;
-			if ($column_index == 2) {
-				if ($column_value == 'SAVED') $column_value = "<span class='label label-info'>$column_value</span>";
-				if ($column_value == 'PENDING') $column_value = "<span class='label label-warning'>$column_value</span>";
-				if ($column_value == 'REJECTED') $column_value = "<span class='label label-danger'>$column_value</span>";
+
+			$blue_status = ['SAVED', 'FOR COSTING'];
+			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION'];
+			$green_status = ['APPROVED'];
+			
+			if ($column_index == 1) {
+				if (in_array($column_value, $blue_status)) {
+					$column_value = "<span class='label label-info'>$column_value</span>";
+				} else if (in_array($column_value, $orange_status)) {
+					$column_value = "<span class='label label-warning'>$column_value</span>";
+				} else if (in_array($column_value, $green_status)) {
+					$column_value = "<span class='label label-success'>$column_value</span>";
+				}
+				
+				if (str_contains($column_value, 'APPROVAL')) $column_value = "<span class='label label-info'>$column_value</span>";
 			}
 	    }
 
@@ -810,6 +854,21 @@
 				->with([
 					'message_type' => 'success',
 					'message' => "✔️ $rnd_menu_description forwarded to Marketing for Menu Creation!"
+				]);
+		}
+
+		public function deleteRndMenuItem($id) {
+			DB::table('rnd_menu_items')
+				->where('id', $id)
+				->update([
+					'status' => 'INACTIVE',
+					'deleted_at' => date('Y-m-d H:i:s')
+				]);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "✔️ RND Menu Item Deleted!"
 				]);
 		}
 
