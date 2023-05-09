@@ -450,7 +450,8 @@
 				'rnd_menu_ingredients_auto_compute.ttp',
 				'cost',
 				'item_masters.updated_at',
-				'item_masters.created_at')
+				'item_masters.created_at',
+				'rnd_menu_ingredients_auto_compute.item_description')
 			->leftJoin('item_masters', 'rnd_menu_ingredients_auto_compute.item_masters_id', '=', 'item_masters.id')
 			->leftJoin('menu_items', 'rnd_menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
 			->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
@@ -481,7 +482,8 @@
 				'rnd_menu_packagings_auto_compute.ttp',
 				'cost',
 				'item_masters.updated_at',
-				'item_masters.created_at')
+				'item_masters.created_at',
+				'rnd_menu_packagings_auto_compute.item_description')
 			->leftJoin('item_masters', 'rnd_menu_packagings_auto_compute.item_masters_id', '=', 'item_masters.id')
 			->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
 			->leftJoin('menu_ingredients_preparations', 'rnd_menu_packagings_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
@@ -781,7 +783,6 @@
 					DB::table('rnd_menu_packagings_details')->updateOrInsert([
 						'rnd_menu_items_id' => $rnd_menu_items_id,
 						'item_masters_id' => $packaging['item_masters_id'],
-						'packaging_name' => $packaging['packaging_name'],
 						'new_packagings_id' => $packaging['new_packagings_id']
 					], $packaging);
 						
@@ -915,7 +916,6 @@
 						->where([
 							'rnd_menu_items_id' => $rnd_menu_items_id,
 							'item_masters_id' => $packaging['item_masters_id'],
-							'packaging_name' => $packaging['packaging_name'],
 							'new_packagings_id' => $packaging['new_packagings_id'],
 						])->exists();
 

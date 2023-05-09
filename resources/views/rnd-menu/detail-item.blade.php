@@ -177,7 +177,7 @@
                         .text(
                             groupedIngredient.full_item_description ||
                             groupedIngredient.menu_item_description ||
-                            groupedIngredient.ingredient_name
+                            groupedIngredient.item_description
                         ).css('background', groupedIngredient.checked ? 'yellow' : '');
                     ingredient.html(ingredientSpan);
                     const packagingSize = $(document.createElement('td')).text(groupedIngredient.packaging_size)
@@ -278,7 +278,7 @@
                         .text(
                             groupedPackaging.full_item_description ||
                             groupedPackaging.menu_item_description ||
-                            groupedPackaging.packaging_name
+                            groupedPackaging.item_description
                         ).css('background', groupedPackaging.checked ? 'yellow' : '');
                     packaging.html(packagingSpan);
                     const packagingSize = $(document.createElement('td')).text(groupedPackaging.packaging_size)
