@@ -183,7 +183,6 @@
 	        $this->script_js = "
 			$('.delete-rnd-menu').on('click', function() {
 				const dbId = $(this).attr('href')?.replace('#', '');
-				console.log(dbId);
 				swal({   
 						title: `Are you sure ?`,   
 						text: `You will not be able to recover this record data!`,   
