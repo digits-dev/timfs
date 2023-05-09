@@ -1,7 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
 
@@ -333,5 +333,21 @@
 
 	    //By the way, you can still create your own method in here... :) 
 
+		public function searchNewIngredients(Request $request) {
+			$search_terms = json_decode($request->content);
+			$result = DB::table('new_ingredients')
+				->where('new_ingredients.status', 'ACTIVE')
+				->where('new_ingredients.item_masters_id', null)
+				->where(function($query) use ($search_terms) {
+					foreach ($search_terms as $search_term) {
+						$query->where('new_ingredients.item_description', 'like', "%{$search_term}%");
+					}
+				})
+				->select('*', 'new_ingredients.id as new_ingredients_id', 'new_ingredients.created_at as created_at')
+				->leftJoin('uoms', 'uoms.id', '=', 'new_ingredients.uoms_id')
+				->get()
+				->toArray();
 
+			return json_encode($result);
+		}
 	}

@@ -118,8 +118,8 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/for_approval_rnd_menu/edit/delete-comment', [AdminRndMenuItemsForApprovalController::class, 'deleteComment'])->name('delete_rnd_comment');
 
     //new ingredients
-    Route::post('/admin/new-ingredients/search-new-ingredients', [AdminNewIngredientsController::class, 'searchNewIngredients'])->name('search_new_ingredients');
-    
+    Route::post('/admin/new_ingredients/search-new-ingredients', [AdminNewIngredientsController::class, 'searchNewIngredients'])->name('search_new_ingredient');
+
     //new packagings
-    Route::post('/admin/new-ingredients/search-new-packagings', [AdminNewPackagingsController::class, 'searchNewPackagings'])->name('search_new_packagings');
+    Route::post('/admin/new_packagings/search-new-packagings', [AdminNewPackagingsController::class, 'searchNewPackagings'])->name('search_new_packaging');
 });
