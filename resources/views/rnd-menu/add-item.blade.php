@@ -1209,7 +1209,6 @@
                     ingredientObject.item_masters_id = ingredientMember.find('.ingredient').attr('item_id');
                     ingredientObject.new_ingredients_id = ingredientMember.find('.ingredient-name').attr('new_ingredients_id');
                     ingredientObject.menu_as_ingredient_id = ingredientMember.find('.ingredient').attr('menu_item_id');
-                    ingredientObject.ingredient_name = ingredientMember.find('.ingredient-name').val()?.trim().toUpperCase();
                     ingredientObject.packaging_size = ingredientMember.find('.pack-size').val();
                     ingredientObject.prep_qty = ingredientMember.find('.prep-quantity').val();
                     ingredientObject.uom_id = ingredientMember.find('.uom').val();
@@ -1243,7 +1242,6 @@
                     packagingObject.packaging_group = groupIndex;
                     packagingObject.item_masters_id = packagingMember.find('.packaging').attr('item_id');
                     packagingObject.new_packagings_id = packagingMember.find('.packaging-name').attr('new_packagings_id');
-                    packagingObject.packaging_name = packagingMember.find('.packaging-name').val()?.trim().toUpperCase();
                     packagingObject.packaging_size = packagingMember.find('.pack-size').val();
                     packagingObject.prep_qty = packagingMember.find('.prep-quantity').val();
                     packagingObject.uom_id = packagingMember.find('.uom').val();
@@ -1259,8 +1257,6 @@
                     packagingsArray.push(packagingArray);
                 }
             });
-            console.log(ingredientsArray, packagingsArray); return;
-            return;
             const ingredientsJSON = JSON.stringify(ingredientsArray);
             const packagingsJSON = JSON.stringify(packagingsArray);
 

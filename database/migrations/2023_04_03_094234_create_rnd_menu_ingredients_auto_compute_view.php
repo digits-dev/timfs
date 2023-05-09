@@ -14,16 +14,16 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
     public function up()
     {
         DB::statement("
-            CREATE VIEW rnd_menu_ingredients_auto_compute AS 
+            CREATE VIEW RND_MENU_INGREDIENTS_AUTO_COMPUTE AS 
                 SELECT
                     rnd_menu_ingredients_details.id,
                     rnd_menu_ingredients_details.rnd_menu_items_id,
                     rnd_menu_ingredients_details.item_masters_id,
                     rnd_menu_ingredients_details.menu_as_ingredient_id,
-                    rnd_menu_ingredients_details.item_masters_temp_id,
+                    rnd_menu_ingredients_details.new_ingredients_id,
                     item_masters.full_item_description,
                     menu_items.menu_item_description,
-                    item_masters_temp.item_description,
+                    new_ingredients.item_description,
                     rnd_menu_ingredients_details.ingredient_name,
                     rnd_menu_ingredients_details.ingredient_group,
                     rnd_menu_ingredients_details.row_id,
@@ -46,12 +46,12 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                     CASE
                         WHEN rnd_menu_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
                         WHEN rnd_menu_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
-                        WHEN rnd_menu_ingredients_details.item_masters_temp_id IS NOT NULL THEN item_masters_temp.ttp
+                        WHEN rnd_menu_ingredients_details.new_ingredients_id IS NOT NULL THEN new_ingredients.ttp
                         ELSE rnd_menu_ingredients_details.ttp
                     END as ttp,
                     CASE
                         WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
-                        WHEN item_masters_temp.packaging_size IS NOT NULL THEN item_masters_temp.packaging_size
+                        WHEN new_ingredients.packaging_size IS NOT NULL THEN new_ingredients.packaging_size
                         WHEN rnd_menu_ingredients_details.packaging_size IS NOT NULL THEN rnd_menu_ingredients_details.packaging_size
                         ELSE 1
                     END as packaging_size,
@@ -70,7 +70,7 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                         1 / (
                             CASE
                                 WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
-                                WHEN item_masters_temp.packaging_size IS NOT NULL THEN item_masters_temp.packaging_size
+                                WHEN new_ingredients.packaging_size IS NOT NULL THEN new_ingredients.packaging_size
                                 WHEN rnd_menu_ingredients_details.packaging_size IS NOT NULL THEN rnd_menu_ingredients_details.packaging_size
                                 ELSE 1
                             END
@@ -89,7 +89,7 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                             1 / (
                                 CASE
                                     WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
-                                    WHEN item_masters_temp.packaging_size IS NOT NULL THEN item_masters_temp.packaging_size
+                                    WHEN new_ingredients.packaging_size IS NOT NULL THEN new_ingredients.packaging_size
                                     WHEN rnd_menu_ingredients_details.packaging_size IS NOT NULL THEN rnd_menu_ingredients_details.packaging_size
                                     ELSE 1
                                 END
@@ -105,7 +105,7 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                         ) * CASE
                             WHEN rnd_menu_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
                             WHEN rnd_menu_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
-                            WHEN rnd_menu_ingredients_details.item_masters_temp_id IS NOT NULL THEN item_masters_temp.ttp
+                            WHEN rnd_menu_ingredients_details.new_ingredients_id IS NOT NULL THEN new_ingredients.ttp
                             ELSE rnd_menu_ingredients_details.ttp
                         END,
                         4
@@ -114,7 +114,7 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                     rnd_menu_ingredients_details
                     LEFT JOIN item_masters ON item_masters.id = rnd_menu_ingredients_details.item_masters_id
                     LEFT JOIN menu_items ON menu_items.id = rnd_menu_ingredients_details.menu_as_ingredient_id
-                    LEFT JOIN item_masters_temp ON item_masters_temp.id = rnd_menu_ingredients_details.item_masters_temp_id
+                    LEFT JOIN new_ingredients ON new_ingredients.id = rnd_menu_ingredients_details.new_ingredients_id
                     LEFT JOIN uoms ON rnd_menu_ingredients_details.uom_id = uoms.id
                     LEFT JOIN packagings ON packagings.id = COALESCE(
                         item_masters.packagings_id,
@@ -129,9 +129,9 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                     rnd_menu_packagings_details.id,
                     rnd_menu_packagings_details.rnd_menu_items_id,
                     rnd_menu_packagings_details.item_masters_id,
-                    rnd_menu_packagings_details.item_masters_temp_id,
+                    rnd_menu_packagings_details.new_packagings_id,
                     item_masters.full_item_description,
-                    item_masters_temp.item_description,
+                    new_packagings.item_description,
                     rnd_menu_packagings_details.packaging_name,
                     rnd_menu_packagings_details.packaging_group,
                     rnd_menu_packagings_details.row_id,
@@ -152,12 +152,12 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                     1 as uom_qty,
                     CASE
                         WHEN rnd_menu_packagings_details.item_masters_id IS NOT NULL THEN item_masters.ttp
-                        WHEN rnd_menu_packagings_details.item_masters_temp_id IS NOT NULL THEN item_masters_temp.ttp
+                        WHEN rnd_menu_packagings_details.new_packagings_id IS NOT NULL THEN new_packagings.ttp
                         ELSE rnd_menu_packagings_details.ttp
                     END as ttp,
                     CASE
                         WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
-                        WHEN item_masters_temp.packaging_size IS NOT NULL THEN item_masters_temp.packaging_size
+                        WHEN new_packagings.packaging_size IS NOT NULL THEN new_packagings.packaging_size
                         WHEN rnd_menu_packagings_details.packaging_size IS NOT NULL THEN rnd_menu_packagings_details.packaging_size
                         ELSE 1
                     END as packaging_size,
@@ -176,7 +176,7 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                         1 / (
                             CASE
                                 WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
-                                WHEN item_masters_temp.packaging_size IS NOT NULL THEN item_masters_temp.packaging_size
+                                WHEN new_packagings.packaging_size IS NOT NULL THEN new_packagings.packaging_size
                                 WHEN rnd_menu_packagings_details.packaging_size IS NOT NULL THEN rnd_menu_packagings_details.packaging_size
                                 ELSE 1
                             END
@@ -195,7 +195,7 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                             1 / (
                                 CASE
                                     WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
-                                    WHEN item_masters_temp.packaging_size IS NOT NULL THEN item_masters_temp.packaging_size
+                                    WHEN new_packagings.packaging_size IS NOT NULL THEN new_packagings.packaging_size
                                     WHEN rnd_menu_packagings_details.packaging_size IS NOT NULL THEN rnd_menu_packagings_details.packaging_size
                                     ELSE 1
                                 END
@@ -210,7 +210,7 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                             4
                         ) * CASE
                             WHEN rnd_menu_packagings_details.item_masters_id IS NOT NULL THEN item_masters.ttp
-                            WHEN rnd_menu_packagings_details.item_masters_temp_id IS NOT NULL THEN item_masters_temp.ttp
+                            WHEN rnd_menu_packagings_details.new_packagings_id IS NOT NULL THEN new_packagings.ttp
                             ELSE rnd_menu_packagings_details.ttp
                         END,
                         4
@@ -218,7 +218,7 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                 FROM
                     rnd_menu_packagings_details
                     LEFT JOIN item_masters ON item_masters.id = rnd_menu_packagings_details.item_masters_id
-                    LEFT JOIN item_masters_temp ON item_masters_temp.id = rnd_menu_packagings_details.item_masters_temp_id
+                    LEFT JOIN new_packagings ON new_packagings.id = rnd_menu_packagings_details.new_packagings_id
                     LEFT JOIN uoms ON rnd_menu_packagings_details.uom_id = uoms.id
                     LEFT JOIN packagings ON packagings.id = COALESCE(
                         item_masters.packagings_id,

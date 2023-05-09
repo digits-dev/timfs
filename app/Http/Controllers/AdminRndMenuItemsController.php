@@ -708,8 +708,8 @@
 						->where([
 							'rnd_menu_items_id' => $rnd_menu_items_id,
 							'item_masters_id' => $ingredient['item_masters_id'],
-							'ingredient_name' => $ingredient['ingredient_name'],
-							'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
+							'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
+							'new_ingredients_id' => $ingredient['new_ingredients_id'],
 						])->exists();
 					
 					if ($is_existing) {
@@ -722,22 +722,6 @@
 					
 					$ingredient['status'] = 'ACTIVE';
 					$ingredient['deleted_at'] = null;
-
-					// inserting item to item_masters_temp if new ingredient
-					if ($ingredient['is_existing'] != 'TRUE' && !$ingredient['item_masters_temp_id']) {
-						$inserted_item_id = DB::table('item_masters_temp')->insertGetId([
-							'creation_status' => 'FOR ITEM CREATION',
-							'item_description' => $ingredient['ingredient_name'],
-							'packaging_size' => $ingredient['packaging_size'],
-							'uoms_id' => $ingredient['uom_id'],
-							'ttp' => $ingredient['ttp'],
-							'created_by' => $action_by,
-							'created_at' => $time_stamp,
-						]);
-
-						$ingredient['item_masters_temp_id'] = $inserted_item_id;
-						unset($ingredient['ttp']);
-					}
 
 					//unsetting ingredients details that may be outdated in the future
 					unset(
@@ -753,7 +737,7 @@
 						'item_masters_id' => $ingredient['item_masters_id'],
 						'ingredient_name' => $ingredient['ingredient_name'],
 						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
-						'item_masters_temp_id' => $ingredient['item_masters_temp_id'],
+						'new_ingredients_id' => $ingredient['new_ingredient_id'],
 					], $ingredient);
 				}
 			}
@@ -769,6 +753,7 @@
 							'rnd_menu_items_id' => $rnd_menu_items_id,
 							'item_masters_id' => $packaging['item_masters_id'],
 							'packaging_name' => $packaging['packaging_name'],
+							'new_packagings_id' => $packaging['new_packagings_id'],
 						])->exists();
 
 					if ($is_existing) {
@@ -781,22 +766,6 @@
 
 					$packaging['status'] = 'ACTIVE';
 					$packaging['deleted_at'] = null;
-
-					// inserting item to item_masters_temp if new packaging
-					if ($packaging['is_existing'] != 'TRUE' && !$packaging['item_masters_temp_id']) {
-						$inserted_item_id = DB::table('item_masters_temp')->insertGetId([
-							'creation_status' => 'FOR ITEM CREATION',
-							'item_description' => $packaging['packaging_name'],
-							'packaging_size' => $packaging['packaging_size'],
-							'uoms_id' => $packaging['uom_id'],
-							'ttp' => $packaging['ttp'],
-							'created_by' => $action_by,
-							'created_at' => $time_stamp,
-						]);
-
-						$packaging['item_masters_temp_id'] = $inserted_item_id;
-						
-					}
 
 					//unsetting packagings details that may be outdated in the future
 					unset(
@@ -811,7 +780,7 @@
 						'rnd_menu_items_id' => $rnd_menu_items_id,
 						'item_masters_id' => $packaging['item_masters_id'],
 						'packaging_name' => $packaging['packaging_name'],
-						'item_masters_temp_id' => $packaging['item_masters_temp_id']
+						'new_packagings_id' => $packaging['new_packagings_id']
 					], $packaging);
 						
 				}

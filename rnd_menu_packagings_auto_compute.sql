@@ -3,9 +3,9 @@ CREATE VIEW RND_MENU_PACKAGINGS_AUTO_COMPUTE AS
 	    rnd_menu_packagings_details.id,
 	    rnd_menu_packagings_details.rnd_menu_items_id,
 	    rnd_menu_packagings_details.item_masters_id,
-	    rnd_menu_packagings_details.item_masters_temp_id,
+	    rnd_menu_packagings_details.new_packagings_id,
 	    item_masters.full_item_description,
-	    item_masters_temp.item_description,
+	    new_packagings.item_description,
 	    rnd_menu_packagings_details.packaging_name,
 	    rnd_menu_packagings_details.packaging_group,
 	    rnd_menu_packagings_details.row_id,
@@ -26,12 +26,12 @@ CREATE VIEW RND_MENU_PACKAGINGS_AUTO_COMPUTE AS
 	    1 as uom_qty,
 	    CASE
 	        WHEN rnd_menu_packagings_details.item_masters_id IS NOT NULL THEN item_masters.ttp
-	        WHEN rnd_menu_packagings_details.item_masters_temp_id IS NOT NULL THEN item_masters_temp.ttp
+	        WHEN rnd_menu_packagings_details.new_packagings_id IS NOT NULL THEN new_packagings.ttp
 	        ELSE rnd_menu_packagings_details.ttp
 	    END as ttp,
 	    CASE
 	        WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
-	        WHEN item_masters_temp.packaging_size IS NOT NULL THEN item_masters_temp.packaging_size
+	        WHEN new_packagings.packaging_size IS NOT NULL THEN new_packagings.packaging_size
 	        WHEN rnd_menu_packagings_details.packaging_size IS NOT NULL THEN rnd_menu_packagings_details.packaging_size
 	        ELSE 1
 	    END as packaging_size,
@@ -50,7 +50,7 @@ CREATE VIEW RND_MENU_PACKAGINGS_AUTO_COMPUTE AS
 	        1 / (
 	            CASE
 	                WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
-	                WHEN item_masters_temp.packaging_size IS NOT NULL THEN item_masters_temp.packaging_size
+	                WHEN new_packagings.packaging_size IS NOT NULL THEN new_packagings.packaging_size
 	                WHEN rnd_menu_packagings_details.packaging_size IS NOT NULL THEN rnd_menu_packagings_details.packaging_size
 	                ELSE 1
 	            END
@@ -69,7 +69,7 @@ CREATE VIEW RND_MENU_PACKAGINGS_AUTO_COMPUTE AS
 	            1 / (
 	                CASE
 	                    WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
-	                    WHEN item_masters_temp.packaging_size IS NOT NULL THEN item_masters_temp.packaging_size
+	                    WHEN new_packagings.packaging_size IS NOT NULL THEN new_packagings.packaging_size
 	                    WHEN rnd_menu_packagings_details.packaging_size IS NOT NULL THEN rnd_menu_packagings_details.packaging_size
 	                    ELSE 1
 	                END
@@ -84,7 +84,7 @@ CREATE VIEW RND_MENU_PACKAGINGS_AUTO_COMPUTE AS
 	            4
 	        ) * CASE
 	            WHEN rnd_menu_packagings_details.item_masters_id IS NOT NULL THEN item_masters.ttp
-	            WHEN rnd_menu_packagings_details.item_masters_temp_id IS NOT NULL THEN item_masters_temp.ttp
+	            WHEN rnd_menu_packagings_details.new_packagings_id IS NOT NULL THEN new_packagings.ttp
 	            ELSE rnd_menu_packagings_details.ttp
 	        END,
 	        4
@@ -92,7 +92,7 @@ CREATE VIEW RND_MENU_PACKAGINGS_AUTO_COMPUTE AS
 	FROM
 	    rnd_menu_packagings_details
 	    LEFT JOIN item_masters ON item_masters.id = rnd_menu_packagings_details.item_masters_id
-	    LEFT JOIN item_masters_temp ON item_masters_temp.id = rnd_menu_packagings_details.item_masters_temp_id
+	    LEFT JOIN new_packagings ON new_packagings.id = rnd_menu_packagings_details.new_packagings_id
 	    LEFT JOIN uoms ON rnd_menu_packagings_details.uom_id = uoms.id
 	    LEFT JOIN packagings ON packagings.id = COALESCE(
 	        item_masters.packagings_id,
