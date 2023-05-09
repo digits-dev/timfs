@@ -663,13 +663,9 @@
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-        @if ($action == 'edit' || $action == 'add')
-		<button class="btn btn-primary pull-right" id="save-btn"><i class="fa fa-save" ></i> Save</button>
-		<button class="btn btn-success pull-right" id="publish-btn" style="margin-right: 10px;"><i class="fa fa-upload" ></i> Publish</button>
-        @elseif ($action == 'approve')
-        <button class="btn btn-success pull-right" id="approve-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-up" ></i> Approve</button>
-        <button class="btn btn-danger pull-right" id="reject-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-down" ></i> Reject</button>
-        @endif
+		<button class="btn btn-success pull-right" id="publish-btn"><i class="fa fa-upload" ></i> Publish</button>
+		<button class="btn btn-warning pull-right" id="food-tasting-btn" style="margin-right: 10px;"><i class="fa fa-spoon" ></i> Food Tasting</button>
+		<button class="btn btn-primary pull-right" id="save-btn" style="margin-right: 10px;"><i class="fa fa-save" ></i> Save</button>
     </div>
 </div>
 
@@ -1395,6 +1391,29 @@
             }
 
         });
+
+        $(document).on('click', '#food-tasting-btn', function(event) {
+            const [isValid, hasIngredient] = $.fn.checkFormValidity();
+            if (isValid && hasIngredient) {
+                Swal.fire({
+                    title: 'Do you want to update the status?',
+                    html: '🟠  Doing so will change the status of this item to <span class="label label-primary">FOR FOOD TASTING</span>.<br/>' +
+                        `📄  You won't be able to revert this.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes',
+                    width: '600',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.fn.submitForm('food-tasting');
+                    }    
+                });
+            } else {
+                $.fn.formatInvalidInputs(isValid);
+            }
+        })
 
         $(document).on('click', '.list-item', function(event) {
             const item = $(this);
