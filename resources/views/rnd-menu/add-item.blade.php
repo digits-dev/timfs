@@ -755,7 +755,7 @@
                         ''
                     );
                     element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
-                    element.find('.ingredient-name').val(savedIngredient.ingredient_name);
+                    element.find('.ingredient-name').val(savedIngredient.item_description);
                     element.find('.pack-size').val(parseFloat(savedIngredient.packaging_size));
                     element.find('.prep-quantity').val(parseFloat(savedIngredient.prep_qty) || 0).attr('readonly', false);
                     element.find('.uom').val(savedIngredient.packagings_id || savedIngredient.uom_id);
@@ -765,7 +765,7 @@
                     element.find('.preparation').val(savedIngredient.menu_ingredients_preparations_id)
                     element.find('.yield').val(parseFloat(savedIngredient.yield) || 0);
                     element.find('.ttp').val(parseFloat(savedIngredient.ttp) || 0).attr('packaging_size', savedIngredient.packaging_size);
-                    element.find('.ingredient-name').attr('item_masters_temp_id', savedIngredient.item_masters_temp_id);
+                    element.find('.ingredient-name').attr('new_ingredients_id', savedIngredient.new_ingredients_id);
                     element.find('.ttp').attr('readonly', true);
                     element.find('.uom').attr('disabled', true);
                     element.find('.pack-size').parents('label').remove();
@@ -835,7 +835,7 @@
                         ''
                     );
                     element.find('.display-packaging').val(savedPackaging.full_item_description);
-                    element.find('.packaging-name').val(savedPackaging.packaging_name);
+                    element.find('.packaging-name').val(savedPackaging.item_description);
                     element.find('.pack-size').val(parseFloat(savedPackaging.packaging_size));
                     element.find('.prep-quantity').val(parseFloat(savedPackaging.prep_qty) || 0).attr('readonly', false);
                     element.find('.uom').val(savedPackaging.uom_id);
@@ -845,7 +845,7 @@
                     element.find('.preparation').val(savedPackaging.menu_ingredients_preparations_id)
                     element.find('.yield').val(parseFloat(savedPackaging.yield) || 0);
                     element.find('.ttp').val(parseFloat(savedPackaging.ttp) || 0).attr('packaging_size', savedPackaging.packaging_size);
-                    element.find('.packaging-name').attr('item_masters_temp_id', savedPackaging.item_masters_temp_id);
+                    element.find('.packaging-name').attr('new_packagings_id', savedPackaging.new_packagings_id);
                     element.find('.ttp').attr('readonly', true);
                     element.find('.uom').attr('disabled', true);
                     element.find('.pack-size').parents('label').remove();
