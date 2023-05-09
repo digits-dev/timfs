@@ -84,14 +84,10 @@
             <label class="packaging-label">
                 <span class="required-star">*</span> Packaging <span class="item-from label label-secondary">USER</span>
                 <div>
-                    <input value="" type="text" class="packaging-name form-control" required/>
+                    <input value="" type="text" class="packaging-name form-control" placeholder="Search by Item Description" required/>
                     <div class="item-list">
                     </div>
                 </div>
-            </label>
-            <label>
-                <span class="required-star">*</span> Packaging Size
-                <input value="" class="form-control pack-size" type="number" required>
             </label>
             <label>
                 <span class="required-star">*</span> Preparation Qty
@@ -99,15 +95,14 @@
             </label>
             <label>
                 <span class="required-star">*</span> Packaging UOM
-                <select class="form-control uom">
-                    @foreach ($uoms as $uom)
-                    <option {{$uom->packaging_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->packaging_description}}</option>
-                    @endforeach
-                </select>
+                <div>
+                    <input type="text" class="form-control uom" value="" style="display: none;"/>
+                    <input type="text" class="form-control display-uom" value="" readonly>
+                </div>
             </label>
             <label class="label-wide">
                 <span class="required-star">*</span> Preparation
-                <select class="form-control preparation">
+                <select class="form-control preparation" disabled>
                     @foreach ($preparations as $preparation)
                     <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
                     @endforeach
@@ -202,14 +197,10 @@
         <label class="packaging-label">
             <span class="required-star">*</span> Packaging <span class="item-from label label-secondary">USER</span>
             <div>
-                <input value="" type="text" class="packaging-name form-control" required/>
+                <input value="" type="text" class="packaging-name form-control" placeholder="Search by Item Description" required/>
                 <div class="item-list">
                 </div>
             </div>
-        </label>
-        <label>
-            <span class="required-star">*</span> Packaging Size
-            <input value="" class="form-control pack-size" type="number" required>
         </label>
         <label>
             <span class="required-star">*</span> Preparation Qty
@@ -217,15 +208,14 @@
         </label>
         <label>
             <span class="required-star">*</span> Packaging UOM
-            <select class="form-control uom">
-                @foreach ($uoms as $uom)
-                <option {{$uom->packaging_description == 'GRM (GRM)' ? 'selected' : ''}} value="{{$uom->id}}">{{$uom->packaging_description}}</option>
-                @endforeach
-            </select>
+            <div>
+                <input type="text" class="form-control uom" value="" style="display: none;"/>
+                <input type="text" class="form-control display-uom" value="" readonly>
+            </div>
         </label>
         <label class="label-wide">
             <span class="required-star">*</span> Preparation
-            <select class="form-control preparation">
+            <select class="form-control preparation" disabled>
                 @foreach ($preparations as $preparation)
                 <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
                 @endforeach
@@ -443,7 +433,6 @@
                     .append($('.new-add-sub-btn').eq(0).clone());
 
                 groupedPackaging.forEach(savedPackaging => {
-                    console.log(savedPackaging.uom_id)
                     let element;
                     if (savedPackaging.is_primary == 'TRUE') {
                         if (savedPackaging.is_existing == 'TRUE') {
@@ -488,17 +477,17 @@
                         ''
                     );
                     element.find('.display-packaging').val(savedPackaging.full_item_description);
-                    element.find('.packaging-name').val(savedPackaging.packaging_name);
+                    element.find('.packaging-name').val(savedPackaging.item_description);
                     element.find('.pack-size').val(parseFloat(savedPackaging.packaging_size));
                     element.find('.prep-quantity').val(parseFloat(savedPackaging.prep_qty) || 0).attr('readonly', false);
-                    element.find('.uom').val(savedPackaging.packagings_id || savedPackaging.uom_id);
+                    element.find('.uom').val(savedPackaging.uom_id);
                     element.find('.uom_name').val(savedPackaging.uom_name);
                     element.find('.display-uom').val(savedPackaging.uom_description);
                     element.find('.preparation option').attr('selected', false);
                     element.find('.preparation').val(savedPackaging.menu_ingredients_preparations_id)
                     element.find('.yield').val(parseFloat(savedPackaging.yield) || 0);
                     element.find('.ttp').val(parseFloat(savedPackaging.ttp) || 0).attr('packaging_size', savedPackaging.packaging_size);
-                    element.find('.packaging-name').attr('item_masters_temp_id', savedPackaging.item_masters_temp_id);
+                    element.find('.packaging-name').attr('new_packagings_id', savedPackaging.new_packagings_id);
                     element.find('.ttp').attr('readonly', true);
                     element.find('.uom').attr('disabled', true);
                     element.find('.pack-size').parents('label').remove();
@@ -526,6 +515,12 @@
                     .new-substitute-packaging
                 `);
 
+                let route = "{{ route('search_ingredient') }}";
+                if ((entry.hasClass('packaging-entry') && entry.attr('isExisting') == 'false') ||
+                    entry.hasClass('new-substitute-packaging')) {
+                        route = "{{ route('search_new_packaging') }}";
+                    }
+
                 const isNewItem = entry.attr('isExisting') == 'false';
                 const query = $(this).val().toLowerCase().replace(/\s+/g, ' ').trim().split(' ')?.filter(e => e != '');
                 const itemList = entry.find('.item-list');
@@ -537,8 +532,8 @@
 
                 $.ajax({
                     type: 'POST',
-                    url: isNewItem ? "{{ route('search_temp_items') }}" : "{{ route('search_ingredient') }}",
-                    data: { content: JSON.stringify(query)},
+                    url: route,
+                    data: { content: JSON.stringify(query), _token: "{{ csrf_token() }}",},
                     success: function(response) {
                         const searchResult = JSON.parse(response);
                         $.fn.renderSearchResult(entry, itemList, searchResult);
@@ -741,7 +736,7 @@
         }
 
         $.fn.renderSearchResult = function(entry, itemList, searchResult) {
-            const currentItems = {item_id: [], menu_item_id: [], item_id_temp: []};
+            const currentItems = {item_id: [], menu_item_id: []};
 
             $('form .ingredient, form .packaging, form .ingredient-name, form .packaging-name').each(function(index) {
                 const item = $(this);
@@ -752,17 +747,16 @@
                     form .packaging-name`
                 ).index(entry.find('.ingredient, .packaging, .ingredient-name, .packaging-name'));
                 if (index != itemIndex) {
-                    if (item.attr('item_id'))  console.log('pumasok'),currentItems.item_id.push(item.attr('item_id'));
+                    if (item.attr('item_id'))  currentItems.item_id.push(item.attr('item_id'));
                     if (item.attr('menu_item_id')) currentItems.menu_item_id.push(item.attr('menu_item_id'));
-                    if (item.attr('item_masters_temp_id')) currentItems.item_id_temp.push(item.attr('item_masters_temp_id'))
                 }
             });
 
             const result = [...searchResult]
-                .filter(item => !currentItems.item_id.includes(item.item_masters_id?.toString()) && 
-                    !currentItems.menu_item_id.includes(item.menu_item_id?.toString()) &&
-                    !currentItems.item_id_temp.includes(item.item_masters_temp_id?.toString()))
-                .sort((a, b) => (a.full_item_description || a.menu_item_description)
+                .filter(
+                    item => !currentItems.item_id.includes(item.item_masters_id?.toString()) && 
+                    !currentItems.menu_item_id.includes(item.menu_item_id?.toString())
+                ).sort((a, b) => (a.full_item_description || a.menu_item_description)
                 ?.localeCompare(b.full_item_description || b.menu_item_description));
 
             if (!result.length) {
@@ -789,7 +783,8 @@
                 li.attr({
                     item_id: e.item_masters_id,
                     menu_item_id: e.menu_item_id,
-                    item_masters_temp_id: e.item_masters_temp_id,
+                    new_ingredients_id: e.new_ingredients_id,
+                    new_packagings_id: e.new_packagings_id,
                     ttp: parseFloat(e.ttp) || parseFloat(e.food_cost) || 0,
                     packaging_size: e.packaging_size || 1,
                     uom: e.packagings_id || e.uoms_id,
@@ -800,7 +795,7 @@
                 });
                 a.html(e.full_item_description && e.item_masters_id ? `<span class="label label-info">IMFS</span> ${e.full_item_description}`
                     : e.menu_item_description ? `<span class="label label-warning">MIMF</span> ${e.menu_item_description}` 
-                    : e.item_masters_temp_id ? `<span class="label label-purple">USER</span> ${e.item_description}` 
+                    : (e.new_ingredients_id || e.new_packagings_id) ? `<span class="label label-purple">USER</span> ${e.item_description}` 
                     : 'No Item Found');
                 li.append(a);
                 ul.append(li);
@@ -972,7 +967,9 @@
 
             const ingredient_packaging = entry.find('.ingredient, .packaging');
 
-            if (!item.attr('item_id') && !item.attr('menu_item_id') && !item.attr('item_masters_temp_id')) return;
+            if (
+                !item.attr('item_id') && !item.attr('menu_item_id') && 
+                !item.attr('new_ingredients_id') && !item.attr('new_packagings_id')) return;
             if (item.attr('item_id') && !item.attr('menu_item_id')) {
                 entry.find('.item-from')
                     .removeClass('label-info label-warning label-success label-secondary label-primary')
@@ -1003,7 +1000,8 @@
                 .ingredient-name, 
                 .packaging-name
             `).val(item.attr('item_desc'))
-                .attr('item_masters_temp_id', item.attr('item_masters_temp_id'));
+                .attr('new_ingredients_id', item.attr('new_ingredients_id'))
+                .attr('new_packagings_id', item.attr('new_packagings_id'));
             entry.find('.uom').val(item.attr('uom'));
             entry.find('.display-uom').val(item.attr('uom_desc'));
             entry.find('uom').val(item.attr('uoms_id'));
@@ -1026,7 +1024,6 @@
             }
 
             entry.find('select.uom').attr('disabled', true);
-            entry.find('input.pack-size').parents('label').remove();
             $('#form input:valid, #form select:valid').css('outline', 'none');
             $('.item-list').html('');  
             $('.item-list').fadeOut();

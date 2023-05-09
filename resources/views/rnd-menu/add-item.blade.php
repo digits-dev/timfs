@@ -1266,7 +1266,7 @@
                     'action', 
                     buttonClicked == 'save' ? 
                     "{{ route('edit_rnd_menu') }}" : 
-                    buttonClicked == 'pubish' ?
+                    buttonClicked == 'publish' ?
                     "{{ route('publish_rnd_menu') }}" :
                     "{{ route('food_tasting_rnd_menu') }}"
                 )
