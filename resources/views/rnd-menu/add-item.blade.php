@@ -1207,7 +1207,7 @@
                     ingredientObject.row_id = memberIndex;
                     ingredientObject.ingredient_group = groupIndex;
                     ingredientObject.item_masters_id = ingredientMember.find('.ingredient').attr('item_id');
-                    ingredientObject.item_masters_temp_id = ingredientMember.find('.ingredient-name').attr('item_masters_temp_id');
+                    ingredientObject.new_ingredients_id = ingredientMember.find('.ingredient-name').attr('new_ingredients_id');
                     ingredientObject.menu_as_ingredient_id = ingredientMember.find('.ingredient').attr('menu_item_id');
                     ingredientObject.ingredient_name = ingredientMember.find('.ingredient-name').val()?.trim().toUpperCase();
                     ingredientObject.packaging_size = ingredientMember.find('.pack-size').val();
@@ -1242,7 +1242,7 @@
                     packagingObject.row_id = memberIndex;
                     packagingObject.packaging_group = groupIndex;
                     packagingObject.item_masters_id = packagingMember.find('.packaging').attr('item_id');
-                    packagingObject.item_masters_temp_id = packagingMember.find('.packaging-name').attr('item_masters_temp_id');
+                    packagingObject.new_packagings_id = packagingMember.find('.packaging-name').attr('new_packagings_id');
                     packagingObject.packaging_name = packagingMember.find('.packaging-name').val()?.trim().toUpperCase();
                     packagingObject.packaging_size = packagingMember.find('.pack-size').val();
                     packagingObject.prep_qty = packagingMember.find('.prep-quantity').val();
@@ -1259,6 +1259,8 @@
                     packagingsArray.push(packagingArray);
                 }
             });
+            console.log(ingredientsArray, packagingsArray); return;
+            return;
             const ingredientsJSON = JSON.stringify(ingredientsArray);
             const packagingsJSON = JSON.stringify(packagingsArray);
 
@@ -1469,7 +1471,8 @@
                 .ingredient-name, 
                 .packaging-name
             `).val(item.attr('item_desc'))
-                .attr('item_masters_temp_id', item.attr('item_masters_temp_id'));
+                .attr('new_ingredients_id', item.attr('new_ingredients_id'))
+                .attr('new_packagings_id', item.attr('new_packagings_id'));
             entry.find('.uom').val(item.attr('uom'));
             entry.find('.display-uom').val(item.attr('uom_desc'));
             entry.find('uom').val(item.attr('uoms_id'));
