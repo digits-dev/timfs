@@ -17,6 +17,8 @@ class CreateRndMenuApprovalsTable extends Migration
             $table->increments('id');
             $table->integer('rnd_menu_items_id')->length(10)->unsigned()->nullable();
             $table->string('approval_status')->length(100)->nullable();
+            $table->integer('food_tasting_by')->length(10)->unsigned()->nullable();
+            $table->timestamp('food_tasting_at')->nullable();
             $table->integer('published_by')->length(10)->unsigned()->nullable();
             $table->timestamp('published_at')->nullable();
             $table->integer('packaging_updated_by')->length(10)->unsigned()->nullable();

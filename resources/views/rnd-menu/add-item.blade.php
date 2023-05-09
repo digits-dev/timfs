@@ -664,7 +664,7 @@
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
 		<button class="btn btn-success pull-right" id="publish-btn"><i class="fa fa-upload" ></i> Publish</button>
-		<button class="btn btn-warning pull-right" id="food-tasting-btn" style="margin-right: 10px;"><i class="fa fa-spoon" ></i> Food Tasting</button>
+		<button class="btn btn-warning pull-right" id="food-tasting-btn" style="margin-right: 10px;" {{$approval_status == 'FOR FOOD TASTING' ? 'disabled' : ''}}><i class="fa fa-spoon"></i> Food Tasting</button>
 		<button class="btn btn-primary pull-right" id="save-btn" style="margin-right: 10px;"><i class="fa fa-save" ></i> Save</button>
     </div>
 </div>
@@ -1263,7 +1263,14 @@
 
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
-                .attr('action', buttonClicked == 'save' ? "{{ route('edit_rnd_menu') }}" : "{{ route('publish_rnd_menu') }}")
+                .attr(
+                    'action', 
+                    buttonClicked == 'save' ? 
+                    "{{ route('edit_rnd_menu') }}" : 
+                    buttonClicked == 'pubish' ?
+                    "{{ route('publish_rnd_menu') }}" :
+                    "{{ route('food_tasting_rnd_menu') }}"
+                )
                 .css('display', 'none');
 
             const csrf = $(document.createElement('input'))

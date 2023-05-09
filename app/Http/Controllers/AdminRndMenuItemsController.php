@@ -100,7 +100,7 @@
 				'url'=>CRUDBooster::mainpath('edit/[id]'),
 				'icon'=>'fa fa-pencil',
 				'color' => ' ',
-				"showIf"=>"[approval_status] == 'SAVED'"
+				"showIf"=>"[approval_status] == 'SAVED' || [approval_status] == 'FOR FOOD TASTING'"
 			];
 
 			$this->addaction[] = [
@@ -108,7 +108,7 @@
 				'url' => '#[id]',
 				'icon'=>'fa fa-trash',
 				'color' => ' delete-rnd-menu',
-				"showIf"=>"[approval_status] == 'SAVED'"
+				"showIf"=>"[approval_status] == 'SAVED' || [approval_status] == 'FOR FOOD TASTING'"
 			];
 
 	        /* 
@@ -302,6 +302,7 @@
 			if (is_numeric($column_value)) $column_value = (float) $column_value;
 
 			$blue_status = ['SAVED', 'FOR COSTING'];
+			$dark_blue_status = ['FOR FOOD TASTING'];
 			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION'];
 			$green_status = ['APPROVED'];
 			
@@ -312,7 +313,9 @@
 					$column_value = "<span class='label label-warning'>$column_value</span>";
 				} else if (in_array($column_value, $green_status)) {
 					$column_value = "<span class='label label-success'>$column_value</span>";
-				}
+				} else if (in_array($column_value, $dark_blue_status)) {
+					$column_value = "<span class='label label-primary'>$column_value</span>";
+				}	
 				
 				if (str_contains($column_value, 'APPROVAL')) $column_value = "<span class='label label-info'>$column_value</span>";
 			}
@@ -614,6 +617,12 @@
 					->get()
 					->first();
 
+				$data['approval_status'] = DB::table('rnd_menu_approvals')
+					->where('rnd_menu_items_id', $id)
+					->get()
+					->first()
+					->approval_status;
+
 				$data['comments_data'] = self::getRNDComments($id);
 
 				$data['workflow_data'] = self::getWorkFlowDetails($id);
@@ -822,7 +831,7 @@
 					'created_at' => $time_stamp,
 				]);
 			
-			if ($action == 'publish') {
+			if ($action != 'save') {
 				return $rnd_menu_items_id;
 			}
 
@@ -830,6 +839,29 @@
 				->with([
 					'message_type' => 'success',
 					'message' => "✔️ RND Menu Item Details of $rnd_menu_description Updated!"
+				]);
+		}
+
+		public function foodTastingRNDMenu(Request $request) {
+			$rnd_menu_approval_status = 'FOR FOOD TASTING';
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$rnd_menu_description = $request->get('rnd_menu_description');
+			$rnd_menu_items_id = self::editRNDMenu($request, 'food-tasting');
+
+			DB::table('rnd_menu_approvals')
+				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
+					'rnd_menu_items_id' => $rnd_menu_items_id,
+					'approval_status' => $rnd_menu_approval_status,
+					'food_tasting_by' => $action_by,
+					'food_tasting_at' => $time_stamp,
+					'updated_at' => $time_stamp,
+				]);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "✔️ $rnd_menu_description: status updated!"
 				]);
 		}
 
