@@ -276,6 +276,7 @@
 			if (is_numeric($column_value)) $column_value = (float) $column_value;
 
 			$blue_status = ['SAVED', 'FOR COSTING'];
+			$dark_blue_status = ['FOR FOOD TASTING'];
 			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION'];
 			$green_status = ['APPROVED'];
 			
@@ -286,6 +287,8 @@
 					$column_value = "<span class='label label-warning'>$column_value</span>";
 				} else if (in_array($column_value, $green_status)) {
 					$column_value = "<span class='label label-success'>$column_value</span>";
+				} else if (in_array($column_value, $dark_blue_status)) {
+					$column_value = "<span class='label label-primary'>$column_value</span>";
 				}
 				
 				if (str_contains($column_value, 'APPROVAL')) $column_value = "<span class='label label-info'>$column_value</span>";
