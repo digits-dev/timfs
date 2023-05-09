@@ -271,6 +271,7 @@
 			$nwp_code = 'NWP-' . str_pad($nwp_code_int, 5, '0', STR_PAD_LEFT);
 
 			$postdata['nwp_code'] = $nwp_code;
+			$postdata['item_description'] = strtoupper($postdata['item_description']);
 	    }
 
 	    /* 

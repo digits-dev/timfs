@@ -266,6 +266,7 @@
 			$nwi_code = 'NWI-' . str_pad($nwi_code_int, 5, '0', STR_PAD_LEFT);
 
 			$postdata['nwi_code'] = $nwi_code;
+			$postdata['item_description'] = strtoupper($postdata['item_description']);
 	    }
 
 	    /* 
