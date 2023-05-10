@@ -431,6 +431,13 @@
 			
 			$data['table'] = 'new_packagings';
 
+			if ($data['item']->item_masters_id) {
+				return CRUDBooster::redirect(
+					CRUDBooster::mainPath(),
+					"This item has already been tagged.", 'danger'
+				);
+			}
+
 			return $this->view('new-items/edit-new-items', $data);
 		}
 
