@@ -381,6 +381,8 @@
 
 			$data['table'] = 'new_packagings';
 
+			$data['comments_data'] = (new AdminNewIngredientsController)->getNewItemsComments($id, false, 'new_packagings');
+
 			return $this->view('new-items/detail-new-items', $data);
 		}
 
