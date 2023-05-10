@@ -82,6 +82,15 @@
             </div>
             <button type="submit" class="hide" id="submit-btn">Submit</button>
         </form>
+        <div class="row">
+            <div class="col-md-6">
+                <hr>
+                <h3 class="text-center">COMMENTS</h3>
+                <div class="chat-app">
+                    @include('new-items/chat-app', $comments_data)
+                </div>
+            </div>
+        </div>
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>

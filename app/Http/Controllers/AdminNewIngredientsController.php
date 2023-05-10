@@ -426,6 +426,8 @@
 
 			$data['table'] = 'new_ingredients';
 
+			$data['comments_data'] = self::getNewItemsComments($id);
+
 			if ($data['item']->item_masters_id) {
 				return CRUDBooster::redirect(
 					CRUDBooster::mainPath(),
@@ -500,6 +502,83 @@
 				->where('tasteless_code', $tasteless_code)
 				->get()
 				->first();
+
+			return json_encode($response);
+		}
+
+		public function getNewItemsComments($id, $to_comment = true, $table = 'new_ingredients') {
+			$data = [];
+
+			$item = DB::table($table)
+				->where($table . '.id', $id)
+				->get()
+				->first();
+
+			$data['comments'] = DB::table('new_items_comments')
+				->where("new_items_comments.$table" . '_id', $id)
+				->where('new_items_comments.status', 'ACTIVE')
+				->select(
+					'*', 
+					'cms_users.id as cms_users_id', 
+					'new_items_comments.created_at as comment_added_at', 
+					'new_items_comments.id as comment_id'
+				)
+				->leftJoin('cms_users', 'new_items_comments.created_by', '=', 'cms_users.id')
+				->orderBy('comment_added_at', 'ASC')
+				->get()
+				->toArray();
+
+			$data['new_items_id'] = $id;
+
+			$data['table'] = $table;
+
+			$data['item_description'] = ($item->item_description);
+
+			$data['to_comment'] = $to_comment;
+
+			return $data;
+		}
+
+		public function addNewItemsComments(Request $request) {
+			$comment_content = $request->comment_content;
+			$table = $request->table;
+			$new_items_id = $request->new_items_id;
+			$action_by = CRUDBooster::myId();
+			$time_stamp = date('Y-m-d H:i:s');
+
+			$inserted_id = DB::table('new_items_comments')
+				->insertGetId([
+					$table . '_id' => $new_items_id,
+					'comment_content' => $comment_content,
+					'created_by' => $action_by,
+					'created_at' => $time_stamp,
+				]);
+
+			$response = DB::table('new_items_comments')
+				->where('new_items_comments.id', $inserted_id)
+				->leftJoin('cms_users', 'new_items_comments.created_by', '=', 'cms_users.id')
+				->select(
+					'*', 
+					'cms_users.id as cms_users_id', 
+					'new_items_comments.created_at as comment_added_at', 
+					'new_items_comments.id as comment_id'
+				)
+				->get()
+				->first();
+
+			return json_encode([$response]);
+		}
+
+		public function deleteNewItemsComments(Request $request) {
+			$comment_id = $request->comment_id;
+			$time_stamp = date('Y-m-d H:i:s');
+
+			$response = DB::table('new_items_comments')
+				->where('id', $comment_id)
+				->update([
+					'status' => 'INACTIVE',
+					'deleted_at' => $time_stamp,
+				]);
 
 			return json_encode($response);
 		}

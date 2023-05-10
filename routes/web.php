@@ -117,12 +117,16 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/for_approval_rnd_menu/edit/add-comment', [AdminRndMenuItemsForApprovalController::class, 'addComment'])->name('add_rnd_comment');
     Route::post('/admin/for_approval_rnd_menu/edit/delete-comment', [AdminRndMenuItemsForApprovalController::class, 'deleteComment'])->name('delete_rnd_comment');
 
-    //new ingredients
+    //new items (new ingredients and packagings)
     Route::post('/admin/new_ingredients/search-new-ingredients', [AdminNewIngredientsController::class, 'searchNewIngredients'])->name('search_new_ingredient');
     Route::post('/admin/new_ingredients/edit-new-ingredients', [AdminNewIngredientsController::class, 'editNewIngredients'])->name('edit_new_ingredients');
     Route::post('/admin/new_ingredients/search-item-for-tagging', [AdminNewIngredientsController::class, 'searchItemForTagging'])->name('search_item_for_tagging');
+
+    Route::post('/admin/new_ingredients/add-new-items-comments', [AdminNewIngredientsController::class, 'addNewItemsComments'])->name('add_new_items_comments');
+    Route::post('/admin/new_ingredients/delete-new-items-comments', [AdminNewIngredientsController::class, 'deleteNewItemsComments'])->name('delete_new_items_comments');
     
-    //new packagings
     Route::post('/admin/new_packagings/search-new-packagings', [AdminNewPackagingsController::class, 'searchNewPackagings'])->name('search_new_packaging');
     Route::post('/admin/new_packagings/edit-new-packagings', [AdminNewpackagingsController::class, 'editNewPackagings'])->name('edit_new_packagings');
+    
+    
 });
