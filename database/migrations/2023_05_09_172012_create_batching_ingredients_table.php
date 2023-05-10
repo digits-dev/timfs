@@ -15,6 +15,7 @@ class CreateBatchingIngredientsTable extends Migration
     {
         Schema::create('batching_ingredients', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('bi_code')->nullable();
             $table->string('ingredient_description')->nullable();
             $table->integer('uoms_id')->length(10)->unsigned()->nullable();
             $table->timestamps();
