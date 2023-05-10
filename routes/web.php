@@ -119,6 +119,8 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
 
     //new ingredients
     Route::post('/admin/new_ingredients/search-new-ingredients', [AdminNewIngredientsController::class, 'searchNewIngredients'])->name('search_new_ingredient');
+    Route::post('/admin/new_ingredients/edit-new-ingredients', [AdminNewIngredientsController::class, 'editNewIngredients'])->name('edit_new_ingredients');
+    Route::post('/admin/new_ingredients/search-item-for-tagging', [AdminNewIngredientsController::class, 'searchItemForTagging'])->name('search_item_for_tagging');
 
     //new packagings
     Route::post('/admin/new_packagings/search-new-packagings', [AdminNewPackagingsController::class, 'searchNewPackagings'])->name('search_new_packaging');

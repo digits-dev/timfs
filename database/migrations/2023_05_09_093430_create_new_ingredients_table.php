@@ -22,6 +22,25 @@ class CreateNewIngredientsTable extends Migration
             $table->integer('uoms_id')->length(10)->unsigned()->nullable();
             $table->decimal('ttp', 16, 2)->unsigned()->nullable();
             $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE')->nullable();
+            $table->decimal('tagged_by')->length(10)->unsigned()->nullable();
+            $table->timestamp('tagged_at')->nullable();
+            $table->decimal('created_by')->length(10)->unsigned()->nullable();
+            $table->decimal('updated_by')->length(10)->unsigned()->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('new_packagings', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('item_masters_id')->length(10)->nullable();
+            $table->string('nwp_code')->length(30)->nullable();
+            $table->string('item_description')->nullable();
+            $table->decimal('packaging_size', 16, 2)->unsigned()->nullable();
+            $table->integer('uoms_id')->length(10)->unsigned()->nullable();
+            $table->decimal('ttp', 16, 2)->unsigned()->nullable();
+            $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE')->nullable();
+            $table->decimal('tagged_by')->length(10)->unsigned()->nullable();
+            $table->timestamp('tagged_at')->nullable();
             $table->decimal('created_by')->length(10)->unsigned()->nullable();
             $table->decimal('updated_by')->length(10)->unsigned()->nullable();
             $table->timestamps();
@@ -37,5 +56,6 @@ class CreateNewIngredientsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('new_ingredients');
+        Schema::dropIfExists('new_packagings');
     }
 }

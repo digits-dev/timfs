@@ -31,11 +31,16 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"NWI Code","name"=>"nwi_code"];
+			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
 			$this->col[] = ["label"=>"Packaging Size","name"=>"packaging_size"];
 			$this->col[] = ["label"=>"UOM","name"=>"uoms_id","join"=>"uoms,uom_description"];
 			$this->col[] = ["label"=>"TTP","name"=>"ttp"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
+			$this->col[] = ["label"=>"Tagged By","name"=>"tagged_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Tagged Date","name"=>"tagged_at"];
+			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -267,6 +272,8 @@
 
 			$postdata['nwi_code'] = $nwi_code;
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
+			$postdata['created_by'] = CRUDBooster::myId();
+			$postdata['created_at'] = date('Y-m-d H:i:s');
 	    }
 
 	    /* 
@@ -350,5 +357,103 @@
 				->toArray();
 
 			return json_encode($result);
+		}
+
+		public function getEdit($id) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$data = [];
+
+			$data['item'] = DB::table('new_ingredients')
+				->where('new_ingredients.id', $id)
+				->select(
+					'*',
+					'new_ingredients.created_at as created_at',
+					'new_ingredients.id as new_ingredients_id'
+				)
+				->leftJoin('uoms', 'uoms.id', '=', 'new_ingredients.uoms_id')
+				->leftJoin('cms_users', 'cms_users.id', '=', 'new_ingredients.created_by')
+				->get()
+				->first();
+
+			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
+					->where('status', 'ACTIVE')
+					->where('new_ingredients_id', $id)
+					->get()
+					->count();
+
+
+			return $this->view('rnd-menu/edit-new-ingredient', $data);
+		}
+
+		public function editNewIngredients(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$new_ingredients_id = $request->get('new_ingredients_id');
+			$tasteless_code = $request->get('tasteless_code');
+			$action_by = CRUDBooster::myId();
+			$time_stamp = date('Y-m-d H:i:s');
+			
+			$item_masters_id = DB::table('item_masters')
+				->where('sku_statuses_id', '!=', '2')
+				->where('tasteless_code', $tasteless_code)
+				->get()
+				->first()
+				->id;
+
+			if (!$item_masters_id) {
+				return CRUDBooster::redirect(
+					CRUDBooster::mainPath('edit/' . $new_ingredients_id),
+					'I\'m sorry. The tasteless code you entered is either from an inactive item or doesn\'t exist.', 'danger'
+				);
+			} else {
+				DB::table('new_ingredients')
+					->where('id', $new_ingredients_id)
+					->update([
+						'item_masters_id' => $item_masters_id,
+						'updated_by' => $action_by,
+						'updated_at' => $time_stamp,
+						'tagged_by' => $action_by,
+						'tagged_at' => $time_stamp,
+					]);
+
+				DB::table('rnd_menu_ingredients_details')
+					->where('new_ingredients_id', $new_ingredients_id)
+					->where('status', 'ACTIVE')
+					->update([
+						'updated_by' => $action_by,
+						'updated_at' => $time_stamp,
+						'new_ingredients_id' => null,
+						'item_masters_id' => $item_masters_id,
+						'is_existing' => 'TRUE'
+					]);
+
+				return redirect(CRUDBooster::mainpath())
+					->with([
+						'message_type' => 'success',
+						'message' => "Item successfully tagged!"
+					]);
+			}
+			
+
+		}
+
+		public function searchItemForTagging(Request $request) {
+			$tasteless_code = $request->get('tasteless_code');
+
+			$response = DB::table('item_masters')
+				->where('tasteless_code', $tasteless_code)
+				->get()
+				->first();
+
+			return json_encode($response);
 		}
 	}
