@@ -386,8 +386,10 @@
 					->get()
 					->count();
 
+			$data['table'] = 'new_ingredients';
 
-			return $this->view('rnd-menu/edit-new-ingredient', $data);
+
+			return $this->view('rnd-menu/edit-new-items', $data);
 		}
 
 		public function editNewIngredients(Request $request) {
@@ -397,7 +399,7 @@
 					trans('crudbooster.denied_access')
 				);
 
-			$new_ingredients_id = $request->get('new_ingredients_id');
+			$new_ingredients_id = $request->get('new_items_id');
 			$tasteless_code = $request->get('tasteless_code');
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
@@ -412,7 +414,7 @@
 			if (!$item_masters_id) {
 				return CRUDBooster::redirect(
 					CRUDBooster::mainPath('edit/' . $new_ingredients_id),
-					'I\'m sorry. The tasteless code you entered is either from an inactive item or doesn\'t exist.', 'danger'
+					"I'm sorry, the tasteless code you entered is either not existing or from an inactive item.", 'danger'
 				);
 			} else {
 				DB::table('new_ingredients')

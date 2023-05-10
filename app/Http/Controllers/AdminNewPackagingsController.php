@@ -31,11 +31,16 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"NWP Code","name"=>"nwp_code"];
+			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
 			$this->col[] = ["label"=>"Packaging Size","name"=>"packaging_size"];
 			$this->col[] = ["label"=>"UOM","name"=>"uoms_id","join"=>"uoms,uom_description"];
 			$this->col[] = ["label"=>"TTP","name"=>"ttp"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
+			$this->col[] = ["label"=>"Tagged By","name"=>"tagged_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Tagged Date","name"=>"tagged_at"];
+			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -272,6 +277,8 @@
 
 			$postdata['nwp_code'] = $nwp_code;
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
+			$postdata['created_by'] = CRUDBooster::myId();
+			$postdata['created_at'] = date('Y-m-d H:i:s');
 	    }
 
 	    /* 
@@ -356,6 +363,94 @@
 				->toArray();
 
 			return json_encode($result);
+		}
+
+		public function getEdit($id) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$data = [];
+
+			$data['item'] = DB::table('new_packagings')
+				->where('new_packagings.id', $id)
+				->select(
+					'*',
+					'new_packagings.created_at as created_at',
+					'new_packagings.id as new_packagings_id'
+				)
+				->leftJoin('uoms', 'uoms.id', '=', 'new_packagings.uoms_id')
+				->leftJoin('cms_users', 'cms_users.id', '=', 'new_packagings.created_by')
+				->get()
+				->first();
+
+			$data['rnd_count'] = DB::table('rnd_menu_packagings_details')
+					->where('status', 'ACTIVE')
+					->where('new_packagings_id', $id)
+					->get()
+					->count();
+			
+			$data['table'] = 'new_packagings';
+
+			return $this->view('rnd-menu/edit-new-items', $data);
+		}
+
+		public function editNewPackagings(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$new_packagings_id = $request->get('new_items_id');
+			$tasteless_code = $request->get('tasteless_code');
+			$action_by = CRUDBooster::myId();
+			$time_stamp = date('Y-m-d H:i:s');
+			
+			$item_masters_id = DB::table('item_masters')
+				->where('sku_statuses_id', '!=', '2')
+				->where('tasteless_code', $tasteless_code)
+				->get()
+				->first()
+				->id;
+
+			if (!$item_masters_id) {
+				return CRUDBooster::redirect(
+					CRUDBooster::mainPath('edit/' . $new_packagings_id),
+					"I'm sorry, the tasteless code you entered is either not existing or from an inactive item.", 'danger'
+				);
+			} else {
+				DB::table('new_packagings')
+					->where('id', $new_packagings_id)
+					->update([
+						'item_masters_id' => $item_masters_id,
+						'updated_by' => $action_by,
+						'updated_at' => $time_stamp,
+						'tagged_by' => $action_by,
+						'tagged_at' => $time_stamp,
+					]);
+
+				DB::table('rnd_menu_packagings_details')
+					->where('new_packagings_id', $new_packagings_id)
+					->where('status', 'ACTIVE')
+					->update([
+						'updated_by' => $action_by,
+						'updated_at' => $time_stamp,
+						'new_packagings_id' => null,
+						'item_masters_id' => $item_masters_id,
+						'is_existing' => 'TRUE'
+					]);
+
+				return redirect(CRUDBooster::mainpath())
+					->with([
+						'message_type' => 'success',
+						'message' => "Item successfully tagged!"
+					]);
+			}
+			
+
 		}
 
 	}

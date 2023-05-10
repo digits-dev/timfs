@@ -1,7 +1,6 @@
 @push('head')
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
 <style>
     table, tbody, td, th {
@@ -20,12 +19,12 @@
 </p>      
 <div class="panel panel-default">
     <div class="panel-heading">
-        <i class="fa fa-pencil"></i><strong> Edit RND Menu Item</strong>
+        <i class="fa fa-pencil"></i><strong> Edit {{CRUDBooster::getCurrentModule()->name}}</strong>
     </div>
     <div class="panel-body">
-        <form method="POST" action="{{ route('edit_new_ingredients') }}" id="form-main" autocomplete="off">
+        <form method="POST" action="{{ $table == 'new_ingredients' ? route('edit_new_ingredients') : route('edit_new_packagings')}}" id="form-main" autocomplete="off">
             @csrf
-            <input type="text" name="new_ingredients_id" class="hide" value="{{ $item->new_ingredients_id }}">
+            <input type="text" name="new_items_id" class="hide" value="{{ $item->new_ingredients_id ?? $item->new_packagings_id }}">
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -121,7 +120,7 @@
                     const data = JSON.parse(response) || {};
                     Swal.close();
                     Swal.fire({
-                        title: 'Do you want to save the changes?',
+                        title: 'Do you want to tag to this item?',
                         html: data.full_item_description ? `<strong>Item:</strong> ${data.full_item_description}` : undefined,
                         icon: 'warning',
                         showCancelButton: true,
