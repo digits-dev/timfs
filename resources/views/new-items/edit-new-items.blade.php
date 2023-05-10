@@ -65,6 +65,10 @@
                     <table class="table table-responsive">
                         <tbody>
                             <tr>
+                                <th>{{$table == 'new_ingredients' ? 'NWI Code' : 'NWP Code'}}</th>
+                                <th>{{$item->nwi_code ?? $item->nwp_code}}</th>
+                            </tr>
+                            <tr>
                                 <th>Created by</th>
                                 <td>{{$item->name}}</td>
                             </tr>

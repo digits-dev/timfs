@@ -359,7 +359,8 @@
 					'new_ingredients.created_at',
 					'new_ingredients.tagged_at',
 					'item_masters.id as item_masters_id',
-					'new_ingredients.ttp as ttp'
+					'new_ingredients.ttp as ttp',
+					'new_ingredients.packaging_size as packaging_size'
 				)
 				->leftJoin('uoms', 'uoms.id', '=', 'new_ingredients.uoms_id')
 				->leftJoin('cms_users as creator', 'creator.id', '=', 'new_ingredients.created_by')
