@@ -376,7 +376,7 @@
 
 			$data['table'] = 'new_ingredients';
 
-			return $this->view('rnd-menu/detail-new-items', $data);
+			return $this->view('new-items/detail-new-items', $data);
 		}
 
 		public function searchNewIngredients(Request $request) {
@@ -427,7 +427,7 @@
 			$data['table'] = 'new_ingredients';
 
 
-			return $this->view('rnd-menu/edit-new-items', $data);
+			return $this->view('new-items/edit-new-items', $data);
 		}
 
 		public function editNewIngredients(Request $request) {

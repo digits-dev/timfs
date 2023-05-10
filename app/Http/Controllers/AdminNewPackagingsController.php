@@ -381,9 +381,8 @@
 
 			$data['table'] = 'new_packagings';
 
-			return $this->view('rnd-menu/detail-new-items', $data);
+			return $this->view('new-items/detail-new-items', $data);
 		}
-
 
 		public function searchNewPackagings(Request $request) {
 			$search_terms = json_decode($request->content);
@@ -432,7 +431,7 @@
 			
 			$data['table'] = 'new_packagings';
 
-			return $this->view('rnd-menu/edit-new-items', $data);
+			return $this->view('new-items/edit-new-items', $data);
 		}
 
 		public function editNewPackagings(Request $request) {
