@@ -58,10 +58,12 @@
                         <th>Tagged Date</th>
                         <td>{{$item->tagged_at}}</td>
                     </tr>
+                    @if ($item->item_masters_id)
                     <tr>
                         <th>View Item Masters Details</th>
                         <td><a href="{{CRUDBooster::adminPath('item_masters/detail/' . $item->item_masters_id)}}">View Details</a></td>
                     </tr>
+                    @endif
                 </tbody>
             </table>
         </div>
