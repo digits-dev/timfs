@@ -431,6 +431,8 @@
 			
 			$data['table'] = 'new_packagings';
 
+			$data['comments_data'] = (new AdminNewIngredientsController)->getNewItemsComments($id, true, 'new_packagings');
+
 			if ($data['item']->item_masters_id) {
 				return CRUDBooster::redirect(
 					CRUDBooster::mainPath(),

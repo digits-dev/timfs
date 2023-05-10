@@ -6,7 +6,7 @@
 <div class="chat-app-container flex flex-column">
     <section class="chat-heading flex">
         <div class="chat-title-section flex flex-column">
-            <h4 class="convo-title text-bold">RND Menu Masterfile</h4>
+            <h4 class="convo-title text-bold">{{$table == 'new_ingredients' ? 'NEW INGREDIENTS' : 'NEW PACKAGINGS'}}</h4>
             <div class="convo-info">
                 {{$item_description}}
             </div>
