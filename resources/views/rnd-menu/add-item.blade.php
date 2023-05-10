@@ -1359,7 +1359,6 @@
             if (isValid) {
                 Swal.fire({
                     title: action == 'add' ? 'Do you want to save this item?' : 'Do you want to save the changes?',
-                    html: '📄 Newly added ingredients and packagings will be forwarded to <label class="label label-info">PURCHASING</label> for Item Creation in IMFS.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
@@ -1403,7 +1402,7 @@
             if (isValid && hasIngredient) {
                 Swal.fire({
                     title: 'Do you want to update the status?',
-                    html: '🟠  Doing so will change the status of this item to <span class="label label-primary">FOR FOOD TASTING</span>.<br/>' +
+                    html: '🔵  Doing so will change the status of this item to <span class="label label-primary">FOR FOOD TASTING</span>.<br/>' +
                         `📄  You won't be able to revert this.`,
                     icon: 'warning',
                     showCancelButton: true,
