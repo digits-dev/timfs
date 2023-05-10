@@ -23,6 +23,10 @@
                         <td>{{$item->tasteless_code}}</td>
                     </tr>
                     <tr>
+                        <th>{{$table == 'new_ingredients' ? 'NWI Code' : 'NWP Code'}}</th>
+                        <td>{{$item->nwi_code ?? $item->nwp_code}}</td>
+                    </tr>
+                    <tr>
                         <th>Item Description</th>
                         <td>{{$item->item_description}}</td>
                     </tr>
@@ -43,7 +47,7 @@
                         <td>{{$item->creator_name}}</td>
                     </tr>
                     <tr>
-                        <th>Created at</th>
+                        <th>Created Date</th>
                         <td>{{$item->created_at}}</td>
                     </tr>
                     <tr>
@@ -51,7 +55,7 @@
                         <td>{{$item->tagger_name}}</td>
                     </tr>
                     <tr>
-                        <th>Tagged at</th>
+                        <th>Tagged Date</th>
                         <td>{{$item->tagged_at}}</td>
                     </tr>
                     <tr>

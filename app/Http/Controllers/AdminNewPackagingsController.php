@@ -346,6 +346,44 @@
 
 	    //By the way, you can still create your own method in here... :) 
 
+		public function getDetail($id) {
+			if (!CRUDBooster::isRead())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$data['item'] = DB::table('new_packagings')
+				->where('new_packagings.id', $id)
+				->select(
+					'*',
+					'new_packagings.created_at as created_at',
+					'new_packagings.id as new_packagings_id',
+					'creator.name as creator_name',
+					'tagger.name as tagger_name',
+					'new_packagings.created_at',
+					'new_packagings.tagged_at',
+					'item_masters.id as item_masters_id',
+					'new_packagings.ttp as ttp'
+				)
+				->leftJoin('uoms', 'uoms.id', '=', 'new_packagings.uoms_id')
+				->leftJoin('cms_users as creator', 'creator.id', '=', 'new_packagings.created_by')
+				->leftJoin('cms_users as tagger', 'tagger.id', '=', 'new_packagings.tagged_by')
+				->leftJoin('item_masters', 'item_masters.id', '=', 'new_packagings.item_masters_id')
+				->get()
+				->first();
+
+			$data['rnd_count'] = DB::table('rnd_menu_packagings_details')
+					->where('status', 'ACTIVE')
+					->where('new_packagings_id', $id)
+					->get()
+					->count();
+
+			$data['table'] = 'new_packagings';
+
+			return $this->view('rnd-menu/detail-new-items', $data);
+		}
+
 
 		public function searchNewPackagings(Request $request) {
 			$search_terms = json_decode($request->content);
