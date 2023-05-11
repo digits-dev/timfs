@@ -82,7 +82,7 @@
     <div class="packaging-entry" isExisting="false">
         <div class="packaging-inputs">
             <label class="packaging-label">
-                <span class="required-star">*</span> Packaging <span class="item-from label label-secondary">USER</span>
+                <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span>
                 <div>
                     <input value="" type="text" class="packaging-name form-control" placeholder="Search by Item Description" required/>
                     <div class="item-list">
@@ -195,7 +195,7 @@
 <div class="new-substitute-packaging" style="display: none;" isExisting="false">
     <div class="packaging-inputs">
         <label class="packaging-label">
-            <span class="required-star">*</span> Packaging <span class="item-from label label-secondary">USER</span>
+            <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span>
             <div>
                 <input value="" type="text" class="packaging-name form-control" placeholder="Search by Item Description" required/>
                 <div class="item-list">
@@ -795,7 +795,7 @@
                 });
                 a.html(e.full_item_description && e.item_masters_id ? `<span class="label label-info">IMFS</span> ${e.full_item_description}`
                     : e.menu_item_description ? `<span class="label label-warning">MIMF</span> ${e.menu_item_description}` 
-                    : (e.new_ingredients_id || e.new_packagings_id) ? `<span class="label label-purple">USER</span> ${e.item_description}` 
+                    : (e.new_ingredients_id || e.new_packagings_id) ? `<span class="label label-success">NEW</span> ${e.item_description}` 
                     : 'No Item Found');
                 li.append(a);
                 ul.append(li);

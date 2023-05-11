@@ -197,11 +197,11 @@
                     else if (groupedIngredient.menu_item_description)
                         from.html('<span class="label label-warning">MIMF</span>')
                     else
-                        from.html('<span class="label label-secondary">USER</span>')
+                        from.html('<span class="label label-success">NEW</span>')
     
-                    if (groupedIngredient.menu_item_status == 'INACTIVE' || groupedIngredient.item_status == 'INACTIVE')
+                    if (groupedIngredient.menu_item_status == 'INACTIVE' || groupedIngredient.item_status == 'INACTIVE' || groupedIngredient.new_ingredient_status == 'INACTIVE')
                         status.html('<span class="label label-danger">INACTIVE</span>')
-                    else if (groupedIngredient.menu_item_status == 'ACTIVE' || groupedIngredient.item_status == 'ACTIVE')
+                    else if (groupedIngredient.menu_item_status == 'ACTIVE' || groupedIngredient.item_status == 'ACTIVE' || groupedIngredient.new_ingredient_status == 'ACTIVE')
                         status.html('<span class="label label-success">ACTIVE</span>')
                     else if (groupedIngredient.menu_item_status == 'ALTERNATIVE' || groupedIngredient.item_status == 'ALTERNATIVE')
                         status.html('<span class="label label-primary">ALTERNATIVE</span>')
@@ -298,11 +298,12 @@
                     else if (groupedPackaging.menu_item_description)
                         from.html('<span class="label label-warning">MIMF</span>')
                     else
-                        from.html('<span class="label label-secondary">USER</span>')
+                        from.html('<span class="label label-success">NEW</span>')
     
-                    if (groupedPackaging.menu_item_status == 'INACTIVE' || groupedPackaging.item_status == 'INACTIVE')
+                    if (groupedPackaging.menu_item_status == 'INACTIVE' || groupedPackaging.item_status == 'INACTIVE' || groupedPackaging.new_packaging_status == 'INACTIVE')
                         status.html('<span class="label label-danger">INACTIVE</span>')
-                    else if (groupedPackaging.menu_item_status == 'ACTIVE' || groupedPackaging.item_status == 'ACTIVE')
+                    else if (groupedPackaging.menu_item_status == 'ACTIVE' || groupedPackaging.item_status == 'ACTIVE' ||
+                    groupedPackaging.new_packaging_status == 'ACTIVE')
                         status.html('<span class="label label-success">ACTIVE</span>')
                     else if (groupedPackaging.menu_item_status == 'ALTERNATIVE' || groupedPackaging.item_status == 'ALTERNATIVE')
                         status.html('<span class="label label-primary">ALTERNATIVE</span>')
