@@ -1495,7 +1495,7 @@
 
 			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
 
-			$data['comments_data'] = self::getRNDComments($id, false);
+			$data['comments_data'] = self::getRNDComments($id, true);
 
 
 			return $this->view('rnd-menu/detail-approvers', $data);
