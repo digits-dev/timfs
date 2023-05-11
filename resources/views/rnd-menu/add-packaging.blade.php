@@ -515,7 +515,7 @@
                     .new-substitute-packaging
                 `);
 
-                let route = "{{ route('search_ingredient') }}";
+                let route = "{{ route('search_all_ingredients') }}";
                 if ((entry.hasClass('packaging-entry') && entry.attr('isExisting') == 'false') ||
                     entry.hasClass('new-substitute-packaging')) {
                         route = "{{ route('search_new_packaging') }}";
@@ -533,7 +533,7 @@
                 $.ajax({
                     type: 'POST',
                     url: route,
-                    data: { content: JSON.stringify(query), _token: "{{ csrf_token() }}",},
+                    data: { content: JSON.stringify(query), _token: "{{ csrf_token() }}", with_menu: false},
                     success: function(response) {
                         const searchResult = JSON.parse(response);
                         $.fn.renderSearchResult(entry, itemList, searchResult);
