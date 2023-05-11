@@ -18,7 +18,7 @@
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
 			$this->button_add = true;
-			$this->button_edit = true;
+			$this->button_edit = false;
 			$this->button_delete = true;
 			$this->button_detail = true;
 			$this->button_show = true;
@@ -86,6 +86,13 @@
 	        | 
 	        */
 	        $this->addaction = array();
+			$this->addaction[] = [
+				'title'=>'Edit',
+				'url'=>CRUDBooster::mainpath('edit/[id]'),
+				'icon'=>'fa fa-pencil',
+				'color' => ' ',
+				"showIf"=>"[item_masters_id] == null"
+			];
 
 
 	        /* 
