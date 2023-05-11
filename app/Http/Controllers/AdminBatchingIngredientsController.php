@@ -248,7 +248,7 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code here
+	    	if (is_numeric($column_value)) $column_value = (float) $column_value;
 	    }
 
 	    /*
@@ -370,17 +370,17 @@
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 
 			if ($id) {
-				$data['ingredients'] = DB::table('rnd_menu_ingredients_auto_compute')
-					->where('rnd_menu_items_id', $id)
-					->where('rnd_menu_ingredients_auto_compute.status', 'ACTIVE')
+				$data['ingredients'] = DB::table('batching_ingredients_auto_compute')
+					->where('batching_ingredients_id', $id)
+					->where('batching_ingredients_auto_compute.status', 'ACTIVE')
 					->select(\DB::raw('item_masters.id as item_masters_id'),
 						'ingredient_name',
 						'menu_as_ingredient_id',
-						'rnd_menu_ingredients_auto_compute.menu_item_description',
+						'batching_ingredients_auto_compute.menu_item_description',
 						'is_selected',
 						'is_primary',
 						'is_existing',
-						'rnd_menu_ingredients_auto_compute.packaging_size',
+						'batching_ingredients_auto_compute.packaging_size',
 						'ingredient_qty',
 						'cost',
 						'menu_items.food_cost',
@@ -392,68 +392,23 @@
 						'prep_qty',
 						'menu_ingredients_preparations_id',
 						'yield',
-						'rnd_menu_ingredients_auto_compute.ttp',
-						'rnd_menu_ingredients_auto_compute.ttp as ingredient_cost',
+						'batching_ingredients_auto_compute.ttp',
+						'batching_ingredients_auto_compute.ttp as ingredient_cost',
 						'item_masters.full_item_description',
 						'sku_status_description as item_status',
 						'menu_items.status as menu_status',
 						'item_masters.updated_at',
 						'item_masters.created_at',
-						'rnd_menu_ingredients_auto_compute.new_ingredients_id',
-						'rnd_menu_ingredients_auto_compute.item_description')
-					->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_ingredients_auto_compute.item_masters_id')
-					->leftJoin('menu_items', 'rnd_menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
+						'batching_ingredients_auto_compute.new_ingredients_id',
+						'batching_ingredients_auto_compute.item_description')
+					->leftJoin('item_masters', 'item_masters.id', '=', 'batching_ingredients_auto_compute.item_masters_id')
+					->leftJoin('menu_items', 'batching_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
 					->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
-					->leftJoin('new_ingredients', 'new_ingredients.id', 'rnd_menu_ingredients_auto_compute.new_ingredients_id')
+					->leftJoin('new_ingredients', 'new_ingredients.id', 'batching_ingredients_auto_compute.new_ingredients_id')
 					->orderBy('ingredient_group', 'ASC')
 					->orderBy('row_id', 'ASC')
 					->get()
 					->toArray();
-	
-				$data['packagings'] = DB::table('rnd_menu_packagings_auto_compute')
-					->where('rnd_menu_items_id', $id)
-					->where('rnd_menu_packagings_auto_compute.status', 'ACTIVE')
-					->select(\DB::raw('item_masters.id as item_masters_id'),
-						'packaging_name',
-						'is_selected',
-						'is_primary',
-						'is_existing',
-						'rnd_menu_packagings_auto_compute.packaging_size',
-						'packaging_qty',
-						'cost',
-						'packaging_group',
-						'uom_id',
-						'uom_description',
-						'packagings_id',
-						'packaging_description',
-						'prep_qty',
-						'menu_ingredients_preparations_id',
-						'yield',
-						'rnd_menu_packagings_auto_compute.ttp',
-						'rnd_menu_packagings_auto_compute.ttp as packaging_cost',
-						'item_masters.full_item_description',
-						'sku_status_description as item_status',
-						'item_masters.updated_at',
-						'item_masters.created_at',
-						'rnd_menu_packagings_auto_compute.new_packagings_id',
-						'rnd_menu_packagings_auto_compute.item_description')
-					->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_packagings_auto_compute.item_masters_id')
-					->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
-					->orderBy('packaging_group', 'ASC')
-					->orderBy('row_id', 'ASC')
-					->get()
-					->toArray();
-
-				$data['food_cost_data'] = DB::table('rnd_menu_computed_food_cost')
-					->where('id', $id)
-					->get()
-					->first();
-
-				$data['approval_status'] = DB::table('rnd_menu_approvals')
-					->where('rnd_menu_items_id', $id)
-					->get()
-					->first()
-					->approval_status;
 
 			}
 
@@ -494,19 +449,9 @@
 			}
 
 			//inactivating all active ingredients of rnd menu item
-			DB::table('rnd_menu_ingredients_details')
+			DB::table('batching_ingredients_details')
 				->where('status', 'ACTIVE')
-				->where('rnd_menu_items_id', $rnd_menu_items_id)
-				->update([
-					'status' => 'INACTIVE',
-					'row_id' => null,
-					'deleted_at' => $time_stamp
-				]);
-
-			//inactivating all active packagings of rnd menu item
-			DB::table('rnd_menu_packagings_details')
-				->where('status', 'ACTIVE')
-				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->where('batching_ingredients_id', $batching_ingredients_id)
 				->update([
 					'status' => 'INACTIVE',
 					'row_id' => null,
@@ -519,9 +464,9 @@
 					$ingredient = (array) $ingredient;
 
 					//checking if the ingredient already exists
-					$is_existing = DB::table('rnd_menu_ingredients_details')
+					$is_existing = DB::table('batching_ingredients_details')
 						->where([
-							'rnd_menu_items_id' => $rnd_menu_items_id,
+							'batching_ingredients_id' => $batching_ingredients_id,
 							'item_masters_id' => $ingredient['item_masters_id'],
 							'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
 							'new_ingredients_id' => $ingredient['new_ingredients_id'],
@@ -547,38 +492,20 @@
 					);
 
 					//finally, inserting ingredients to the table
-					DB::table('rnd_menu_ingredients_details')->updateOrInsert([
-						'rnd_menu_items_id' => $rnd_menu_items_id,
+					DB::table('batching_ingredients_details')->updateOrInsert([
+						'batching_ingredients_id' => $batching_ingredients_id,
 						'item_masters_id' => $ingredient['item_masters_id'],
 						'ingredient_name' => $ingredient['ingredient_name'],
 						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
-						'new_ingredients_id' => $ingredient['new_ingredient_id'],
+						'new_ingredients_id' => $ingredient['new_ingredients_id'],
 					], $ingredient);
 				}
-			}
-
-			//updating the comments
-			DB::table('rnd_menu_comments')
-				->where('created_by', $action_by)
-				->where('rnd_menu_items_id', null)
-				->update(['rnd_menu_items_id' => $rnd_menu_items_id]);
-			
-			//updating approval status
-			DB::table('rnd_menu_approvals')
-				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
-					'rnd_menu_items_id' => $rnd_menu_items_id,
-					'approval_status' => $rnd_menu_approval_status,
-					'created_at' => $time_stamp,
-				]);
-			
-			if ($action != 'save') {
-				return $rnd_menu_items_id;
 			}
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
-					'message' => "✔️ RND Menu Item Details of $rnd_menu_description Updated!"
+					'message' => "✔️ Batching Ingredients Details of $ingredient_description Updated!"
 				]);
 		}
 
