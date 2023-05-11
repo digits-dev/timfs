@@ -26,7 +26,7 @@
 			$this->button_add          = TRUE;
 			$this->button_delete       = false;
 			$this->button_edit         = false;
-			$this->button_detail       = TRUE;
+			$this->button_detail       = false;
 			$this->button_show         = TRUE;
 			$this->button_filter       = TRUE;        
 			$this->button_export       = FALSE;	        
@@ -95,6 +95,13 @@
 	        | 
 	        */
 	        $this->addaction = array();
+			$this->addaction[] = [
+				'title'=>'Detail',
+				'url'=>CRUDBooster::mainpath('detail/[id]'),
+				'icon'=>'fa fa-eye',
+				'color' => ' ',
+			];
+
 			$this->addaction[] = [
 				'title'=>'Edit',
 				'url'=>CRUDBooster::mainpath('edit/[id]'),

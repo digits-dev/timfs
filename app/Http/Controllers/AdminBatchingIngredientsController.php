@@ -308,7 +308,7 @@
 	    | 
 	    */
 	    public function hook_before_delete($id) {
-	        //Your code here
+	        DB::table('batching_ingredients')->where('id', $id)->update(['status' => 'INACTIVE']);
 
 	    }
 

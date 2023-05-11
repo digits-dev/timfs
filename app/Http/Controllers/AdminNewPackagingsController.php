@@ -19,8 +19,8 @@
 			$this->button_action_style = "button_icon";
 			$this->button_add = true;
 			$this->button_edit = false;
-			$this->button_delete = true;
-			$this->button_detail = true;
+			$this->button_delete = false;
+			$this->button_detail = false;
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
@@ -92,10 +92,25 @@
 	        */
 	        $this->addaction = array();
 			$this->addaction[] = [
+				'title'=>'Detail',
+				'url'=>CRUDBooster::mainpath('detail/[id]'),
+				'icon'=>'fa fa-eye',
+				'color' => ' ',
+			];
+
+			$this->addaction[] = [
 				'title'=>'Edit',
 				'url'=>CRUDBooster::mainpath('edit/[id]'),
 				'icon'=>'fa fa-pencil',
 				'color' => ' ',
+				"showIf"=>"[item_masters_id] == null"
+			];
+
+			$this->addaction[] = [
+				'title'=>'Delete',
+				'url' => '#[id]',
+				'icon'=>'fa fa-trash',
+				'color' => ' delete-rnd-menu',
 				"showIf"=>"[item_masters_id] == null"
 			];
 
@@ -168,7 +183,24 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
-	        $this->script_js = NULL;
+	        $admin_path = CRUDBooster::adminPath();
+	        $this->script_js = "
+			$('.delete-rnd-menu').on('click', function() {
+				const dbId = $(this).attr('href')?.replace('#', '');
+				swal({   
+						title: `Are you sure ?`,   
+						text: `You will not be able to recover this record data!`,   
+						type: `warning`,   
+						showCancelButton: true,   
+						confirmButtonColor: `#ff0000`,   
+						confirmButtonText: `Yes!`,  
+						cancelButtonText: `No`,  
+						closeOnConfirm: false 
+					}, 
+					function(){location.href=`$admin_path/delete-new-items/new_packagings/` + dbId}
+				);
+			});
+			";
 
 
             /*
@@ -345,7 +377,7 @@
 	    | 
 	    */
 	    public function hook_after_delete($id) {
-	        //Your code here
+	        DB::table('new_packagings')->where('id', $id)->update(['status' => 'INACTIVE']);
 
 	    }
 
