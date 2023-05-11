@@ -733,7 +733,7 @@
                 });
                 a.html(e.full_item_description && e.item_masters_id ? `<span class="label label-info">IMFS</span> ${e.full_item_description}`
                     : e.menu_item_description ? `<span class="label label-warning">MIMF</span> ${e.menu_item_description}` 
-                    : (e.new_ingredients_id || e.new_packagings_id) ? `<span class="label label-purple">USER</span> ${e.item_description}` 
+                    : (e.new_ingredients_id || e.new_packagings_id) ? `<span class="label label-secondary">USER</span> ${e.item_description}` 
                     : 'No Item Found');
                 li.append(a);
                 ul.append(li);
