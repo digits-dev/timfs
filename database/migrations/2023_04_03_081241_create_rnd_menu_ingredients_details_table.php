@@ -19,6 +19,7 @@ class CreateRndMenuIngredientsDetailsTable extends Migration
             $table->integer('item_masters_id')->length(10)->unsigned()->nullable();
             $table->integer('new_ingredients_id')->length(10)->unsigned()->nullable();
             $table->integer('menu_as_ingredient_id')->length(10)->unsigned()->nullable();
+            $table->integer('batching_ingredients_id')->length(10)->unsigned()->nullable();
             $table->string('ingredient_name')->length(100)->nullable();
             $table->integer('row_id')->length(10)->signed()->nullable();
             $table->integer('ingredient_group')->length(10)->signed()->nullable();
