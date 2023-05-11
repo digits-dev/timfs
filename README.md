@@ -110,7 +110,6 @@
       - [x] Accounting Approver Page
   - [x] Use Add page of Patrick for menu creation
   - [x] Use Edit page of Patrick for editing the menu
-  - [ ] Copy RND menu ingredient(s) to menu item ingredient(s) after menu creation
   - [x] Create new module for Purchasing
     - [x] Create page for adding new item
     - [x] Implement update to chef's ingredient when item is created
@@ -118,6 +117,33 @@
   - [x] Create page for the approval of accounting
     - [x] Restrict accounting to approve until all items have codes
     - [x] Change the approval status after approval
+    ***
+  - [x] Add **Food Tasting** button in chef dashboard
+  - Create modules for new item
+    - [x] New ingredients
+      - [x] Add tagging of newly added item via `tasteless_code`
+      - [x] After tagging, update all ingredients inputted by chef
+    - [x] New Packagings
+      - [x] Add tagging of newly added item via `tasteless_code`
+      - [x] After tagging, update all packagings inputted by chef and/or marketing
+  - [x] Create module for batching ingredients
+    - [x] Adjust the page of adding ingredients page
+    - [x] Adjust sql views
+      - rnd ingredients details
+      - ingredients auto compute
+      - packaging auto compute
+      - rnd menu costing
+  - Create chat apps for various pages and priveleges
+    - [x] for chef and purchasing
+    - [x] for marketing and purchasing
+    - [x] chef and marketing
+  - [ ] Copy all ingredients from rnd menu to menu item
+    - [ ] Adjust sql views
+      - ingredients details
+      - ingredients auto compute
+      - computed food cost
+    - [ ] Adjust the front end (edit page, details page)
+  - [ ] Add page for marketing (Adding release date for uploading to POS)
 
 - ### 🟰 RND Menu Costing Formula
 
