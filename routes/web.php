@@ -20,6 +20,7 @@ use App\Http\Controllers\AdminRndMenuItemsForApprovalController;
 use App\Http\Controllers\AdminItemMastersTempController;
 use App\Http\Controllers\AdminNewIngredientsController;
 use App\Http\Controllers\AdminNewPackagingsController;
+use App\Http\Controllers\AdminBatchingIngredientsController;
 
 Route::get('/', function () {
     return redirect('admin/login');
@@ -128,5 +129,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/new_packagings/search-new-packagings', [AdminNewPackagingsController::class, 'searchNewPackagings'])->name('search_new_packaging');
     Route::post('/admin/new_packagings/edit-new-packagings', [AdminNewpackagingsController::class, 'editNewPackagings'])->name('edit_new_packagings');
     
+    // batching ingredients
+    Route::post('/admin/batching_ingredients/edit-batching-ingredient', [AdminBatchingIngredientsController::class, 'editBatchingIngredient'])->name('edit_batching_ingredient');
     
 });

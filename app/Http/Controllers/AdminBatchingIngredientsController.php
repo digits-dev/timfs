@@ -1,7 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
 
@@ -30,8 +30,15 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Ingredient Description","name"=>"ingredient_description"];
-			$this->col[] = ["label"=>"Uoms Id","name"=>"uoms_id","join"=>"uoms,id"];
+			$this->col[] = ["label"=>"BI Code","name"=>"bi_code"];
+			$this->col[] = ["label"=>"Ingredient Descrition","name"=>"ingredient_description"];
+			$this->col[] = ["label"=>"Portion Size","name"=>"portion_size"];
+			$this->col[] = ["label"=>"Food Cost","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_food_cost","join_id"=>"id"];
+			$this->col[] = ["label"=>"Status","name"=>"status"];
+			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
+			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Updated At","name"=>"updated_at"];
+			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -320,6 +327,260 @@
 
 
 	    //By the way, you can still create your own method in here... :) 
+
+		public function getAdd() {
+			if (!CRUDBooster::isCreate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return self::getEdit(null, 'add');
+		}
+
+		public function getEdit($id, $action = 'edit') {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$data = [];
+
+			$data['action'] = $action;
+
+			$data['item'] = DB::table('batching_ingredients')
+				->where('id', $id)
+				->first();
+
+			$data['preparations'] = DB::table('menu_ingredients_preparations')
+				->where('status', 'ACTIVE')
+				->select('id', 'preparation_desc')
+				->orderBy('preparation_desc', 'ASC')
+				->get()
+				->toArray();
+
+			$data['uoms'] = DB::table('packagings')
+				->where('status', 'ACTIVE')
+				->select('id', 'packaging_description')
+				->orderBy('packaging_description')
+				->get()
+				->toArray();
+
+			$data['privilege'] = CRUDBooster::myPrivilegeName();
+
+			if ($id) {
+				$data['ingredients'] = DB::table('rnd_menu_ingredients_auto_compute')
+					->where('rnd_menu_items_id', $id)
+					->where('rnd_menu_ingredients_auto_compute.status', 'ACTIVE')
+					->select(\DB::raw('item_masters.id as item_masters_id'),
+						'ingredient_name',
+						'menu_as_ingredient_id',
+						'rnd_menu_ingredients_auto_compute.menu_item_description',
+						'is_selected',
+						'is_primary',
+						'is_existing',
+						'rnd_menu_ingredients_auto_compute.packaging_size',
+						'ingredient_qty',
+						'cost',
+						'menu_items.food_cost',
+						'ingredient_group',
+						'uom_id',
+						'uom_description',
+						'packagings_id',
+						'packaging_description',
+						'prep_qty',
+						'menu_ingredients_preparations_id',
+						'yield',
+						'rnd_menu_ingredients_auto_compute.ttp',
+						'rnd_menu_ingredients_auto_compute.ttp as ingredient_cost',
+						'item_masters.full_item_description',
+						'sku_status_description as item_status',
+						'menu_items.status as menu_status',
+						'item_masters.updated_at',
+						'item_masters.created_at',
+						'rnd_menu_ingredients_auto_compute.new_ingredients_id',
+						'rnd_menu_ingredients_auto_compute.item_description')
+					->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_ingredients_auto_compute.item_masters_id')
+					->leftJoin('menu_items', 'rnd_menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
+					->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+					->leftJoin('new_ingredients', 'new_ingredients.id', 'rnd_menu_ingredients_auto_compute.new_ingredients_id')
+					->orderBy('ingredient_group', 'ASC')
+					->orderBy('row_id', 'ASC')
+					->get()
+					->toArray();
+	
+				$data['packagings'] = DB::table('rnd_menu_packagings_auto_compute')
+					->where('rnd_menu_items_id', $id)
+					->where('rnd_menu_packagings_auto_compute.status', 'ACTIVE')
+					->select(\DB::raw('item_masters.id as item_masters_id'),
+						'packaging_name',
+						'is_selected',
+						'is_primary',
+						'is_existing',
+						'rnd_menu_packagings_auto_compute.packaging_size',
+						'packaging_qty',
+						'cost',
+						'packaging_group',
+						'uom_id',
+						'uom_description',
+						'packagings_id',
+						'packaging_description',
+						'prep_qty',
+						'menu_ingredients_preparations_id',
+						'yield',
+						'rnd_menu_packagings_auto_compute.ttp',
+						'rnd_menu_packagings_auto_compute.ttp as packaging_cost',
+						'item_masters.full_item_description',
+						'sku_status_description as item_status',
+						'item_masters.updated_at',
+						'item_masters.created_at',
+						'rnd_menu_packagings_auto_compute.new_packagings_id',
+						'rnd_menu_packagings_auto_compute.item_description')
+					->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_packagings_auto_compute.item_masters_id')
+					->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+					->orderBy('packaging_group', 'ASC')
+					->orderBy('row_id', 'ASC')
+					->get()
+					->toArray();
+
+				$data['food_cost_data'] = DB::table('rnd_menu_computed_food_cost')
+					->where('id', $id)
+					->get()
+					->first();
+
+				$data['approval_status'] = DB::table('rnd_menu_approvals')
+					->where('rnd_menu_items_id', $id)
+					->get()
+					->first()
+					->approval_status;
+
+			}
+
+			return $this->view('new-items/batching-ingredients-add', $data);
+		}
+
+		public function editBatchingIngredient(Request $request) {
+			$batching_ingredients_id = $request->get('batching_ingredients_id');
+			$ingredient_description = $request->get('ingredient_description');
+			$portion_size = $request->get('portion_size');
+			$ingredients = json_decode($request->get('ingredients'));
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$max_bi_code = DB::table('batching_ingredients')->max('bi_code');
+			$bi_code_int = (int) explode('-', $max_bi_code)[1] + 1;
+			$bi_code = 'BI-' . str_pad($bi_code_int, 5, '0', STR_PAD_LEFT);
+
+			if (!$batching_ingredients_id) {
+				// inserting new rnd menu item and getting the id
+				$batching_ingredients_id = DB::table('batching_ingredients')
+					->insertGetId([
+						'ingredient_description' => $ingredient_description,
+						'bi_code' => $bi_code,
+						'portion_size' => $portion_size,
+						'created_by' => $action_by,
+						'created_at' => $time_stamp
+					]);
+			} else {
+				//update details for rnd menu item
+				DB::table('batching_ingredients')
+					->where('id', $batching_ingredients_id)
+					->update([
+						'ingredient_description' => $ingredient_description,
+						'portion_size' => $portion_size,
+						'updated_at' => $time_stamp,
+						'updated_by' => $action_by
+					]);
+			}
+
+			//inactivating all active ingredients of rnd menu item
+			DB::table('rnd_menu_ingredients_details')
+				->where('status', 'ACTIVE')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update([
+					'status' => 'INACTIVE',
+					'row_id' => null,
+					'deleted_at' => $time_stamp
+				]);
+
+			//inactivating all active packagings of rnd menu item
+			DB::table('rnd_menu_packagings_details')
+				->where('status', 'ACTIVE')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update([
+					'status' => 'INACTIVE',
+					'row_id' => null,
+					'deleted_at' => $time_stamp
+				]);
+
+			//looping through the nested ingredients by their ingredient_group
+			foreach ($ingredients as $group) {
+				foreach ($group as $ingredient) {
+					$ingredient = (array) $ingredient;
+
+					//checking if the ingredient already exists
+					$is_existing = DB::table('rnd_menu_ingredients_details')
+						->where([
+							'rnd_menu_items_id' => $rnd_menu_items_id,
+							'item_masters_id' => $ingredient['item_masters_id'],
+							'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
+							'new_ingredients_id' => $ingredient['new_ingredients_id'],
+						])->exists();
+					
+					if ($is_existing) {
+						$ingredient['updated_at'] = $time_stamp;
+						$ingredient['updated_by'] = $action_by;
+					} else {
+						$ingredient['created_at'] = $time_stamp;
+						$ingredient['created_by'] = $action_by;
+					}
+					
+					$ingredient['status'] = 'ACTIVE';
+					$ingredient['deleted_at'] = null;
+
+					//unsetting ingredients details that may be outdated in the future
+					unset(
+						$ingredient['qty'], 
+						$ingredient['cost'], 
+						$ingredient['total_cost'],
+						$ingredient['ttp']
+					);
+
+					//finally, inserting ingredients to the table
+					DB::table('rnd_menu_ingredients_details')->updateOrInsert([
+						'rnd_menu_items_id' => $rnd_menu_items_id,
+						'item_masters_id' => $ingredient['item_masters_id'],
+						'ingredient_name' => $ingredient['ingredient_name'],
+						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
+						'new_ingredients_id' => $ingredient['new_ingredient_id'],
+					], $ingredient);
+				}
+			}
+
+			//updating the comments
+			DB::table('rnd_menu_comments')
+				->where('created_by', $action_by)
+				->where('rnd_menu_items_id', null)
+				->update(['rnd_menu_items_id' => $rnd_menu_items_id]);
+			
+			//updating approval status
+			DB::table('rnd_menu_approvals')
+				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
+					'rnd_menu_items_id' => $rnd_menu_items_id,
+					'approval_status' => $rnd_menu_approval_status,
+					'created_at' => $time_stamp,
+				]);
+			
+			if ($action != 'save') {
+				return $rnd_menu_items_id;
+			}
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "✔️ RND Menu Item Details of $rnd_menu_description Updated!"
+				]);
+		}
 
 
 	}
