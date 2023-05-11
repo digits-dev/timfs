@@ -21,9 +21,11 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                     rnd_menu_ingredients_details.item_masters_id,
                     rnd_menu_ingredients_details.menu_as_ingredient_id,
                     rnd_menu_ingredients_details.new_ingredients_id,
+                    rnd_menu_ingredients_details.batching_ingredients_id,
                     item_masters.full_item_description,
                     menu_items.menu_item_description,
                     new_ingredients.item_description,
+                    batching_ingredients_computed_food_cost.ingredient_description,
                     rnd_menu_ingredients_details.ingredient_name,
                     rnd_menu_ingredients_details.ingredient_group,
                     rnd_menu_ingredients_details.row_id,
@@ -46,6 +48,10 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                     CASE
                         WHEN rnd_menu_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
                         WHEN rnd_menu_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
+                        WHEN rnd_menu_ingredients_details.batching_ingredients_id IS NOT NULL THEN ROUND(
+                            batching_ingredients_computed_food_cost.food_cost,
+                            4
+                        )
                         WHEN rnd_menu_ingredients_details.new_ingredients_id IS NOT NULL THEN new_ingredients.ttp
                         ELSE rnd_menu_ingredients_details.ttp
                     END as ttp,
@@ -105,6 +111,10 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                         ) * CASE
                             WHEN rnd_menu_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
                             WHEN rnd_menu_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
+                            WHEN rnd_menu_ingredients_details.batching_ingredients_id IS NOT NULL THEN ROUND(
+                                batching_ingredients_computed_food_cost.food_cost,
+                                4
+                            )
                             WHEN rnd_menu_ingredients_details.new_ingredients_id IS NOT NULL THEN new_ingredients.ttp
                             ELSE rnd_menu_ingredients_details.ttp
                         END,
@@ -115,12 +125,12 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                     LEFT JOIN item_masters ON item_masters.id = rnd_menu_ingredients_details.item_masters_id
                     LEFT JOIN menu_items ON menu_items.id = rnd_menu_ingredients_details.menu_as_ingredient_id
                     LEFT JOIN new_ingredients ON new_ingredients.id = rnd_menu_ingredients_details.new_ingredients_id
+                    LEFT JOIN batching_ingredients_computed_food_cost ON batching_ingredients_computed_food_cost.id = rnd_menu_ingredients_details.batching_ingredients_id
                     LEFT JOIN uoms ON rnd_menu_ingredients_details.uom_id = uoms.id
                     LEFT JOIN packagings ON packagings.id = COALESCE(
                         item_masters.packagings_id,
                         rnd_menu_ingredients_details.uom_id
                     );
-            ;          
         ");
 
         DB::statement("

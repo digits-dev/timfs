@@ -558,6 +558,8 @@
 					->where('rnd_menu_ingredients_auto_compute.status', 'ACTIVE')
 					->select(\DB::raw('item_masters.id as item_masters_id'),
 						'ingredient_name',
+						'batching_ingredients_computed_food_cost.ingredient_description',
+						'batching_ingredients_computed_food_cost.id as batching_ingredients_id',
 						'menu_as_ingredient_id',
 						'rnd_menu_ingredients_auto_compute.menu_item_description',
 						'is_selected',
@@ -587,7 +589,8 @@
 					->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_ingredients_auto_compute.item_masters_id')
 					->leftJoin('menu_items', 'rnd_menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
 					->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
-					->leftJoin('new_ingredients', 'new_ingredients.id', 'rnd_menu_ingredients_auto_compute.new_ingredients_id')
+					->leftJoin('new_ingredients', 'new_ingredients.id', '=', 'rnd_menu_ingredients_auto_compute.new_ingredients_id')
+					->leftJoin('batching_ingredients_computed_food_cost', 'batching_ingredients_computed_food_cost.id', 'rnd_menu_ingredients_auto_compute.batching_ingredients_id')
 					->orderBy('ingredient_group', 'ASC')
 					->orderBy('row_id', 'ASC')
 					->get()
@@ -725,6 +728,7 @@
 							'item_masters_id' => $ingredient['item_masters_id'],
 							'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
 							'new_ingredients_id' => $ingredient['new_ingredients_id'],
+							'batching_ingredients_id' => $ingredient['batching_ingredients_id']
 						])->exists();
 					
 					if ($is_existing) {
@@ -750,9 +754,9 @@
 					DB::table('rnd_menu_ingredients_details')->updateOrInsert([
 						'rnd_menu_items_id' => $rnd_menu_items_id,
 						'item_masters_id' => $ingredient['item_masters_id'],
-						'ingredient_name' => $ingredient['ingredient_name'],
 						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
 						'new_ingredients_id' => $ingredient['new_ingredients_id'],
+						'batching_ingredients_id' => $ingredient['batching_ingredients_id']
 					], $ingredient);
 				}
 			}
@@ -889,7 +893,7 @@
 		public function searchAllIngredients(Request $request) {
 			$search_terms = json_decode($request->content);
 			$with_menu = json_decode($request->with_menu);
-			
+
 			$item_masters = DB::table('item_masters')
 				->where('sku_statuses_id', '!=', '2')
 				->where(function($query) use ($search_terms) {
@@ -952,7 +956,30 @@
 				->get()
 				->toArray();
 
-			$response = array_merge($item_masters, $menu_items);
+			$batching_ingredients = DB::table('batching_ingredients')
+				->where('batching_ingredients.status', 'ACTIVE')
+				->where(function($query) use ($search_terms) {
+					$query->orWhere(function($q) use ($search_terms) {
+						foreach ($search_terms as $term) {
+							$q->where('batching_ingredients.ingredient_description', 'like', "%{$term}%");
+						}
+					})->orWhere(function($q) use ($search_terms) {
+						foreach ($search_terms as $term) {
+							$q->orWhere('batching_ingredients.bi_code', 'like', "%{$term}%");
+						}
+					});
+				})
+				->select('batching_ingredients.id as batching_ingredients_id',
+					'batching_ingredients.ingredient_description',
+					'food_cost',
+					'batching_ingredients.uoms_id',
+					'uom_description')
+				->leftJoin('uoms', 'uoms.id', '=', 'batching_ingredients.uoms_id')
+				->leftJoin('batching_ingredients_computed_food_cost', 'batching_ingredients_computed_food_cost.id', '=', 'batching_ingredients.id')
+				->get()
+				->toArray();
+
+			$response = array_merge($item_masters, $menu_items, $batching_ingredients);
 			
 			return json_encode($response);
 		}

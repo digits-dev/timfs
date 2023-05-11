@@ -740,13 +740,17 @@
                     if (savedIngredient.menu_as_ingredient_id && !savedIngredient.item_masters_id)
                         element.find('.item-from').addClass('label-warning').text('MIMF');
 
+                    if (savedIngredient.batching_ingredients_id)
+                        element.find('.item-from').addClass('label-secondary').text('BATCH');
+
                     const ingredientInput = element.find('.ingredient');
-                    ingredientInput.val(savedIngredient.item_masters_id || savedIngredient.menu_as_ingredient_id);
+                    ingredientInput.val(savedIngredient.item_masters_id || savedIngredient.menu_as_ingredient_id || savedIngredient.batching_ingredients_id);
                     ingredientInput.attr({
                         cost: savedIngredient.ingredient_cost || savedIngredient.food_cost,
                         uom: savedIngredient.packagings_id,
                         item_id: savedIngredient.item_masters_id,
                         menu_item_id: savedIngredient.menu_as_ingredient_id,
+                        batching_ingredients_id: savedIngredient.batching_ingredients_id,
                     });
 
                     if (savedIngredient.item_masters_id) element.find('.date-updated').html(
@@ -754,7 +758,7 @@
                         savedIngredient.created_at ? `${timeago.format(savedIngredient.created_at)}` :
                         ''
                     );
-                    element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
+                    element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description || savedIngredient.ingredient_description);
                     element.find('.ingredient-name').val(savedIngredient.item_description);
                     element.find('.pack-size').val(parseFloat(savedIngredient.packaging_size));
                     element.find('.prep-quantity').val(parseFloat(savedIngredient.prep_qty) || 0).attr('readonly', false);
@@ -1123,8 +1127,8 @@
                 .filter(
                     item => !currentItems.item_id.includes(item.item_masters_id?.toString()) && 
                     !currentItems.menu_item_id.includes(item.menu_item_id?.toString())
-                ).sort((a, b) => (a.full_item_description || a.menu_item_description)
-                ?.localeCompare(b.full_item_description || b.menu_item_description));
+                ).sort((a, b) => (a.full_item_description || a.menu_item_description || a.item_description || a.ingredient_description)
+                ?.localeCompare(b.full_item_description || b.menu_item_description || b.item_description || b.ingredient_description));
 
             if (!result.length) {
                 result.push({full_item_description: 'No Item Found'});
@@ -1143,26 +1147,25 @@
             result.forEach(e => {
                 const li = $(document.createElement('li'));
                 const a = $(document.createElement('a'));
-                if (!e.item_masters_id && !e.menu_item_id) {
-                    a.css('color', 'red !important');
-                }
                 li.addClass('list-item dropdown-item');
                 li.attr({
                     item_id: e.item_masters_id,
                     menu_item_id: e.menu_item_id,
                     new_ingredients_id: e.new_ingredients_id,
                     new_packagings_id: e.new_packagings_id,
+                    batching_ingredients_id: e.batching_ingredients_id,
                     ttp: parseFloat(e.ttp) || parseFloat(e.food_cost) || 0,
                     packaging_size: e.packaging_size || 1,
                     uom: e.packagings_id || e.uoms_id,
                     uom_desc: e.packaging_description || e.uom_description,
                     food_cost_temp: e.food_cost_temp,
-                    item_desc: e.full_item_description || e.menu_item_description || e.item_description,
+                    item_desc: e.full_item_description || e.menu_item_description || e.item_description || e.ingredient_description,
                     date_updated: e.updated_at || e.created_at,
                 });
                 a.html(e.full_item_description && e.item_masters_id ? `<span class="label label-info">IMFS</span> ${e.full_item_description}`
                     : e.menu_item_description ? `<span class="label label-warning">MIMF</span> ${e.menu_item_description}` 
                     : (e.new_ingredients_id || e.new_packagings_id) ? `<span class="label label-success">NEW</span> ${e.item_description}` 
+                    : e.batching_ingredients_id ? `<span class="label label-secondary">BATCH</span> ${e.ingredient_description}`
                     : 'No Item Found');
                 li.append(a);
                 ul.append(li);
@@ -1209,6 +1212,7 @@
                     ingredientObject.ingredient_group = groupIndex;
                     ingredientObject.item_masters_id = ingredientMember.find('.ingredient').attr('item_id');
                     ingredientObject.new_ingredients_id = ingredientMember.find('.ingredient-name').attr('new_ingredients_id');
+                    ingredientObject.batching_ingredients_id = ingredientMember.find('.ingredient').attr('batching_ingredients_id');
                     ingredientObject.menu_as_ingredient_id = ingredientMember.find('.ingredient').attr('menu_item_id');
                     ingredientObject.packaging_size = ingredientMember.find('.pack-size').val();
                     ingredientObject.prep_qty = ingredientMember.find('.prep-quantity').val();
@@ -1436,7 +1440,8 @@
 
             if (
                 !item.attr('item_id') && !item.attr('menu_item_id') && 
-                !item.attr('new_ingredients_id') && !item.attr('new_packagings_id')) return;
+                !item.attr('new_ingredients_id') && !item.attr('new_packagings_id') &&
+                !item.attr('batching_ingredients_id')) return;
             if (item.attr('item_id') && !item.attr('menu_item_id')) {
                 entry.find('.item-from')
                     .removeClass('label-info label-warning label-success label-secondary label-primary')
@@ -1447,20 +1452,27 @@
                     .removeClass('label-info label-warning label-success label-secondary label-primary')
                     .addClass('label-warning')
                     .text('MIMF')
+            } else if (item.attr('batching_ingredients_id')) {
+                entry.find('.item-from')
+                    .removeClass('label-info label-warning label-success label-secondary label-primary')
+                    .addClass('label-secondary')
+                    .text('BATCH')
             }
             
             entry.find('.label-danger').text('');
             entry.find('.date-updated').text('');
-            ingredient_packaging.val(item.attr('item_id') || item.attr('menu_item_id'));
+            ingredient_packaging.val(item.attr('item_id') || item.attr('menu_item_id') || item.attr('batching_ingredients_id'));
             ingredient_packaging.attr({
-                cost: $(this).attr('cost'),
-                food_cost_temp: $(this).attr('food_cost_temp'),
-                uom: $(this).attr('uom'),
-                item_id: $(this).attr('item_id'),
-                menu_item_id: $(this).attr('menu_item_id'),
+                cost: item.attr('cost'),
+                food_cost_temp: item.attr('food_cost_temp'),
+                uom: item.attr('uom'),
+                item_id: item.attr('item_id'),
+                menu_item_id: item.attr('menu_item_id'),
+                batching_ingredients_id: item.attr('batching_ingredients_id'),
             });
-            if (!item.attr('item_id')) ingredient_packaging.removeAttr('item_id');
+            if (!item.attr('item_id')) ingredient_packaging.removeAttr('item_id ');
             if (!item.attr('menu_item_id')) ingredient_packaging.removeAttr('menu_item_id');
+            if (!item.attr('batching_ingredients_id')) ingredient_packaging.removeAttr('batching_ingredients_id');
             entry.find(`
                 .display-ingredient, 
                 .display-packaging, 
@@ -1468,7 +1480,8 @@
                 .packaging-name
             `).val(item.attr('item_desc'))
                 .attr('new_ingredients_id', item.attr('new_ingredients_id'))
-                .attr('new_packagings_id', item.attr('new_packagings_id'));
+                .attr('new_packagings_id', item.attr('new_packagings_id'))
+                .attr('batching_ingredients_id', item.attr('batching_ingredients_id'));
             entry.find('.uom').val(item.attr('uom'));
             entry.find('.display-uom').val(item.attr('uom_desc'));
             entry.find('uom').val(item.attr('uoms_id'));
