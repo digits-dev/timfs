@@ -741,7 +741,7 @@
 						'item_masters_id' => $ingredient['item_masters_id'],
 						'ingredient_name' => $ingredient['ingredient_name'],
 						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
-						'new_ingredients_id' => $ingredient['new_ingredient_id'],
+						'new_ingredients_id' => $ingredient['new_ingredients_id'],
 					], $ingredient);
 				}
 			}
