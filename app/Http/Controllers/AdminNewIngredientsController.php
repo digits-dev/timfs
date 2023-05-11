@@ -416,7 +416,7 @@
 
 			$data['table'] = 'new_ingredients';
 
-			$data['comments_data'] = self::getNewItemsComments($id, false);
+			$data['comments_data'] = self::getNewItemsComments($id, true);
 
 			return $this->view('new-items/detail-new-items', $data);
 		}
