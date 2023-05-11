@@ -73,15 +73,14 @@
 
 @extends('crudbooster::admin_template')
 @section('content')
-<p>
-    <a title="Return" href="{{ CRUDBooster::mainpath() }}">
-        <i class="fa fa-chevron-circle-left "></i>
-        Back To List Data RND Menu Items (For Approval)
+<p class="noprint">
+    <a title='Return' href="{{ CRUDBooster::mainPath() }}">
+        <i class='fa fa-chevron-circle-left '></i> &nbsp; {{trans("crudbooster.form_back_to_list",['module'=>CRUDBooster::getCurrentModule()->name])}}
     </a>
 </p>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <i class="fa fa-pencil"></i><strong> Edit RND Menu Item</strong>
+        <i class="fa fa-eye"></i><strong> Details RND Menu Item</strong>
     </div>
     <div class="panel-body">
         <form action="" id="form" class="form">
