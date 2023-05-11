@@ -320,72 +320,68 @@
                     </table>
                 </div>
                 <div class="col-md-6">
-                    <hr>
-                    <h3 class="text-center">COMMENTS</h3>
-                    <div class="chat">
-                        @include('rnd-menu/chat-app', $comments_data)
-                    </div>
+                    <section class="workflow-details">
+                        <hr>
+                        <h3 class="text-center">WORKFLOW DETAILS</h3>
+                        <div class="flex parent">
+                            <div class="flex child">
+                                <div class="text-bold">Published by:</div>
+                                <div>{{$workflow->published_by_name}}</div>
+                            </div>
+                            <div class="flex child">
+                                <div class="text-bold">Published at:</div>
+                                <div>{{$workflow->published_at}}</div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="flex parent">
+                            <div class="flex child">
+                                <div class="text-bold">Packaging updated by:</div>
+                                <div>{{$workflow->packaging_updated_by_name}}</div>
+                            </div>
+                            <div class="flex child">
+                                <div class="text-bold">Packaging updated at:</div>
+                                <div>{{$workflow->packaging_updated_at}}</div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="flex parent">
+                            <div class="flex child">
+                                <div class="text-bold">Menu created by:</div>
+                                <div>{{$workflow->menu_created_by_name}}</div>
+                            </div>
+                            <div class="flex child">
+                                <div class="text-bold">Menu created at:</div>
+                                <div>{{$workflow->menu_created_at}}</div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="flex parent">
+                            <div class="flex child">
+                                <div class="text-bold">Costing updated by:</div>
+                                <div>{{$workflow->costing_updated_by_name}}</div>
+                            </div>
+                            <div class="flex child">
+                                <div class="text-bold">Costing updated at:</div>
+                                <div>{{$workflow->costing_updated_at}}</div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="flex parent">
+                            <div class="flex child">
+                                <div class="text-bold">Approved by (Marketing):</div>
+                                <div>{{$workflow->marketing_approved_by_name}}</div>
+                            </div>
+                            <div class="flex child">
+                                <div class="text-bold">Approved at (Marketing):</div>
+                                <div>{{$workflow->marketing_approved_at}}</div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </div>
         </section>
         <hr>
-        <section class="workflow-details">
-            <h3 class="text-center">WORKFLOW DETAILS</h3>
-            <div class="flex parent">
-                <div class="flex child">
-                    <div class="text-bold">Published by:</div>
-                    <div>{{$workflow->published_by_name}}</div>
-                </div>
-                <div class="flex child">
-                    <div class="text-bold">Published at:</div>
-                    <div>{{$workflow->published_at}}</div>
-                </div>
-            </div>
-            <br>
-            <div class="flex parent">
-                <div class="flex child">
-                    <div class="text-bold">Packaging updated by:</div>
-                    <div>{{$workflow->packaging_updated_by_name}}</div>
-                </div>
-                <div class="flex child">
-                    <div class="text-bold">Packaging updated at:</div>
-                    <div>{{$workflow->packaging_updated_at}}</div>
-                </div>
-            </div>
-            <br>
-            <div class="flex parent">
-                <div class="flex child">
-                    <div class="text-bold">Menu created by:</div>
-                    <div>{{$workflow->menu_created_by_name}}</div>
-                </div>
-                <div class="flex child">
-                    <div class="text-bold">Menu created at:</div>
-                    <div>{{$workflow->menu_created_at}}</div>
-                </div>
-            </div>
-            <br>
-            <div class="flex parent">
-                <div class="flex child">
-                    <div class="text-bold">Costing updated by:</div>
-                    <div>{{$workflow->costing_updated_by_name}}</div>
-                </div>
-                <div class="flex child">
-                    <div class="text-bold">Costing updated at:</div>
-                    <div>{{$workflow->costing_updated_at}}</div>
-                </div>
-            </div>
-            <br>
-            <div class="flex parent">
-                <div class="flex child">
-                    <div class="text-bold">Approved by (Marketing):</div>
-                    <div>{{$workflow->marketing_approved_by_name}}</div>
-                </div>
-                <div class="flex child">
-                    <div class="text-bold">Approved at (Marketing):</div>
-                    <div>{{$workflow->marketing_approved_at}}</div>
-                </div>
-            </div>
-        </section>
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
