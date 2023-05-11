@@ -117,7 +117,7 @@
                 return;
             }
             Swal.fire({
-                title: 'Uploading...',
+                title: 'Fetching...',
                 html: 'Please wait...',
                 allowEscapeKey: false,
                 allowOutsideClick: false,
