@@ -868,7 +868,8 @@
             }
 
             $('.display-ingredient, .display-packaging, .ingredient-name, .packaging-name').keyup(debounce(function() {
-                let route = "{{ route('search_ingredient') }}";
+                let route = "{{ route('search_all_ingredients') }}";
+                let withMenu = true;
                 const entry = $(this).parents(`
                     .ingredient-entry,
                     .substitute-ingredient,
@@ -887,6 +888,10 @@
                         route = "{{ route('search_new_packaging') }}";
                     }
 
+                if (entry.attr('class').includes('packaging')) {
+                    withMenu = false;
+                }
+
                 const isNewItem = entry.attr('isExisting') == 'false';
                 const query = $(this).val().toLowerCase().replace(/\s+/g, ' ').trim().split(' ')?.filter(e => e != '');
                 const itemList = entry.find('.item-list');
@@ -899,7 +904,7 @@
                 $.ajax({
                     type: 'POST',
                     url: route,
-                    data: { content: JSON.stringify(query), _token: "{{ csrf_token() }}",},
+                    data: { content: JSON.stringify(query), _token: "{{ csrf_token() }}", with_menu: withMenu},
                     success: function(response) {
                         const searchResult = JSON.parse(response);
                         $.fn.renderSearchResult(entry, itemList, searchResult);
@@ -1015,10 +1020,6 @@
 
             $('.rnd_menu_srp').keyup(function() {
                 $.fn.sumCost();
-            });
-
-            $('.ingredient-name, .packaging-name').focusout(function() {
-                $('.item-list').fadeOut();
             });
         }
 

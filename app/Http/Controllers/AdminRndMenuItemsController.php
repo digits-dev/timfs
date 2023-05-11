@@ -886,6 +886,77 @@
 				]);
 		}
 
+		public function searchAllIngredients(Request $request) {
+			$search_terms = json_decode($request->content);
+			$with_menu = json_decode($request->with_menu);
+			
+			$item_masters = DB::table('item_masters')
+				->where('sku_statuses_id', '!=', '2')
+				->where(function($query) use ($search_terms) {
+					$query->where(function($query_item_desc) use ($search_terms) {
+						$query_item_desc->orWhere(function($q) use ($search_terms) {
+							foreach ($search_terms as $term) {
+								$q->where('full_item_description', 'like', "%{$term}%");
+							}
+						})->orWhere(function($q) use ($search_terms) {
+							foreach ($search_terms as $term) {
+								$q->where('brands.brand_description', 'like', "%{$term}%");
+							}
+						});
+					})->orWhere(function ($query_code) use ($search_terms) {
+						foreach ($search_terms as $term) {
+							$query_code->orWhere('tasteless_code', 'like', "%{$term}%");
+						}
+					});
+				})
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'item_masters.packagings_id',
+					'ttp',
+					'packaging_size',
+					'item_masters.full_item_description',
+					'item_masters.tasteless_code',
+					'uoms.uom_description',
+					'brands.brand_description',
+					'item_masters.updated_at',
+					'item_masters.created_at')
+				->leftJoin('uoms','item_masters.packagings_id', '=', 'uoms.id')
+				->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id')
+				->orderby('full_item_description')
+				->get()
+				->toArray();
+
+			if (!$with_menu) {
+				return json_encode($item_masters);
+			}
+			
+			$menu_items = DB::table('menu_items')
+				->where('menu_items.status', 'ACTIVE')
+				->where(function($query) use ($search_terms) {
+					$query->orWhere(function($q) use ($search_terms) {
+						foreach ($search_terms as $term) {
+							$q->where('menu_item_description', 'like', "%{$term}%");
+						}
+					})->orWhere(function($q) use ($search_terms) {
+						foreach ($search_terms as $term) {
+							$q->orWhere('tasteless_menu_code', 'like', "%{$term}%");
+						}
+					});
+				})
+				->select('menu_items.id as menu_item_id',
+					'menu_item_description',
+					'tasteless_menu_code',
+					'food_cost',
+					'menu_items.uoms_id',
+					'uom_description')
+				->leftJoin('uoms', 'uoms.id', '=', 'menu_items.uoms_id')
+				->get()
+				->toArray();
+
+			$response = array_merge($item_masters, $menu_items);
+			
+			return json_encode($response);
+		}
+
 		// for marketing
 		public function getSetPackaging($id) {
 
