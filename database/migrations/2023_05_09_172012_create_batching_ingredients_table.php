@@ -18,6 +18,10 @@ class CreateBatchingIngredientsTable extends Migration
             $table->string('bi_code')->nullable();
             $table->string('ingredient_description')->nullable();
             $table->integer('uoms_id')->length(10)->unsigned()->nullable();
+            $table->decimal('portion_size', 18, 4)->unsigned()->nullable();
+            $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE')->nullable();
+            $table->integer('created_by')->length(10)->unsigned()->nullable();
+            $table->integer('updated_by')->length(10)->unsigned()->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
