@@ -434,45 +434,45 @@
 				->first();
 
 			$ingredients = DB::table('rnd_menu_ingredients_auto_compute')
-			->where('rnd_menu_items_id', $id)
-			->where('rnd_menu_ingredients_auto_compute.status', 'ACTIVE')
-			->select('tasteless_code',
-				'menu_items.status as menu_item_status',
-				'sku_statuses.sku_status_description as item_status',
-				'new_ingredients.status as new_ingredient_status',
-				'batching_ingredients.status as batching_ingredient_status',
-				'rnd_menu_ingredients_auto_compute.item_masters_id',
-				'rnd_menu_ingredients_auto_compute.menu_item_description',
-				'rnd_menu_ingredients_auto_compute.item_description',
-				'rnd_menu_ingredients_auto_compute.ingredient_description',
-				'tasteless_menu_code',
-				'ingredient_name',
-				'prep_qty',
-				'ingredient_group',
-				'row_id',
-				'is_primary',
-				'is_selected',
-				'rnd_menu_ingredients_auto_compute.packaging_size',
-				'rnd_menu_ingredients_auto_compute.full_item_description',
-				'menu_ingredients_preparations.preparation_desc',
-				'ingredient_qty',
-				'rnd_menu_ingredients_auto_compute.uom_description',
-				'yield',
-				'rnd_menu_ingredients_auto_compute.ttp',
-				'cost',
-				'item_masters.updated_at',
-				'item_masters.created_at',
-				'rnd_menu_ingredients_auto_compute.item_description')
-			->leftJoin('item_masters', 'rnd_menu_ingredients_auto_compute.item_masters_id', '=', 'item_masters.id')
-			->leftJoin('menu_items', 'rnd_menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
-			->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
-			->leftJoin('menu_ingredients_preparations', 'rnd_menu_ingredients_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
-			->leftJoin('new_ingredients', 'new_ingredients.id', '=', 'rnd_menu_ingredients_auto_compute.new_ingredients_id')
-			->leftJoin('batching_ingredients', 'batching_ingredients.id', '=', 'rnd_menu_ingredients_auto_compute.batching_ingredients_id')
-			->orderby('ingredient_group', 'asc')
-			->orderby('row_id', 'asc')
-			->get()
-			->toArray();
+				->where('rnd_menu_items_id', $id)
+				->where('rnd_menu_ingredients_auto_compute.status', 'ACTIVE')
+				->select('tasteless_code',
+					'menu_items.status as menu_item_status',
+					'sku_statuses.sku_status_description as item_status',
+					'new_ingredients.status as new_ingredient_status',
+					'batching_ingredients.status as batching_ingredient_status',
+					'rnd_menu_ingredients_auto_compute.item_masters_id',
+					'rnd_menu_ingredients_auto_compute.menu_item_description',
+					'rnd_menu_ingredients_auto_compute.item_description',
+					'rnd_menu_ingredients_auto_compute.ingredient_description',
+					'tasteless_menu_code',
+					'ingredient_name',
+					'prep_qty',
+					'ingredient_group',
+					'row_id',
+					'is_primary',
+					'is_selected',
+					'rnd_menu_ingredients_auto_compute.packaging_size',
+					'rnd_menu_ingredients_auto_compute.full_item_description',
+					'menu_ingredients_preparations.preparation_desc',
+					'ingredient_qty',
+					'rnd_menu_ingredients_auto_compute.uom_description',
+					'yield',
+					'rnd_menu_ingredients_auto_compute.ttp',
+					'cost',
+					'item_masters.updated_at',
+					'item_masters.created_at',
+					'rnd_menu_ingredients_auto_compute.item_description')
+				->leftJoin('item_masters', 'rnd_menu_ingredients_auto_compute.item_masters_id', '=', 'item_masters.id')
+				->leftJoin('menu_items', 'rnd_menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
+				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->leftJoin('menu_ingredients_preparations', 'rnd_menu_ingredients_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
+				->leftJoin('new_ingredients', 'new_ingredients.id', '=', 'rnd_menu_ingredients_auto_compute.new_ingredients_id')
+				->leftJoin('batching_ingredients', 'batching_ingredients.id', '=', 'rnd_menu_ingredients_auto_compute.batching_ingredients_id')
+				->orderby('ingredient_group', 'asc')
+				->orderby('row_id', 'asc')
+				->get()
+				->toArray();
 			
 			$packagings = DB::table('rnd_menu_packagings_auto_compute')
 				->where('rnd_menu_items_id', $id)
