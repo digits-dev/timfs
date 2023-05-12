@@ -114,106 +114,111 @@
         const ingredients = {!! json_encode($ingredients) !!};
         const item = {!! json_encode($item) !!};
         document.title = 'View Ingredients: ' + item.menu_item_description;
-        const tbody = $('.ingredient-tbody');
-        const groupCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
-        for (const key in item) {
-            if (!isNaN(item[key])) item[key] = parseFloat(item[key]);
+
+        function showIngredients() {
+            const ingredientTbody = $('.ingredient-tbody');
+            const groupCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
+            
+            for (const i of groupCount) {
+                const groupedIngredients = ingredients.filter(e => e.ingredient_group == i);
+                const isSelected = groupedIngredients.find(e => e.is_selected == 'TRUE');
+                let primary;
+                if (isSelected) isSelected.checked = true;
+                else groupedIngredients.find(e => e.is_primary == 'TRUE').checked = true;
+                groupedIngredients.forEach(groupedIngredient => {
+                    for (const key in groupedIngredient) {
+                        if (!isNaN(groupedIngredient[key])) groupedIngredient[key] = parseFloat(groupedIngredient[key]) || true;
+                    }
+                    const tr = $(document.createElement('tr'));
+                    const check = $(document.createElement('td'))
+                        .text(groupedIngredient.checked ? '✓' : '')
+                        .css('font-weight', '700');
+                    const status = $(document.createElement('td'));
+                    const from = $(document.createElement('td'))
+                    const tastelessCode = $(document.createElement('td'))
+                        .text(
+                            groupedIngredient.tasteless_code ||
+                            groupedIngredient.tasteless_menu_code ||
+                            'No Item Code'
+                        ).css('font-style', !groupedIngredient.tastelessCode)
+                    const ingredient = $(document.createElement('td'));
+                    const ingredientSpan = $(document.createElement('span'))
+                        .text(
+                            groupedIngredient.full_item_description ||
+                            groupedIngredient.menu_item_description ||
+                            groupedIngredient.ingredient_description ||
+                            groupedIngredient.item_description
+                        ).css('background', groupedIngredient.checked ? 'yellow' : '');
+                    ingredient.html(ingredientSpan);
+                    const packagingSize = $(document.createElement('td')).text(groupedIngredient.packaging_size)
+                    const preparationQty = $(document.createElement('td')).text(groupedIngredient.prep_qty);
+                    const uom = $(document.createElement('td')).text(groupedIngredient.uom_description);
+                    const preparation = $(document.createElement('td')).text(groupedIngredient.preparation_desc);
+                    const yield = $(document.createElement('td')).text(groupedIngredient.yield + '%');
+                    const ttpSpan = $(document.createElement('span'))
+                        .addClass('date-updated')
+                        .text(groupedIngredient.item_masters_id ? timeago.format(groupedIngredient.updated_at || groupedIngredient.created_at) : '')
+                    const ttp = $(document.createElement('td')).html('₱ ' + (groupedIngredient.ttp || '0.00') + '<br/>').append(ttpSpan);
+                    const ingredientQty = $(document.createElement('td')).text(groupedIngredient.ingredient_qty);
+                    const cost = $(document.createElement('td')).text('₱ ' + (groupedIngredient.cost || '0.00'));
+    
+                    if (groupedIngredient.full_item_description || groupedIngredient.item_masters_id)
+                        from.html('<span class="label label-info">IMFS</span>')
+                    else if (groupedIngredient.menu_item_description)
+                        from.html('<span class="label label-warning">MIMF</span>')
+                    else if (groupedIngredient.ingredient_description)
+                        from.html('<span class="label label-secondary">BATCH</span>')
+                    else
+                        from.html('<span class="label label-success">NEW</span>')
+    
+                    if (groupedIngredient.menu_item_status == 'INACTIVE' || groupedIngredient.item_status == 'INACTIVE' || groupedIngredient.new_ingredient_status == 'INACTIVE' || groupedIngredient.batching_ingredient_status == 'INACTIVE')
+                        status.html('<span class="label label-danger">INACTIVE</span>')
+                    else if (groupedIngredient.menu_item_status == 'ACTIVE' || groupedIngredient.item_status == 'ACTIVE' || groupedIngredient.new_ingredient_status == 'ACTIVE' || groupedIngredient.batching_ingredient_status == 'ACTIVE')
+                        status.html('<span class="label label-success">ACTIVE</span>')
+                    else if (groupedIngredient.menu_item_status == 'ALTERNATIVE' || groupedIngredient.item_status == 'ALTERNATIVE')
+                        status.html('<span class="label label-primary">ALTERNATIVE</span>')
+                    tr.append(
+                        check,
+                        status,
+                        from,
+                        tastelessCode,
+                        ingredient,
+                        packagingSize,
+                        preparationQty,
+                        uom,
+                        preparation,
+                        yield,
+                        ttp,
+                        ingredientQty,
+                        cost
+                    );
+                    ingredientTbody.append(tr);
+                });
+            }
+    
+            const lastRow = $(document.createElement('tr')).css('font-weight', 'bold');
+            const totalCostLabel = $(document.createElement('td'))
+                .text('Total Ingredient Cost')
+                .attr('colspan', 12)
+                .addClass('total-cost-label');
+            const totalCostValue = $(document.createElement('td')).text('₱ ' + item.ingredient_total_cost);
+            lastRow.append(totalCostLabel, totalCostValue);       
+            ingredientTbody.append(lastRow);
+    
+            if (!ingredients.length) {
+                $('.no-ingredient-warning').css('display', '');
+            } else {
+                $('.with-ingredient').css('display', '');
+                $('.note-ingredients').css('display', '');
+            }
+
+            const lowCost = Number(localStorage.getItem('lowCost')) || 30;
+            
+            if (item.rnd_menu_srp > 0 && item.computed_food_cost_percentage > lowCost) {
+                $('.food-cost-percentage').css('color', 'red');
+            }
         }
-
-        for (i of groupCount) {
-            const groupedIngredients = ingredients.filter(e => e.ingredient_group == i);
-            const isSelected = groupedIngredients.find(e => e.is_selected == 'TRUE');
-            let primary;
-            if (isSelected) isSelected.checked = true;
-            else groupedIngredients.find(e => e.is_primary == 'TRUE').checked = true;
-            groupedIngredients.forEach(groupedIngredient => {
-                for (const key in groupedIngredient) {
-                    if (!isNaN(groupedIngredient[key])) groupedIngredient[key] = parseFloat(groupedIngredient[key]) || true;
-                }
-                const tr = $(document.createElement('tr'));
-                const check = $(document.createElement('td'))
-                    .text(groupedIngredient.checked ? '✓' : '')
-                    .css('font-weight', '700');
-                const status = $(document.createElement('td'));
-                const from = $(document.createElement('td'))
-                const tastelessCode = $(document.createElement('td'))
-                    .text(
-                        groupedIngredient.tasteless_code ||
-                        groupedIngredient.tasteless_menu_code ||
-                        'No Item Code'
-                    ).css('font-style', !groupedIngredient.tastelessCode)
-                const ingredient = $(document.createElement('td'));
-                const ingredientSpan = $(document.createElement('span'))
-                    .text(
-                        groupedIngredient.full_item_description ||
-                        groupedIngredient.menu_item_description ||
-                        groupedIngredient.ingredient_name
-                    ).css('background', groupedIngredient.checked ? 'yellow' : '');
-                ingredient.html(ingredientSpan);
-                const packagingSize = $(document.createElement('td')).text(groupedIngredient.packaging_size)
-                const preparationQty = $(document.createElement('td')).text(groupedIngredient.prep_qty);
-                const uom = $(document.createElement('td')).text(groupedIngredient.uom_description);
-                const preparation = $(document.createElement('td')).text(groupedIngredient.preparation_desc);
-                const yield = $(document.createElement('td')).text(groupedIngredient.yield + '%');
-                const ttpSpan = $(document.createElement('span'))
-                    .addClass('date-updated')
-                    .text(groupedIngredient.item_masters_id ? timeago.format(groupedIngredient.updated_at || groupedIngredient.created_at) : '')
-                const ttp = $(document.createElement('td')).html('₱ ' + (groupedIngredient.ttp || '0.00') + '<br/>').append(ttpSpan);
-                const ingredientQty = $(document.createElement('td')).text(groupedIngredient.ingredient_qty);
-                const cost = $(document.createElement('td')).text('₱ ' + (groupedIngredient.cost || '0.00'));
-
-                if (groupedIngredient.full_item_description || groupedIngredient.item_masters_id)
-                    from.html('<span class="label label-info">IMFS</span>')
-                else if (groupedIngredient.menu_item_description)
-                    from.html('<span class="label label-warning">MIMF</span>')
-                else
-                    from.html('<span class="label label-secondary">USER</span>')
-
-                if (groupedIngredient.menu_item_status == 'INACTIVE' || groupedIngredient.item_status == 'INACTIVE')
-                    status.html('<span class="label label-danger">INACTIVE</span>')
-                else if (groupedIngredient.menu_item_status == 'ACTIVE' || groupedIngredient.item_status == 'ACTIVE')
-                    status.html('<span class="label label-success">ACTIVE</span>')
-                else if (groupedIngredient.menu_item_status == 'ALTERNATIVE' || groupedIngredient.item_status == 'ALTERNATIVE')
-                    status.html('<span class="label label-primary">ALTERNATIVE</span>')
-                tr.append(
-                    check,
-                    status,
-                    from,
-                    tastelessCode,
-                    ingredient,
-                    packagingSize,
-                    preparationQty,
-                    uom,
-                    preparation,
-                    yield,
-                    ttp,
-                    ingredientQty,
-                    cost
-                );
-                $('.ingredient-tbody').append(tr);
-            });
-        }
-
-        const lastRow = $(document.createElement('tr')).css('font-weight', 'bold');
-        const totalCostLabel = $(document.createElement('td'))
-            .text('Total Cost')
-            .attr('colspan', 12)
-            .addClass('total-cost-label');
-        const totalCostValue = $(document.createElement('td')).text('₱ ' + item.ingredient_total_cost);
-        lastRow.append(totalCostLabel, totalCostValue);       
-        $('.ingredient-tbody').append(lastRow);
-
-        if (!ingredients.length) {
-            $('.no-ingredient-warning').css('display', '');
-        } else {
-            $('.with-ingredient').css('display', '');
-            $('.note').css('display', '');
-        }
-        const lowCost = Number(localStorage.getItem('lowCost')) || 30;
-
-        if (item.menu_price_dine > 0 && item.food_cost_percentage > lowCost) {
-            $('.food-cost-percentage').css('color', 'red');
-        }
+        showIngredients();
         $('table th, table td').css('border', '1px solid #aaaaaa').css('vertical-align', 'middle');
         $('table thead').css('background', '#deeaee');
     });
