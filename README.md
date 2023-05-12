@@ -137,13 +137,14 @@
     - [x] for chef and purchasing
     - [x] for marketing and purchasing
     - [x] chef and marketing
-  - [ ] Copy all ingredients from rnd menu to menu item
-    - [ ] Adjust sql views
+  - [x] Copy all ingredients from rnd menu to menu item
+    - [x] Adjust sql views
       - ingredients details
       - ingredients auto compute
       - computed food cost
-    - [ ] Adjust the front end (edit page, details page)
-  - [ ] Add page for marketing (Adding release date for uploading to POS)
+    - [x] Adjust the front end (edit page, details page)
+  - [x] Add page for marketing (Adding release date for uploading to POS)
+  - [x] Change the color to red of input if there are items with no codes
 
 - ### 🟰 RND Menu Costing Formula
 
