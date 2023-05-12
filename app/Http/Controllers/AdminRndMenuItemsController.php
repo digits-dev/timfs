@@ -310,8 +310,8 @@
 
 			$blue_status = ['SAVED', 'FOR COSTING'];
 			$dark_blue_status = ['FOR FOOD TASTING'];
-			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION'];
-			$green_status = ['APPROVED'];
+			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION', 'FOR RELEASE DATE'];
+			$green_status = ['APPROVED', 'CLOSED'];
 			
 			if ($column_index == 1) {
 				if (in_array($column_value, $blue_status)) {
