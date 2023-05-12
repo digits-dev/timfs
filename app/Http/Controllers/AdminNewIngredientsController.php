@@ -549,6 +549,27 @@
 						'is_existing' => 'TRUE'
 					]);
 
+				$to_update = DB::table('menu_computed_food_cost')
+					->where(
+						DB::raw('CAST(computed_food_cost AS DECIMAL(18, 4))'),
+						'!=',
+						DB::raw('CAST(food_cost AS DECIMAL(18, 4))')
+					)
+					->orWhere(
+						DB::raw('CAST(computed_food_cost_percentage AS DECIMAL(18, 4))'),
+						'!=',
+						DB::raw('CAST(food_cost_percentage AS DECIMAL(18, 4))')
+					)
+					->orWhere(
+						DB::raw('CAST(computed_ingredient_total_cost AS DECIMAL(18, 4))'),
+						'!=',
+						DB::raw('CAST(ingredient_total_cost AS DECIMAL(18, 4))')
+					)
+					->get('id')
+					->toArray();
+
+				(new AdminMenuItemsController)->updateCostOfOtherMenu($to_update);
+
 				return redirect(CRUDBooster::mainpath())
 					->with([
 						'message_type' => 'success',
