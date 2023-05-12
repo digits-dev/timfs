@@ -1450,6 +1450,37 @@
 			return $this->view('rnd-menu/add-release-date', $data);
 		}
 
+		public function addReleaseDate(Request $request) {
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$release_date = $request->get('release_date');
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$approval_status = 'CLOSED';
+
+			DB::table('rnd_menu_items')
+				->where('id', $rnd_menu_items_id)
+				->update([
+					'release_date' => $release_date,
+					'updated_at' => $time_stamp,
+					'updated_by' => $action_by,
+				]);
+
+			DB::table('rnd_menu_approvals')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update([
+					'set_release_date_by' => $action_by,
+					'set_release_date_at' => $time_stamp,
+					'updated_at' => $time_stamp,
+					'approval_status' => $approval_status,
+				]);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => '✔️ Release Date added.',
+				]);
+		}
+
 		//for accounting
 		public function getApproveByAccounting($id) {
 			$data = [];
@@ -1487,7 +1518,7 @@
 			$approval_status = null;
 
 			if ($action == 'approve') {
-				$approval_status = 'APPROVED';
+				$approval_status = 'FOR RELEASE DATE';
 				$db_column_at = 'accounting_approved_at';
 				$db_column_by = 'accounting_approved_by';
 				$message = '✔️ Item Approved!';

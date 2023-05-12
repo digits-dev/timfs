@@ -1,7 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
 
@@ -37,6 +37,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"Approval Status","name"=>"id","join"=>"rnd_menu_approvals,approval_status","join_id"=>"rnd_menu_items_id"];
+			$this->col[] = ["label"=>"Release Date","name"=>"release_date"];
 			$this->col[] = ["label"=>"RND Code","name"=>"rnd_code"];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"menu_items_id","join"=>"menu_items,tasteless_menu_code"];
 			$this->col[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description"];
@@ -113,7 +114,7 @@
 				'url'=>CRUDBooster::mainpath('edit/[id]'),
 				'icon'=>'fa fa-pencil',
 				'color' => ' ',
-				// "showIf"=>"[approval_status] == 'SAVED' || [approval_status] == 'FOR FOOD TASTING'"
+				"showIf"=>"[approval_status] != 'CLOSED'"
 			];
 
 	        /* 
@@ -271,8 +272,10 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-	        //Your code here
-	        $query->where('rnd_menu_approvals.approval_status', '=', 'APPROVED');
+			$approval_status = ['APPROVED', 'CLOSED', 'FOR RELEASE DATE'];
+			
+	        $query->whereIn('rnd_menu_approvals.approval_status', $approval_status)
+				->addSelect('rnd_menu_approvals.approval_status');
 	    }
 
 	    /*
@@ -284,11 +287,24 @@
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
 			if (is_numeric($column_value)) $column_value = (float) $column_value;
+
+			$blue_status = ['SAVED', 'FOR COSTING'];
+			$dark_blue_status = ['FOR FOOD TASTING'];
+			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION', 'FOR RELEASE DATE'];
+			$green_status = ['CLOSED'];
+			
 			if ($column_index == 2) {
-				if ($column_value == 'SAVED') $column_value = "<span class='label label-success'>$column_value</span>";
-				if ($column_value == 'PENDING') $column_value = "<span class='label label-warning'>$column_value</span>";
+				if (in_array($column_value, $blue_status)) {
+					$column_value = "<span class='label label-info'>$column_value</span>";
+				} else if (in_array($column_value, $orange_status)) {
+					$column_value = "<span class='label label-warning'>$column_value</span>";
+				} else if (in_array($column_value, $green_status)) {
+					$column_value = "<span class='label label-success'>$column_value</span>";
+				} else if (in_array($column_value, $dark_blue_status)) {
+					$column_value = "<span class='label label-primary'>$column_value</span>";
+				}	
+				
 				if (str_contains($column_value, 'APPROVAL')) $column_value = "<span class='label label-info'>$column_value</span>";
-				if ($column_value == 'APPROVED') $column_value = "<span class='label label-success'>$column_value</span>";
 			}
 	    }
 
@@ -386,5 +402,9 @@
 				);
 
 			return $this->mainController->getAddReleaseDate($id);
+		}
+
+		public function addReleaseDate(Request $request) {
+			return $this->mainController->addReleaseDate($request);
 		}
 	}

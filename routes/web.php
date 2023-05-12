@@ -17,7 +17,7 @@ use App\Http\Controllers\AdminFoodCostController;
 use App\Http\Controllers\AdminExperimentalMenuItemsController;
 use App\Http\Controllers\AdminRndMenuItemsController;
 use App\Http\Controllers\AdminRndMenuItemsForApprovalController;
-use App\Http\Controllers\AdminItemMastersTempController;
+use App\Http\Controllers\AdminRndMenuItemsApprovedController;
 use App\Http\Controllers\AdminNewIngredientsController;
 use App\Http\Controllers\AdminNewPackagingsController;
 use App\Http\Controllers\AdminBatchingIngredientsController;

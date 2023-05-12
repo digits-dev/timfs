@@ -271,10 +271,17 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-	        
+			$not_valid_approval_statuses = [
+				'SAVED', 
+				'REJECTED', 
+				'APPROVED', 
+				'CLOSED', 
+				'FOR RELEASE DATE'
+			];
+
 			$query
 				->addSelect('rnd_menu_approvals.approval_status as approval_status')
-				->whereNotIn('rnd_menu_approvals.approval_status', ['SAVED', 'REJECTED', 'APPROVED']);
+				->whereNotIn('rnd_menu_approvals.approval_status', $not_valid_approval_statuses);
 	    }
 
 	    /*

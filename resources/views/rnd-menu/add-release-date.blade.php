@@ -257,8 +257,9 @@
                 </div>
             </div>
             <div class="hide">
-                <input type="text" value="{{$item->rnd_menu_items_id}}">
+                <input type="text" name="rnd_menu_items_id" value="{{$item->rnd_menu_items_id}}">
                 <button type="submit" id="submit-release-date"> Submit</button>
+                @csrf
             </div>
         </form>
         <section class="menu-and-workflow">
