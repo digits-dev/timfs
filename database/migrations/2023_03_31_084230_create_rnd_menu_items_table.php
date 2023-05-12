@@ -22,6 +22,7 @@ class CreateRndMenuItemsTable extends Migration
             $table->decimal('buffer', 18, 4)->default(6.5)->unsigned()->nullable();
             $table->decimal('ideal_food_cost', 18, 4)->default(30)->unsigned()->nullable();
             $table->decimal('rnd_menu_srp', 18, 4)->unsigned()->nullable();
+            $table->timestamp('release_date')->nullable();
             $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE')->nullable();
             $table->integer('created_by')->length(10)->unsigned()->nullable();
             $table->integer('updated_by')->length(10)->unsigned()->nullable();
