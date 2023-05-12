@@ -770,11 +770,13 @@
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 
-			$current_ingredients = DB::table('menu_ingredients_auto_compute')
+			$ingredients = DB::table('menu_ingredients_auto_compute')
 				->where('menu_items_id', $id)
 				->where('menu_ingredients_auto_compute.status', 'ACTIVE')
 				->select(\DB::raw('item_masters.id as item_masters_id'),
 					'ingredient_name',
+					'batching_ingredients_computed_food_cost.ingredient_description',
+					'batching_ingredients_computed_food_cost.id as batching_ingredients_id',
 					'menu_as_ingredient_id',
 					'menu_ingredients_auto_compute.menu_item_description',
 					'is_selected',
@@ -786,8 +788,8 @@
 					'menu_items.food_cost',
 					'ingredient_group',
 					'uom_id',
-					'uom_name',
 					'uom_description',
+					'packagings_id',
 					'packaging_description',
 					'prep_qty',
 					'menu_ingredients_preparations_id',
@@ -798,10 +800,14 @@
 					'sku_status_description as item_status',
 					'menu_items.status as menu_status',
 					'item_masters.updated_at',
-					'item_masters.created_at')
+					'item_masters.created_at',
+					'menu_ingredients_auto_compute.new_ingredients_id',
+					'menu_ingredients_auto_compute.item_description')
 				->leftJoin('item_masters', 'item_masters.id', '=', 'menu_ingredients_auto_compute.item_masters_id')
 				->leftJoin('menu_items', 'menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
 				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->leftJoin('new_ingredients', 'new_ingredients.id', '=', 'menu_ingredients_auto_compute.new_ingredients_id')
+				->leftJoin('batching_ingredients_computed_food_cost', 'batching_ingredients_computed_food_cost.id', 'menu_ingredients_auto_compute.batching_ingredients_id')
 				->orderBy('ingredient_group', 'ASC')
 				->orderBy('row_id', 'ASC')
 				->get()
@@ -821,7 +827,7 @@
 				->get()
 				->toArray();
 
-			$data['current_ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $current_ingredients);
+			$data['ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $ingredients);
 			return $this->view('menu-items/edit-item', $data);
 		}
 
@@ -832,6 +838,8 @@
 			$food_cost_percentage = $request->input('food_cost_percentage');
 			$portion_size = $request->input('portion_size');
 			$ingredient_total_cost = $request->input('ingredient_total_cost');
+			$action_by = CRUDBooster::myId();
+			$time_stamp = date('Y-m-d H:i:s');
 
 			//updating food cost and percentage to menu items table
 			DB::table('menu_items')
@@ -850,8 +858,8 @@
 				->update(['status' => 'INACTIVE',
 					'row_id' => null,
 					'total_cost' => null,
-					'deleted_by' => CRUDBooster::myId(),
-					'deleted_at' => date('Y-m-d H:i:s')]);
+					'deleted_by' => $action_by,
+					'deleted_at' => $time_stamp]);
 			
 			foreach ($ingredients as $ingredient_group) {
 				foreach ($ingredient_group as $ingredient) {
@@ -862,16 +870,17 @@
 						->where([
 							'menu_items_id' => $menu_items_id,
 							'item_masters_id' => $ingredient['item_masters_id'],
-							'ingredient_name' => $ingredient['ingredient_name'],
-							'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
+							'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
+							'new_ingredients_id' => $ingredient['new_ingredients_id'],
+							'batching_ingredients_id' => $ingredient['batching_ingredients_id']
 						])->exists();
 					
 					if ($is_existing) {
-						$ingredient['updated_at'] = date('Y-m-d H:i:s');
-						$ingredient['updated_by'] = CRUDBooster::myId();
+						$ingredient['updated_at'] = $time_stamp;
+						$ingredient['updated_by'] = $action_by;
 					} else {
-						$ingredient['created_at'] = date('Y-m-d H:i:s');
-						$ingredient['created_by'] = CRUDBooster::myId();
+						$ingredient['created_at'] = $time_stamp;
+						$ingredient['created_by'] = $action_by;
 					}
 
 					$ingredient['status'] = 'ACTIVE';
@@ -882,19 +891,17 @@
 					unset(
 						$ingredient['qty'], 
 						$ingredient['cost'], 
-						$ingredient['total_cost'], 
+						$ingredient['total_cost'],
+						$ingredient['ttp'],
 					);
-
-					if ($ingredient['is_existing'] == 'TRUE') {
-						unset($ingredient['ttp']);
-					}
 	
 					//finally, inserting ingredients to menu ingredients details table
 					DB::table('menu_ingredients_details')->updateOrInsert([
 						'menu_items_id' => $menu_items_id,
 						'item_masters_id' => $ingredient['item_masters_id'],
-						'ingredient_name' => $ingredient['ingredient_name'],
-						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id']
+						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
+						'new_ingredients_id' => $ingredient['new_ingredients_id'],
+						'batching_ingredients_id' => $ingredient['batching_ingredients_id']
 					], $ingredient);
 				}
 			}
