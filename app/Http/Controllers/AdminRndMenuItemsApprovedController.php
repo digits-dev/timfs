@@ -375,6 +375,16 @@
 					trans('crudbooster.denied_access')
 				);
 
-			return (new AdminRndMenuItemsController)->getDetailNoIngredient($id);
+			return $this->mainController->getDetailNoIngredient($id);
+		}
+
+		public function getEdit($id) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->getAddReleaseDate($id);
 		}
 	}

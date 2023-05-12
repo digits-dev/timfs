@@ -1433,6 +1433,23 @@
 
 		}
 
+		public function getAddReleaseDate($id) {
+			$data = [];
+
+			$data['item'] = DB::table('rnd_menu_costing')
+				->where('rnd_menu_items_id', $id)
+				->first();
+
+			$data['workflow'] = self::getWorkFlowDetails($id);
+
+			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
+
+			$data['comments_data'] = self::getRNDComments($id);
+
+
+			return $this->view('rnd-menu/add-release-date', $data);
+		}
+
 		//for accounting
 		public function getApproveByAccounting($id) {
 			$data = [];
