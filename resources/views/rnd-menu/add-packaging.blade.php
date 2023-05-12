@@ -937,7 +937,7 @@
             if (isValid && hasPackaging) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
-                    html: '📄 Newly added packagings will be forwarded to <label class="label label-info">PURCHASING</label> for Item Creation in IMFS.',
+                    html: "📄 You won't be able revert this.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
