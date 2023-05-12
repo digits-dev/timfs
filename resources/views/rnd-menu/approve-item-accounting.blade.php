@@ -3,6 +3,10 @@
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <style>
+    .no-code {
+        color: red;
+        outline: 2px solid red;
+    }
     .flex {
         display: flex;
     }
@@ -126,7 +130,7 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input value="{{$no_codes}}" class="form-control" readonly>
+                            <input value="{{$no_codes}}" class="form-control {{$no_codes ? 'no-code' : ''}}" readonly>
                         </div>
                     </div>
                 </div>
