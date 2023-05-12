@@ -440,8 +440,11 @@
 				'menu_items.status as menu_item_status',
 				'sku_statuses.sku_status_description as item_status',
 				'new_ingredients.status as new_ingredient_status',
+				'batching_ingredients.status as batching_ingredient_status',
 				'rnd_menu_ingredients_auto_compute.item_masters_id',
 				'rnd_menu_ingredients_auto_compute.menu_item_description',
+				'rnd_menu_ingredients_auto_compute.item_description',
+				'rnd_menu_ingredients_auto_compute.ingredient_description',
 				'tasteless_menu_code',
 				'ingredient_name',
 				'prep_qty',
@@ -465,6 +468,7 @@
 			->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
 			->leftJoin('menu_ingredients_preparations', 'rnd_menu_ingredients_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
 			->leftJoin('new_ingredients', 'new_ingredients.id', '=', 'rnd_menu_ingredients_auto_compute.new_ingredients_id')
+			->leftJoin('batching_ingredients', 'batching_ingredients.id', '=', 'rnd_menu_ingredients_auto_compute.batching_ingredients_id')
 			->orderby('ingredient_group', 'asc')
 			->orderby('row_id', 'asc')
 			->get()

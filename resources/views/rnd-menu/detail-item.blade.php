@@ -177,6 +177,7 @@
                         .text(
                             groupedIngredient.full_item_description ||
                             groupedIngredient.menu_item_description ||
+                            groupedIngredient.ingredient_description ||
                             groupedIngredient.item_description
                         ).css('background', groupedIngredient.checked ? 'yellow' : '');
                     ingredient.html(ingredientSpan);
@@ -196,12 +197,14 @@
                         from.html('<span class="label label-info">IMFS</span>')
                     else if (groupedIngredient.menu_item_description)
                         from.html('<span class="label label-warning">MIMF</span>')
+                    else if (groupedIngredient.ingredient_description)
+                        from.html('<span class="label label-secondary">BATCH</span>')
                     else
                         from.html('<span class="label label-success">NEW</span>')
     
-                    if (groupedIngredient.menu_item_status == 'INACTIVE' || groupedIngredient.item_status == 'INACTIVE' || groupedIngredient.new_ingredient_status == 'INACTIVE')
+                    if (groupedIngredient.menu_item_status == 'INACTIVE' || groupedIngredient.item_status == 'INACTIVE' || groupedIngredient.new_ingredient_status == 'INACTIVE' || groupedIngredient.batching_ingredient_status == 'INACTIVE')
                         status.html('<span class="label label-danger">INACTIVE</span>')
-                    else if (groupedIngredient.menu_item_status == 'ACTIVE' || groupedIngredient.item_status == 'ACTIVE' || groupedIngredient.new_ingredient_status == 'ACTIVE')
+                    else if (groupedIngredient.menu_item_status == 'ACTIVE' || groupedIngredient.item_status == 'ACTIVE' || groupedIngredient.new_ingredient_status == 'ACTIVE' || groupedIngredient.batching_ingredient_status == 'ACTIVE')
                         status.html('<span class="label label-success">ACTIVE</span>')
                     else if (groupedIngredient.menu_item_status == 'ALTERNATIVE' || groupedIngredient.item_status == 'ALTERNATIVE')
                         status.html('<span class="label label-primary">ALTERNATIVE</span>')
