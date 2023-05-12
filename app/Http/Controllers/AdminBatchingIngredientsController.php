@@ -328,6 +328,68 @@
 
 	    //By the way, you can still create your own method in here... :) 
 
+		public function getDetail($id) {
+			if (!CRUDBooster::isRead())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$data = [];
+			$data['item'] = DB::table('batching_ingredients')
+				->where('batching_ingredients.id', $id)
+				->select(
+					'*',
+					'batching_ingredients.created_at',
+					'batching_ingredients.status',
+				)
+				->leftJoin('cms_users', 'cms_users.id', 'batching_ingredients.created_by')
+				->leftJoin('batching_ingredients_computed_food_cost', 'batching_ingredients_computed_food_cost.id', '=', 'batching_ingredients.id')
+				->get()
+				->first();
+
+			$ingredients = DB::table('batching_ingredients_auto_compute')
+				->where('batching_ingredients_id', $id)
+				->where('batching_ingredients_auto_compute.status', 'ACTIVE')
+				->select('tasteless_code',
+					'menu_items.status as menu_item_status',
+					'sku_statuses.sku_status_description as item_status',
+					'new_ingredients.status as new_ingredient_status',
+					'batching_ingredients_auto_compute.item_masters_id',
+					'batching_ingredients_auto_compute.menu_item_description',
+					'tasteless_menu_code',
+					'ingredient_name',
+					'prep_qty',
+					'ingredient_group',
+					'row_id',
+					'is_primary',
+					'is_selected',
+					'batching_ingredients_auto_compute.packaging_size',
+					'batching_ingredients_auto_compute.full_item_description',
+					'menu_ingredients_preparations.preparation_desc',
+					'ingredient_qty',
+					'batching_ingredients_auto_compute.uom_description',
+					'yield',
+					'batching_ingredients_auto_compute.ttp',
+					'cost',
+					'item_masters.updated_at',
+					'item_masters.created_at',
+					'batching_ingredients_auto_compute.item_description')
+				->leftJoin('item_masters', 'batching_ingredients_auto_compute.item_masters_id', '=', 'item_masters.id')
+				->leftJoin('menu_items', 'batching_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
+				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->leftJoin('menu_ingredients_preparations', 'batching_ingredients_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
+				->leftJoin('new_ingredients', 'new_ingredients.id', '=', 'batching_ingredients_auto_compute.new_ingredients_id')
+				->orderby('ingredient_group', 'asc')
+				->orderby('row_id', 'asc')
+				->get()
+				->toArray();
+
+			$data['ingredients'] = array_map(fn ($object) => (object) array_filter((array) $object), $ingredients);
+
+			return $this->view('new-items/batching-ingredients-detail', $data);
+		}
+
 		public function getAdd() {
 			if (!CRUDBooster::isCreate())
 				CRUDBooster::redirect(
