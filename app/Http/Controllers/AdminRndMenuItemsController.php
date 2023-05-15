@@ -1444,9 +1444,6 @@
 
 			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
 
-			$data['comments_data'] = self::getRNDComments($id);
-
-
 			return $this->view('rnd-menu/add-release-date', $data);
 		}
 
