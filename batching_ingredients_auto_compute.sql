@@ -107,3 +107,5 @@ CREATE VIEW BATCHING_INGREDIENTS_AUTO_COMPUTE AS
 	        batching_ingredients_details.uom_id
 	    );
 ; 
+
+;

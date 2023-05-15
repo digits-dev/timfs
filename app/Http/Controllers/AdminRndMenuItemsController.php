@@ -1629,7 +1629,7 @@
 			return json_encode($response);
 		}
 
-		public function getDetailNoIngredient($id) {
+		public function getDetailNoIngredient($id, $with_comments = true) {
 			$data = [];
 
 			$data['item'] = DB::table('rnd_menu_costing')
@@ -1642,6 +1642,9 @@
 
 			$data['comments_data'] = self::getRNDComments($id, true);
 
+			if (!$with_comments) {
+				return $this->view('rnd-menu/detail-no-comments', $data);
+			}
 
 			return $this->view('rnd-menu/detail-approvers', $data);
 		}

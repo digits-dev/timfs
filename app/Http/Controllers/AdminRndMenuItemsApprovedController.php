@@ -391,7 +391,7 @@
 					trans('crudbooster.denied_access')
 				);
 
-			return $this->mainController->getDetailNoIngredient($id);
+			return $this->mainController->getDetailNoIngredient($id, false);
 		}
 
 		public function getEdit($id) {
