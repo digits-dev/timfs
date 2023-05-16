@@ -110,7 +110,9 @@ FROM menu_ingredients_details
     LEFT JOIN menu_items ON menu_items.id = menu_ingredients_details.menu_as_ingredient_id
     LEFT JOIN new_ingredients ON new_ingredients.id = menu_ingredients_details.new_ingredients_id
     LEFT JOIN batching_ingredients_computed_food_cost ON batching_ingredients_computed_food_cost.id = menu_ingredients_details.batching_ingredients_id
-    LEFT JOIN uoms ON menu_ingredients_details.uom_id = uoms.id
+    LEFT JOIN uoms ON uoms.id = COALESCE(
+        item_masters.uoms_id, menu_items.uoms_id, menu_ingredients_details.uom_id
+    )
     LEFT JOIN packagings ON packagings.id = COALESCE(
         item_masters.packagings_id, menu_ingredients_details.uom_id
     );

@@ -516,35 +516,36 @@
 						'tagged_at' => $time_stamp,
 					]);
 
+				// updating the ingredients of rnd
 				DB::table('rnd_menu_ingredients_details')
 					->where('new_ingredients_id', $new_ingredients_id)
 					->where('status', 'ACTIVE')
 					->update([
 						'updated_by' => $action_by,
 						'updated_at' => $time_stamp,
-						'new_ingredients_id' => null,
 						'item_masters_id' => $item_masters_id,
 						'is_existing' => 'TRUE'
 					]);
 
+				
+				// updating the ingredients of batching
 				DB::table('batching_ingredients_details')
 					->where('new_ingredients_id', $new_ingredients_id)
 					->where('status', 'ACTIVE')
 					->update([
 						'updated_by' => $action_by,
 						'updated_at' => $time_stamp,
-						'new_ingredients_id' => null,
 						'item_masters_id' => $item_masters_id,
 						'is_existing' => 'TRUE'
 					]);
-
+				
+				//updating the ingredients of menu
 				DB::table('menu_ingredients_details')
 					->where('new_ingredients_id', $new_ingredients_id)
 					->where('status', 'ACTIVE')
 					->update([
 						'updated_by' => $action_by,
 						'updated_at' => $time_stamp,
-						'new_ingredients_id' => null,
 						'item_masters_id' => $item_masters_id,
 						'is_existing' => 'TRUE'
 					]);

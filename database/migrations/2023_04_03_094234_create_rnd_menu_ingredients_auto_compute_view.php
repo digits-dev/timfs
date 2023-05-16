@@ -126,7 +126,11 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                     LEFT JOIN menu_items ON menu_items.id = rnd_menu_ingredients_details.menu_as_ingredient_id
                     LEFT JOIN new_ingredients ON new_ingredients.id = rnd_menu_ingredients_details.new_ingredients_id
                     LEFT JOIN batching_ingredients_computed_food_cost ON batching_ingredients_computed_food_cost.id = rnd_menu_ingredients_details.batching_ingredients_id
-                    LEFT JOIN uoms ON rnd_menu_ingredients_details.uom_id = uoms.id
+                    LEFT JOIN uoms ON uoms.id = COALESCE(
+                        item_masters.uoms_id,
+                        menu_items.uoms_id,
+                        rnd_menu_ingredients_details.uom_id
+                    )
                     LEFT JOIN packagings ON packagings.id = COALESCE(
                         item_masters.packagings_id,
                         rnd_menu_ingredients_details.uom_id
@@ -229,7 +233,10 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
                     rnd_menu_packagings_details
                     LEFT JOIN item_masters ON item_masters.id = rnd_menu_packagings_details.item_masters_id
                     LEFT JOIN new_packagings ON new_packagings.id = rnd_menu_packagings_details.new_packagings_id
-                    LEFT JOIN uoms ON rnd_menu_packagings_details.uom_id = uoms.id
+                    LEFT JOIN uoms ON uoms.id = COALESCE(
+                        item_masters.uoms_id,
+                        rnd_menu_packagings_details.uom_id
+                    )
                     LEFT JOIN packagings ON packagings.id = COALESCE(
                         item_masters.packagings_id,
                         rnd_menu_packagings_details.uom_id

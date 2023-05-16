@@ -101,11 +101,13 @@ CREATE VIEW BATCHING_INGREDIENTS_AUTO_COMPUTE AS
 	    LEFT JOIN item_masters ON item_masters.id = batching_ingredients_details.item_masters_id
 	    LEFT JOIN menu_items ON menu_items.id = batching_ingredients_details.menu_as_ingredient_id
 	    LEFT JOIN new_ingredients ON new_ingredients.id = batching_ingredients_details.new_ingredients_id
-	    LEFT JOIN uoms ON batching_ingredients_details.uom_id = uoms.id
+	    LEFT JOIN uoms ON uoms.id = COALESCE(
+	        item_masters.uoms_id,
+	        menu_items.uoms_id,
+	        new_ingredients.uoms_id
+	    )
 	    LEFT JOIN packagings ON packagings.id = COALESCE(
 	        item_masters.packagings_id,
-	        batching_ingredients_details.uom_id
+	        new_ingredients.uoms_id
 	    );
 ; 
-
-;
