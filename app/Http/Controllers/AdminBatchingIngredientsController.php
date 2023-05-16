@@ -480,7 +480,7 @@
 
 		public function editBatchingIngredient(Request $request) {
 			$batching_ingredients_id = $request->get('batching_ingredients_id');
-			$ingredient_description = $request->get('ingredient_description');
+			$ingredient_description = strtoupper($request->get('ingredient_description'));
 			$portion_size = $request->get('portion_size');
 			$ingredients = json_decode($request->get('ingredients'));
 			$time_stamp = date('Y-m-d H:i:s');
