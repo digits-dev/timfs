@@ -965,6 +965,7 @@
 					'menu_ingredients_preparations.preparation_desc',
 					'ingredient_qty',
 					'menu_ingredients_auto_compute.uom_description',
+					'menu_ingredients_auto_compute.packaging_description',
 					'yield',
 					'menu_ingredients_auto_compute.ttp',
 					'cost',

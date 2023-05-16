@@ -369,6 +369,7 @@
 					'menu_ingredients_preparations.preparation_desc',
 					'ingredient_qty',
 					'batching_ingredients_auto_compute.uom_description',
+					'batching_ingredients_auto_compute.packaging_description',
 					'yield',
 					'batching_ingredients_auto_compute.ttp',
 					'cost',

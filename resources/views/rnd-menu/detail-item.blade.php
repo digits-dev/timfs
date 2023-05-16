@@ -183,7 +183,7 @@
                     ingredient.html(ingredientSpan);
                     const packagingSize = $(document.createElement('td')).text(groupedIngredient.packaging_size)
                     const preparationQty = $(document.createElement('td')).text(groupedIngredient.prep_qty);
-                    const uom = $(document.createElement('td')).text(groupedIngredient.uom_description);
+                    const uom = $(document.createElement('td')).text(groupedIngredient.packaging_description || groupedIngredient.uom_description);
                     const preparation = $(document.createElement('td')).text(groupedIngredient.preparation_desc);
                     const yield = $(document.createElement('td')).text(groupedIngredient.yield + '%');
                     const ttpSpan = $(document.createElement('span'))
@@ -286,7 +286,7 @@
                     packaging.html(packagingSpan);
                     const packagingSize = $(document.createElement('td')).text(groupedPackaging.packaging_size)
                     const preparationQty = $(document.createElement('td')).text(groupedPackaging.prep_qty);
-                    const uom = $(document.createElement('td')).text(groupedPackaging.uom_description);
+                    const uom = $(document.createElement('td')).text(groupedPackaging.packaging_description || groupedPackaging.uom_description);
                     const preparation = $(document.createElement('td')).text(groupedPackaging.preparation_desc);
                     const yield = $(document.createElement('td')).text(groupedPackaging.yield + '%');
                     const ttpSpan = $(document.createElement('span'))
