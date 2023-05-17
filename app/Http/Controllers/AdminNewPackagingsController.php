@@ -526,7 +526,6 @@
 					->update([
 						'updated_by' => $action_by,
 						'updated_at' => $time_stamp,
-						'new_packagings_id' => null,
 						'item_masters_id' => $item_masters_id,
 						'is_existing' => 'TRUE'
 					]);
