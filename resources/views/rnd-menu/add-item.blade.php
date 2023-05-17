@@ -751,6 +751,7 @@
                         item_id: savedIngredient.item_masters_id,
                         menu_item_id: savedIngredient.menu_as_ingredient_id,
                         batching_ingredients_id: savedIngredient.batching_ingredients_id,
+                        new_ingredients_id: savedIngredient.new_ingredients_id,
                     });
 
                     if (savedIngredient.item_masters_id) element.find('.date-updated').html(
@@ -831,6 +832,7 @@
                         cost: savedPackaging.packaging_cost,
                         uom: savedPackaging.uom_id,
                         item_id: savedPackaging.item_masters_id,
+                        new_packagings_id: savedPackaging.new_packagings_id,
                     });
 
                     if (savedPackaging.item_masters_id) element.find('.date-updated').html(
@@ -1211,7 +1213,7 @@
                     ingredientObject.row_id = memberIndex;
                     ingredientObject.ingredient_group = groupIndex;
                     ingredientObject.item_masters_id = ingredientMember.find('.ingredient').attr('item_id');
-                    ingredientObject.new_ingredients_id = ingredientMember.find('.ingredient-name').attr('new_ingredients_id');
+                    ingredientObject.new_ingredients_id = ingredientMember.find('.ingredient-name').attr('new_ingredients_id') || ingredientMember.find('.ingredient').attr('new_ingredients_id');
                     ingredientObject.batching_ingredients_id = ingredientMember.find('.ingredient').attr('batching_ingredients_id');
                     ingredientObject.menu_as_ingredient_id = ingredientMember.find('.ingredient').attr('menu_item_id');
                     ingredientObject.packaging_size = ingredientMember.find('.pack-size').val();
@@ -1246,7 +1248,7 @@
                     packagingObject.row_id = memberIndex;
                     packagingObject.packaging_group = groupIndex;
                     packagingObject.item_masters_id = packagingMember.find('.packaging').attr('item_id');
-                    packagingObject.new_packagings_id = packagingMember.find('.packaging-name').attr('new_packagings_id');
+                    packagingObject.new_packagings_id = packagingMember.find('.packaging-name').attr('new_packagings_id') || packagingMember.find('.packaging').attr('new_packagings_id');
                     packagingObject.packaging_size = packagingMember.find('.pack-size').val();
                     packagingObject.prep_qty = packagingMember.find('.prep-quantity').val();
                     packagingObject.uom_id = packagingMember.find('.uom').val();
