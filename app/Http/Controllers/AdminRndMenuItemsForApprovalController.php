@@ -451,6 +451,10 @@
 				->first()
 				->approval_status;
 
+			if ($status == 'FOR FOOD TASTING') {
+				return $this->mainController->getDetailWithIngredient($id);
+			}
+
 			return $this->mainController->getDetailNoIngredient($id);
 			
 
