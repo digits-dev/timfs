@@ -86,6 +86,8 @@
 	        | 
 	        */
 	        $this->addaction = array();
+			$my_privilege = CRUDBooster::myPrivilegeName();
+
 			$this->addaction[] = [
 				'title'=>'Detail',
 				'url'=>CRUDBooster::mainpath('detail/[id]'),
@@ -93,21 +95,25 @@
 				'color' => ' ',
 			];
 
-			$this->addaction[] = [
-				'title'=>'Edit',
-				'url'=>CRUDBooster::mainpath('edit/[id]'),
-				'icon'=>'fa fa-pencil',
-				'color' => ' ',
-				"showIf"=>"[item_masters_id] == null"
-			];
+			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Purchasing Staff') {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url'=>CRUDBooster::mainpath('edit/[id]'),
+					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"[item_masters_id] == null"
+				];
+			}
 
-			$this->addaction[] = [
-				'title'=>'Delete',
-				'url' => '#[id]',
-				'icon'=>'fa fa-trash',
-				'color' => ' delete-rnd-menu',
-				"showIf"=>"[item_masters_id] == null"
-			];
+			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Chef') {
+				$this->addaction[] = [
+					'title'=>'Delete',
+					'url' => '#[id]',
+					'icon'=>'fa fa-trash',
+					'color' => ' delete-rnd-menu',
+					"showIf"=>"[item_masters_id] == null"
+				];
+			}
 
 
 	        /* 
@@ -283,6 +289,11 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
+
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			if ($my_privilege == 'Purchasing Staff') {
+				$query->where('new_ingredients.item_masters_id', null);
+			}
 	            
 	    }
 

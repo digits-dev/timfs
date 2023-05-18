@@ -102,6 +102,7 @@
 	        | 
 	        */
 	        $this->addaction = array();
+			$my_privilege = CRUDBooster::myPrivilegeName();
 			$this->addaction[] = [
 				'title'=>'Detail',
 				'url'=>CRUDBooster::mainpath('detail/[id]'),
@@ -109,13 +110,15 @@
 				'color' => ' ',
 			];
 
-			$this->addaction[] = [
-				'title'=>'Edit',
-				'url'=>CRUDBooster::mainpath('edit/[id]'),
-				'icon'=>'fa fa-pencil',
-				'color' => ' ',
-				"showIf"=>"[approval_status] != 'CLOSED'"
-			];
+			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Marketing Approver') {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url'=>CRUDBooster::mainpath('edit/[id]'),
+					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"[approval_status] != 'CLOSED'"
+				];
+			}
 
 	        /* 
 	        | ---------------------------------------------------------------------- 

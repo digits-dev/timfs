@@ -106,14 +106,46 @@
 				'icon'=>'fa fa-eye',
 				'color' => ' ',
 			];
+			
+			$privilege = CRUDBooster::myPrivilegeName();
 
-			$this->addaction[] = [
-				'title'=>'Edit',
-				'url'=>CRUDBooster::mainpath('edit/[id]'),
-				'icon'=>'fa fa-pencil',
-				'color' => ' ',
-				"showIf"=>"[approval_status] != 'FOR FOOD TASTING'"
-			];
+			if (CRUDBooster::isSuperAdmin() || $privilege == 'Marketing Encoder') {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url'=>CRUDBooster::mainpath('edit/[id]'),
+					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"
+						[approval_status] == 'FOR PACKAGING' ||
+						[approval_status] == 'FOR MENU CREATION' ||
+						[approval_status] == 'FOR COSTING'
+					"
+				];
+			}
+
+			if (CRUDBooster::isSuperAdmin() || $privilege == 'Marketing Approver') {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url'=>CRUDBooster::mainpath('edit/[id]'),
+					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"
+						[approval_status] == 'FOR APPROVAL (MARKETING)'
+					"
+				];
+			}
+			
+			if (CRUDBooster::isSuperAdmin() || $privilege == 'Accounting Approver') {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url'=>CRUDBooster::mainpath('edit/[id]'),
+					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"
+						[approval_status] == 'FOR APPROVAL (ACCOUNTING)'
+					"
+				];
+			}
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -279,9 +311,23 @@
 				'FOR RELEASE DATE'
 			];
 
+			$upperCasedPrivilege = strtoupper(CRUDBooster::myPrivilegeName());
+
+			$privileges = [
+				'CHEF' => [],
+				'MARKETING ENCODER' => ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR COSTING'],
+				'MARKETING APPROVER' => ['FOR FOOD TASTING', 'FOR APPROVAL (MARKETING)'],
+				'ACCOUNTING APPROVER' => ['FOR APPROVAL (ACCOUNTING)'],
+				'PURCHASING STAFF' => [],
+			];
+
 			$query
 				->addSelect('rnd_menu_approvals.approval_status as approval_status')
 				->whereNotIn('rnd_menu_approvals.approval_status', $not_valid_approval_statuses);
+			
+			if (!CRUDBooster::isSuperAdmin()) {
+				$query->whereIn('rnd_menu_approvals.approval_status', $privileges[$upperCasedPrivilege]);
+			}
 	    }
 
 	    /*
