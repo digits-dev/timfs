@@ -1119,6 +1119,14 @@
 			}
 			//------> END CODE FROM PAT'S CONTROLLER
 
+			$portion_size = DB::table('rnd_menu_items')
+				->where('id', $rnd_menu_items_id)
+				->get()
+				->first()
+				->portion_size;
+
+			$data['portion_size'] = $portion_size;
+
 			$inserted_id = DB::table('menu_items')
 				->insertGetId($data);
 
