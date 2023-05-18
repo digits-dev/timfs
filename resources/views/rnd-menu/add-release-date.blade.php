@@ -86,7 +86,7 @@
     <div class="panel-body">
         <form method="POST" action="{{route('add_release_date')}}" id="form" class="form">
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="" class="control-label">Menu Item Description</label>
                         <div class="input-group">
@@ -127,6 +127,17 @@
                                 <i class="fa fa-sticky-note"></i>
                             </div>
                             <input type="date" class="form-control release_date" name="release_date" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">End Date</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-sticky-note"></i>
+                            </div>
+                            <input type="date" class="form-control end_date" name="end_date">
                         </div>
                     </div>
                 </div>

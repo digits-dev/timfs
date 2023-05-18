@@ -1452,6 +1452,7 @@
 		public function addReleaseDate(Request $request) {
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
 			$release_date = $request->get('release_date');
+			$end_date = $request->get('end_date');
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 			$approval_status = 'CLOSED';
@@ -1460,6 +1461,7 @@
 				->where('id', $rnd_menu_items_id)
 				->update([
 					'release_date' => $release_date,
+					'end_date' => $end_date,
 					'updated_at' => $time_stamp,
 					'updated_by' => $action_by,
 				]);
