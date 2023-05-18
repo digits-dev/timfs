@@ -520,21 +520,10 @@
 		}
 
 		public function addComment(Request $request) {
-			if (!CRUDBooster::isUpdate())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-
 			return $this->mainController->addComment($request);
 		}
 
 		public function deleteComment(Request $request) {
-			if (!CRUDBooster::isUpdate())
-				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
 
 			return $this->mainController->deleteComment($request);
 		}
