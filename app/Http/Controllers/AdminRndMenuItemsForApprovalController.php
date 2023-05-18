@@ -453,6 +453,8 @@
 
 			if ($status == 'FOR FOOD TASTING') {
 				return $this->mainController->getDetailWithIngredient($id);
+			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
+				return $this->mainController->getDetailNoIngredient($id, false);
 			}
 
 			return $this->mainController->getDetailNoIngredient($id);
