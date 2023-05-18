@@ -6,7 +6,6 @@
     "type": "project",
     "require": {
         "php": "^7.3|^8.0",
-        "barryvdh/laravel-debugbar": "^3.7",
         "crocodicstudio/crudbooster": "5.6.*",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
