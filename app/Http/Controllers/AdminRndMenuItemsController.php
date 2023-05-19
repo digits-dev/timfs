@@ -107,7 +107,9 @@
 				'url'=>CRUDBooster::mainpath('edit/[id]'),
 				'icon'=>'fa fa-pencil',
 				'color' => ' ',
-				"showIf"=>"[approval_status] == 'SAVED' || [approval_status] == 'FOR FOOD TASTING'"
+				"showIf"=>"[approval_status] == 'SAVED' || 
+					[approval_status] == 'FOR FOOD TASTING' ||
+					[approval_status] == 'REJECTED'"
 			];
 
 			$this->addaction[] = [
@@ -312,6 +314,7 @@
 			$dark_blue_status = ['FOR FOOD TASTING'];
 			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION', 'FOR RELEASE DATE'];
 			$green_status = ['APPROVED', 'CLOSED'];
+			$red_status = ['REJECTED'];
 			
 			if ($column_index == 1) {
 				if (in_array($column_value, $blue_status)) {
@@ -322,7 +325,9 @@
 					$column_value = "<span class='label label-success'>$column_value</span>";
 				} else if (in_array($column_value, $dark_blue_status)) {
 					$column_value = "<span class='label label-primary'>$column_value</span>";
-				}	
+				} else if (in_array($column_value, $red_status)) {
+					$column_value = "<span class='label label-danger'>$column_value</span>";
+				}
 				
 				if (str_contains($column_value, 'APPROVAL')) $column_value = "<span class='label label-info'>$column_value</span>";
 			}
@@ -805,7 +810,7 @@
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
-					'message' => "✔️ $rnd_menu_description forwarded to Marketing for Menu Creation!"
+					'message' => "✔️ $rnd_menu_description forwarded to Marketing for Packaging!"
 				]);
 		}
 
@@ -1475,47 +1480,50 @@
 					$db_column_by => $action_by,
 					$db_column_at => $time_stamp,
 				]);
-			
-			// getting the foreign key of menu item and rnd menu item
-			$menu_items_id = DB::table('rnd_menu_items')
-				->where('id', $rnd_menu_items_id)
-				->get('menu_items_id')
-				->first()
-				->menu_items_id;
 
-			// getting all the active ingredients of the rnd menu
-			$ingredients = DB::table('rnd_menu_ingredients_details')
-				->where('rnd_menu_items_id', $rnd_menu_items_id)
-				->where('status', 'ACTIVE')
-				->get()
-				->toArray();
-			
-			// preparing every ingredient to be copied as
-			// ingredient of the menu item
-			foreach ($ingredients as $index => $ingredient) {
-				$ingredient = (array) $ingredient;
-				unset(
-					$ingredient['id'],
-					$ingredient['rnd_menu_items_id'],
-					$ingredient['item_masters_temp_id'],
-					$ingredient['deleted_at'],
-				);
-
-				$ingredient['menu_items_id'] = $menu_items_id;
-				$ingredients[$index] = $ingredient;
+			if ($action == 'approve') {
+				// getting the foreign key of menu item and rnd menu item
+				$menu_items_id = DB::table('rnd_menu_items')
+					->where('id', $rnd_menu_items_id)
+					->get('menu_items_id')
+					->first()
+					->menu_items_id;
+	
+				// getting all the active ingredients of the rnd menu
+				$ingredients = DB::table('rnd_menu_ingredients_details')
+					->where('rnd_menu_items_id', $rnd_menu_items_id)
+					->where('status', 'ACTIVE')
+					->get()
+					->toArray();
+				
+				// preparing every ingredient to be copied as
+				// ingredient of the menu item
+				foreach ($ingredients as $index => $ingredient) {
+					$ingredient = (array) $ingredient;
+					unset(
+						$ingredient['id'],
+						$ingredient['rnd_menu_items_id'],
+						$ingredient['item_masters_temp_id'],
+						$ingredient['deleted_at'],
+					);
+	
+					$ingredient['menu_items_id'] = $menu_items_id;
+					$ingredients[$index] = $ingredient;
+				}
+	
+				DB::table('menu_ingredients_details')
+					->insert($ingredients);
+	
+				DB::table('menu_items')
+					->leftJoin('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
+					->where('menu_items.id', $menu_items_id)
+					->update([
+						'menu_items.ingredient_total_cost' => DB::raw('menu_computed_food_cost.computed_ingredient_total_cost'),
+						'menu_items.food_cost' => DB::raw('menu_computed_food_cost.computed_food_cost'),
+						'menu_items.food_cost_percentage' => DB::raw('menu_computed_food_cost.computed_food_cost_percentage')
+					]);
 			}
-
-			DB::table('menu_ingredients_details')
-				->insert($ingredients);
-
-			DB::table('menu_items')
-				->leftJoin('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
-				->where('menu_items.id', $menu_items_id)
-				->update([
-					'menu_items.ingredient_total_cost' => DB::raw('menu_computed_food_cost.computed_ingredient_total_cost'),
-					'menu_items.food_cost' => DB::raw('menu_computed_food_cost.computed_food_cost'),
-					'menu_items.food_cost_percentage' => DB::raw('menu_computed_food_cost.computed_food_cost_percentage')
-				]);
+			
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
