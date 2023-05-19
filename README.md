@@ -3,11 +3,9 @@
 ## ✅ TODOS:
 
 - [x] Show the SRP of the menu on the front end
-- [x] Add new column `packaging_uom` in item_masters - should not be included on import QB template // Already exists (`packagings_id`)
 - [x] Add 'Recipe' text
 - [x] Change 'Ingredient SRP' to 'Ingredient Cost'
 - [x] AutoFill the Ingredient UOM and Ingredient Cost
-- [x] Implement the conversion // Not necessary because of the `packagings_id`
 - [x] Implement cost vs. srp percentage
 - [x] Implement option to add substitute ingredient
 - [x] Add new column `ingredient_cost` in item_masters
@@ -115,9 +113,12 @@
     - [x] Implement update to chef's ingredient when item is created
     - [x] Implement update to marketing's packaging when item is created
   - [x] Create page for the approval of accounting
+
     - [x] Restrict accounting to approve until all items have codes
     - [x] Change the approval status after approval
-    ***
+
+  ***
+
   - [x] Add **Food Tasting** button in chef dashboard
   - Create modules for new item
     - [x] New ingredients
@@ -146,6 +147,12 @@
   - [x] Add page for marketing (Adding release date for uploading to POS)
   - [x] Change the color to red of input if there are items with no codes
 
+  ***
+
+  - [x] Show ingredients to marketing approver during food tasting and approval
+  - [x] Add release date (required)
+  - [x] Add end date (optional)
+
 - ### 🟰 RND Menu Costing Formula
 
   |       |           Particulars           | Value / Input by / Formula | Default Value |         Input Type         |
@@ -166,220 +173,26 @@
   | **n** |          % total cost           |          `l + m`           |               |        auto compute        |
 
 - ### 📅 Tables
-
-  - [ ] `rnd_menu_items`
-
-    - `id`
-    - `rnd_menu_description`
-    - `rnd_code`
-    - `rnd_tasteless_code`
-    - `portion_size`
-    - `rnd_menu_srp`
-    - `rnd_menu_srp`
-    - `status`
-
-  - [ ] `rnd_menu_ingredients_details`
-
-    - `id`
-    - `rnd_menu_items_id`
-    - `item_masters_id`
-    - `menu_as_ingredient_id`
-    - `ingredient_name`
-    - `row_id`
-    - `ingredient_group`
-    - `is_primary`
-    - `is_selected`
-    - `is_primary`
-    - `is_existing`
-    - `status`
-    - `packaging_size`
-    - `prep-qty`
-    - `qty`
-    - `uom_id`
-    - `menu_ingredients_preparations_id`
-    - `yield`
-    - `ttp`
-    - `cost`
-
-  - [ ] `rnd_menu_ingredients_auto_compute`
-
-    ```sql
-    CREATE VIEW rnd_menu_ingredients_auto_compute AS
-        SELECT
-            rnd_menu_ingredients_details.id,
-            rnd_menu_ingredients_details.rnd_menu_items_id,
-            rnd_menu_ingredients_details.item_masters_id,
-            rnd_menu_ingredients_details.menu_as_ingredient_id,
-            item_masters.full_item_description,
-            menu_items.menu_item_description,
-            rnd_menu_ingredients_details.ingredient_name,
-            rnd_menu_ingredients_details.ingredient_group,
-            rnd_menu_ingredients_details.row_id,
-            rnd_menu_ingredients_details.is_existing,
-            rnd_menu_ingredients_details.is_primary,
-            rnd_menu_ingredients_details.is_selected,
-            rnd_menu_ingredients_details.prep_qty,
-            rnd_menu_ingredients_details.uom_id,
-            uoms.uom_description,
-            rnd_menu_ingredients_details.menu_ingredients_preparations_id,
-            packagings.packaging_description,
-            rnd_menu_ingredients_details.yield,
-            rnd_menu_ingredients_details.status,
-            menu_items.food_cost AS food_cost,
-            ROUND(
-                rnd_menu_ingredients_details.yield / 100,
-                4
-            ) as converted_yield,
-            1 as uom_qty,
-            CASE
-                WHEN rnd_menu_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
-                WHEN rnd_menu_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
-                ELSE rnd_menu_ingredients_details.ttp
-            END as ttp,
-            CASE
-                WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
-                WHEN rnd_menu_ingredients_details.packaging_size IS NOT NULL THEN rnd_menu_ingredients_details.packaging_size
-                ELSE 1
-            END as packaging_size,
-            ROUND(
-                prep_qty * (
-                    1 + (
-                        1 - ROUND(
-                            rnd_menu_ingredients_details.yield / 100,
-                            4
-                        )
-                    )
-                ),
-                4
-            ) as ingredient_qty,
-            ROUND(
-                1 / (
-                    CASE
-                        WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
-                        WHEN rnd_menu_ingredients_details.packaging_size IS NOT NULL THEN rnd_menu_ingredients_details.packaging_size
-                        ELSE 1
-                    END
-                ) * prep_qty * (
-                    1 + (
-                        1 - ROUND(
-                            rnd_menu_ingredients_details.yield / 100,
-                            4
-                        )
-                    )
-                ),
-                4
-            ) as modifier,
-            ROUND(
-                ROUND(
-                    1 / (
-                        CASE
-                            WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
-                            WHEN rnd_menu_ingredients_details.packaging_size IS NOT NULL THEN rnd_menu_ingredients_details.packaging_size
-                            ELSE 1
-                        END
-                    ) * prep_qty * (
-                        1 + (
-                            1 - ROUND(
-                                rnd_menu_ingredients_details.yield / 100,
-                                4
-                            )
-                        )
-                    ),
-                    4
-                ) * CASE
-                    WHEN rnd_menu_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
-                    WHEN rnd_menu_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
-                    ELSE rnd_menu_ingredients_details.ttp
-                END,
-                4
-            ) as cost
-        FROM
-            rnd_menu_ingredients_details
-            LEFT JOIN item_masters ON item_masters.id = rnd_menu_ingredients_details.item_masters_id
-            LEFT JOIN menu_items ON menu_items.id = rnd_menu_ingredients_details.menu_as_ingredient_id
-            LEFT JOIN uoms ON rnd_menu_ingredients_details.uom_id = uoms.id
-            LEFT JOIN packagings ON packagings.id = (
-                rnd_menu_ingredients_details.uom_id
-            )
-    ;
-
-    ```
-
-  - [ ] `rnd_menu_computed_food_cost`
-
-    ```sql
-     CREATE VIEW rnd_menu_computed_food_cost AS
-        SELECT
-            rnd_menu_items.id,
-            rnd_menu_items.rnd_menu_description,
-            rnd_menu_items.status,
-            rnd_menu_items.portion_size,
-            ROUND(SUM(subquery.cost), 4) as computed_ingredient_total_cost,
-            ROUND(
-                ROUND(SUM(subquery.cost), 4) / rnd_menu_items.portion_size,
-                4
-            ) AS computed_food_cost,
-            ROUND(
-                ROUND(
-                    ROUND(SUM(subquery.cost), 4) / rnd_menu_items.portion_size,
-                    4
-                ) / rnd_menu_items.rnd_menu_srp * 100,
-                2
-            ) AS computed_food_cost_percentage
-        FROM rnd_menu_items
-            JOIN (
-                SELECT
-                    mi.id AS rnd_menu_items_id,
-                    ig.ingredient_group,
-                    SUM(COALESCE(sic.cost, pic.cost)) AS cost
-                FROM rnd_menu_items mi
-                    JOIN (
-                        SELECT
-                            rnd_menu_items_id,
-                            ingredient_group
-                        FROM
-                            rnd_menu_ingredients_auto_compute
-                        GROUP BY
-                            rnd_menu_items_id,
-                            ingredient_group
-                    ) ig ON mi.id = ig.rnd_menu_items_id
-                    JOIN rnd_menu_ingredients_auto_compute pic ON mi.id = pic.rnd_menu_items_id
-                    AND pic.ingredient_group = ig.ingredient_group
-                    AND pic.is_primary = 'TRUE'
-                    AND pic.status = 'ACTIVE'
-                    LEFT JOIN (
-                        SELECT
-                            rnd_menu_items_id,
-                            ingredient_group,
-                            cost
-                        FROM
-                            rnd_menu_ingredients_auto_compute
-                        WHERE
-                            is_selected = 'TRUE'
-                            AND rnd_menu_ingredients_auto_compute.status = 'ACTIVE'
-                    ) sic ON mi.id = sic.rnd_menu_items_id
-                    AND sic.ingredient_group = ig.ingredient_group
-                GROUP BY
-                    mi.id,
-                    ig.ingredient_group
-            ) subquery ON subquery.rnd_menu_items_id = rnd_menu_items.id
-        GROUP BY (subquery.rnd_menu_items_id)
-    ;
-    ```
-
-  - [ ] `rnd_menu_approvals`
-    - `id`
-    - `rnd_menu_approval_status`
-    - `rnd_menu_items_id`
-    - `published_by`
-    - `published_at`
-    - `marketing_approved_by`
-    - `marketing_approved_at`
-    - `purchasing_approved_by`
-    - `purchasing_approved_at`
-    - `accounting_approved_by`
-    - `accounting_approved_at`
-
+  - `rnd_menu_items`
+  - `rnd_meu_ingredients_details`
+  - `rnd_menu_packagings_details`
+  - `rnd_meu_approvals`
+  - `rnd_menu_comments`
+  - `batching_ingredients`
+  - `batching_ingredients_details`
+  - `new_ingredients`
+  - `new_packagings`
+  - `new_items_comments`
+- ### 👁️ SQL Views
+  - `batching_ingredients_auto_compute`
+  - `	batching_ingredients_computed_food_cost`
+  - `	menu_computed_food_cost`
+  - `	menu_ingredients_auto_compute`
+  - `	rnd_menu_computed_food_cost`
+  - `	rnd_menu_computed_packaging_cost`
+  - `	rnd_menu_costing`
+  - `	rnd_menu_ingredients_auto_compute`
+  - `	rnd_menu_packagings_auto_compute`
 - ### 🔄️ RND Workflow
 
   - #### 🧑‍🍳 Chef
@@ -387,31 +200,37 @@
     - create rnd menu item
     - add / save ingredients
     - add / save packagings
-    - new ingredients and packagings will be forwarded to purchasing for item creation
+    - add new ingredients to **New Ingredients** Module
+    - create batching ingredients in **Batching Ingredients** Module
     - edit the rnd menu if they wish to
     - submit the rnd menu to next step (**publish**)
 
   - #### 💹 Marketing
 
     - edit and finalize the packagings that chef inputted
+    - add new packagings to **New Packagings** Module
     - view the food cost value only
     - individual ingredients are hidden
-    - create the menu
+    - create / udpate the menu
     - add the costing of the menu
 
   - #### 👍 Marketing Approver
 
-    - can see details about the menu except the ingredients
+    - can talk to chef via comment section during food tasting
+    - can see ingredients
     - can approve or reject the rnd menu item
+    - should add the release and end date after accounting approval
 
   - #### 💵 Purchasing (FOR ITEM CREATION) -> different module
 
     - should see all new items to be created
     - should not be able to see which menu the items are used
     - should create items in IMFS for new ingredients / packagings
+    - should tag all new ingredients / packagings
+    - after tagging, new ingredients and packagings should be updated
 
   - #### 🧾 Accounting
-    - same view as marketing
+    - should not see the ingredients
     - approve or reject
     - should not be able to approve until all ingredients and packagings are in IMFS
 
