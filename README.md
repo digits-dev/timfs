@@ -185,14 +185,14 @@
   - `new_items_comments`
 - ### 👁️ SQL Views
   - `batching_ingredients_auto_compute`
-  - `	batching_ingredients_computed_food_cost`
-  - `	menu_computed_food_cost`
-  - `	menu_ingredients_auto_compute`
-  - `	rnd_menu_computed_food_cost`
-  - `	rnd_menu_computed_packaging_cost`
-  - `	rnd_menu_costing`
-  - `	rnd_menu_ingredients_auto_compute`
-  - `	rnd_menu_packagings_auto_compute`
+  - `batching_ingredients_computed_food_cost`
+  - `menu_computed_food_cost`
+  - `menu_ingredients_auto_compute`
+  - `rnd_menu_computed_food_cost`
+  - `rnd_menu_computed_packaging_cost`
+  - `rnd_menu_costing`
+  - `rnd_menu_ingredients_auto_compute`
+  - `rnd_menu_packagings_auto_compute`
 - ### 🔄️ RND Workflow
 
   - #### 🧑‍🍳 Chef
