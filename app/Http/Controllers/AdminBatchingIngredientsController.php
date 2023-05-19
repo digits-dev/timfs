@@ -33,7 +33,7 @@
 			$this->col[] = ["label"=>"BI Code","name"=>"bi_code"];
 			$this->col[] = ["label"=>"Ingredient Descrition","name"=>"ingredient_description"];
 			$this->col[] = ["label"=>"Portion Size","name"=>"portion_size"];
-			$this->col[] = ["label"=>"Food Cost","name"=>"id","join"=>"rnd_menu_computed_food_cost,computed_food_cost","join_id"=>"id"];
+			$this->col[] = ["label"=>"Food Cost","name"=>"id","join"=>"batching_ingredients_computed_food_cost,food_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
