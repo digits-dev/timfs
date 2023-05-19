@@ -458,8 +458,7 @@ $('#menu_type_select1').select2({
                         cancelButtonText: 'Not now',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            return 
-                            location.href = "{{ CRUDBooster::mainPath() }}" + '/edit/' + "{{ $row->id }}";
+                            location.href = "{{ CRUDBooster::mainPath() }}" + '/edit/' + "{{ $rnd_menu_items_id }}";
                         } else {
                             location.href = "{{ CRUDBooster::mainPath() }}";
                         }
