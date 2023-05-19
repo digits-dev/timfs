@@ -22,6 +22,7 @@ class CreateNewIngredientsTable extends Migration
             $table->integer('uoms_id')->length(10)->unsigned()->nullable();
             $table->decimal('ttp', 16, 2)->unsigned()->nullable();
             $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE')->nullable();
+            $table->enum('is_taggable', ['TRUE', 'FALSE'])->default('TRUE')->nullable();
             $table->decimal('tagged_by')->length(10)->unsigned()->nullable();
             $table->timestamp('tagged_at')->nullable();
             $table->decimal('created_by')->length(10)->unsigned()->nullable();
@@ -39,6 +40,7 @@ class CreateNewIngredientsTable extends Migration
             $table->integer('uoms_id')->length(10)->unsigned()->nullable();
             $table->decimal('ttp', 16, 2)->unsigned()->nullable();
             $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE')->nullable();
+            $table->enum('is_taggable', ['TRUE', 'FALSE'])->default('TRUE')->nullable();
             $table->decimal('tagged_by')->length(10)->unsigned()->nullable();
             $table->timestamp('tagged_at')->nullable();
             $table->decimal('created_by')->length(10)->unsigned()->nullable();
