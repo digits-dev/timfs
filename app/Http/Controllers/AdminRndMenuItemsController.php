@@ -297,6 +297,10 @@
 	        //Your code here
 	        
 			$query->addSelect('rnd_menu_approvals.approval_status');
+
+			if (!CRUDBooster::isSuperAdmin()) {
+				$query->where('rnd_menu_items.created_by', CRUDBooster::myId());
+			}
 	    }
 
 	    /*
