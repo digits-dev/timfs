@@ -460,7 +460,7 @@
         });
 
         $('#save-btn').on('click', function() {
-            const isValid = jQuery.makeArray($('#form input')).every(e => !!$(e).val());
+            const isValid = jQuery.makeArray($('#form input:not(.rnd_tasteless_code)')).every(e => !!$(e).val());
             if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',

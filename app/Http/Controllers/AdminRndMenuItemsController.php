@@ -1091,7 +1091,7 @@
 				->get();
 
 			// Add data to database
-			$data['tasteless_menu_code'] = $tasteless_menu_code+1;
+			// $data['tasteless_menu_code'] = $tasteless_menu_code+1;
 			$data['old_code_1'] = $returnInputs['pos_item_code_1'];
 			$data['old_code_2'] = $returnInputs['pos_item_code_2'];
 			$data['old_code_3'] = $returnInputs['pos_item_code_3'];
@@ -1371,6 +1371,34 @@
 					$db_column_by => $action_by,
 					$db_column_at => $time_stamp,
 				]);
+
+			if ($action == 'approve') {
+				$promo_id = DB::table('menu_types')
+					->select('id')
+					->where('status', 'ACTIVE')
+					->where('menu_type_description', 'PROMO')->value('id');
+
+				$menu_items = DB::table('rnd_menu_items')
+					->where('rnd_menu_items.id', $rnd_menu_items_id)
+					->select('*')
+					->leftJoin('menu_items', 'menu_items.id', '=', 'rnd_menu_items.menu_items_id')
+					->leftJoin('menu_types', 'menu_types.id', '=', 'menu_items.menu_types_id')
+					->first();
+
+				if ($menu_items->menu_type_description == 'PROMO') {
+					$tasteless_menu_code = (int) DB::table('menu_items')->where('tasteless_menu_code','like',"5%")
+						->select('tasteless_menu_code')
+						->max('tasteless_menu_code');
+				} else {
+					$tasteless_menu_code = (int) DB::table('menu_items')->where('tasteless_menu_code','like',"6%")
+						->select('tasteless_menu_code')
+						->max('tasteless_menu_code');
+				}
+
+				DB::table('menu_items')
+					->where('id', $menu_items->menu_items_id)
+					->update(['tasteless_menu_code' => $tasteless_menu_code + 1]);
+			}
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
