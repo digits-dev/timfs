@@ -437,7 +437,9 @@
                 confirmButtonText: 'Yes',
                 returnFocus: false,
             }).then((result) => {
-                $('#submit-release-date').click();
+                if (result.isConfirmed) {
+                    $('#submit-release-date').click();
+                }
             });
         });
     });
