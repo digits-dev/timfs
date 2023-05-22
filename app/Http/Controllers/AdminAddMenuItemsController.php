@@ -64,7 +64,7 @@
 			$this->col[] = ["label"=>"Menu Item Description","name"=>"menu_item_description"];
 			$this->col[] = ["label"=>"Menu Category","name"=>"menu_categories_id","join"=>"menu_categories,category_description"];
 			$this->col[] = ["label"=>"Menu Subcategory","name"=>"menu_subcategories_id","join"=>"menu_subcategories,subcategory_description"];
-			// $this->col[] = ["label"=>"Menu Product Type","name"=>"menu_product_types_id","join"=>"menu_product_types,menu_product_type_description"];
+			$this->col[] = ["label"=>"Menu Product Type","name"=>"menu_product_types_id","join"=>"menu_product_types,menu_product_type_description"];
 			$this->col[] = ["label"=>"Menu Product Type", 'name'=> 'menu_product_types_name'];
 			$this->col[] = ["label"=>"Menu Type","name"=>"menu_types_id","join"=>"menu_types,menu_type_description"];
 			foreach($prices as $price){
@@ -277,6 +277,14 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
+			DB::table('menu_items')
+				->leftJoin('menu_product_types', 'menu_items.menu_product_types_id', '=', 'menu_product_types.id')
+				->where('menu_items.menu_product_types_name', null)
+				->where('menu_items.menu_product_types_id', '!=', null)
+				->update([
+					'menu_items.menu_product_types_name' => DB::raw('menu_product_types.menu_product_type_description')
+				]);
+
 			$query->orderBy('status', 'asc');
 			
 			if (CRUDBooster::myPrivilegeName() == 'Chef') {
@@ -306,31 +314,8 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code 
 
-			if($column_index == '2'){
-
-				$tasteless_menu_code_id = DB::table('menu_items')
-					->where('status', 'ACTIVE')
-					->where('tasteless_menu_code', $column_value)
-					->first();
-		
-				$product_type_name = DB::table('menu_product_types')
-					->where('id', $tasteless_menu_code_id->menu_product_types_id)
-					->select('menu_product_type_description')
-					->value('menu_product_type_description');
-
-				if($tasteless_menu_code_id->menu_product_types_name == null){
-					$update = DB::table('menu_items')
-					->where('tasteless_menu_code', $tasteless_menu_code_id->tasteless_menu_code)
-					->update([
-						'menu_product_types_name' => $product_type_name
-					]);
-				}
-								
-			}
-
-			if($column_index == '18'){
+			if($column_index == '19'){
 
 				if($column_value == 'INACTIVE'){
 					$column_value = '<span class="label label-danger">INACTIVE</span>';
