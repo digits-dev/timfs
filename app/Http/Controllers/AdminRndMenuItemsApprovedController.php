@@ -109,7 +109,7 @@
 				'color' => ' ',
 			];
 
-			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Marketing Approver') {
+			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Marketing Encoder') {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
