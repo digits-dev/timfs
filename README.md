@@ -153,6 +153,24 @@
   - [x] Add release date (required)
   - [x] Add end date (optional)
 
+  ***
+
+  #### For Phase 1
+
+  - [ ] Add new field for New Items
+    - Buy Out
+    - Commisary
+    - Direct
+  - [ ] Add red font-color and background if **Total Cost** is higher than **Ideal Food Cost**
+  - [ ] Tasteless Menu Item Code should be generated after approval of accounting
+  - [ ] In Menu Creation Page, hide POS OLD ITEM CODES and Prices (Dine in, Take Out, Delivery)
+  - [ ] In Menu Creation, make a submaster for the menu item status
+  - [ ] Add Archive button to Chef's RND Menu Dashboard
+  - [ ] For approvers (Marketing & Accoounting), add new button
+    - Return to Chef
+    - Return to Marketing | status: (FOR PACKAGING)
+  - [ ] Tagging of User Account to Concepts
+
 - ### 🟰 RND Menu Costing Formula
 
   |       |           Particulars           | Value / Input by / Formula | Default Value |         Input Type         |
