@@ -162,7 +162,7 @@
     - Commisary
     - Direct
   - [x] Add red font-color and background if **Total Cost** is higher than **Ideal Food Cost**
-  - [ ] Tasteless Menu Item Code should be generated after approval of accounting
+  - [x] Tasteless Menu Item Code should be generated after approval of accounting
   - [ ] In Menu Creation Page, hide POS OLD ITEM CODES and Prices (Dine in, Take Out, Delivery)
   - [ ] In Menu Creation, make a submaster for the menu item status
   - [ ] Add Archive button to Chef's RND Menu Dashboard
