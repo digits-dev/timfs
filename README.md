@@ -155,7 +155,7 @@
 
   ***
 
-  #### For Phase 1
+  - #### For Phase 1
 
   - [ ] Add new field for New Items
     - Buy Out
@@ -170,6 +170,29 @@
     - Return to Chef
     - Return to Marketing | status: (FOR PACKAGING)
   - [ ] Tagging of User Account to Concepts
+
+- ### 🐬 SQL DB Migration: Order of files that need to be migrated
+
+  - ⚠️ **Important:** It is recommended to migrate the files one by one for lesser risk of migration error.
+    - Use command: `php artisan migrate --path=the/relative/path/of/migration/file.php`
+    - If not applicable, or you don't want to migrate them one by one, do these:
+      1. Create a backup copy of migration files of sql views only.
+      2. Delete the migration files for sql views.
+      3. Run `php artisan migrate:status` to check the status of migration files.
+      4. Run `php artisan migrate` to migrate the files without the sql views. You can run `php artisan migrate:status` to check if all are migrated.
+      5. Copy the backup migration files again to db migration folder: `database/migrations`.
+      6. Run `php artisan migrate` once more and it should be good.
+  - ⚠️ **Important:** Make sure that the sql views are the last ones to be migrated to the database as they require some tables to already exist before it can be migrated.
+  - ⚠️ **Important:** Make sure that you follow the order of these sql files when migrating them.
+
+    1. `database/migrations/2023_03_29_170000_edited_create_menu_ingredients_auto_compute_view.php`
+    2. `database/migrations/2023_03_29_180000_create_menu_food_cost_view.php`
+    3. `database/migrations/2023_04_03_094234_create_rnd_menu_ingredients_auto_compute_view.php` (2 views inside: Ingredients / Packagings)
+    4. `database/migrations/2023_04_03_144811_create_rnd_computed_food_cost_view.php`
+    5. `database/migrations/2023_04_19_130328_create_rnd_menu_costing_view.php`
+    6. `database/migrations/2023_05_11_085328_create_batching_ingredients_auto_compute_view.php`
+    7. `database/migrations/2023_05_11_093632_create_batching_ingredients_computed_food_cost_view.php`
+    8. `database/migrations/2023_05_12_115455_update_menu_ingredients_auto_compute_sql_view.php`
 
 - ### 🟰 RND Menu Costing Formula
 
