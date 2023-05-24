@@ -352,14 +352,6 @@
 					}
 				});
 			}
-
-
-	       $query->where(function($sub_query){
-				$create_item_status = ApprovalWorkflowSetting::where('workflow_number', 1)->where('action_type', 'Create')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
-				
-				$sub_query->where('menu_items.approval_status',	$create_item_status);
-				
-			});
 	    }
 
 	    /*

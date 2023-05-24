@@ -157,7 +157,7 @@
 
   - #### For Phase 1
 
-  - [ ] Add new field for New Items
+  - [ ] Add new field for New Items: Item Type
     - Buy Out
     - Commisary
     - Direct
