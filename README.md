@@ -161,7 +161,7 @@
     - Buy Out
     - Commisary
     - Direct
-  - [ ] Add red font-color and background if **Total Cost** is higher than **Ideal Food Cost**
+  - [x] Add red font-color and background if **Total Cost** is higher than **Ideal Food Cost**
   - [ ] Tasteless Menu Item Code should be generated after approval of accounting
   - [ ] In Menu Creation Page, hide POS OLD ITEM CODES and Prices (Dine in, Take Out, Delivery)
   - [ ] In Menu Creation, make a submaster for the menu item status

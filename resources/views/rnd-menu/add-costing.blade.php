@@ -407,6 +407,24 @@
             $('.cost-packaging-from-final-srp').val(costPackagingFromFinalSrp);
             $('.food-cost-from-final-srp').val(foodCostFromFinalSrp);
             $('.total-cost').val(totalCost);
+
+            formatTotalCost();
+        }
+
+        function formatTotalCost() {
+            const totalCost = $('.total-cost').val();
+            const idealFoodCost = $('.ideal-food-cost').val();
+            if (parseFloat(totalCost) > parseFloat(idealFoodCost)) {
+                $('.total-cost').css({
+                    color: 'red',
+                    border: '2px solid red',
+                });
+            } else {
+                $('.total-cost').css({
+                    color: 'unset',
+                    border: 'unset',
+                });
+            }
         }
 
         function submitForm() {
