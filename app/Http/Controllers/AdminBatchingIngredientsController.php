@@ -18,9 +18,9 @@
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
 			$this->button_add = true;
-			$this->button_edit = true;
-			$this->button_delete = true;
-			$this->button_detail = true;
+			$this->button_edit = false;
+			$this->button_delete = false;
+			$this->button_detail = false;
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
@@ -80,7 +80,24 @@
 	        | 
 	        */
 	        $this->addaction = array();
+			$this->addaction = array();
+			
+			$my_id = CRUDBooster::myId();
+			$is_admin = CRUDBooster::isSuperAdmin();
+			$this->addaction[] = [
+				'title'=>'Detail',
+				'url'=>CRUDBooster::mainpath('detail/[id]'),
+				'icon'=>'fa fa-eye',
+				'color' => ' ',
+			];
 
+			$this->addaction[] = [
+				'title'=>'Edit',
+				'url'=>CRUDBooster::mainpath('edit/[id]'),
+				'icon'=>'fa fa-pencil',
+				'color' => ' ',
+				"showIf"=>"[created_by] == $my_id || $is_admin",
+			];
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
