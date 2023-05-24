@@ -165,7 +165,7 @@
   - [x] Tasteless Menu Item Code should be generated after approval of accounting
   - [ ] In Menu Creation Page, hide POS OLD ITEM CODES and Prices (Dine in, Take Out, Delivery)
   - [ ] In Menu Creation, make a submaster for the menu item status
-  - [ ] Add Archive button to Chef's RND Menu Dashboard
+  - [x] Add Archive button to Chef's RND Menu Dashboard
   - [ ] For approvers (Marketing & Accoounting), add new button
     - Return to Chef
     - Return to Marketing | status: (FOR PACKAGING)

@@ -15,3 +15,12 @@
 .swal2-popup, .swal2-modal, .swal2-icon-warning .swal2-show {
     font-size: 1.6rem !important;
 }
+
+.btn.btn-purple {
+    color: #fff;
+    background-color: #7e57c2;
+}
+
+.btn.btn-purple:hover {
+    background-color: #6e42bb;
+}

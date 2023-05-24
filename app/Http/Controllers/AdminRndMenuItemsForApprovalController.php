@@ -306,7 +306,8 @@
 				'REJECTED', 
 				'APPROVED', 
 				'CLOSED', 
-				'FOR RELEASE DATE'
+				'FOR RELEASE DATE',
+				'ARCHIVED'
 			];
 
 			$upperCasedPrivilege = strtoupper(CRUDBooster::myPrivilegeName());

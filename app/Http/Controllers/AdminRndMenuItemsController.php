@@ -109,7 +109,8 @@
 				'color' => ' ',
 				"showIf"=>"[approval_status] == 'SAVED' || 
 					[approval_status] == 'FOR FOOD TASTING' ||
-					[approval_status] == 'REJECTED'"
+					[approval_status] == 'ARCHIVED' ||
+					[approval_status] == 'REJECTED'",
 			];
 
 			$this->addaction[] = [
@@ -117,7 +118,10 @@
 				'url' => '#[id]',
 				'icon'=>'fa fa-trash',
 				'color' => ' delete-rnd-menu',
-				"showIf"=>"[approval_status] == 'SAVED' || [approval_status] == 'FOR FOOD TASTING'"
+				"showIf"=>"[approval_status] == 'SAVED' || 
+					[approval_status] == 'FOR FOOD TASTING' ||
+					[approval_status] == 'ARCHIVED' ||
+					[approval_status] == 'REJECTED'",
 			];
 
 	        /* 
@@ -296,7 +300,9 @@
 	    public function hook_query_index(&$query) {
 	        //Your code here
 	        
-			$query->addSelect('rnd_menu_approvals.approval_status');
+			$query
+				->addSelect('rnd_menu_approvals.approval_status')
+				->orderBy(DB::raw("rnd_menu_approvals.approval_status = 'ARCHIVED'"));
 
 			if (!CRUDBooster::isSuperAdmin()) {
 				$query->where('rnd_menu_items.created_by', CRUDBooster::myId());
@@ -319,6 +325,7 @@
 			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION', 'FOR RELEASE DATE'];
 			$green_status = ['APPROVED', 'CLOSED'];
 			$red_status = ['REJECTED'];
+			$purple_status = ['ARCHIVED'];
 			
 			if ($column_index == 1) {
 				if (in_array($column_value, $blue_status)) {
@@ -331,6 +338,8 @@
 					$column_value = "<span class='label label-primary'>$column_value</span>";
 				} else if (in_array($column_value, $red_status)) {
 					$column_value = "<span class='label label-danger'>$column_value</span>";
+				} else if (in_array($column_value, $purple_status)) {
+					$column_value = "<span class='label label-purple'>$column_value</span>";
 				}
 				
 				if (str_contains($column_value, 'APPROVAL')) $column_value = "<span class='label label-info'>$column_value</span>";
@@ -815,6 +824,29 @@
 				->with([
 					'message_type' => 'success',
 					'message' => "✔️ $rnd_menu_description forwarded to Marketing for Packaging!"
+				]);
+		}
+
+		public function archiveRNDMenu(Request $request) {
+			$rnd_menu_approval_status = 'ARCHIVED';
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$rnd_menu_description = $request->get('rnd_menu_description');
+			$rnd_menu_items_id = self::editRNDMenu($request, 'archive');
+
+			DB::table('rnd_menu_approvals')
+				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
+					'rnd_menu_items_id' => $rnd_menu_items_id,
+					'approval_status' => $rnd_menu_approval_status,
+					'published_by' => $action_by,
+					'published_at' => $time_stamp,
+					'updated_at' => $time_stamp,
+				]);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "✔️ $rnd_menu_description added to archived items!"
 				]);
 		}
 

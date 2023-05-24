@@ -4,6 +4,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
 <link rel="stylesheet" href="{{asset('css/edit-rnd-menu.css')}}">
+<link rel="stylesheet" href="{{asset('css/custom.css')}}">
 @endpush
 @extends('crudbooster::admin_template')
 @section('content')
@@ -657,6 +658,9 @@
 		<button class="btn btn-success pull-right" id="publish-btn"><i class="fa fa-upload" ></i> Publish</button>
 		<button class="btn btn-warning pull-right" id="food-tasting-btn" style="margin-right: 10px;" {{$approval_status == 'FOR FOOD TASTING' ? 'disabled' : ''}}><i class="fa fa-spoon"></i> Food Tasting</button>
 		<button class="btn btn-primary pull-right" id="save-btn" style="margin-right: 10px;"><i class="fa fa-save" ></i> Save</button>
+        @if ($item)
+		<button class="btn btn-purple pull-right" id="archive-btn" style="margin-right: 10px;" {{$approval_status == 'ARCHIVED' ? 'disabled' : ''}}><i class="fa fa-eye-slash" ></i> Archive</button>
+        @endif
     </div>
 </div>
 
@@ -1275,7 +1279,9 @@
                     "{{ route('edit_rnd_menu') }}" : 
                     buttonClicked == 'publish' ?
                     "{{ route('publish_rnd_menu') }}" :
-                    "{{ route('food_tasting_rnd_menu') }}"
+                    buttonClicked == 'food-tasting' ?
+                    "{{ route('food_tasting_rnd_menu') }}":
+                    "{{ route('archive_rnd_menu') }}"
                 )
                 .css('display', 'none');
 
@@ -1425,7 +1431,23 @@
             } else {
                 $.fn.formatInvalidInputs(isValid);
             }
-        })
+        });
+
+        $(document).on('click', '#archive-btn', function() {
+            Swal.fire({
+                title: 'Do you want to archive this item?',
+                html: '⚠️  Doing so will push  this item to the bottom of the list.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.fn.submitForm('archive');
+                }    
+            });
+        });
 
         $(document).on('click', '.list-item', function(event) {
             const item = $(this);

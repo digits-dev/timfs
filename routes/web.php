@@ -107,6 +107,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/rnd_menu_items/edit', [AdminRndMenuItemsController::class, 'editRNDMenu'])->name('edit_rnd_menu');
     Route::post('/admin/rnd_menu_items/publish', [AdminRndMenuItemsController::class, 'publishRNDMenu'])->name('publish_rnd_menu');
     Route::post('/admin/rnd_menu_items/food-tasting', [AdminRndMenuItemsController::class, 'foodTastingRNDMenu'])->name('food_tasting_rnd_menu');
+    Route::post('/admin/rnd_menu_items/archive', [AdminRndMenuItemsController::class, 'archiveRNDMenu'])->name('archive_rnd_menu');
     Route::get('/admin/rnd_menu_items/delete-rnd-menu/{id}', [AdminRndMenuItemsController::class, 'deleteRndMenuItem']);
     Route::post('/admin/rnd_menu_items/search-ingredients/', [AdminRndMenuItemsController::class, 'searchAllIngredients'])->name('search_all_ingredients');
     Route::post('/admin/for_approval_rnd_menu/edit/add-menu-item', [AdminRndMenuItemsForApprovalController::class, 'addNewMenu'])->name('add_new_menu');
