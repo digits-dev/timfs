@@ -194,6 +194,19 @@
     7. `database/migrations/2023_05_11_093632_create_batching_ingredients_computed_food_cost_view.php`
     8. `database/migrations/2023_05_12_115455_update_menu_ingredients_auto_compute_sql_view.php`
 
+- ### 🔵 List of Modules Need to be Added to Production
+
+  - Menu Items
+    - New Ingredients
+    - New Packagings
+    - Batching Ingredients
+  - RND Menu Masterfile
+    - RND Menu Items
+    - RND Menu (For Approval)
+    - RND Menu (Approved)
+  - Menu Submaster Modules
+    - Ingredients Preparations
+
 - ### 🟰 RND Menu Costing Formula
 
   |       |           Particulars           | Value / Input by / Formula | Default Value |         Input Type         |
