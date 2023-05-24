@@ -110,7 +110,8 @@
 				"showIf"=>"[approval_status] == 'SAVED' || 
 					[approval_status] == 'FOR FOOD TASTING' ||
 					[approval_status] == 'ARCHIVED' ||
-					[approval_status] == 'REJECTED'",
+					[approval_status] == 'REJECTED' ||
+					[approval_status] == 'RETURNED'",
 			];
 
 			$this->addaction[] = [
@@ -121,7 +122,8 @@
 				"showIf"=>"[approval_status] == 'SAVED' || 
 					[approval_status] == 'FOR FOOD TASTING' ||
 					[approval_status] == 'ARCHIVED' ||
-					[approval_status] == 'REJECTED'",
+					[approval_status] == 'REJECTED' ||
+					[approval_status] == 'RETURNED'",
 			];
 
 	        /* 
@@ -321,7 +323,7 @@
 			if (is_numeric($column_value)) $column_value = (float) $column_value;
 
 			$blue_status = ['SAVED', 'FOR COSTING'];
-			$dark_blue_status = ['FOR FOOD TASTING'];
+			$dark_blue_status = ['FOR FOOD TASTING', 'RETURNED'];
 			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION', 'FOR RELEASE DATE'];
 			$green_status = ['APPROVED', 'CLOSED'];
 			$red_status = ['REJECTED'];
@@ -1489,6 +1491,7 @@
 		}
 
 		public function approveByAccounting(Request $request) {
+			dd($request->all());
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
 			$action = $request->get('action');
 			$time_stamp = date('Y-m-d H:i:s');
@@ -1689,6 +1692,37 @@
 			$data['page_title'] = "Detail RND Menu Item: $rnd_menu_description";
 
 			return $this->view('rnd-menu/detail-with-ingredients', $data);
+		}
+
+		public function returnRNDMenu(Request $request) {
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$return_to = $request->get('return_to');
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$approval_status = null;
+			$message = null;
+
+			if ($return_to == 'chef') {
+				$approval_status = 'RETURNED';
+				$message = '✔️ Item successfully returned to Chef.';
+			} else {
+				$approval_status = 'FOR PACKAGING';
+				$message = '✔️ Item successfully returned to Marketing.';
+			}
+
+			DB::table('rnd_menu_approvals')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update([
+					'returned_by' => $action_by,
+					'returned_at' => $time_stamp,
+					'approval_status' => $approval_status,
+				]);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => $message,
+				]);
 		}
 
 		function notifyForRejection($id) {

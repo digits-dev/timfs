@@ -35,6 +35,8 @@ class CreateRndMenuApprovalsTable extends Migration
             $table->timestamp('set_release_date_at')->nullable();
             $table->integer('rejected_by')->length(10)->unsigned()->nullable();
             $table->timestamp('rejected_at')->nullable();
+            $table->integer('returned_by')->length(10)->unsigned()->nullable();
+            $table->timestamp('returned_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -307,7 +307,8 @@
 				'APPROVED', 
 				'CLOSED', 
 				'FOR RELEASE DATE',
-				'ARCHIVED'
+				'ARCHIVED',
+				'RETURNED'
 			];
 
 			$upperCasedPrivilege = strtoupper(CRUDBooster::myPrivilegeName());
@@ -551,5 +552,15 @@
 				);
 
 			return $this->mainController->approveByAccounting($request);
+		}
+
+		public function returnRNDMenu(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->returnRNDMenu($request);
 		}
 	}

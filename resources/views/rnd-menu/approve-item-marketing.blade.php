@@ -369,6 +369,8 @@
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
 		<button class="btn btn-success pull-right" _action="approve" id="approve-btn"><i class="fa fa-thumbs-up" ></i> Approve</button>
 		<button class="btn btn-danger pull-right" _action="reject" id="reject-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-down" ></i> Reject</button>
+		<button class="btn btn-warning pull-right return-btn" _return_to="marketing" style="margin-right: 10px;"><i class="fa fa-mail-reply" ></i> Return to Marketing</button>
+		<button class="btn btn-warning pull-right return-btn" _return_to="chef" style="margin-right: 10px;"><i class="fa fa-mail-reply" ></i> Return to Chef</button>
     </div>
 </div>
 
@@ -383,10 +385,10 @@
     $(document).ready(function() {
         $('body').addClass('sidebar-collapse');
 
-        function submitActionOfMarketing(action) {
+        function submitActionOfMarketing({action, returnTo}) {
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
-                .attr('action', "{{route('approve_by_marketing')}}")
+                .attr('action', action == 'return' ? "{{ route('return_rnd_menu') }}" : "{{ route('approve_by_marketing') }}")
                 .hide();
 
             const csrf = $(document.createElement('input'))
@@ -394,14 +396,18 @@
                 .val("{{csrf_token()}}");
 
             const actionInput = $(document.createElement('input'))
-                .attr('name', 'action')
+                .attr('name','action')
                 .val(action);
+
+            const returnToInput = $(document.createElement('input'))
+                .attr('name', 'return_to')
+                .val(returnTo)
 
             const rndMenuItemsId = $(document.createElement('input'))
                 .attr('name', 'rnd_menu_items_id')
                 .val(item.rnd_menu_items_id);
 
-            form.append(csrf, actionInput, rndMenuItemsId);
+            form.append(csrf, actionInput, returnToInput, rndMenuItemsId);
             $('.panel-body').append(form);
             form.submit();
         }
@@ -410,9 +416,11 @@
             const action = $(this).attr('_action');
             Swal.fire({
                 title: `Do you want to ${action} this item?`,
-                html: action == 'approve' 
+                html: (
+                    action == 'approve' 
                     ? `🔵 Doing so will forward this item to <label class="label label-info">ACCOUNTING</label>.`
-                    : `🔴 Doing so will turn the status of this item to <label class="label label-danger">REJECTED</label>.`,
+                    : `🔴 Doing so will turn the status of this item to <label class="label label-danger">REJECTED</label>.`
+                ) + `<br/> ⚠️ You won't be able to revert this.`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -420,7 +428,26 @@
                 confirmButtonText: 'Yes'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    submitActionOfMarketing(action);
+                    submitActionOfMarketing({action});
+                }
+            });
+        });
+
+        $('.return-btn').on('click', function() {
+            const returnTo = $(this).attr('_return_to');
+            const action = 'return';
+            Swal.fire({
+                title: `Do you want to return this item?`,
+                html: `🟠 Doing so will return this item to <label class="label label-warning">${returnTo.toUpperCase()}</label>.` +
+                    `<br/> ⚠️ You won't be able to revert this.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitActionOfMarketing({action, returnTo});
                 }
             });
         });

@@ -391,6 +391,8 @@
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
 		<button class="btn btn-success pull-right {{$no_codes > 0 ? 'disabled' : ''}}" _action="approve" id="approve-btn"><i class="fa fa-thumbs-up"></i> Approve</button>
 		<button class="btn btn-danger pull-right" _action="reject" id="reject-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-down" ></i> Reject</button>
+        <button class="btn btn-warning pull-right return-btn" _return_to="marketing" style="margin-right: 10px;"><i class="fa fa-mail-reply" ></i> Return to Marketing</button>
+		<button class="btn btn-warning pull-right return-btn" _return_to="chef" style="margin-right: 10px;"><i class="fa fa-mail-reply" ></i> Return to Chef</button>
     </div>
 </div>
 
@@ -406,10 +408,10 @@
     $(document).ready(function() {
         $('body').addClass('sidebar-collapse');
 
-        function submitActionOfMarketing(action) {
+        function submitActionOfAccounting({action, returnTo}) {
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
-                .attr('action', "{{route('approve_by_accounting')}}")
+                .attr('action', action == "return" ? " {{ route('return_rnd_menu') }} " : "{{ route('approve_by_accounting') }}")
                 .hide();
 
             const csrf = $(document.createElement('input'))
@@ -420,17 +422,23 @@
                 .attr('name', 'action')
                 .val(action);
 
+            const returnToInput = $(document.createElement('input'))
+                .attr('name', 'return_to')
+                .val(returnTo);
+
             const rndMenuItemsId = $(document.createElement('input'))
                 .attr('name', 'rnd_menu_items_id')
                 .val(item.rnd_menu_items_id);
 
-            form.append(csrf, actionInput, rndMenuItemsId);
+            form.append(csrf, actionInput, returnToInput, rndMenuItemsId);
             $('.panel-body').append(form);
             form.submit();
         }
 
         $('#approve-btn, #reject-btn').on('click', function() {
-            if (noCodes > 0) {
+            const action = $(this).attr('_action');
+
+            if (noCodes > 0 && action == 'approve') {
                 Swal.fire({
                     title: `Oops`,
                     html: `🔴 Please make sure all items used for this menu have item codes.` +
@@ -442,7 +450,6 @@
                 return;
             }
 
-            const action = $(this).attr('_action');
             Swal.fire({
                 title: `Do you want to ${action} this item?`,
                 html: (action == 'approve' 
@@ -456,7 +463,26 @@
                 confirmButtonText: 'Yes'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    submitActionOfMarketing(action);
+                    submitActionOfAccounting({action});
+                }
+            });
+        });
+
+        $('.return-btn').on('click', function() {
+            const returnTo = $(this).attr('_return_to');
+            const action = 'return';
+            Swal.fire({
+                title: `Do you want to return this item?`,
+                html: `🟠 Doing so will return this item to <label class="label label-warning">${returnTo.toUpperCase()}</label>.` +
+                    `<br/> ⚠️ You won't be able to revert this.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitActionOfAccounting({action, returnTo});
                 }
             });
         });
