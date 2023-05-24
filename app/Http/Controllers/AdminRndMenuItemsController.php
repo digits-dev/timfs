@@ -1491,7 +1491,6 @@
 		}
 
 		public function approveByAccounting(Request $request) {
-			dd($request->all());
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
 			$action = $request->get('action');
 			$time_stamp = date('Y-m-d H:i:s');
