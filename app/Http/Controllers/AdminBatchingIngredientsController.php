@@ -363,6 +363,7 @@
 				)
 				->leftJoin('cms_users', 'cms_users.id', 'batching_ingredients.created_by')
 				->leftJoin('batching_ingredients_computed_food_cost', 'batching_ingredients_computed_food_cost.id', '=', 'batching_ingredients.id')
+				->leftJoin('batching_ingredients_prepared_by', 'batching_ingredients_prepared_by.id', '=', 'batching_ingredients.batching_ingredients_prepared_by_id')
 				->get()
 				->first();
 
