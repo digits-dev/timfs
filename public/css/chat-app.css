@@ -108,6 +108,8 @@
   color: #f4f4f4;
   position: relative;
   margin-top: 5px;
+  white-space: pre-line;
+  word-break: break-all;
 }
 
 .message:hover {
@@ -157,4 +159,5 @@
 .type-message {
   width: 100%;
   margin-right: 10px;
+  resize: none;
 }
