@@ -157,10 +157,13 @@
 
   - #### For Phase 1
 
-  - [ ] Add new field for New Items: Item Type
+  - [x] Add new field for New Items: Item Type
     - Buy Out
-    - Commisary
+    - Commissary
     - Direct
+  - [x] Add new field for Batching Ingredient: Prepared By
+    - Commissary
+    - Store
   - [x] Add red font-color and background if **Total Cost** is higher than **Ideal Food Cost**
   - [x] Tasteless Menu Item Code should be generated after approval of accounting
   - [ ] In Menu Creation Page, hide POS OLD ITEM CODES and Prices (Dine in, Take Out, Delivery)
@@ -169,6 +172,7 @@
   - [x] For approvers (Marketing & Accoounting), add new button
     - Return to Chef
     - Return to Marketing | status: (FOR PACKAGING)
+  - [ ] Add a template in new item comment section for details of new item
   - [ ] Tagging of User Account to Concepts
 
 - ### 🐬 SQL DB Migration: Order of files that need to be migrated
