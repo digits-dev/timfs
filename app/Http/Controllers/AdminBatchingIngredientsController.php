@@ -31,6 +31,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"BI Code","name"=>"bi_code"];
+			$this->col[] = ["label"=>"Prepared by","name"=>"batching_ingredients_prepared_by_id","join"=>"batching_ingredients_prepared_by,prepared_by"];
 			$this->col[] = ["label"=>"Ingredient Descrition","name"=>"ingredient_description"];
 			$this->col[] = ["label"=>"Portion Size","name"=>"portion_size"];
 			$this->col[] = ["label"=>"Food Cost","name"=>"id","join"=>"batching_ingredients_computed_food_cost,food_cost","join_id"=>"id"];
@@ -449,6 +450,11 @@
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 
+			$data['prepared_bys'] = DB::table('batching_ingredients_prepared_by')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
 			if ($id) {
 				$data['ingredients'] = DB::table('batching_ingredients_auto_compute')
 					->where('batching_ingredients_id', $id)
@@ -499,6 +505,7 @@
 			$batching_ingredients_id = $request->get('batching_ingredients_id');
 			$ingredient_description = strtoupper($request->get('ingredient_description'));
 			$portion_size = $request->get('portion_size');
+			$batching_ingredients_prepared_by_id = $request->get('batching_ingredients_prepared_by_id');
 			$ingredients = json_decode($request->get('ingredients'));
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
@@ -511,6 +518,7 @@
 				$batching_ingredients_id = DB::table('batching_ingredients')
 					->insertGetId([
 						'ingredient_description' => $ingredient_description,
+						'batching_ingredients_prepared_by_id' => $batching_ingredients_prepared_by_id,
 						'bi_code' => $bi_code,
 						'portion_size' => $portion_size,
 						'created_by' => $action_by,
@@ -522,6 +530,7 @@
 					->where('id', $batching_ingredients_id)
 					->update([
 						'ingredient_description' => $ingredient_description,
+						'batching_ingredients_prepared_by_id' => $batching_ingredients_prepared_by_id,
 						'portion_size' => $portion_size,
 						'updated_at' => $time_stamp,
 						'updated_by' => $action_by

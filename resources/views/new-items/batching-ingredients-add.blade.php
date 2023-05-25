@@ -273,7 +273,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="" class="control-label">Batching Ingredient Item Code</label>
                         <div class="input-group">
@@ -281,6 +281,22 @@
                                 <i class="fa fa-sticky-note"></i>
                             </div>
                             <input value="{{$item ? $item->bi_code : ''}}" type="text" class="form-control bi_code" placeholder="BI-XXXXX" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="" class="control-label"><span class="required-star">*</span> Batching Ingredient Prepared By</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-sticky-note"></i>
+                            </div>
+                            <select class="form-control prepared-by" required>
+                                <option value="" {{!$item->batching_ingredients_prepared_by_id ? 'selected' : ''}} disabled>None selected</option>
+                                @foreach ($prepared_bys as $prepared_by)
+                                <option value="{{ $prepared_by->id }}" {{$item->batching_ingredients_prepared_by_id == $prepared_by->id ? 'selected' : ''}}>{{ $prepared_by->prepared_by }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -528,7 +544,11 @@
             });
 
             $('form input, form select').keyup(function() {
-                $('form input:valid, #form select:valid').css('outline', 'none');
+                $('form input:valid, form select:valid').css('outline', 'none');
+            });
+
+            $('form select').on('change', function() {
+                $('form select:valid').css('outline', 'none');
             });
 
             $('.prep-quantity').keyup(function() {
@@ -827,12 +847,17 @@
                 .attr('name', 'portion_size')
                 .val($('.portion').val());
 
+            const batchingIngredientsPreparedById = $(document.createElement('input'))
+                .attr('name', 'batching_ingredients_prepared_by_id')
+                .val($('.prepared-by').val());
+
             form.append(
                 csrf,
                 ingredientsData,
                 ingrediendDescription,
                 bachingIngredientId,
                 portionData,
+                batchingIngredientsPreparedById,
             );
             $('.panel-body').append(form);
             form.submit();
@@ -848,7 +873,7 @@
 
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
-                $('.portion').val() > 0 && $('.ingredient-description').val();
+                $('.portion').val() > 0 && $('.ingredient-description').val() && $('.prepared-by').val();
 
             const hasIngredient = $('#form-ingredient .ingredient-wrapper, #form-ingredient .new-ingredient-wrapper').length > 0;
             
@@ -865,7 +890,8 @@
                         .ingredient-section input:invalid, 
                         .ingredient-section select:invalid,
                         .packaging-section input:invalid, 
-                        .packaging-section select:invalid
+                        .packaging-section select:invalid,
+                        .prepared-by
                     `).css('outline', '2px solid red');
                     $('.ingredient-section .ingredient:invalid, .packaging-section .packaging:invalid')
                         .parents('.ingredient-entry, .packaging-entry')
