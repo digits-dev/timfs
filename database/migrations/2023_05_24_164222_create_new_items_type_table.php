@@ -20,6 +20,15 @@ class CreateNewItemsTypeTable extends Migration
             $table->integer('created_by')->length(10)->unsigned()->nullable();
             $table->integer('updated_by')->length(10)->unsigned()->nullable();
             $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::table('new_ingredients', function (Blueprint $table) {
+            $table->integer('new_item_types_id')->length(10)->unsigned()->nullable()->after('id');
+        });
+
+        Schema::table('new_packagings', function (Blueprint $table) {
+            $table->integer('new_item_types_id')->length(10)->unsigned()->nullable()->after('id');
         });
     }
 
@@ -30,6 +39,14 @@ class CreateNewItemsTypeTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('new_item_type');
+        Schema::dropIfExists('new_items_types');
+
+        Schema::table('new_ingredients', function (Blueprint $table) {
+            $table->dropColumn('new_item_types_id');
+        });
+
+        Schema::table('new_packagings', function (Blueprint $table) {
+            $table->dropColumn('new_item_types_id');
+        });
     }
 }
