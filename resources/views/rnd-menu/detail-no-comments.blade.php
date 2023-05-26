@@ -85,7 +85,7 @@
     <div class="panel-body">
         <form action="" id="form" class="form">
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="" class="control-label">Menu Item Description</label>
                         <div class="input-group">
@@ -118,6 +118,30 @@
                         </div>
                     </div>
                 </div>
+                @if ($item->release_date)
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">Release Date</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-sticky-note"></i>
+                            </div>
+                            <input value="{{$item->release_date}}" type="text" class="form-control rnd_tasteless_code" placeholder="XXXXXX" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">End Date</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-sticky-note"></i>
+                            </div>
+                            <input value="{{$item->end_date}}" type="text" class="form-control rnd_tasteless_code" placeholder="YYYY-MM-DD" readonly>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
             <hr>
             <h3 class="text-center">RND MENU COSTING</h3>

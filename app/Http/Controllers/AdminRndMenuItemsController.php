@@ -1645,6 +1645,7 @@
 
 			$data['item'] = DB::table('rnd_menu_costing')
 				->where('rnd_menu_items_id', $id)
+				->leftJoin('rnd_menu_items', 'rnd_menu_items.id', '=', 'rnd_menu_costing.rnd_menu_items_id')
 				->first();
 
 			$data['workflow'] = self::getWorkFlowDetails($id);
