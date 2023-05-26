@@ -641,7 +641,7 @@
                 </div>
             </section>
         </form>
-        @if ($approval_status == 'FOR FOOD TASTING')
+        @if ($approval_status == 'FOR FOOD TASTING' || $approval_status == 'RETURNED')
         <div class="row">
             <div class="col-md-6">
                 <hr>

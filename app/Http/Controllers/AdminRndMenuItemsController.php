@@ -1481,6 +1481,8 @@
 				->count();
 
 			$data['no_codes'] = $no_code_ingredients + $no_code_packagings;
+
+			$data['comments_data'] = self::getRNDComments($id);
 			
 			$data['workflow'] = self::getWorkFlowDetails($id);
 

@@ -324,6 +324,15 @@
                     </table>
                 </div>
                 <div class="col-md-6">
+                    <hr>
+                    <h3 class="text-center">COMMENTS</h3>
+                    <div class="chat">
+                        @include('rnd-menu/chat-app', $comments_data)
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
                     <section class="workflow-details">
                         <hr>
                         <h3 class="text-center">WORKFLOW DETAILS</h3>
