@@ -131,7 +131,11 @@
 @extends('crudbooster::admin_template')
 @section('content')
   <!-- Your html goes here -->
-  <p><a title='Return' href='{{ CRUDBooster::mainpath() }}'><i class='fa fa-chevron-circle-left '></i>&nbsp; Back To Add Menu Item</a></p>
+  <p class="noprint">
+    <a title='Return' href="{{ CRUDBooster::mainPath() }}">
+        <i class='fa fa-chevron-circle-left '></i> &nbsp; {{trans("crudbooster.form_back_to_list",['module'=>CRUDBooster::getCurrentModule()->name])}}
+    </a>
+  </p>
   <div class='panel panel-default'>
     <div class='panel-heading'>Add Menu Items</div>
     <div class='panel-body'>
@@ -142,6 +146,7 @@
             @endif
             <div class="add-content">
                 <div class="form-column">
+                    @if (!$item->rnd_menu_items_id) 
                     <fieldset>
                         <legend> POS Old Item Code 1</legend>
                         <input type="text" name="pos_item_code_1" placeholder="Enter pos old item code 1" oninput="this.value = this.value.toUpperCase()">
@@ -158,6 +163,7 @@
                         <legend> POS Old Description</legend>
                         <input type="text" name="pos_item_description" placeholder="Enter pos old item description" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
+                    @endif
                     <fieldset>
                         <legend><span id="required">*</span> Menu Description</legend>
                         <input type="text" name="menu_item_description" value="{{$item->rnd_menu_description ? $item->rnd_menu_description : ''}}" placeholder="Enter menu description" required oninput="this.value = this.value.toUpperCase()">
@@ -225,6 +231,7 @@
                             @endforeach
                         </select> 
                     </fieldset>
+                    @if (!$item->rnd_menu_items_id) 
                     <fieldset>
                         <legend><span id="required">*</span> Price - Dine In</legend>
                         <input type="number" name="price_dine_in" value="{{$item->rnd_menu_srp ? (float) $item->rnd_menu_srp : ''}}" placeholder="Enter price - dine in" required oninput="this.value = this.value.toUpperCase()">
@@ -237,6 +244,7 @@
                         <legend> Price - Take Out</legend>
                         <input type="number" name="price_take_out" placeholder="Leave blank if same as dine in" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>  
+                    @endif
                     <fieldset>
                         <legend><span id="required">*</span> Original Concept</legend>
                         <input type="text" name="original_concept" placeholder="Enter original concept" required oninput="this.value = this.value.toUpperCase()">

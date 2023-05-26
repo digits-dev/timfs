@@ -380,8 +380,8 @@
             $('.packaging-cost').val(parseFloat(item.packaging_cost || 0));
             $('.ideal-food-cost').val(parseFloat(item.ideal_food_cost || 30));
             $('.final-srp-w-vat-dine-in').val(parseFloat(item.final_srp_w_vat_dine_in || 0));
-            $('.final-srp-w-vat-take-out').val(parseFloat(item.final_srp_w_vat_take_out || 0));
-            $('.final-srp-w-vat-delivery').val(parseFloat(item.final_srp_w_vat_delivery || 0));
+            $('.final-srp-w-vat-take-out').val(parseFloat(item.final_srp_w_vat_take_out || item.final_srp_w_vat_dine_in || 0));
+            $('.final-srp-w-vat-delivery').val(parseFloat(item.final_srp_w_vat_delivery || item.final_srp_w_vat_dine_in || 0));
         }
 
         function computeFormula() {

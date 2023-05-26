@@ -1179,7 +1179,6 @@
 				->update([
 					'menu_items_id' => $inserted_id,
 					'rnd_menu_description' => $rnd_menu_description,
-					'rnd_menu_srp' => $rnd_menu_srp,
 					'updated_by' => $action_by,
 					'updated_at' => $time_stamp,
 				]);
