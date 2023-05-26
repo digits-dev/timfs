@@ -129,8 +129,9 @@
                 <div class="form-column">
                     <label> Tasteless Menu Code</label>
                     <fieldset>
-                        <input type="text" name="pos_item_code_1" value="{{ $row->tasteless_menu_code }}" readonly>
+                        <input type="text" name="tasteless_menu_code" value="{{ $row->tasteless_menu_code }}" readonly>
                     </fieldset>
+                    @if (!$rnd_menu_items_id)
                     <label> POS Old Item Code 1</label>
                     <fieldset>
                         <input type="text" name="pos_item_code_1" placeholder="Enter pos old item code 1" value="{{ $row->old_code_1 }}" oninput="this.value = this.value.toUpperCase()">
@@ -147,6 +148,7 @@
                     <fieldset>
                         <input type="text" name="pos_item_description" placeholder="Enter pos old item description" value="{{ $row->pos_old_item_description }}" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
+                    @endif
                     <label><span id="required">*</span> Menu Description</label>
                     <fieldset>
                         <input type="text" name="menu_item_description" placeholder="Enter menu description" required value="{{ $row->menu_item_description }}" oninput="this.value = this.value.toUpperCase()">
@@ -253,6 +255,7 @@
                             @endforeach
                         </select> 
                     </fieldset>
+                    @if (!$rnd_menu_items_id)
                     <label><span id="required">*</span> Price - Dine In</label>
                     <fieldset>
                         <input type="number" name="price_dine_in" placeholder="Enter price - dine in" value="{{ $row->menu_price_dine }}" required oninput="this.value = this.value.toUpperCase()">
@@ -264,7 +267,8 @@
                     <label> Price - Take Out</label>
                     <fieldset>
                         <input type="number" name="price_take_out" placeholder="Leave blank if same as dine in" value="{{ $row->menu_price_take }}">
-                    </fieldset>  
+                    </fieldset> 
+                    @endif 
                     <label><span id="required">*</span> Original Concept</label>
                     <fieldset>
                         <input type="text" name="original_concept" placeholder="Enter original concept" value="{{ $row->original_concept }}" required oninput="this.value = this.value.toUpperCase()">

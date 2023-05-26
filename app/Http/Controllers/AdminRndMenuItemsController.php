@@ -1201,7 +1201,6 @@
 			$approval_status = 'FOR COSTING';
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
-			$rnd_menu_srp = $returnInputs['price_dine_in'];
 			$rnd_menu_description = $returnInputs['menu_item_description'];
 
 
@@ -1212,19 +1211,6 @@
 				->select('menu_segment_column_name')
 				->get();
 			$menu_segments = Arr::pluck($user_menu_segmentations, 'menu_segment_column_name');
-
-			// Price Delivery
-			if($returnInputs['price_delivery'] == null){
-				$price_delivery = $returnInputs['price_dine_in'];
-			}else{
-				$price_delivery = $returnInputs['price_delivery'];
-			}
-
-			if($returnInputs['price_take_out'] == null){
-				$price_take_out = $returnInputs['price_dine_in'];
-			}else{
-				$price_take_out = $returnInputs['price_take_out'];
-			}
 
 			// Choices Group
 			$choices_group = DB::table('menu_choice_groups')
@@ -1248,9 +1234,6 @@
 				}
 			}
 			$data['menu_types_id'] = $returnInputs['menu_type'];
-			$data['menu_price_dine'] = $returnInputs['price_dine_in'];
-			$data['menu_price_dlv'] = $price_delivery;
-			$data['menu_price_take'] = $price_take_out;
 			$data['original_concept'] = $returnInputs['original_concept'];
 			$data['pos_old_item_description'] = $returnInputs['pos_item_description'];
 			$data['menu_product_types_name'] = $returnInputs['product_type'];
@@ -1289,7 +1272,6 @@
 				->where('id', $rnd_menu_items_id)
 				->update([
 					'rnd_menu_description' => $rnd_menu_description,
-					'rnd_menu_srp' => $rnd_menu_srp,
 					'updated_by' => $action_by,
 					'updated_at' => $time_stamp,
 				]);
