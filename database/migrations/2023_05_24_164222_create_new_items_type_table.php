@@ -25,10 +25,12 @@ class CreateNewItemsTypeTable extends Migration
 
         Schema::table('new_ingredients', function (Blueprint $table) {
             $table->integer('new_item_types_id')->length(10)->unsigned()->nullable()->after('id');
+            $table->text('comment')->nullable()->after('status');
         });
 
         Schema::table('new_packagings', function (Blueprint $table) {
             $table->integer('new_item_types_id')->length(10)->unsigned()->nullable()->after('id');
+            $table->text('comment')->nullable()->after('status');
         });
     }
 
