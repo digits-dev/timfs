@@ -52,7 +52,7 @@
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  Packaging Size</th>
-                                <td><input type="number" step="any" name="packaging_size" class="form-control" required placeholder="Pakcaging Size"></td>
+                                <td><input type="number" step="any" name="packaging_size" class="form-control" required placeholder="Packaging Size"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  UOM</th>
@@ -66,8 +66,8 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span>  TTP</th>
-                                <td><input type="number" step="any" name="ttp" class="form-control" required placeholder="TTP"></td>
+                                <th><span class="required-star">*</span>  SRP</th>
+                                <td><input type="number" step="any" name="ttp" class="form-control" required placeholder="SRP"></td>
                             </tr>
                         </tbody>
                     </table>
