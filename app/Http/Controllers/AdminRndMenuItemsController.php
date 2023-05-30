@@ -111,7 +111,7 @@
 					[approval_status] == 'FOR FOOD TASTING' ||
 					[approval_status] == 'ARCHIVED' ||
 					[approval_status] == 'REJECTED' ||
-					[approval_status] == 'RETURNED'",
+					[approval_status] == 'FOR ADJUSTMENT'",
 			];
 
 			$this->addaction[] = [
@@ -123,7 +123,7 @@
 					[approval_status] == 'FOR FOOD TASTING' ||
 					[approval_status] == 'ARCHIVED' ||
 					[approval_status] == 'REJECTED' ||
-					[approval_status] == 'RETURNED'",
+					[approval_status] == 'FOR ADJUSTMENT'",
 			];
 
 	        /* 
@@ -323,7 +323,7 @@
 			if (is_numeric($column_value)) $column_value = (float) $column_value;
 
 			$blue_status = ['SAVED', 'FOR COSTING'];
-			$dark_blue_status = ['FOR FOOD TASTING', 'RETURNED'];
+			$dark_blue_status = ['FOR FOOD TASTING', 'RETURNED', 'FOR ADJUSTMENT'];
 			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION', 'FOR RELEASE DATE'];
 			$green_status = ['APPROVED', 'CLOSED'];
 			$red_status = ['REJECTED'];
@@ -1686,7 +1686,7 @@
 			$message = null;
 
 			if ($return_to == 'chef') {
-				$approval_status = 'RETURNED';
+				$approval_status = 'FOR ADJUSTMENT';
 				$message = '✔️ Item successfully returned to Chef.';
 			} else {
 				$approval_status = 'FOR PACKAGING';
