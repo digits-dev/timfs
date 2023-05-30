@@ -172,7 +172,7 @@
   - [x] For approvers (Marketing & Accoounting), add new button
     - Return to Chef
     - Return to Marketing | status: (FOR PACKAGING)
-  - [ ] Add a template in new item comment section for details of new item
+  - [x] Add a template in new item comment section for details of new item
   - [ ] Tagging of User Account to Concepts
 
 - ### 🐬 SQL DB Migration: Order of files that need to be migrated
