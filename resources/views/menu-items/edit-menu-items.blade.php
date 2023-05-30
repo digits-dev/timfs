@@ -127,11 +127,11 @@
             @endif
             <div class="add-content">
                 <div class="form-column">
+                    @if (!$rnd_menu_items_id)
                     <label> Tasteless Menu Code</label>
                     <fieldset>
                         <input type="text" name="tasteless_menu_code" value="{{ $row->tasteless_menu_code }}" readonly>
                     </fieldset>
-                    @if (!$rnd_menu_items_id)
                     <label> POS Old Item Code 1</label>
                     <fieldset>
                         <input type="text" name="pos_item_code_1" placeholder="Enter pos old item code 1" value="{{ $row->old_code_1 }}" oninput="this.value = this.value.toUpperCase()">
