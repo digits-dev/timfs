@@ -886,8 +886,7 @@
                         .ingredient-section input:invalid, 
                         .ingredient-section select:invalid,
                         .packaging-section input:invalid, 
-                        .packaging-section select:invalid,
-                        .prepared-by
+                        .packaging-section select:invalid
                     `).css('outline', '2px solid red');
                     $('.ingredient-section .ingredient:invalid, .packaging-section .packaging:invalid')
                         .parents('.ingredient-entry, .packaging-entry')
@@ -895,6 +894,7 @@
                         .css('outline', '2px solid red');
                     if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
 					if (!$('.ingredient-description').val()) $('.ingredient-description').css('outline', '2px solid red');
+                    if (!$('.prepared-by').val()) $('.prepared-by').css('outline', '2px solid red');
                 });
         }
 
