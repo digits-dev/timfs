@@ -473,13 +473,21 @@
             form.submit();
         }
 
+        function priceIsValid() {
+            const dineIn = $('.final-srp-w-vat-dine-in').val();
+            const takeOut = $('.final-srp-w-vat-take-out').val();
+            const delivery = $('.final-srp-w-vat-delivery').val();
+            return parseFloat(dineIn) <= parseFloat(takeOut) && parseFloat(dineIn) <= parseFloat(delivery);
+        }
+
         $(document).on('keyup', inputTriggerClasses, function() {
             computeFormula();
         });
 
         $('#save-btn').on('click', function() {
             const isValid = jQuery.makeArray($('#form input:not(.rnd_tasteless_code)')).every(e => !!$(e).val());
-            if (isValid) {
+            const validPrice = priceIsValid();
+            if (isValid && validPrice) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
                     html: '🔵 Doing so will forward this item to <label class="label label-info">MARKETING APPROVER</label>.' + 
@@ -494,10 +502,16 @@
                         submitForm();
                     }
                 });
-            } else {
+            } else if (!isValid){
                 Swal.fire({
                     title: 'Oops..',
                     text: 'Please fill out all fields.',
+                    icon: 'error',
+                });
+            } else {
+                Swal.fire({
+                    title: 'Oops..',
+                    text: 'Please double check the SRPs. Prices for delivery and take out cannot be less than the dine in price.',
                     icon: 'error',
                 });
             }

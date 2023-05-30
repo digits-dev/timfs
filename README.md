@@ -175,9 +175,9 @@
   - [x] Add a template in new item comment section for details of new item
   - [ ] Tagging of User Account to Concepts
   - [x] Add restriction, cannot click publish unless on food tasting phase
-  - [ ] Add restriction, on costing phase cannot move to next step if delivery and / or take out is lower than dine in
+  - [x] Add restriction, on costing phase cannot move to next step if **delivery** and / or **take out** is less than **dine in**
   - [ ] Add "Return to Chef" button durin packaging, menu creation, and costing
-  - [ ] Change "RETURNED" status to "FOR ADJUSTMENT"
+  - [ ] Change **"RETURNED"** status to **"FOR ADJUSTMENT"**
   - [ ] Add comment box to menu creation page
   - [ ] Move submasters to menu, give privilege to marketing head
 
