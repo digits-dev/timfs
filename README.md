@@ -174,7 +174,7 @@
     - Return to Marketing | status: (FOR PACKAGING)
   - [x] Add a template in new item comment section for details of new item
   - [ ] Tagging of User Account to Concepts
-  - [ ] Add restriction, cannot click publish unless on food tasting phase
+  - [x] Add restriction, cannot click publish unless on food tasting phase
   - [ ] Add restriction, on costing phase cannot move to next step if delivery and / or take out is lower than dine in
   - [ ] Add "Return to Chef" button durin packaging, menu creation, and costing
   - [ ] Change "RETURNED" status to "FOR ADJUSTMENT"
