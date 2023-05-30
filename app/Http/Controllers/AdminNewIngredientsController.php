@@ -2,6 +2,7 @@
 
 	use Session;
 	use Illuminate\Http\Request;
+	use Illuminate\Support\Facades\Request as Input;
 	use DB;
 	use CRUDBooster;
 
@@ -324,6 +325,7 @@
 			$nwi_code = 'NWI-' . str_pad($nwi_code_int, 5, '0', STR_PAD_LEFT);
 
 			$postdata['nwi_code'] = $nwi_code;
+			$postdata['comment'] = Input::get('comment');
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
 			$postdata['created_by'] = CRUDBooster::myId();
 			$postdata['created_at'] = date('Y-m-d H:i:s');
@@ -337,8 +339,19 @@
 	    | 
 	    */
 	    public function hook_after_add($id) {        
-	        //Your code here
+			$comment_content = DB::table('new_ingredients')
+				->where('id', $id)
+				->get('comment')
+				->first()
+				->comment;
 
+			DB::table('new_items_comments')
+				->insert([
+					'new_ingredients_id' => $id,
+					'comment_content' => $comment_content,
+					'created_by' => CRUDBooster::myId(),
+					'created_at' => date('Y-m-d H:i:s'),
+				]);
 	    }
 
 	    /* 
@@ -432,6 +445,8 @@
 
 			$data['comments_data'] = self::getNewItemsComments($id, true);
 
+			$data['comment_templates'] = self::getCommentTemplate('ingredient');
+
 			return $this->view('new-items/detail-new-items', $data);
 		}
 
@@ -493,6 +508,34 @@
 
 
 			return $this->view('new-items/edit-new-items', $data);
+		}
+
+		public function getAdd() {
+
+			$data = [];
+
+			$data['uoms'] = DB::table('uoms')
+				->where('uoms.status', 'ACTIVE')
+				->orderBy('uoms.uom_description')
+				->get()
+				->toArray();
+
+			$data['new_item_types'] = DB::table('new_item_types')
+				->where('new_item_types.status', 'ACTIVE')
+				->orderBy('item_type_description')
+				->get()
+				->toArray();
+
+			$data['comment_templates'] = self::getCommentTemplate('ingredient');
+
+			$data['created_by'] = DB::table('cms_users')
+				->where('id', CRUDBooster::myId())
+				->get()
+				->first();
+
+			$data['created_at'] = date('Y-m-d');
+
+			return $this->view('new-items/add-new-item', $data);
 		}
 
 		public function editNewIngredients(Request $request) {
@@ -697,5 +740,41 @@
 					'message_type' => 'success',
 					'message' => "✔️ Item Deleted!"
 				]);
+		}
+
+		function getCommentTemplate($type) {
+			if ($type == 'ingredient') {
+				$additional_fields = [
+					'SEGMENTATION',
+					'REASON (NEW MENU | REPLACEMENT | NEW CONCEPT | RND)',
+					'[IF REPLACEMENT] EXISTING INGREDIENT',
+					'RECOMMENDED BRAND 1',
+					'RECOMMENDED BRAND 2',
+					'RECOMMENDED BRAND 3',
+					'INITIAL QTY NEEDED (IN KG | PC)',
+					'FORECAST QTY NEEDED PER MONTH (IN KG | PC)',
+					'BUDGET RANGE',
+					'REFERENCE LINKS',
+					'TARGET DATE NEEDED',
+					'ONE-TIME | REGULAR | SEASONAL',
+					'DURATION',
+				];
+			} else if ($type == 'packaging') {
+				$additional_fields = [
+					'TYPE (TAKEOUT CONTAINER | STICKER LABEL)',
+					'[IF STICKER] STICKER MATERIAL (SATIN | MATTE | LAMINATED | VINYL)',
+					'PACKAGING FOR (FOOD | BEVERAGE | NA)',
+					'[IF BEVERAGE] BEVERAGE PACKAGING TYPE (CAP | CAP WITH LID | STRAW)',
+					'MATERIAL (PAPER | PLASTIC)',
+					'[IF PAPER] PAPER TYPE (CRAFT | CORRUGATED)',
+					'DESIGN (GENERIC | CUSTOM)',
+					'SIZE',
+					'BUDGET RANGE',
+					'INITIAL QTY NEEDED (IN PC)',
+					'FORECAST QTY NEEDED PER MONTH (IN PC)',
+					'TARGET DATE NEEDED',
+				];
+			}
+			return $additional_fields;
 		}
 	}

@@ -24,3 +24,7 @@
 .btn.btn-purple:hover {
     background-color: #6e42bb;
 }
+
+.required-star {
+    color: rgb(241, 66, 66);
+}

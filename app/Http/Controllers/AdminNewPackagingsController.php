@@ -2,10 +2,16 @@
 
 	use Session;
 	use Illuminate\Http\Request;
+	use Illuminate\Support\Facades\Request as Input;
 	use DB;
 	use CRUDBooster;
 
 	class AdminNewPackagingsController extends \crocodicstudio\crudbooster\controllers\CBController {
+
+		public function __construct() {
+			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+			$this->mainController = new AdminNewIngredientsController;
+		}
 
 	    public function cbInit() {
 
@@ -327,6 +333,7 @@
 
 			$postdata['nwp_code'] = $nwp_code;
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
+			$postdata['comment'] = Input::get('comment');
 			$postdata['created_by'] = CRUDBooster::myId();
 			$postdata['created_at'] = date('Y-m-d H:i:s');
 	    }
@@ -339,7 +346,19 @@
 	    | 
 	    */
 	    public function hook_after_add($id) {        
-	        //Your code here
+	        $comment_content = DB::table('new_packagings')
+				->where('id', $id)
+				->get('comment')
+				->first()
+				->comment;
+
+			DB::table('new_items_comments')
+				->insert([
+					'new_packagings_id' => $id,
+					'comment_content' => $comment_content,
+					'created_by' => CRUDBooster::myId(),
+					'created_at' => date('Y-m-d H:i:s'),
+				]);
 
 	    }
 
@@ -434,6 +453,8 @@
 
 			$data['comments_data'] = (new AdminNewIngredientsController)->getNewItemsComments($id, true, 'new_packagings');
 
+			$data['comment_templates'] = (new AdminNewIngredientsController)->getCommentTemplate('packaging');
+
 			return $this->view('new-items/detail-new-items', $data);
 		}
 
@@ -494,6 +515,33 @@
 			}
 
 			return $this->view('new-items/edit-new-items', $data);
+		}
+
+		public function getAdd() {
+			$data = [];
+
+			$data['uoms'] = DB::table('uoms')
+				->where('uoms.status', 'ACTIVE')
+				->orderBy('uoms.uom_description')
+				->get()
+				->toArray();
+
+			$data['new_item_types'] = DB::table('new_item_types')
+				->where('new_item_types.status', 'ACTIVE')
+				->orderBy('item_type_description')
+				->get()
+				->toArray();
+
+			$data['comment_templates'] = $this->mainController->getCommentTemplate('packaging');
+
+			$data['created_by'] = DB::table('cms_users')
+				->where('id', CRUDBooster::myId())
+				->get()
+				->first();
+
+			$data['created_at'] = date('Y-m-d');
+
+			return $this->view('new-items/add-new-item', $data);
 		}
 
 		public function editNewPackagings(Request $request) {

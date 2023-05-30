@@ -71,6 +71,13 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="new-fields">
+                    <h5>Please copy, paste, and fill out these fields to your comment.</h5>
+                    @foreach ($comment_templates as $field)
+                    🔵 {{ $field }}:
+                    <br />
+                    @endforeach
+                </div>
             </div>
             <div class="col-md-6">
                 <hr>
