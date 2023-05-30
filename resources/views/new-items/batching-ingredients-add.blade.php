@@ -646,10 +646,6 @@
             $('.rnd_menu_srp').keyup(function() {
                 $.fn.sumCost();
             });
-
-            $('.ingredient-name, .packaging-name').focusout(function() {
-                $('.item-list').fadeOut();
-            });
         }
 
         $.fn.sumCost = function() {
