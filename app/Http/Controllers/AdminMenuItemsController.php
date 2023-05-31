@@ -346,11 +346,16 @@
 					->get('menu_segment_column_name')
 					->toArray();
 
-				$query->where(function($subQuery) use ($concepts) {
-					foreach($concepts as $concept) {
-						$subQuery->orWhere('menu_items.' . $concept->menu_segment_column_name, '1');
-					}
-				});
+				if ($concepts) {
+					$query->where(function($subQuery) use ($concepts) {
+						foreach($concepts as $concept) {
+							$subQuery->orWhere('menu_items.' . $concept->menu_segment_column_name, '1');
+						}
+					});
+				} else {
+					$query->where('menu_items.id', null);
+				}
+
 			}
 	    }
 
