@@ -127,6 +127,15 @@
             </div>
         </div>
         <p class="note-packagings" style="display: none">** Highlighted packaging names are primary packagings.</p>
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chat-app">
+                    <h4 class="text-center text-bold">Comments</h4>
+                    @include('rnd-menu/chat-app', $comments_data)
+                </div>
+            </div>
+        </div>
     </div>
     <div class="panel-footer">
         <a class="btn btn-primary" href="{{ CRUDBooster::mainpath() }}" type="button" id="export"> <i class="fa fa-arrow-left" ></i> Back </a>

@@ -461,6 +461,8 @@
 			$data['ingredients'] = array_map(fn ($object) => (object) array_filter((array) $object), $ingredients);
 			$data['packagings'] = array_map(fn ($object) => (object) array_filter((array) $object), $packagings);
 			$data['page_title'] = "Detail RND Menu Item: $rnd_menu_description";
+			$data['comments_data'] = self::getRNDComments($id);
+			
 			return $this->view('rnd-menu/detail-item', $data);
 
 		}
