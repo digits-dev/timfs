@@ -176,9 +176,12 @@
   - [ ] Tagging of User Account to Concepts
   - [x] Add restriction, cannot click publish unless on food tasting phase
   - [x] Add restriction, on costing phase cannot move to next step if **delivery** and / or **take out** is less than **dine in**
-  - [ ] Add "Return to Chef" button durin packaging, menu creation, and costing
+  - [x] Add "Return to Chef" button on marketing's pages
+    - Add Packaging
+    - Menu Creation
+    - Costing
   - [x] Change **"RETURNED"** status to **"FOR ADJUSTMENT"**
-  - [ ] Add comment box to menu creation page
+  - [x] Add comment box to menu creation page
   - [ ] Move submasters to menu, give privilege to marketing head
 
 - ### 🐬 SQL DB Migration: Order of files that need to be migrated
