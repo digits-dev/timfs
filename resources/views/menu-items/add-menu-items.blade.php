@@ -138,8 +138,8 @@
   </p>
   <div class='panel panel-default'>
     <div class='panel-heading'>Add Menu Items</div>
-    <div class='panel-body'>
-        <form method="POST" action="{{$item->rnd_menu_items_id ? route('add_new_menu') : CRUDBooster::mainpath('add-save')}}" id="form-add">
+    <form method="POST" action="{{$item->rnd_menu_items_id ? route('add_new_menu') : CRUDBooster::mainpath('add-save')}}" id="form-add">
+        <div class='panel-body'>
             @csrf
             @if ($item->rnd_menu_items_id) 
             <input type="text" class="hidden" name="rnd_menu_items_id" value="{{$item->rnd_menu_items_id}}">
@@ -264,15 +264,18 @@
                     </fieldset> 
                 </div>
             </div>
-            <div class="panel-footer">
-                <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-                <input type="{{$item->rnd_menu_items_id ? 'button' : 'submit'}}" class='btn btn-primary pull-right add-menu' value='Add Menu' onclick=""/>
-                @if ($item->rnd_menu_items_id)
-                <button id="submit-button" type="submit" class="hide">Submit</button>
-                @endif
-            </div>
-        </form>
-    </div>
+        </div>
+        <div class="panel-footer">
+            <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
+            @if ($item->rnd_menu_items_id)
+            <button type="button" class="btn btn-primary pull-right save-btn"><i class="fa fa-save"></i> Save</button>
+            <button class="btn btn-warning pull-right return-btn" type="button" _return_to="chef" style="margin-right: 10px;"><i class="fa fa-mail-reply" ></i> Return to Chef</button>
+            <button id="submit-button" type="submit" class="hide">Submit</button>
+            @else
+            <input type="submit" class='btn btn-primary pull-right add-menu' value='Add Menu' onclick=""/>
+            @endif
+        </div>
+    </form>
 </div>
 
 <script>
@@ -368,62 +371,102 @@
     });
 
     @if ($item->rnd_menu_items_id)
-    if (item.rnd_menu_items_id) {
-        $(document).on('click', '.add-menu', function() {
-            Swal.fire({
-                title: 'Do you want to save this item?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes',
-                returnFocus: false,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $('#submit-button').click();
-                }
-            });
+    $(document).on('click', '.save-btn', function() {
+        Swal.fire({
+            title: 'Do you want to save this item?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            returnFocus: false,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#submit-button').click();
+            }
+        });
+    });
+
+    $('#form-add').submit(function(event) {
+        const formData = $('#form-add').serialize();
+        $.ajax({
+            type: "POST",
+            url: "{{ route('add_new_menu') }}",
+            data: formData,
+            dataType: "json",
+            encode: true,
+            success: function(response) {
+                Swal.fire({
+                    title: `✔️ New Menu Item Created!`,
+                    html: '📄 Do you want to continue to Costing?',
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'Not now',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.href = "{{ CRUDBooster::mainPath() }}" + `/edit/${item.rnd_menu_items_id}`;
+                    } else {
+                        location.href = "{{ CRUDBooster::mainPath() }}";
+                    }
+                });
+            },
+            error: function(response) { 
+                console.log(response);
+                Swal.fire({
+                    title: 'Oops',
+                    html: 'Something went wrong.',
+                    icon: 'error'
+                });
+            } 
         });
 
-        $('#form-add').submit(function(event) {
-            const formData = $('#form-add').serialize();
-            $.ajax({
-                type: "POST",
-                url: "{{ route('add_new_menu') }}",
-                data: formData,
-                dataType: "json",
-                encode: true,
-                success: function(response) {
-                    Swal.fire({
-                        title: `✔️ New Menu Item Created!`,
-                        html: '📄 Do you want to continue to Costing?',
-                        icon: 'success',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes',
-                        cancelButtonText: 'Not now',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.href = "{{ CRUDBooster::mainPath() }}" + `/edit/${item.rnd_menu_items_id}`;
-                        } else {
-                            location.href = "{{ CRUDBooster::mainPath() }}";
-                        }
-                    });
-                },
-                error: function(response) { 
-                    console.log(response);
-                    Swal.fire({
-                        title: 'Oops',
-                        html: 'Something went wrong.',
-                        icon: 'error'
-                    });
-                } 
-            });
+        event.preventDefault();
+    });
 
-            event.preventDefault();
+    $(document).on('click', '.return-btn', function() {
+        const returnTo = $(this).attr('_return_to');
+        const action = 'return';
+        Swal.fire({
+            title: `Do you want to return this item?`,
+            html: `🟠 Doing so will return this item to <label class="label label-warning">${returnTo.toUpperCase()}</label>.` +
+                `<br/> ⚠️ You won't be able to revert this.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = $(document.createElement('form'))
+                    .attr('method', 'POST')
+                    .attr('action', "{{ route('return_rnd_menu') }}")
+                    .hide();
+
+                const csrf = $(document.createElement('input'))
+                    .attr('name', '_token')
+                    .val("{{csrf_token()}}");
+
+                const actionInput = $(document.createElement('input'))
+                    .attr('name','action')
+                    .val('return');
+
+                const returnToInput = $(document.createElement('input'))
+                    .attr('name', 'return_to')
+                    .val(returnTo)
+
+                const rndMenuItemsId = $(document.createElement('input'))
+                    .attr('name', 'rnd_menu_items_id')
+                    .val("{{ $item->rnd_menu_items_id }}");
+
+                form.append(csrf, actionInput, returnToInput, rndMenuItemsId);
+                $('.panel-body').append(form);
+                form.submit();
+            }
         });
-    }
+    });
     @endif
 
 
