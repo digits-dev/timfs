@@ -94,12 +94,14 @@
                     $low_cost_id = array_map(fn($obj) => $obj->id, $low_cost);
                     $no_cost_id = array_map(fn($obj) => $obj->id, $no_cost);
                 @endphp
+                @if ($menu_items)
                 <tr>
                     <td>ALL</td>
                     <td class="clickable" filter="low" id="all" items="{{implode(',', $low_cost_id)}}">{{count($low_cost)}}</td>
                     <td class="clickable" filter="high" id="all" items="{{implode(',', $high_cost_id)}}">{{count($high_cost)}}</td>
                     <td class="clickable" filter="no" id="all" items="{{implode(',', $no_cost_id)}}">{{count($no_cost)}}</td>
                 </tr>
+                @endif
             </tbody>
         </table>
     </div>
