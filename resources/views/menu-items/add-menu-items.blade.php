@@ -264,18 +264,27 @@
                     </fieldset> 
                 </div>
             </div>
-        </div>
-        <div class="panel-footer">
-            <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-            @if ($item->rnd_menu_items_id)
-            <button type="button" class="btn btn-primary pull-right save-btn"><i class="fa fa-save"></i> Save</button>
-            <button class="btn btn-warning pull-right return-btn" type="button" _return_to="chef" style="margin-right: 10px;"><i class="fa fa-mail-reply" ></i> Return to Chef</button>
             <button id="submit-button" type="submit" class="hide">Submit</button>
-            @else
-            <input type="submit" class='btn btn-primary pull-right add-menu' value='Add Menu' onclick=""/>
-            @endif
+        </form>
+        @if ($item->rnd_menu_items_id)
+        <div class="row">
+            <div class="col-md-6">
+                <hr>
+                <h4 class="text-center">Comments</h4>
+                @include('rnd-menu/chat-app', $comments_data)
+            </div>
         </div>
-    </form>
+        @endif
+    </div>
+    <div class="panel-footer">
+        <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
+        @if ($item->rnd_menu_items_id)
+        <button type="button" class="btn btn-primary pull-right save-btn"><i class="fa fa-save"></i> Save</button>
+        <button class="btn btn-warning pull-right return-btn" type="button" _return_to="chef" style="margin-right: 10px;"><i class="fa fa-mail-reply" ></i> Return to Chef</button>
+        @else
+        <input type="submit" class='btn btn-primary pull-right add-menu' value='Add Menu' onclick=""/>
+        @endif
+    </div>
 </div>
 
 <script>
@@ -369,6 +378,10 @@
             
         }
     });
+
+    $('.add-menu[type="submit"]').on('click', function() {
+        $('#submit-button').click();
+    })
 
     @if ($item->rnd_menu_items_id)
     $(document).on('click', '.save-btn', function() {

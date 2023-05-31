@@ -22,9 +22,9 @@
     </div>
     @if ($to_comment)
     <section class="type-message-section">
-        <form action="" class="message-form flex">
-            <input type="text" class="type-message form-control" placeholder="✏️ Type your comment here...">
-            <button class="btn btn-success send-btn" disabled>➡️Send</button>
+        <form action="" id="message-comment-form" class="message-form flex">
+            <input form="message-comment-form" type="text" class="type-message form-control" placeholder="✏️ Type your comment here...">
+            <button form="message-comment-form" class="btn btn-success send-btn" disabled>➡️Send</button>
         </form>
     </section>
     @endif

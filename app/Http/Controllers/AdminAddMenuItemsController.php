@@ -556,7 +556,7 @@
 
 
 	    //By the way, you can still create your own method in here... :) 
-		public function getAdd($table = 'menu_items', $item = null) {
+		public function getAdd($table = 'menu_items', $item = null, $comments = null) {
 			//Create an Auth
 			if ($table == 'menu_items') {
 				if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {    
@@ -602,6 +602,7 @@
 
 			if ($item) {
 				$data['item'] = $item;
+				$data['comments_data'] = $comments;
 			}
 				
 			return $this->view('menu-items.add-menu-items',$data);

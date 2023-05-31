@@ -1072,12 +1072,14 @@
 				->get()
 				->first()
 				->menu_items_id;
+
+			$comments = self::getRNDComments($id);
 			
 			if ($menu_items_id) {
 				return (new AdminAddMenuItemsController)->getEdit($menu_items_id, 'rnd_menu_items', $id);
 			}
 
-			return (new AdminAddMenuItemsController)->getAdd('rnd_menu_items', $item);
+			return (new AdminAddMenuItemsController)->getAdd('rnd_menu_items', $item, $comments);
 		}
 
 		public function saveNewMenu(Request $request) {
