@@ -383,6 +383,7 @@
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
         <button class="btn btn-primary pull-right" id="save-btn"><i class="fa fa-save" ></i> Save</button>
+        <button class="btn btn-warning pull-right return-btn" _return_to="chef" style="margin-right: 10px;"><i class="fa fa-mail-reply" ></i> Return to Chef</button>
     </div>
 </div>
 
@@ -1193,6 +1194,48 @@
             subEntry.hide('fast', function() {
                 $(this).remove();
                 $.fn.sumCost();
+            });
+        });
+
+        $(document).on('click', '.return-btn', function() {
+            const returnTo = $(this).attr('_return_to');
+            const action = 'return';
+            Swal.fire({
+                title: `Do you want to return this item?`,
+                html: `🟠 Doing so will return this item to <label class="label label-warning">${returnTo.toUpperCase()}</label>.` +
+                    `<br/> ⚠️ You won't be able to revert this.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = $(document.createElement('form'))
+                        .attr('method', 'POST')
+                        .attr('action', "{{ route('return_rnd_menu') }}")
+                        .hide();
+
+                    const csrf = $(document.createElement('input'))
+                        .attr('name', '_token')
+                        .val("{{csrf_token()}}");
+
+                    const actionInput = $(document.createElement('input'))
+                        .attr('name','action')
+                        .val('return');
+
+                    const returnToInput = $(document.createElement('input'))
+                        .attr('name', 'return_to')
+                        .val(returnTo)
+
+                    const rndMenuItemsId = $(document.createElement('input'))
+                        .attr('name', 'rnd_menu_items_id')
+                        .val("{{ $item->id }}");
+
+                    form.append(csrf, actionInput, returnToInput, rndMenuItemsId);
+                    $('.panel-body').append(form);
+                    form.submit();
+                }
             });
         });
 

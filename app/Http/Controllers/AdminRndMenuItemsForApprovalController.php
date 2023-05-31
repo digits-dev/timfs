@@ -308,7 +308,8 @@
 				'CLOSED', 
 				'FOR RELEASE DATE',
 				'ARCHIVED',
-				'RETURNED'
+				'RETURNED',
+				'FOR ADJUSTMENT',
 			];
 
 			$upperCasedPrivilege = strtoupper(CRUDBooster::myPrivilegeName());
