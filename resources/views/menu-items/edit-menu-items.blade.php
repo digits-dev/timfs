@@ -295,14 +295,17 @@
                     </fieldset>
                 </div>
             </div>
-            <div class="panel-footer">
-                <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-                <input type="{{$table == 'menu_items' ? 'submit' : 'button'}}" id="save-edit-btn" class='btn btn-primary pull-right' value='Edit Menu' onclick=""/>
-                @if($table == 'rnd_menu_items')
-                <button class="edit-new-menu hide" id="submit-button">Save-edit</button>
-                @endif
-            </div>
+            <button id="submit-button" type="submit" class="hide">Submit</button>
         </form>
+    </div>
+    <div class="panel-footer">
+        <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
+        @if ($rnd_menu_items_id)
+        <button type="button" class="btn btn-primary pull-right save-btn" id="save-edit-rnd"><i class="fa fa-save"></i> Save</button>
+        <button class="btn btn-warning pull-right return-btn" type="button" _return_to="chef" style="margin-right: 10px;"><i class="fa fa-mail-reply" ></i> Return to Chef</button>
+        @else
+        <input type="button" id="save-edit-btn" class='btn btn-primary pull-right' value='Edit Menu' onclick=""/>
+        @endif
     </div>
 </div>
 
@@ -425,8 +428,12 @@ $('#menu_type_select1').select2({
         }
     }); 
 
-    if (table == 'rnd_menu_items') {
-        $(document).on('click', '#save-edit-btn', function() {
+    $('#save-edit-btn').on('click', function() {
+        $('#submit-button').click();
+    });
+
+    @if ($rnd_menu_items_id)
+        $(document).on('click', '#save-edit-rnd', function() {
             Swal.fire({
                 title: 'Do you want to save this item?',
                 icon: 'warning',
@@ -480,7 +487,49 @@ $('#menu_type_select1').select2({
 
             event.preventDefault();
         });
-    }
+
+        $(document).on('click', '.return-btn', function() {
+        const returnTo = $(this).attr('_return_to');
+        const action = 'return';
+        Swal.fire({
+            title: `Do you want to return this item?`,
+            html: `🟠 Doing so will return this item to <label class="label label-warning">${returnTo.toUpperCase()}</label>.` +
+                `<br/> ⚠️ You won't be able to revert this.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = $(document.createElement('form'))
+                    .attr('method', 'POST')
+                    .attr('action', "{{ route('return_rnd_menu') }}")
+                    .hide();
+
+                const csrf = $(document.createElement('input'))
+                    .attr('name', '_token')
+                    .val("{{csrf_token()}}");
+
+                const actionInput = $(document.createElement('input'))
+                    .attr('name','action')
+                    .val('return');
+
+                const returnToInput = $(document.createElement('input'))
+                    .attr('name', 'return_to')
+                    .val(returnTo)
+
+                const rndMenuItemsId = $(document.createElement('input'))
+                    .attr('name', 'rnd_menu_items_id')
+                    .val("{{ $rnd_menu_items_id }}");
+
+                form.append(csrf, actionInput, returnToInput, rndMenuItemsId);
+                $('.panel-body').append(form);
+                form.submit();
+            }
+        });
+    });
+    @endif
 
 </script>
 @endsection
