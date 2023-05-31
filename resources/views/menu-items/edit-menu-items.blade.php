@@ -297,6 +297,15 @@
             </div>
             <button id="submit-button" type="submit" class="hide">Submit</button>
         </form>
+        @if ($rnd_menu_items_id)
+        <div class="row">
+            <div class="col-md-6">
+                <hr>
+                <h4 class="text-center">Comments</h4>
+                @include('rnd-menu/chat-app', $comments_data)
+            </div>
+        </div>
+        @endif
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>

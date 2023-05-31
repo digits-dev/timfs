@@ -622,7 +622,7 @@
 
 		}
 
-		public function getEdit($id, $table = 'menu_items', $rnd_menu_items_id = null) {
+		public function getEdit($id, $table = 'menu_items', $rnd_menu_items_id = null, $comments = null) {
 			//Create an Auth
 			if ($table == 'menu_items') {
 				if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE || $this->button_edit==FALSE) {    
@@ -692,6 +692,8 @@
 
 			$data['table'] = $table;
 			$data['rnd_menu_items_id'] = $rnd_menu_items_id;
+
+			$data['comments_data'] = $comments;
 			
 			return $this->view('menu-items.edit-menu-items',$data);
 		}
