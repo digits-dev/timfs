@@ -2,6 +2,7 @@
 @push('head')
 <link rel="stylesheet" href="{{asset('css/chat-app.css')}}">
 <script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 <div class="chat-app-container flex flex-column">
     <section class="chat-heading flex">
