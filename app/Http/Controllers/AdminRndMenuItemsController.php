@@ -312,19 +312,20 @@
 					->first()
 					->menu_segmentations_id;
 
-					
-				if ($my_concepts) {
-					$my_concepts = explode(',', $my_concepts);
-					$query
-						->leftJoin('user_concept_acess', 'user_concept_acess.cms_users_id', 'rnd_menu_items.created_by')
-						->where(function($sub_query) use ($my_concepts) {
-							foreach ($my_concepts as $my_concept) {
-								$sub_query->orWhereRaw("find_in_set('$my_concept', user_concept_acess.menu_segmentations_id)");
-							}
-						});
-				} else {
-					$query->where('rnd_menu_items.created_by', CRUDBooster::myId());
-				}
+				$query->where('rnd_menu_items.created_by', CRUDBooster::myId());
+				
+				// if ($my_concepts) {
+				// 	$my_concepts = explode(',', $my_concepts);
+				// 	$query
+				// 		->leftJoin('user_concept_acess', 'user_concept_acess.cms_users_id', 'rnd_menu_items.created_by')
+				// 		->where(function($sub_query) use ($my_concepts) {
+				// 			foreach ($my_concepts as $my_concept) {
+				// 				$sub_query->orWhereRaw("find_in_set('$my_concept', user_concept_acess.menu_segmentations_id)");
+				// 			}
+				// 		});
+				// } else {
+				// 	$query->where('rnd_menu_items.created_by', CRUDBooster::myId());
+				// }
 
 			}
 	    }
