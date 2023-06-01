@@ -525,6 +525,8 @@
 						'created_by' => $action_by,
 						'created_at' => $time_stamp
 					]);
+
+				$message = "✔️ New Batching Ingredient Created: $ingredient_description";
 			} else {
 				//update details for rnd menu item
 				DB::table('batching_ingredients')
@@ -536,6 +538,8 @@
 						'updated_at' => $time_stamp,
 						'updated_by' => $action_by
 					]);
+
+				$message = "✔️ Batching Ingredient Details of $ingredient_description Updated!";
 			}
 
 			//inactivating all active ingredients of rnd menu item
@@ -595,7 +599,7 @@
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
-					'message' => "✔️ Batching Ingredients Details of $ingredient_description Updated!"
+					'message' => $message,
 				]);
 		}
 
