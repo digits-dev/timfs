@@ -167,13 +167,12 @@
   - [x] Add red font-color and background if **Total Cost** is higher than **Ideal Food Cost**
   - [x] Tasteless Menu Item Code should be generated after approval of accounting
   - [x] In Menu Creation Page, hide POS OLD ITEM CODES and Prices (Dine in, Take Out, Delivery)
-  - [ ] In Menu Creation, make a submaster for the menu item status
   - [x] Add Archive button to Chef's RND Menu Dashboard
   - [x] For approvers (Marketing & Accoounting), add new button
     - Return to Chef
     - Return to Marketing | status: (FOR PACKAGING)
   - [x] Add a template in new item comment section for details of new item
-  - [ ] Tagging of User Account to Concepts
+  - [x] Tagging of User Account to Concepts
   - [x] Add restriction, cannot click publish unless on food tasting phase
   - [x] Add restriction, on costing phase cannot move to next step if **delivery** and / or **take out** is less than **dine in**
   - [x] Add "Return to Chef" button on marketing's pages
@@ -182,7 +181,7 @@
     - Costing
   - [x] Change **"RETURNED"** status to **"FOR ADJUSTMENT"**
   - [x] Add comment box to menu creation page
-  - [ ] Move submasters to menu, give privilege to marketing head
+  - [x] Move submasters to menu, give privilege to marketing head
 
 - ### 🐬 SQL DB Migration: Order of files that need to be migrated
 
