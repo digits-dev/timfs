@@ -639,6 +639,8 @@
 						'created_by' => $action_by,
 						'created_at' => $time_stamp
 					]);
+
+				$message = "✔️ New RND Menu Item Created: $rnd_menu_description";
 			} else {
 				//update details for rnd menu item
 				DB::table('rnd_menu_items')
@@ -650,6 +652,8 @@
 						'updated_at' => $time_stamp,
 						'updated_by' => $action_by
 					]);
+
+				$message = "✔️ RND Menu Item Details of $rnd_menu_description Updated!";
 			}
 
 			//inactivating all active ingredients of rnd menu item
@@ -781,7 +785,7 @@
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
-					'message' => "✔️ RND Menu Item Details of $rnd_menu_description Updated!"
+					'message' => $message,
 				]);
 		}
 
