@@ -1,4 +1,4 @@
-$(document).ready(function() {
+jQuery(function() {
     
     var description_count=false;
     var count_myob_description=0;
@@ -9,7 +9,7 @@ $(document).ready(function() {
 
     $('#quantity_on_hand').val('0.00');
 
-    $("#supplier_item_code, #myob_item_description, #full_item_description, #actual_color, #flavor, #size, #dimension").keyup(function() {
+    $("#supplier_item_code, #myob_item_description, #full_item_description, #actual_color, #flavor, #size, #dimension").on('keyup',function() {
         this.value = this.value.toLocaleUpperCase();
     });
 
@@ -83,7 +83,6 @@ $(document).ready(function() {
         $('#landed_cost').val("");
         $('#price').val("");
     });
-    //-------------------------------------------
 
     $('#brands_id').on('change', function() {
         var id_brand = this.value;
@@ -122,7 +121,6 @@ $(document).ready(function() {
         }
     });
     
-    //-----------Round off supplier cost to 5 decimal-------------
     var supplier_cost = parseFloat($('#purchase_price').val());
     if(supplier_cost != ''){
         const noZeroes = parseFloat(supplier_cost.toFixed(5)); 
@@ -134,7 +132,6 @@ $(document).ready(function() {
         const noZeroes = parseFloat(supplier_cost.toFixed(5));  
         $('#purchase_price').val(noZeroes);
     });
-    //-------------------------------------------------------------
 
     $('#ttp').on('blur', function() {
         var salesprice = $('#ttp').val();
@@ -173,7 +170,6 @@ $(document).ready(function() {
         }
     });
     
-    //------------------------Commi Margin-----------------------
     var margin = $('#ttp_percentage').val();  
     if(margin != ''){
         var salesprice = $('#ttp').val();
@@ -181,13 +177,11 @@ $(document).ready(function() {
         var commi_margin = (salesprice - lc)/salesprice;
         $('#ttp_percentage').val(parseFloat(commi_margin).toFixed(2));
     }
-    //------------------------------------------------------------
 
     $(document).on("wheel", "input[type=number]", function (e) {
-        $(this).blur();
+        $(this).trigger("blur");
     });
     
-    //------added by cris 20200707----------------
     $("#tax_codes_id,#purchase_price,#ttp,#ttp_percentage").on('change keyup click', function() {
         var pp = $('#purchase_price').val();
         var tax_code = $('#tax_codes_id').val();
@@ -205,7 +199,10 @@ $(document).ready(function() {
             $('#price').val(ttp);
         }
     });
-    //----------------------------------------------
+
+    if(add_action){
+        $('input:radio[value="X"]').attr('checked','checked');
+    }
 
     $('form').submit(function(event) {
         if(add_action) {
