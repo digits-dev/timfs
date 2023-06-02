@@ -217,7 +217,9 @@
     - RND Menu (For Approval)
     - RND Menu (Approved)
   - Menu Submaster Modules
+    - Batch Prepared By
     - Ingredients Preparations
+    - New Item Types
 
 - ### 🟰 RND Menu Costing Formula
 
