@@ -387,13 +387,9 @@ class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CB
 			$concept_column_names[$index] = $value->menu_segment_column_name;
 		}
 
-		if (CRUDBooster::myPrivilegeName() == 'Chef' && $concept_column_names) {
-			$menu_items = DB::table('menu_items')
-				->where(function ($subQuery) use ($concept_column_names) {
-					foreach ($concept_column_names as $concept_column_name) {
-						$subQuery->orWhere($concept_column_name, '1');
-					}
-				})
+		if (CRUDBooster::myPrivilegeName() == 'Chef') {
+
+			$query = DB::table('menu_items')
 				->where('status', 'ACTIVE')
 				->select(DB::raw('id,
 						status,
@@ -403,9 +399,19 @@ class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CB
 						food_cost,
 						food_cost_percentage,
 						menu_item_description,'
-					. implode(', ', $segmentation_columns)))
-				->get()
-				->toArray();
+					. implode(', ', $segmentation_columns)));
+
+			if ($concept_column_names) {
+				$query->where(function ($subQuery) use ($concept_column_names) {
+					foreach ($concept_column_names as $concept_column_name) {
+						$subQuery->orWhere($concept_column_name, '1');
+					}
+				});
+			} else {
+				$query->where('menu_items.id', null);
+			}
+
+			$menu_items = $query->get()->toArray();
 
 			$data['concepts'] = DB::table('menu_segmentations')
 				->where('status', 'ACTIVE')
@@ -471,27 +477,38 @@ class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CB
 				->get()
 				->toArray();
 
-			if (CRUDBooster::myPrivilegeName() == 'Chef' && $concept_column_names) {
-				$menu_items = DB::table('menu_items')
-					->where(function ($subQuery) use ($concept_column_names) {
-						foreach ($concept_column_names as $concept_column_name) {
-							$subQuery->orWhere($concept_column_name, '1');
-						}
-					})
-					->where('status', 'ACTIVE')
-					->select(DB::raw('id,
-							status,
-							menu_price_dine,
-							menu_price_dlv,
-							menu_price_take,
-							food_cost,
-							food_cost_percentage,
-							menu_item_description,
-							tasteless_menu_code,'
-						. implode(', ', $segmentation_columns)))
-					->get()
-					->toArray();
+			if (CRUDBooster::myPrivilegeName() == 'Chef') {
+
+			$query = DB::table('menu_items')
+				->where('status', 'ACTIVE')
+				->select(DB::raw('id,
+					status,
+					menu_price_dine,
+					menu_price_dlv,
+					menu_price_take,
+					food_cost,
+					food_cost_percentage,
+					menu_item_description,
+					tasteless_menu_code,'
+					. implode(', ', $segmentation_columns)));
+
+			if ($concept_column_names) {
+				$query->where(function ($subQuery) use ($concept_column_names) {
+					foreach ($concept_column_names as $concept_column_name) {
+						$subQuery->orWhere($concept_column_name, '1');
+					}
+				});
+			} else {
+				$query->where('menu_items.id', null);
 			}
+			
+			$menu_items = $query->get()->toArray();
+
+			$data['concepts'] = DB::table('menu_segmentations')
+				->where('status', 'ACTIVE')
+				->whereIn('menu_segment_column_name', $concept_column_names)
+				->get();
+		}
 		}
 
 

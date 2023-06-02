@@ -1,13 +1,17 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
+	use Illuminate\Support\Facades\Request as Input;
 
-	class AdminUserConceptAcessController extends \crocodicstudio\crudbooster\controllers\CBController {
+	class AdminRndMenuItemsForApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
+
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+
+			$this->mainController = new AdminRndMenuItemsController;
 		}
 
 	    public function cbInit() {
@@ -20,41 +24,48 @@
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
-			$this->button_add = true;
-			$this->button_edit = true;
-			$this->button_delete = true;
-			$this->button_detail = true;
+			$this->button_add = false;
+			$this->button_edit = false;
+			$this->button_delete = false;
+			$this->button_detail = false;
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "user_concept_acess";
+			$this->table = "rnd_menu_items";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Privileges","name"=>"id_cms_privileges","join"=>"cms_privileges,name"];
-			$this->col[] = ["label"=>"Users Id","name"=>"cms_users_id","join"=>"cms_users,name"];
-			$this->col[] = ["label"=>"Concept Access","name"=>"menu_segmentations_id"];
-			$this->col[] = ["label"=>"Status","name"=>"status"];
-			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
-			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
-			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
-			$this->col[] = ["label"=>"Updated Date","name"=>"updated_at"];
+			$this->col[] = ["label"=>"Approval Status","name"=>"id","join"=>"rnd_menu_approvals,approval_status","join_id"=>"rnd_menu_items_id"];
+			$this->col[] = ["label"=>"RND Code","name"=>"rnd_code"];
+			$this->col[] = ["label"=>"Tasteless Code","name"=>"menu_items_id","join"=>"menu_items,tasteless_menu_code"];
+			$this->col[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description"];
+			$this->col[] = ["label"=>"SRP","name"=>"rnd_menu_srp"];
+			$this->col[] = ["label"=>"Portion Size","name"=>"portion_size"];
+			$this->col[] = ["label"=>"Published By","name"=>"rnd_menu_approvals.published_by","join"=>"cms_users,name","join_id"=>"id"];
+			$this->col[] = ["label"=>"Published Date","name"=>"rnd_menu_approvals.published_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Privilege','name'=>'id_cms_privileges','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-6','datatable'=>'cms_privileges,name','datatable_where'=>'name NOT LIKE \'%Admin%\''];
-			$this->form[] = ['label'=>'User Name','name'=>'cms_users_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-6','datatable'=>'cms_users,email','datatable_where'=>'status=%27ACTIVE%27','parent_select'=>'id_cms_privileges'];
-			$this->form[] = ['label'=>'Concept Access','name'=>'menu_segmentations_id','type'=>'select2-multi','validation'=>'required','width'=>'col-sm-6','datatable'=>'menu_segmentations,menu_segment_column_description'];
+			$this->form[] = ['label'=>'Rnd Menu Description','name'=>'rnd_menu_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Rnd Code','name'=>'rnd_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Rnd Tasteless Code','name'=>'rnd_tasteless_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Portion Size','name'=>'portion_size','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Rnd Menu Srp','name'=>'rnd_menu_srp','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Status','name'=>'status','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Created By','name'=>'created_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Updated By','name'=>'updated_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ["label"=>"Cms Privileges","name"=>"id_cms_privileges","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"cms_privileges,name"];
-			//$this->form[] = ["label"=>"Cms Users Id","name"=>"cms_users_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"cms_users,first_name"];
-			//$this->form[] = ["label"=>"Menu Segmentations Id","name"=>"menu_segmentations_id","type"=>"select2","required"=>TRUE,"validation"=>"required|string|min:5|max:5000","datatable"=>"menu_segmentations,menu_segment_column_name"];
+			//$this->form[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Rnd Code","name"=>"rnd_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Rnd Tasteless Code","name"=>"rnd_tasteless_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Portion Size","name"=>"portion_size","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Rnd Menu Srp","name"=>"rnd_menu_srp","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
 			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
 			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
 			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
@@ -87,7 +98,52 @@
 	        | 
 	        */
 	        $this->addaction = array();
+			$this->addaction[] = [
+				'title'=>'Detail',
+				'url'=>CRUDBooster::mainpath('detail/[id]'),
+				'icon'=>'fa fa-eye',
+				'color' => ' ',
+			];
+			
+			$privilege = CRUDBooster::myPrivilegeName();
 
+			if (CRUDBooster::isSuperAdmin() || $privilege == 'Marketing Encoder') {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url'=>CRUDBooster::mainpath('edit/[id]'),
+					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"
+						[approval_status] == 'FOR PACKAGING' ||
+						[approval_status] == 'FOR MENU CREATION' ||
+						[approval_status] == 'FOR COSTING'
+					"
+				];
+			}
+
+			if (CRUDBooster::isSuperAdmin() || $privilege == 'Marketing Approver') {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url'=>CRUDBooster::mainpath('edit/[id]'),
+					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"
+						[approval_status] == 'FOR APPROVAL (MARKETING)'
+					"
+				];
+			}
+			
+			if (CRUDBooster::isSuperAdmin() || $privilege == 'Accounting Approver') {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url'=>CRUDBooster::mainpath('edit/[id]'),
+					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"
+						[approval_status] == 'FOR APPROVAL (ACCOUNTING)'
+					"
+				];
+			}
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -100,7 +156,6 @@
 	        | 
 	        */
 	        $this->button_selected = array();
-
 	                
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -216,9 +271,10 @@
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-	        $this->load_css = array();
-	        
-	        
+	        $this->load_css = [
+				asset('css/custom.css')
+			];
+
 	    }
 
 
@@ -245,7 +301,34 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-	            
+			$not_valid_approval_statuses = [
+				'SAVED', 
+				'REJECTED', 
+				'APPROVED', 
+				'CLOSED', 
+				'FOR RELEASE DATE',
+				'ARCHIVED',
+				'RETURNED',
+				'FOR ADJUSTMENT',
+			];
+
+			$upperCasedPrivilege = strtoupper(CRUDBooster::myPrivilegeName());
+
+			$privileges = [
+				'CHEF' => [],
+				'MARKETING ENCODER' => ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR COSTING'],
+				'MARKETING APPROVER' => ['FOR FOOD TASTING', 'FOR APPROVAL (MARKETING)'],
+				'ACCOUNTING APPROVER' => ['FOR APPROVAL (ACCOUNTING)'],
+				'PURCHASING STAFF' => [],
+			];
+
+			$query
+				->addSelect('rnd_menu_approvals.approval_status as approval_status')
+				->whereNotIn('rnd_menu_approvals.approval_status', $not_valid_approval_statuses);
+			
+			if (!CRUDBooster::isSuperAdmin()) {
+				$query->whereIn('rnd_menu_approvals.approval_status', $privileges[$upperCasedPrivilege]);
+			}
 	    }
 
 	    /*
@@ -254,20 +337,26 @@
 	    | ---------------------------------------------------------------------- 
 	    |
 	    */    
-	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code here
-			if ($column_index == 4) {
-				$column_array = explode(',', $column_value);
-				$concepts = DB::table('menu_segmentations')
-					->whereIn('id', $column_array)
-					->get('menu_segment_column_description');
+	    public function hook_row_index($column_index,&$column_value) {	       
+			if (is_numeric($column_value)) $column_value = (float) $column_value;
 
-				$column_value = [];
-				foreach ($concepts as $index => $concept) {
-					$column_value[$index] = '<span class="label label-info">' . $concept->menu_segment_column_description . '</span>';
+			$blue_status = ['SAVED', 'FOR COSTING'];
+			$dark_blue_status = ['FOR FOOD TASTING'];
+			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION'];
+			$green_status = ['APPROVED'];
+			
+			if ($column_index == 2) {
+				if (in_array($column_value, $blue_status)) {
+					$column_value = "<span class='label label-info'>$column_value</span>";
+				} else if (in_array($column_value, $orange_status)) {
+					$column_value = "<span class='label label-warning'>$column_value</span>";
+				} else if (in_array($column_value, $green_status)) {
+					$column_value = "<span class='label label-success'>$column_value</span>";
+				} else if (in_array($column_value, $dark_blue_status)) {
+					$column_value = "<span class='label label-primary'>$column_value</span>";
 				}
 				
-				$column_value = implode(' ', $column_value);
+				if (str_contains($column_value, 'APPROVAL')) $column_value = "<span class='label label-info'>$column_value</span>";
 			}
 	    }
 
@@ -278,13 +367,11 @@
 	    | @arr
 	    |
 	    */
-	    public function hook_before_add(&$postdata) {        
-	        //Your code here
-			$postdata['created_by']=CRUDBooster::myId();
-			$postdata['created_at']=date('Y-m-d H:i:s');
-			if (is_array($postdata['menu_segmentations_id'])){
-				$postdata['menu_segmentations_id'] = implode(",", $postdata['menu_segmentations_id']);
-			}
+	    public function hook_before_add(&$postdata) {
+
+			$returnInputs = Input::all();  
+	    	return $this->mainController->saveNewMenu($returnInputs);
+
 	    }
 
 	    /* 
@@ -296,6 +383,7 @@
 	    */
 	    public function hook_after_add($id) {        
 	        //Your code here
+
 	    }
 
 	    /* 
@@ -308,11 +396,7 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        //Your code here
-			$postdata['updated_by']=CRUDBooster::myId();
-			$postdata['updated_at']=date('Y-m-d H:i:s');
-			if (is_array($postdata['menu_segmentations_id'])){
-				$postdata['menu_segmentations_id'] = implode(",", $postdata['menu_segmentations_id']);
-			}
+
 	    }
 
 	    /* 
@@ -355,5 +439,129 @@
 
 	    //By the way, you can still create your own method in here... :) 
 
+		public function getDetail($id) {
 
+			if (!CRUDBooster::isRead())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$status = DB::table('rnd_menu_approvals')
+				->where('rnd_menu_items_id', $id)
+				->first()
+				->approval_status;
+
+			if ($status == 'FOR FOOD TASTING') {
+				return $this->mainController->getDetailWithIngredient($id);
+			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
+				return $this->mainController->getDetailNoIngredient($id, false);
+			}
+
+			return $this->mainController->getDetailNoIngredient($id);
+			
+
+		}
+
+		public function getEdit($id) {
+
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$status = DB::table('rnd_menu_approvals')
+				->where('rnd_menu_items_id', $id)
+				->first()
+				->approval_status;
+
+			if ($status == 'FOR PACKAGING') {
+				return $this->mainController->getSetPackaging($id);
+			} else if ($status == 'FOR COSTING') {
+				return $this->mainController->getSetCosting($id);
+			} else if ($status == 'FOR MENU CREATION') {
+				return $this->mainController->getCreateNewMenu($id);
+			} else if ($status == 'FOR APPROVAL (MARKETING)') {
+				return $this->mainController->getApproveByMarketing($id);
+			} else if ($status == 'FOR ITEM CREATION') {
+				return $this->mainController->getEditByPurchasing($id);
+			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
+				return $this->mainController->getApproveByAccounting($id);
+			}
+		}
+
+		public function addNewMenu(Request $request) {
+			
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->saveNewMenu($request);
+		}
+
+		public function editNewMenu(Request $request, $id) {
+			return $this->mainController->editNewMenu($request, $id);
+		}
+
+		public function addPackaging(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->addPackaging($request);
+		}
+
+		public function submitCosting(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->submitCosting($request);
+		}
+
+		public function addComment(Request $request) {
+			return $this->mainController->addComment($request);
+		}
+
+		public function deleteComment(Request $request) {
+
+			return $this->mainController->deleteComment($request);
+		}
+
+		public function approveByMarketing(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->approveByMarketing($request);
+		}
+
+		public function approveByAccounting(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->approveByAccounting($request);
+		}
+
+		public function returnRNDMenu(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			return $this->mainController->returnRNDMenu($request);
+		}
 	}

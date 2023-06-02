@@ -64,8 +64,7 @@
 			$this->col[] = ["label"=>"Menu Item Description","name"=>"menu_item_description"];
 			$this->col[] = ["label"=>"Menu Category","name"=>"menu_categories_id","join"=>"menu_categories,category_description"];
 			$this->col[] = ["label"=>"Menu Subcategory","name"=>"menu_subcategories_id","join"=>"menu_subcategories,subcategory_description"];
-			// $this->col[] = ["label"=>"Menu Product Type","name"=>"menu_product_types_id","join"=>"menu_product_types,menu_product_type_description"];
-			$this->col[] = ["label"=>"Menu Product Type", 'name'=> 'menu_product_types_name'];
+			$this->col[] = ["label"=>"Menu Product Type","name"=>"menu_product_types_id","join"=>"menu_product_types,menu_product_type_description"];
 			$this->col[] = ["label"=>"Menu Type","name"=>"menu_types_id","join"=>"menu_types,menu_type_description"];
 			foreach($prices as $price){
 				$this->col[] = ["label"=>ucwords(strtolower($price->menu_price_column_description)),"name"=>$price->menu_price_column_name];
@@ -277,6 +276,14 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
+			DB::table('menu_items')
+				->leftJoin('menu_product_types', 'menu_items.menu_product_types_id', '=', 'menu_product_types.id')
+				->where('menu_items.menu_product_types_name', null)
+				->where('menu_items.menu_product_types_id', '!=', null)
+				->update([
+					'menu_items.menu_product_types_name' => DB::raw('menu_product_types.menu_product_type_description')
+				]);
+
 			$query->orderBy('status', 'asc');
 			
 			if (CRUDBooster::myPrivilegeName() == 'Chef') {
@@ -306,31 +313,8 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code 
 
-			if($column_index == '2'){
-
-				$tasteless_menu_code_id = DB::table('menu_items')
-					->where('status', 'ACTIVE')
-					->where('tasteless_menu_code', $column_value)
-					->first();
-		
-				$product_type_name = DB::table('menu_product_types')
-					->where('id', $tasteless_menu_code_id->menu_product_types_id)
-					->select('menu_product_type_description')
-					->value('menu_product_type_description');
-
-				if($tasteless_menu_code_id->menu_product_types_name == null){
-					$update = DB::table('menu_items')
-					->where('tasteless_menu_code', $tasteless_menu_code_id->tasteless_menu_code)
-					->update([
-						'menu_product_types_name' => $product_type_name
-					]);
-				}
-								
-			}
-
-			if($column_index == '18'){
+			if($column_index == '19'){
 
 				if($column_value == 'INACTIVE'){
 					$column_value = '<span class="label label-danger">INACTIVE</span>';
@@ -572,10 +556,12 @@
 
 
 	    //By the way, you can still create your own method in here... :) 
-		public function getAdd() {
+		public function getAdd($table = 'menu_items', $item = null, $comments = null) {
 			//Create an Auth
-			if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {    
-				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			if ($table == 'menu_items') {
+				if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {    
+					CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+				}
 			}
 			
 			$data = [];
@@ -613,6 +599,11 @@
 				->where('status', 'ACTIVE')
 				->orderBy('menu_choice_group_column_description')
 				->get()->unique('menu_choice_group_column_description');
+
+			if ($item) {
+				$data['item'] = $item;
+				$data['comments_data'] = $comments;
+			}
 				
 			return $this->view('menu-items.add-menu-items',$data);
 		}
@@ -631,10 +622,12 @@
 
 		}
 
-		public function getEdit($id) {
+		public function getEdit($id, $table = 'menu_items', $rnd_menu_items_id = null, $comments = null) {
 			//Create an Auth
-			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE || $this->button_edit==FALSE) {    
-				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			if ($table == 'menu_items') {
+				if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE || $this->button_edit==FALSE) {    
+					CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+				}
 			}
 			
 			$data = [];
@@ -696,6 +689,11 @@
 				->get();
 				array_push($data['store_list_id'], $store_list[0]->id);
 			}
+
+			$data['table'] = $table;
+			$data['rnd_menu_items_id'] = $rnd_menu_items_id;
+
+			$data['comments_data'] = $comments;
 			
 			return $this->view('menu-items.edit-menu-items',$data);
 		}

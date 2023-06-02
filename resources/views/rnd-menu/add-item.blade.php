@@ -4,14 +4,19 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
 <link rel="stylesheet" href="{{asset('css/edit-rnd-menu.css')}}">
+<link rel="stylesheet" href="{{asset('css/custom.css')}}">
 @endpush
 @extends('crudbooster::admin_template')
 @section('content')
+
 
 {{-- 
     A COPY OF INGREDIENT ENTRY!!! FOR CLONING!!
     THIS IS HIDDEN FROM THE DOM!!! --> {display: none}
 --}}
+
+{{-- FOR INGREDIENTS !!!!! --}}
+
 <div class="ingredient-wrapper" style="display: none;">
     <div class="ingredient-entry" isExisting="true">
         <div class="ingredient-inputs">
@@ -240,44 +245,285 @@
     </div>
 </div> 
 
-{{-- 
-    END OF COPY
- --}}
+{{-- FOR PACKAGING --}}
+
+<div class="packaging-wrapper" style="display: none;">
+    <div class="packaging-entry" isExisting="true">
+        <div class="packaging-inputs">
+            <label class="packaging-label">
+                <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
+                <div>
+                    <input value="" type="text" class="packaging form-control hidden" required/>
+                    <input value="" type="text" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                    <div class="item-list">
+                    </div>
+                </div>
+            </label>
+            <label>
+                <span class="required-star">*</span> Preparation Qty
+                <input value="" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
+            </label>
+            <label>
+                <span class="required-star">*</span> Packaging UOM
+                <div>
+                    <input type="text" class="form-control uom" name="uom[]" value="" style="display: none;"/>
+                    <input type="text" class="form-control display-uom" value="" readonly>
+                </div>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> Preparation
+                <select class="form-control preparation" disabled>
+                    @foreach ($preparations as $preparation)
+                    <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
+                    @endforeach
+                </select>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> Yield %
+                <input value="" class="form-control yield" type="number" readonly required>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> TTP <span class="date-updated"></span>
+                <input value="" class="form-control ttp" type="number" readonly required>
+            </label>
+            <label>
+                <span class="required-star">*</span> Packaging Qty
+                <input value="" class="form-control pack-quantity" type="number" readonly required>
+            </label>
+            <label>
+                <span class="required-star">*</span> Packaging Cost
+                <input value="" class="form-control cost" type="text" readonly required>
+            </label>
+        </div>
+        <div class="actions">
+            <button class="btn btn-info move-up" title="Move Up" type="button"> <i class="fa fa-arrow-up" ></i></button>
+            <button class="btn btn-info move-down" title="Move Down" type="button"> <i class="fa fa-arrow-down" ></i></button>
+            <button class="btn btn-danger delete" title="Delete Ingredient" type="button"> <i class="fa fa-trash" ></i></button>
+        </div>
+    </div>
+    <div class="add-sub-btn" title="Add Existing Substitute Packaging">
+        <i class="fa fa-plus"></i>
+    </div>
+    <div class="new-add-sub-btn" title="Add New Substitute Packaging">
+        <i class="fa fa-plus"></i>
+    </div>
+</div>
+
+<div class="new-packaging-wrapper" style="display: none;">
+    <div class="packaging-entry" isExisting="false">
+        <div class="packaging-inputs">
+            <label class="packaging-label">
+                <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span>
+                <div>
+                    <input value="" type="text" class="packaging-name form-control" placeholder="Search by Item Description" required/>
+                    <div class="item-list">
+                    </div>
+                </div>
+            </label>
+            <label>
+                <span class="required-star">*</span> Preparation Qty
+                <input value="" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
+            </label>
+            <label>
+                <span class="required-star">*</span> Packaging UOM
+                <div>
+                    <input type="text" class="form-control uom" value="" style="display: none;"/>
+                    <input type="text" class="form-control display-uom" value="" readonly>
+                </div>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> Preparation
+                <select class="form-control preparation" disabled>
+                    @foreach ($preparations as $preparation)
+                    <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
+                    @endforeach
+                </select>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> Yield %
+                <input value="" class="form-control yield" type="number" readonly required>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> TTP <span class="date-updated"></span>
+                <input value="" class="form-control ttp" type="number" readonly required>
+            </label>
+            <label>
+                <span class="required-star">*</span> Packaging Qty
+                <input value="" class="form-control pack-quantity" type="number" readonly required>
+            </label>
+            <label>
+                <span class="required-star">*</span> Packaging Cost
+                <input value="" class="form-control cost" type="text" readonly required>
+            </label>
+        </div>
+        <div class="actions">
+            <button class="btn btn-info move-up" title="Move Up" type="button"> <i class="fa fa-arrow-up" ></i></button>
+            <button class="btn btn-info move-down" title="Move Down" type="button"> <i class="fa fa-arrow-down" ></i></button>
+            <button class="btn btn-danger delete" title="Delete Ingredient" type="button"> <i class="fa fa-trash" ></i></button>
+        </div>
+    </div>
+    <div class="add-sub-btn" title="Add Existing Substitute Ingredient">
+        <i class="fa fa-plus"></i>
+    </div>
+    <div class="new-add-sub-btn" title="Add New Substitute Ingredient">
+        <i class="fa fa-plus"></i>
+    </div>
+</div>
+
+<div class="substitute-packaging" style="display: none;" isExisting="true">
+    <div class="packaging-inputs">
+        <label class="packaging-label">
+            <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
+            <div>
+                <input value="" type="text" class="packaging form-control hidden" required/>
+                <input value="" type="text" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                <div class="item-list">
+                </div>
+            </div>
+        </label>
+        <label>
+            <span class="required-star">*</span> Preparation Qty
+            <input value="" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
+        </label>
+        <label>
+            <span class="required-star">*</span> Packaging UOM
+            <div>
+                <input type="text" class="form-control uom" name="uom[]" value="" style="display: none;"/>
+                <input type="text" class="form-control display-uom" value="" readonly>
+            </div>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> Preparation
+            <select class="form-control preparation" disabled>
+                @foreach ($preparations as $preparation)
+                <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
+                @endforeach
+            </select>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> Yield %
+            <input value="" class="form-control yield" type="number" readonly required>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> TTP <span class="date-updated"></span>
+            <input value="" class="form-control ttp" type="number" readonly required>
+        </label>
+        <label>
+            <span class="required-star">*</span> Packaging Qty
+            <input value="" class="form-control pack-quantity" type="number" readonly required>
+        </label>
+        <label>
+            <span class="required-star">*</span> Packaging Cost
+            <input value="" class="form-control cost" type="text" readonly required>
+        </label>
+    </div>
+    <div class="actions">
+        <button class="btn btn-info set-primary" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
+        <button class="btn btn-danger delete-sub" title="Delete Ingredient" type="button"> <i class="fa fa-minus" ></i></button>
+    </div>
+</div> 
+
+<div class="new-substitute-packaging" style="display: none;" isExisting="false">
+    <div class="packaging-inputs">
+        <label class="packaging-label">
+            <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span>
+            <div>
+                <input value="" type="text" class="packaging-name form-control" placeholder="Search by Item Description" required/>
+                <div class="item-list">
+                </div>
+            </div>
+        </label>
+        <label>
+            <span class="required-star">*</span> Preparation Qty
+            <input value="" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
+        </label>
+        <label>
+            <span class="required-star">*</span> Packaging UOM
+            <div>
+                <input type="text" class="form-control uom" value="" style="display: none;"/>
+                <input type="text" class="form-control display-uom" value="" readonly>
+            </div>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> Preparation
+            <select class="form-control preparation" disabled>
+                @foreach ($preparations as $preparation)
+                <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
+                @endforeach
+            </select>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> Yield %
+            <input value="" class="form-control yield" type="number" readonly required>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> TTP <span class="date-updated"></span>
+            <input value="" class="form-control ttp" type="number" readonly required>
+        </label>
+        <label>
+            <span class="required-star">*</span> Packaging Qty
+            <input value="" class="form-control pack-quantity" type="number" readonly required>
+        </label>
+        <label>
+            <span class="required-star">*</span> Packaging Cost
+            <input value="" class="form-control cost" type="text" readonly required>
+        </label>
+    </div>
+    <div class="actions">
+        <button class="btn btn-info set-primary" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
+        <button class="btn btn-danger delete-sub" title="Delete Ingredient" type="button"> <i class="fa fa-minus" ></i></button>
+    </div>
+</div> 
+
+
+{{-- END OF COPY --}}
 
  {{-- DOM STARTS HERE !!!! --}}
 
 <p>
     <a title="Return" href="{{ CRUDBooster::mainpath() }}">
         <i class="fa fa-chevron-circle-left "></i>
-        Back To List Data Menu Item Masterfile
+        Back To List Data RND Menu Items
     </a>
 </p>
+
 <div class="panel panel-default">
     <div class="panel-heading">
-        <i class="fa fa-pencil"></i><strong> Edit Menu Item</strong>
+        <i class="fa fa-pencil"></i><strong> {{str_replace('get', '', CRUDBooster::getCurrentMethod())}} RND Menu Item</strong>
     </div>
     <div class="panel-body">
         <form action="" id="form-ingredient" class="form">
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="" class="control-label">Menu Item Description</label>
+                        <label for="" class="control-label"><span class="required-star">*</span> RND Temporary Menu Description</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input value="{{$item->menu_item_description}}" type="text" class="form-control" readonly>
+                            <input value="{{$item ? $item->rnd_menu_description : ''}}" type="text" class="form-control rnd_menu_description" placeholder="RND Temporary Menu Description">
                         </div>
                     </div>
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label">Menu SRP</label>
+                        <label for="" class="control-label"><span class="required-star">*</span> RND Menu SRP</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <span class="custom-icon"><strong>₱</strong></span>
                             </div>
-                            <input value="{{$item->menu_price_dine}}" type="number" class="form-control srp" placeholder="0.00" readonly>
+                            <input value="{{$item ? (float) $item->rnd_menu_srp : ''}}" type="number" class="form-control rnd_menu_srp" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">RND Menu Item Code</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-sticky-note"></i>
+                            </div>
+                            <input value="{{$item ? $item->rnd_code : ''}}" type="text" class="form-control rnd_code" placeholder="RND-XXXXX" readonly>
                         </div>
                     </div>
                 </div>
@@ -288,7 +534,18 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input value="{{$item->tasteless_menu_code}}" type="text" class="form-control rnd_tasteless_code" placeholder="XXXXXX" readonly>
+                            <input value="{{$item ? $item->menu_items_code : ''}}" type="text" class="form-control rnd_tasteless_code" placeholder="XXXXXX" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">Total Cost</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <span class="custom-icon"><strong>₱</strong></span>
+                            </div>
+                            <input type="text" class="form-control total-cost" placeholder="0.00" readonly>
                         </div>
                     </div>
                 </div>
@@ -350,15 +607,65 @@
             </section>
         </form>
         <hr>
+        <form action="" id="form-packaging">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box-header text-center">
+                        <h3 class="box-title"><b>Packaging</b></h3>
+                    </div>
+                </div>
+            </div>
+            <section class="packaging-section">
+                <div class="no-packaging-warning text-center">
+                    No packaging currently saved...
+                </div>
+            </section>
+            <section class="section-footer">
+                <div class="add-buttons">
+                    <button class="btn btn-primary" id="add-existing-packaging" name="button" type="button"> <i class="fa fa-plus" ></i> Add existing packaging</button>
+                    <button class="btn btn-success" id="add-new-packaging" name="button" type="button"> <i class="fa fa-plus" ></i> Add new packaging</button>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="" class="control-label">Packaging Cost</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span class="custom-icon"><strong>₱</strong></span>
+                                </div>
+                                <input type="text" class="form-control packaging-cost" placeholder="Packaging Cost" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </form>
+        @if ($approval_status == 'FOR FOOD TASTING' || $approval_status == 'FOR ADJUSTMENT')
+        <div class="row">
+            <div class="col-md-6">
+                <hr>
+                <h3 class="text-center">COMMENTS</h3>
+                <div class="chat">
+                    @include('rnd-menu/chat-app', $comments_data)
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-        <button class="btn btn-primary pull-right" type="button" id="save-btn"> <i class="fa fa-save" ></i> Save</button>
+		<button class="btn btn-success pull-right" id="publish-btn" {{$approval_status == 'FOR FOOD TASTING' ? '' : 'disabled'}}><i class="fa fa-upload"></i> Publish</button>
+		<button class="btn btn-warning pull-right" id="food-tasting-btn" style="margin-right: 10px;" {{$approval_status == 'FOR FOOD TASTING' ? 'disabled' : ''}}><i class="fa fa-spoon"></i> Food Tasting</button>
+		<button class="btn btn-primary pull-right" id="save-btn" style="margin-right: 10px;"><i class="fa fa-save" ></i> Save</button>
+        @if ($item)
+		<button class="btn btn-purple pull-right" id="archive-btn" style="margin-right: 10px;" {{$approval_status == 'ARCHIVED' ? 'disabled' : ''}}><i class="fa fa-eye-slash" ></i> Archive</button>
+        @endif
     </div>
 </div>
-  
 
 @endsection
+
 @push('bottom')
 
 <script>
@@ -366,11 +673,10 @@
     $('body').addClass('sidebar-collapse');
     const savedIngredients = {!! json_encode($ingredients) !!} || [];
     const savedPackagings = {!! json_encode($packagings) !!} || [];
-    const menuItem = {!! json_encode($item) !!};
+    const rndMenuItem = {!! json_encode($item) !!};
     const action = "{{$action}}";
     const privilege = "{{$privilege}}";
     const addButtonsId = '#add-existing-ingredient, #add-new-ingredient, #add-existing-packaging, #add-new-packaging';
-
     $(document).ready(function() {
 
         const debounce = (func, wait, immediate)=> {
@@ -448,8 +754,8 @@
                         uom: savedIngredient.packagings_id,
                         item_id: savedIngredient.item_masters_id,
                         menu_item_id: savedIngredient.menu_as_ingredient_id,
-                        new_ingredients_id: savedIngredient.new_ingredients_id,
                         batching_ingredients_id: savedIngredient.batching_ingredients_id,
+                        new_ingredients_id: savedIngredient.new_ingredients_id,
                     });
 
                     if (savedIngredient.item_masters_id) element.find('.date-updated').html(
@@ -530,6 +836,7 @@
                         cost: savedPackaging.packaging_cost,
                         uom: savedPackaging.uom_id,
                         item_id: savedPackaging.item_masters_id,
+                        new_packagings_id: savedPackaging.new_packagings_id,
                     });
 
                     if (savedPackaging.item_masters_id) element.find('.date-updated').html(
@@ -734,7 +1041,7 @@
             const totalCostInput = $('.total-cost');
             const foodCostInput = $('.food-cost');
             const portionInput = $('.portion');
-            const srpInput = $('.srp');
+            const srpInput = $('.rnd_menu_srp');
             const srp = srpInput.val() || 0;
             const percentageText = $('.percentage');
             if (portionInput.val() <= 0) portionInput.val('1');
@@ -945,7 +1252,7 @@
                     packagingObject.row_id = memberIndex;
                     packagingObject.packaging_group = groupIndex;
                     packagingObject.item_masters_id = packagingMember.find('.packaging').attr('item_id');
-                    packagingObject.new_packagings_id = packagingMember.find('.packaging-name').attr('new_packagings_id');
+                    packagingObject.new_packagings_id = packagingMember.find('.packaging-name').attr('new_packagings_id') || packagingMember.find('.packaging').attr('new_packagings_id');
                     packagingObject.packaging_size = packagingMember.find('.pack-size').val();
                     packagingObject.prep_qty = packagingMember.find('.prep-quantity').val();
                     packagingObject.uom_id = packagingMember.find('.uom').val();
@@ -966,18 +1273,23 @@
 
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
-                .attr('action', "{{ route('edit_menu_item') }}")
-                .hide();
+                .attr(
+                    'action', 
+                    buttonClicked == 'save' ? 
+                    "{{ route('edit_rnd_menu') }}" : 
+                    buttonClicked == 'publish' ?
+                    "{{ route('publish_rnd_menu') }}" :
+                    buttonClicked == 'food-tasting' ?
+                    "{{ route('food_tasting_rnd_menu') }}":
+                    "{{ route('archive_rnd_menu') }}"
+                )
+                .css('display', 'none');
 
             const csrf = $(document.createElement('input'))
                 .attr({
                     type: 'hidden',
                     name: '_token',
                 }).val("{{ csrf_token() }}");
-
-            const menuItemsIdData = $(document.createElement('input'))
-                .attr('name', 'menu_items_id')
-                .val(menuItem.id);
 
             const ingredientsData = $(document.createElement('input'))
                 .attr('name', 'ingredients')
@@ -987,17 +1299,17 @@
                 .attr('name', 'packagings')
                 .val(packagingsJSON);
 
-            const foodCostData = $(document.createElement('input'))
-                .attr('name', 'food_cost')
-                .val($('.food-cost').val().trim());
+            const rndMenuDescriptionData = $(document.createElement('input'))
+                .attr('name', 'rnd_menu_description')
+                .val($('.rnd_menu_description').val().trim());
 
-            const foodCostPercentageData = $(document.createElement('input'))
-                .attr('name', 'food_cost_percentage')
-                .val($('.percentage').text()?.replace(/[^0-9.]/g, ''));
+            const rndMenuIdData = $(document.createElement('input'))
+                .attr('name', 'rnd_menu_items_id')
+                .val(rndMenuItem?.id);
 
-            const ingredientTotalCost = $(document.createElement('input'))
-                .attr('name', 'ingredient_total_cost')
-                .val($('.ingredient-total-cost').val());
+            const srpData = $(document.createElement('input'))
+                .attr('name', 'rnd_menu_srp')
+                .val($('.rnd_menu_srp').val());
             
             const portionData = $(document.createElement('input'))
                 .attr('name', 'portion_size')
@@ -1005,12 +1317,11 @@
 
             form.append(
                 csrf,
-                menuItemsIdData,
                 ingredientsData,
                 packagingsData,
-                foodCostData,
-                foodCostPercentageData,
-                ingredientTotalCost,
+                rndMenuDescriptionData,
+                rndMenuIdData,
+                srpData,
                 portionData,
             );
             $('.panel-body').append(form);
@@ -1027,7 +1338,7 @@
 
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
-                $('.portion').val() > 0;
+                $('.portion').val() > 0 && $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() > 0;
 
             const hasIngredient = $('#form-ingredient .ingredient-wrapper, #form-ingredient .new-ingredient-wrapper').length > 0;
             
@@ -1051,6 +1362,8 @@
                         .find('.display-ingredient, .display-packaging')
                         .css('outline', '2px solid red');
                     if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
+					if (!$('.rnd_menu_description').val()) $('.rnd_menu_description').css('outline', '2px solid red');
+					if (!$('.rnd_menu_srp').val() || $('.rnd_menu_srp').val() <= 0) $('.rnd_menu_srp').css('outline', '2px solid red');
                 });
         }
 
@@ -1073,6 +1386,68 @@
                 $.fn.formatInvalidInputs(isValid);
             }
         }); 
+
+        $(document).on('click', '#publish-btn', function(event) {
+            const [isValid, hasIngredient] = $.fn.checkFormValidity();
+            if (isValid && hasIngredient) {
+                Swal.fire({
+                    title: 'Do you want to publish this item?',
+                    html: '🟠  Doing so will forward this item to <span class="label label-warning">MARKETING</span>.<br/>' +
+                        `📄  You won't be able to edit this item again.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Publish'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.fn.submitForm('publish');
+                    }    
+                });
+            } else {
+                $.fn.formatInvalidInputs(isValid);
+            }
+
+        });
+
+        $(document).on('click', '#food-tasting-btn', function(event) {
+            const [isValid, hasIngredient] = $.fn.checkFormValidity();
+            if (isValid && hasIngredient) {
+                Swal.fire({
+                    title: 'Do you want to update the status?',
+                    html: '🔵  Doing so will change the status of this item to <span class="label label-primary">FOR FOOD TASTING</span>.<br/>' +
+                        `📄  You won't be able to revert this.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes',
+                    width: '600',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.fn.submitForm('food-tasting');
+                    }    
+                });
+            } else {
+                $.fn.formatInvalidInputs(isValid);
+            }
+        });
+
+        $(document).on('click', '#archive-btn', function() {
+            Swal.fire({
+                title: 'Do you want to archive this item?',
+                html: '⚠️  Doing so will push  this item to the bottom of the list.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.fn.submitForm('archive');
+                }    
+            });
+        });
 
         $(document).on('click', '.list-item', function(event) {
             const item = $(this);
@@ -1331,6 +1706,7 @@
         $.fn.reload();
         $.fn.formatSelected();
         $.fn.sumCost();
-    }); 
+    });
 </script>
+
 @endpush

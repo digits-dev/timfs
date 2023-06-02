@@ -15,6 +15,12 @@ use App\Http\Controllers\AdminAddMenuItemsController;
 use App\Http\Controllers\AdminMenuItemsController;
 use App\Http\Controllers\AdminFoodCostController;
 use App\Http\Controllers\AdminExperimentalMenuItemsController;
+use App\Http\Controllers\AdminRndMenuItemsController;
+use App\Http\Controllers\AdminRndMenuItemsForApprovalController;
+use App\Http\Controllers\AdminRndMenuItemsApprovedController;
+use App\Http\Controllers\AdminNewIngredientsController;
+use App\Http\Controllers\AdminNewPackagingsController;
+use App\Http\Controllers\AdminBatchingIngredientsController;
 
 Route::get('/', function () {
     return redirect('admin/login');
@@ -97,4 +103,39 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/add_menu_items/edit/{id}', [AdminAddMenuItemsController::class, 'getEdit']);
     Route::get('/admin/add_menu_items/detail/{id}', [AdminAddMenuItemsController::class, 'getDetail']);
 
+    //rnd menu items
+    Route::post('/admin/rnd_menu_items/edit', [AdminRndMenuItemsController::class, 'editRNDMenu'])->name('edit_rnd_menu');
+    Route::post('/admin/rnd_menu_items/publish', [AdminRndMenuItemsController::class, 'publishRNDMenu'])->name('publish_rnd_menu');
+    Route::post('/admin/rnd_menu_items/food-tasting', [AdminRndMenuItemsController::class, 'foodTastingRNDMenu'])->name('food_tasting_rnd_menu');
+    Route::post('/admin/rnd_menu_items/archive', [AdminRndMenuItemsController::class, 'archiveRNDMenu'])->name('archive_rnd_menu');
+    Route::get('/admin/rnd_menu_items/delete-rnd-menu/{id}', [AdminRndMenuItemsController::class, 'deleteRndMenuItem']);
+    Route::post('/admin/rnd_menu_items/search-ingredients/', [AdminRndMenuItemsController::class, 'searchAllIngredients'])->name('search_all_ingredients');
+    Route::post('/admin/for_approval_rnd_menu/edit/add-menu-item', [AdminRndMenuItemsForApprovalController::class, 'addNewMenu'])->name('add_new_menu');
+    Route::post('/admin/for_approval_rnd_menu/edit/edit-menu-item/{id}', [AdminRndMenuItemsForApprovalController::class, 'editNewMenu'])->name('edit_new_menu');
+    Route::post('/admin/for_approval_rnd_menu/edit/submit-costing', [AdminRndMenuItemsForApprovalController::class, 'submitCosting'])->name('submit_costing');
+    Route::post('/admin/for_approval_rnd_menu/edit/approve_by_marketing', [AdminRndMenuItemsForApprovalController::class, 'approveByMarketing'])->name('approve_by_marketing');
+    Route::post('/admin/for_approval_rnd_menu/edit/approve_by_accounting', [AdminRndMenuItemsForApprovalController::class, 'approveByAccounting'])->name('approve_by_accounting');
+    Route::post('/admin/for_approval_rnd_menu/edit/search-temp-items', [AdminRndMenuItemsController::class, 'searchTempItems'])->name('search_temp_items');
+    Route::post('/admin/for_approval_rnd_menu/edit/add-packaging', [AdminRndMenuItemsForApprovalController::class, 'addPackaging'])->name('add_packaging');
+    Route::post('/admin/for_approval_rnd_menu/edit/add-comment', [AdminRndMenuItemsForApprovalController::class, 'addComment'])->name('add_rnd_comment');
+    Route::post('/admin/for_approval_rnd_menu/edit/delete-comment', [AdminRndMenuItemsForApprovalController::class, 'deleteComment'])->name('delete_rnd_comment');
+    Route::post('/admin/approved_rnd_menu/edit/add-release-date', [AdminRndMenuItemsApprovedController::class, 'addReleaseDate'])->name('add_release_date');
+    Route::post('/admin/for_approval_rnd_menu/edit/return-item', [AdminRndMenuItemsForApprovalController::class, 'returnRNDMenu'])->name('return_rnd_menu');
+
+    //new items (new ingredients and packagings)
+    Route::get('/admin/delete-new-items/{table}/{id}', [AdminNewIngredientsController::class, 'deleteNewItem']);
+
+    Route::post('/admin/new_ingredients/search-new-ingredients', [AdminNewIngredientsController::class, 'searchNewIngredients'])->name('search_new_ingredient');
+    Route::post('/admin/new_ingredients/edit-new-ingredients', [AdminNewIngredientsController::class, 'editNewIngredients'])->name('edit_new_ingredients');
+    Route::post('/admin/new_ingredients/search-item-for-tagging', [AdminNewIngredientsController::class, 'searchItemForTagging'])->name('search_item_for_tagging');
+
+    Route::post('/admin/new_ingredients/add-new-items-comments', [AdminNewIngredientsController::class, 'addNewItemsComments'])->name('add_new_items_comments');
+    Route::post('/admin/new_ingredients/delete-new-items-comments', [AdminNewIngredientsController::class, 'deleteNewItemsComments'])->name('delete_new_items_comments');
+    
+    Route::post('/admin/new_packagings/search-new-packagings', [AdminNewPackagingsController::class, 'searchNewPackagings'])->name('search_new_packaging');
+    Route::post('/admin/new_packagings/edit-new-packagings', [AdminNewpackagingsController::class, 'editNewPackagings'])->name('edit_new_packagings');
+    
+    // batching ingredients
+    Route::post('/admin/batching_ingredients/edit-batching-ingredient', [AdminBatchingIngredientsController::class, 'editBatchingIngredient'])->name('edit_batching_ingredient');
+    
 });

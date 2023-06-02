@@ -10,6 +10,13 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
+    .swal2-html-container {
+        line-height: 3rem;
+    }
+
+    .swal2-popup, .swal2-modal, .swal2-icon-warning .swal2-show {
+        font-size: 1.6rem !important;
+    }
 
     .form-column{
     margin: 0 1vw;
@@ -124,14 +131,22 @@
 @extends('crudbooster::admin_template')
 @section('content')
   <!-- Your html goes here -->
-  <p><a title='Return' href='{{ CRUDBooster::mainpath() }}'><i class='fa fa-chevron-circle-left '></i>&nbsp; Back To Add Menu Item</a></p>
+  <p class="noprint">
+    <a title='Return' href="{{ CRUDBooster::mainPath() }}">
+        <i class='fa fa-chevron-circle-left '></i> &nbsp; {{trans("crudbooster.form_back_to_list",['module'=>CRUDBooster::getCurrentModule()->name])}}
+    </a>
+  </p>
   <div class='panel panel-default'>
     <div class='panel-heading'>Add Menu Items</div>
-    <div class='panel-body'>
-        <form method="POST" action="{{CRUDBooster::mainpath('add-save')}}" id="form-add">
+    <form method="POST" action="{{$item->rnd_menu_items_id ? route('add_new_menu') : CRUDBooster::mainpath('add-save')}}" id="form-add">
+        <div class='panel-body'>
             @csrf
+            @if ($item->rnd_menu_items_id) 
+            <input type="text" class="hidden" name="rnd_menu_items_id" value="{{$item->rnd_menu_items_id}}">
+            @endif
             <div class="add-content">
                 <div class="form-column">
+                    @if (!$item->rnd_menu_items_id) 
                     <fieldset>
                         <legend> POS Old Item Code 1</legend>
                         <input type="text" name="pos_item_code_1" placeholder="Enter pos old item code 1" oninput="this.value = this.value.toUpperCase()">
@@ -148,21 +163,14 @@
                         <legend> POS Old Description</legend>
                         <input type="text" name="pos_item_description" placeholder="Enter pos old item description" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
+                    @endif
                     <fieldset>
                         <legend><span id="required">*</span> Menu Description</legend>
-                        <input type="text" name="menu_item_description" placeholder="Enter menu description" required oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" name="menu_item_description" value="{{$item->rnd_menu_description ? $item->rnd_menu_description : ''}}" placeholder="Enter menu description" required oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
                         <legend><span id="required">*</span> Product Type</legend>
                         <input type="text" name="product_type" placeholder="Enter a product type" required oninput="this.value = this.value.toUpperCase()">
-
-                        {{-- <select class="js-example-basic-single" name="product_type" id="menu_type_select2" required>
-                            <option value="" selected disabled></option>
-                            @foreach ($menu_product_types as $product_type)
-                                <option value="{{ $product_type->id }}">{{ $product_type->menu_product_type_description }}</option>
-                            @endforeach
-                        </select> --}}
-
                     </fieldset>
                     <fieldset>
                         <legend><span id="required">*</span> Menu Type</legend>
@@ -223,9 +231,10 @@
                             @endforeach
                         </select> 
                     </fieldset>
+                    @if (!$item->rnd_menu_items_id) 
                     <fieldset>
                         <legend><span id="required">*</span> Price - Dine In</legend>
-                        <input type="number" name="price_dine_in" placeholder="Enter price - dine in" required oninput="this.value = this.value.toUpperCase()">
+                        <input type="number" name="price_dine_in" value="{{$item->rnd_menu_srp ? (float) $item->rnd_menu_srp : ''}}" placeholder="Enter price - dine in" required oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
                     <fieldset>
                         <legend> Price - Delivery</legend>
@@ -235,6 +244,7 @@
                         <legend> Price - Take Out</legend>
                         <input type="number" name="price_take_out" placeholder="Leave blank if same as dine in" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>  
+                    @endif
                     <fieldset>
                         <legend><span id="required">*</span> Original Concept</legend>
                         <input type="text" name="original_concept" placeholder="Enter original concept" required oninput="this.value = this.value.toUpperCase()">
@@ -254,15 +264,32 @@
                     </fieldset> 
                 </div>
             </div>
-            <div class="panel-footer">
-                <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-                <input type='submit' class='btn btn-primary pull-right' value='Add Menu' onclick=""/>
-            </div>
+            <button id="submit-button" type="submit" class="hide">Submit</button>
         </form>
+        @if ($item->rnd_menu_items_id)
+        <div class="row">
+            <div class="col-md-6">
+                <hr>
+                <h4 class="text-center">Comments</h4>
+                @include('rnd-menu/chat-app', $comments_data)
+            </div>
+        </div>
+        @endif
+    </div>
+    <div class="panel-footer">
+        <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
+        @if ($item->rnd_menu_items_id)
+        <button type="button" class="btn btn-primary pull-right save-btn"><i class="fa fa-save"></i> Save</button>
+        <button class="btn btn-warning pull-right return-btn" type="button" _return_to="chef" style="margin-right: 10px;"><i class="fa fa-mail-reply" ></i> Return to Chef</button>
+        @else
+        <input type="submit" class='btn btn-primary pull-right add-menu' value='Add Menu' onclick=""/>
+        @endif
     </div>
 </div>
 
 <script>
+    const item = {!! json_encode($item) !!} || {};
+
     $('#menu_type_select1').select2({
         placeholder: "Select a menu segmentation",
         allowClear: true,
@@ -351,53 +378,109 @@
             
         }
     });
-    
 
+    $('.add-menu[type="submit"]').on('click', function() {
+        $('#submit-button').click();
+    })
 
+    @if ($item->rnd_menu_items_id)
+    $(document).on('click', '.save-btn', function() {
+        Swal.fire({
+            title: 'Do you want to save this item?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            returnFocus: false,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#submit-button').click();
+            }
+        });
+    });
 
-    // $('.select2-search__field').on('keypress', function(e) {
-    //     console.log('Key pressed: ' + e.which);
-    // })
+    $('#form-add').submit(function(event) {
+        const formData = $('#form-add').serialize();
+        $.ajax({
+            type: "POST",
+            url: "{{ route('add_new_menu') }}",
+            data: formData,
+            dataType: "json",
+            encode: true,
+            success: function(response) {
+                Swal.fire({
+                    title: `✔️ New Menu Item Created!`,
+                    html: '📄 Do you want to continue to Costing?',
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'Not now',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.href = "{{ CRUDBooster::mainPath() }}" + `/edit/${item.rnd_menu_items_id}`;
+                    } else {
+                        location.href = "{{ CRUDBooster::mainPath() }}";
+                    }
+                });
+            },
+            error: function(response) { 
+                console.log(response);
+                Swal.fire({
+                    title: 'Oops',
+                    html: 'Something went wrong.',
+                    icon: 'error'
+                });
+            } 
+        });
 
-    // $('#group_1_sku').find('.select2-search__field').on('keypress', function() {
-    //     let txt = $(this).val();
-    //     var ajax_data = 'Patrick Lester'
-    //     $.ajax({
-    //         url: '{{ url('/add_menu_items') }}',
-    //         type: "POST",
-    //         cache: false,
-    //         data: {
-    //             'name': txt,
-    //             _token: '{!! csrf_token() !!}'
-    //         },
-    //         success: function(data){
-    //             // console.log(result.data.ajax_html.map(e => e.tasteless_menu_code));
+        event.preventDefault();
+    });
 
-    //             // let tasteless_menu = result.data.search_tasteless_menu_code;
-    //             // // $("#menu_type_select6").html('');
-    //             // for(i=0; i<tasteless_menu.length; i++){
+    $(document).on('click', '.return-btn', function() {
+        const returnTo = $(this).attr('_return_to');
+        const action = 'return';
+        Swal.fire({
+            title: `Do you want to return this item?`,
+            html: `🟠 Doing so will return this item to <label class="label label-warning">${returnTo.toUpperCase()}</label>.` +
+                `<br/> ⚠️ You won't be able to revert this.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = $(document.createElement('form'))
+                    .attr('method', 'POST')
+                    .attr('action', "{{ route('return_rnd_menu') }}")
+                    .hide();
 
-    //             //     let menu_code = tasteless_menu.map(e => e.tasteless_menu_code)[i];
-    //             //     let menu_description = tasteless_menu.map(e => e.menu_item_description)[i]
-    //             //     // console.log(tasteless_menu[i]);
-    //             //     $("#menu_type_select6").append("<option value='"+menu_code+"'>"+menu_description+"</option>");
-    //             // }
+                const csrf = $(document.createElement('input'))
+                    .attr('name', '_token')
+                    .val("{{csrf_token()}}");
 
-    //             // $.each(data, function (index, value) {
-    //             //     let test = value.search_tasteless_menu_code
-    //             //     for(i=0;i<test.length;i++){
-    //             //         console.log(test[i]['menu_item_description']);
-    //             //         $('#menu_type_select6').append('<option value="' + value.id + '">' + test[i]['menu_item_description'] + '</option>');
-    //             //     }
-    //             // });
-    //         },
-    //         error: function(xhr, status, error) {
-    //             console.log('Error:', error);
-    //         }
+                const actionInput = $(document.createElement('input'))
+                    .attr('name','action')
+                    .val('return');
 
-    //     })
-    // });
+                const returnToInput = $(document.createElement('input'))
+                    .attr('name', 'return_to')
+                    .val(returnTo)
 
+                const rndMenuItemsId = $(document.createElement('input'))
+                    .attr('name', 'rnd_menu_items_id')
+                    .val("{{ $item->rnd_menu_items_id }}");
+
+                form.append(csrf, actionInput, returnToInput, rndMenuItemsId);
+                $('.panel-body').append(form);
+                form.submit();
+            }
+        });
+    });
+    @endif
 
 
 </script>

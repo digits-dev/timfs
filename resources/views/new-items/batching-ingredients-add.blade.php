@@ -8,10 +8,14 @@
 @extends('crudbooster::admin_template')
 @section('content')
 
+
 {{-- 
     A COPY OF INGREDIENT ENTRY!!! FOR CLONING!!
     THIS IS HIDDEN FROM THE DOM!!! --> {display: none}
 --}}
+
+{{-- FOR INGREDIENTS !!!!! --}}
+
 <div class="ingredient-wrapper" style="display: none;">
     <div class="ingredient-entry" isExisting="true">
         <div class="ingredient-inputs">
@@ -240,55 +244,59 @@
     </div>
 </div> 
 
-{{-- 
-    END OF COPY
- --}}
+
+{{-- END OF COPY --}}
 
  {{-- DOM STARTS HERE !!!! --}}
 
-<p>
-    <a title="Return" href="{{ CRUDBooster::mainpath() }}">
-        <i class="fa fa-chevron-circle-left "></i>
-        Back To List Data Menu Item Masterfile
+ <p class="noprint">
+    <a title='Return' href="{{ CRUDBooster::mainPath() }}">
+        <i class='fa fa-chevron-circle-left '></i> &nbsp; {{trans("crudbooster.form_back_to_list",['module'=>CRUDBooster::getCurrentModule()->name])}}
     </a>
 </p>
+
 <div class="panel panel-default">
     <div class="panel-heading">
-        <i class="fa fa-pencil"></i><strong> Edit Menu Item</strong>
+        <i class="fa fa-pencil"></i><strong> Edit {{CRUDBooster::getCurrentModule()->name}}</strong>
     </div>
     <div class="panel-body">
         <form action="" id="form-ingredient" class="form">
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="" class="control-label">Menu Item Description</label>
+                        <label for="" class="control-label"><span class="required-star">*</span> Batching Ingredient Description</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input value="{{$item->menu_item_description}}" type="text" class="form-control" readonly>
+                            <input value="{{$item ? $item->ingredient_description : ''}}" type="text" class="form-control ingredient-description" placeholder="Batching Ingredient Description">
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-group">
-                        <label for="" class="control-label">Menu SRP</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <span class="custom-icon"><strong>₱</strong></span>
-                            </div>
-                            <input value="{{$item->menu_price_dine}}" type="number" class="form-control srp" placeholder="0.00" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Tasteless Menu Code</label>
+                        <label for="" class="control-label">Batching Ingredient Item Code</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input value="{{$item->tasteless_menu_code}}" type="text" class="form-control rnd_tasteless_code" placeholder="XXXXXX" readonly>
+                            <input value="{{$item ? $item->bi_code : ''}}" type="text" class="form-control bi_code" placeholder="BI-XXXXX" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="" class="control-label"><span class="required-star">*</span> Batching Ingredient Prepared By</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-sticky-note"></i>
+                            </div>
+                            <select class="form-control prepared-by" required>
+                                <option value="" {{!$item->batching_ingredients_prepared_by_id ? 'selected' : ''}} disabled>None selected</option>
+                                @foreach ($prepared_bys as $prepared_by)
+                                <option value="{{ $prepared_by->id }}" {{$item->batching_ingredients_prepared_by_id == $prepared_by->id ? 'selected' : ''}}>{{ $prepared_by->prepared_by }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -324,20 +332,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4" style="display: none;">
-                        <div class="form-group">
-                            <label for="" class="control-label">Total Ingredient Cost</label>
-                            <div class="input-group">
-                                <div class="input-group-addon">
-                                    <i class="fa fa-plus"></i>
-                                </div>
-                                <input type="text" class="form-control ingredient-total-cost" placeholder="Total Cost" readonly>
-                            </div>
-                        </div>
-                    </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="" class="control-label">Food Cost (<span class="percentage"></span>)</label>
+                            <label for="" class="control-label">Food Cost <label>
                             <div class="input-group">
                                 <div class="input-group-addon">
                                     <span class="custom-icon"><strong>₱</strong></span>
@@ -350,15 +347,26 @@
             </section>
         </form>
         <hr>
+        @if ($approval_status == 'FOR FOOD TASTING')
+        <div class="row">
+            <div class="col-md-6">
+                <hr>
+                <h3 class="text-center">COMMENTS</h3>
+                <div class="chat">
+                    @include('rnd-menu/chat-app', $comments_data)
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-        <button class="btn btn-primary pull-right" type="button" id="save-btn"> <i class="fa fa-save" ></i> Save</button>
+		<button class="btn btn-primary pull-right" id="save-btn" style="margin-right: 10px;"><i class="fa fa-save" ></i> Save</button>
     </div>
 </div>
-  
 
 @endsection
+
 @push('bottom')
 
 <script>
@@ -366,11 +374,10 @@
     $('body').addClass('sidebar-collapse');
     const savedIngredients = {!! json_encode($ingredients) !!} || [];
     const savedPackagings = {!! json_encode($packagings) !!} || [];
-    const menuItem = {!! json_encode($item) !!};
+    const batchigIngredient = {!! json_encode($item) !!};
     const action = "{{$action}}";
     const privilege = "{{$privilege}}";
     const addButtonsId = '#add-existing-ingredient, #add-new-ingredient, #add-existing-packaging, #add-new-packaging';
-
     $(document).ready(function() {
 
         const debounce = (func, wait, immediate)=> {
@@ -438,18 +445,14 @@
                     if (savedIngredient.menu_as_ingredient_id && !savedIngredient.item_masters_id)
                         element.find('.item-from').addClass('label-warning').text('MIMF');
 
-                    if (savedIngredient.batching_ingredients_id)
-                        element.find('.item-from').addClass('label-secondary').text('BATCH');
-
                     const ingredientInput = element.find('.ingredient');
-                    ingredientInput.val(savedIngredient.item_masters_id || savedIngredient.menu_as_ingredient_id || savedIngredient.batching_ingredients_id);
+                    ingredientInput.val(savedIngredient.item_masters_id || savedIngredient.menu_as_ingredient_id);
                     ingredientInput.attr({
                         cost: savedIngredient.ingredient_cost || savedIngredient.food_cost,
                         uom: savedIngredient.packagings_id,
                         item_id: savedIngredient.item_masters_id,
                         menu_item_id: savedIngredient.menu_as_ingredient_id,
                         new_ingredients_id: savedIngredient.new_ingredients_id,
-                        batching_ingredients_id: savedIngredient.batching_ingredients_id,
                     });
 
                     if (savedIngredient.item_masters_id) element.find('.date-updated').html(
@@ -457,7 +460,7 @@
                         savedIngredient.created_at ? `${timeago.format(savedIngredient.created_at)}` :
                         ''
                     );
-                    element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description || savedIngredient.ingredient_description);
+                    element.find('.display-ingredient').val(savedIngredient.full_item_description || savedIngredient.menu_item_description);
                     element.find('.ingredient-name').val(savedIngredient.item_description);
                     element.find('.pack-size').val(parseFloat(savedIngredient.packaging_size));
                     element.find('.prep-quantity').val(parseFloat(savedIngredient.prep_qty) || 0).attr('readonly', false);
@@ -483,86 +486,6 @@
                     .attr('disabled', false);
                 ingredientSection.append(wrapperTemplate);
             }
-
-            //looping through saved packagings
-            for (i of packagingGroupCount) {
-                const groupedPackaging = savedPackagings.filter(e => e.packaging_group == i);
-                const wrapperTemplate = $(document.createElement('div'));
-                wrapperTemplate
-                    .addClass('packaging-wrapper')
-                    .append($('.add-sub-btn').eq(0).clone())
-                    .append($('.new-add-sub-btn').eq(0).clone());
-
-                groupedPackaging.forEach(savedPackaging => {
-                    let element;
-                    if (savedPackaging.is_primary == 'TRUE') {
-                        if (savedPackaging.is_existing == 'TRUE') {
-                            //primary and existing
-                            element = $('.packaging-wrapper .packaging-entry').eq(0).clone();
-                        } else {
-                            //primary and new
-                            element = $('.new-packaging-wrapper .packaging-entry').eq(0).clone();
-                            element.find('.ttp').attr('readonly', false);
-                        }
-                    } else {
-                        if (savedPackaging.is_existing == 'TRUE') {
-                            //substitute and existing
-                            element = $('.substitute-packaging').eq(0).clone();
-                            if (savedPackaging.is_selected == 'TRUE') element.attr('primary', true);
-                        } else {
-                            //substitute and new
-                            element = $('.new-substitute-packaging').eq(0).clone();
-                            if (savedPackaging.is_selected == 'TRUE') element.attr('primary', true);
-                        }
-                    }
-                    if (savedPackaging.menu_status == 'INACTIVE' || savedPackaging.item_status == 'INACTIVE') 
-                        element.find('.label-danger').text('⚠️INACTIVE');
-
-                    if (savedPackaging.item_masters_id && !savedPackaging.menu_as_ingredient_id)
-                        element.find('.item-from').addClass('label label-info').text('IMFS');
-
-                    if (savedPackaging.menu_as_ingredient_id && !savedPackaging.item_masters_id)
-                        element.find('.item-from').addClass('label-warning').text('MIMF');
-
-                    const packagingInput = element.find('.packaging');
-                    packagingInput.val(savedPackaging.item_masters_id);
-                    packagingInput.attr({
-                        cost: savedPackaging.packaging_cost,
-                        uom: savedPackaging.uom_id,
-                        item_id: savedPackaging.item_masters_id,
-                    });
-
-                    if (savedPackaging.item_masters_id) element.find('.date-updated').html(
-                        savedPackaging.updated_at ? `${timeago.format(savedPackaging.updated_at)}` :
-                        savedPackaging.created_at ? `${timeago.format(savedPackaging.created_at)}` :
-                        ''
-                    );
-                    element.find('.display-packaging').val(savedPackaging.full_item_description);
-                    element.find('.packaging-name').val(savedPackaging.item_description);
-                    element.find('.pack-size').val(parseFloat(savedPackaging.packaging_size));
-                    element.find('.prep-quantity').val(parseFloat(savedPackaging.prep_qty) || 0).attr('readonly', false);
-                    element.find('.uom').val(savedPackaging.uom_id);
-                    element.find('.uom_name').val(savedPackaging.uom_name);
-                    element.find('.display-uom').val(savedPackaging.uom_description);
-                    element.find('.preparation option').attr('selected', false);
-                    element.find('.preparation').val(savedPackaging.menu_ingredients_preparations_id)
-                    element.find('.yield').val(parseFloat(savedPackaging.yield) || 0);
-                    element.find('.ttp').val(parseFloat(savedPackaging.ttp) || 0).attr('packaging_size', savedPackaging.packaging_size);
-                    element.find('.packaging-name').attr('new_packagings_id', savedPackaging.new_packagings_id);
-                    element.find('.ttp').attr('readonly', true);
-                    element.find('.uom').attr('disabled', true);
-                    element.find('.pack-size').parents('label').remove();
-                    $.fn.computeIngredientOrPackagingCost(element);
-                    element.css('display', '');
-                    wrapperTemplate.append(element);
-                });
-
-                wrapperTemplate
-                    .find('.preparation, .yield')
-                    .attr('readonly', false)
-                    .attr('disabled', false);
-                packagingSection.append(wrapperTemplate);
-            }
         }
 
         $.fn.reload = function() {
@@ -571,8 +494,7 @@
             }
 
             $('.display-ingredient, .display-packaging, .ingredient-name, .packaging-name').keyup(debounce(function() {
-                let route = "{{ route('search_all_ingredients') }}";
-                let withMenu = true;
+                let route = "{{ route('search_ingredient') }}";
                 const entry = $(this).parents(`
                     .ingredient-entry,
                     .substitute-ingredient,
@@ -591,10 +513,6 @@
                         route = "{{ route('search_new_packaging') }}";
                     }
 
-                if (entry.attr('class').includes('packaging')) {
-                    withMenu = false;
-                }
-
                 const isNewItem = entry.attr('isExisting') == 'false';
                 const query = $(this).val().toLowerCase().replace(/\s+/g, ' ').trim().split(' ')?.filter(e => e != '');
                 const itemList = entry.find('.item-list');
@@ -607,7 +525,7 @@
                 $.ajax({
                     type: 'POST',
                     url: route,
-                    data: { content: JSON.stringify(query), _token: "{{ csrf_token() }}", with_menu: withMenu},
+                    data: { content: JSON.stringify(query), _token: "{{ csrf_token() }}",},
                     success: function(response) {
                         const searchResult = JSON.parse(response);
                         $.fn.renderSearchResult(entry, itemList, searchResult);
@@ -626,7 +544,11 @@
             });
 
             $('form input, form select').keyup(function() {
-                $('form input:valid, #form select:valid').css('outline', 'none');
+                $('form input:valid, form select:valid').css('outline', 'none');
+            });
+
+            $('form select').on('change', function() {
+                $('form select:valid').css('outline', 'none');
             });
 
             $('.prep-quantity').keyup(function() {
@@ -728,19 +650,11 @@
 
         $.fn.sumCost = function() {
             const ingredientWrappers = jQuery.makeArray($('.ingredient-section .ingredient-wrapper, .ingredient-section .new-ingredient-wrapper'));
-            const packagingWrappers = jQuery.makeArray($('.packaging-section .packaging-wrapper, .packaging-section .new-packaging-wrapper'));
-            const lowCost = Number(localStorage.getItem('lowCost')) || 30;
-            const totalIngredientCostInput = $('.ingredient-total-cost');
-            const totalCostInput = $('.total-cost');
             const foodCostInput = $('.food-cost');
             const portionInput = $('.portion');
-            const srpInput = $('.srp');
-            const srp = srpInput.val() || 0;
-            const percentageText = $('.percentage');
             if (portionInput.val() <= 0) portionInput.val('1');
             const portionSize = portionInput.val();
             let ingredientSum = 0;
-            let packagingSum = 0;
 
             //looping through ingredient wrappers
             ingredientWrappers.forEach(wrapper => {
@@ -755,36 +669,7 @@
             });
             ingredientSum = math.round(ingredientSum, 4);
             const foodCost = math.round(ingredientSum / portionSize, 4);
-            totalIngredientCostInput.val(ingredientSum);
             foodCostInput.val(foodCost);
-            const percentage = srp > 0 ? math.round(foodCost / srp * 100, 2) : 0;
-            
-            //formatting the percentage text depending on the low cost
-            $(percentageText).text(`${percentage}%`);
-            if (percentage > lowCost) {
-                $(percentageText).css('color', 'red');
-                foodCostInput.css({'color': 'red', 'outline': '2px solid red', 'font-weight': 'bold',});
-            } else {
-                $(percentageText).css('color', '');
-                foodCostInput.css({'color': '', 'outline': '', 'font-weight': 'normal'});    
-            }
-
-            //looping through packaging wrappers 
-            packagingWrappers.forEach(wrapper => {
-                const primary = $(wrapper).find('.packaging-entry');
-                const substitute = jQuery.makeArray($(wrapper).find('.substitute-packaging, .new-substitute-packaging'));
-                const markedSub = substitute.filter(e => $(e).attr('primary') == 'true');
-                if (!!markedSub.length) {
-                    packagingSum += Number($(markedSub[0]).find('.cost').val().replace(/[^0-9.]/g, ''));
-                } else {
-                    packagingSum += Number(primary.find('.cost').val()?.replace(/[^0-9.]/g, ''));
-                }
-            });
-            packagingSum = math.round(packagingSum, 4);
-            $('.packaging-cost').val(packagingSum);
-            const totalCost = math.round(packagingSum + foodCost, 4);
-            totalCostInput.val(totalCost);
-
         }
 
         $.fn.formatSelected = function() {
@@ -826,8 +711,8 @@
                 .filter(
                     item => !currentItems.item_id.includes(item.item_masters_id?.toString()) && 
                     !currentItems.menu_item_id.includes(item.menu_item_id?.toString())
-                ).sort((a, b) => (a.full_item_description || a.menu_item_description || a.item_description || a.ingredient_description)
-                ?.localeCompare(b.full_item_description || b.menu_item_description || b.item_description || b.ingredient_description));
+                ).sort((a, b) => (a.full_item_description || a.menu_item_description)
+                ?.localeCompare(b.full_item_description || b.menu_item_description));
 
             if (!result.length) {
                 result.push({full_item_description: 'No Item Found'});
@@ -846,25 +731,26 @@
             result.forEach(e => {
                 const li = $(document.createElement('li'));
                 const a = $(document.createElement('a'));
+                if (!e.item_masters_id && !e.menu_item_id) {
+                    a.css('color', 'red !important');
+                }
                 li.addClass('list-item dropdown-item');
                 li.attr({
                     item_id: e.item_masters_id,
                     menu_item_id: e.menu_item_id,
                     new_ingredients_id: e.new_ingredients_id,
                     new_packagings_id: e.new_packagings_id,
-                    batching_ingredients_id: e.batching_ingredients_id,
                     ttp: parseFloat(e.ttp) || parseFloat(e.food_cost) || 0,
                     packaging_size: e.packaging_size || 1,
                     uom: e.packagings_id || e.uoms_id,
                     uom_desc: e.packaging_description || e.uom_description,
                     food_cost_temp: e.food_cost_temp,
-                    item_desc: e.full_item_description || e.menu_item_description || e.item_description || e.ingredient_description,
+                    item_desc: e.full_item_description || e.menu_item_description || e.item_description,
                     date_updated: e.updated_at || e.created_at,
                 });
                 a.html(e.full_item_description && e.item_masters_id ? `<span class="label label-info">IMFS</span> ${e.full_item_description}`
                     : e.menu_item_description ? `<span class="label label-warning">MIMF</span> ${e.menu_item_description}` 
                     : (e.new_ingredients_id || e.new_packagings_id) ? `<span class="label label-success">NEW</span> ${e.item_description}` 
-                    : e.batching_ingredients_id ? `<span class="label label-secondary">BATCH</span> ${e.ingredient_description}`
                     : 'No Item Found');
                 li.append(a);
                 ul.append(li);
@@ -911,7 +797,6 @@
                     ingredientObject.ingredient_group = groupIndex;
                     ingredientObject.item_masters_id = ingredientMember.find('.ingredient').attr('item_id');
                     ingredientObject.new_ingredients_id = ingredientMember.find('.ingredient-name').attr('new_ingredients_id') || ingredientMember.find('.ingredient').attr('new_ingredients_id');
-                    ingredientObject.batching_ingredients_id = ingredientMember.find('.ingredient').attr('batching_ingredients_id');
                     ingredientObject.menu_as_ingredient_id = ingredientMember.find('.ingredient').attr('menu_item_id');
                     ingredientObject.packaging_size = ingredientMember.find('.pack-size').val();
                     ingredientObject.prep_qty = ingredientMember.find('.prep-quantity').val();
@@ -929,44 +814,11 @@
                 }
             });
 
-            // for packagings
-            const packagingsArray = [];
-            const packagingGroups = jQuery.makeArray($('#form-packaging .packaging-wrapper, #form-packaging .new-packaging-wrapper'));
-            packagingGroups.forEach((packagingGroup, groupIndex) => {
-                const group = $(packagingGroup);
-                const packagingArray = [];
-                const packagings = jQuery.makeArray(group.find('.packaging-entry, .substitute-packaging, .new-substitute-packaging'));
-                packagings.forEach((packaging, memberIndex) => {
-                    const packagingMember = $(packaging);
-                    const packagingObject = {};
-                    packagingObject.is_existing = (packagingMember.attr('isExisting') == 'true').toString().toUpperCase();
-                    packagingObject.is_primary = (packagingMember.hasClass('packaging-entry')).toString().toUpperCase();
-                    packagingObject.is_selected = (packagingMember.attr('primary') == 'true').toString().toUpperCase();
-                    packagingObject.row_id = memberIndex;
-                    packagingObject.packaging_group = groupIndex;
-                    packagingObject.item_masters_id = packagingMember.find('.packaging').attr('item_id');
-                    packagingObject.new_packagings_id = packagingMember.find('.packaging-name').attr('new_packagings_id');
-                    packagingObject.packaging_size = packagingMember.find('.pack-size').val();
-                    packagingObject.prep_qty = packagingMember.find('.prep-quantity').val();
-                    packagingObject.uom_id = packagingMember.find('.uom').val();
-                    packagingObject.uom_name = packagingMember.find('.uom_name').val()?.trim().toUpperCase();
-                    packagingObject.menu_ingredients_preparations_id = packagingMember.find('.preparation').val();
-                    packagingObject.yield = packagingMember.find('.yield').val();
-                    packagingObject.ttp = packagingMember.find('.ttp').val();
-                    packagingObject.qty = packagingMember.find('.ing-quantity').val();
-                    packagingObject.cost = packagingMember.find('.cost').val()?.replace(/[^0-9.]/g, '');
-                    packagingArray.push(packagingObject);
-                });
-                if (packagingArray.length) {
-                    packagingsArray.push(packagingArray);
-                }
-            });
             const ingredientsJSON = JSON.stringify(ingredientsArray);
-            const packagingsJSON = JSON.stringify(packagingsArray);
 
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')
-                .attr('action', "{{ route('edit_menu_item') }}")
+                .attr('action', "{{ route('edit_batching_ingredient') }}")
                 .hide();
 
             const csrf = $(document.createElement('input'))
@@ -975,43 +827,33 @@
                     name: '_token',
                 }).val("{{ csrf_token() }}");
 
-            const menuItemsIdData = $(document.createElement('input'))
-                .attr('name', 'menu_items_id')
-                .val(menuItem.id);
-
             const ingredientsData = $(document.createElement('input'))
                 .attr('name', 'ingredients')
                 .val(ingredientsJSON);
 
-            const packagingsData = $(document.createElement('input'))
-                .attr('name', 'packagings')
-                .val(packagingsJSON);
+            const ingrediendDescription = $(document.createElement('input'))
+                .attr('name', 'ingredient_description')
+                .val($('.ingredient-description').val().trim());
 
-            const foodCostData = $(document.createElement('input'))
-                .attr('name', 'food_cost')
-                .val($('.food-cost').val().trim());
-
-            const foodCostPercentageData = $(document.createElement('input'))
-                .attr('name', 'food_cost_percentage')
-                .val($('.percentage').text()?.replace(/[^0-9.]/g, ''));
-
-            const ingredientTotalCost = $(document.createElement('input'))
-                .attr('name', 'ingredient_total_cost')
-                .val($('.ingredient-total-cost').val());
+            const bachingIngredientId = $(document.createElement('input'))
+                .attr('name', 'batching_ingredients_id')
+                .val(batchigIngredient?.id);
             
             const portionData = $(document.createElement('input'))
                 .attr('name', 'portion_size')
                 .val($('.portion').val());
 
+            const batchingIngredientsPreparedById = $(document.createElement('input'))
+                .attr('name', 'batching_ingredients_prepared_by_id')
+                .val($('.prepared-by').val());
+
             form.append(
                 csrf,
-                menuItemsIdData,
                 ingredientsData,
-                packagingsData,
-                foodCostData,
-                foodCostPercentageData,
-                ingredientTotalCost,
+                ingrediendDescription,
+                bachingIngredientId,
                 portionData,
+                batchingIngredientsPreparedById,
             );
             $('.panel-body').append(form);
             form.submit();
@@ -1027,7 +869,7 @@
 
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
-                $('.portion').val() > 0;
+                $('.portion').val() > 0 && $('.ingredient-description').val() && $('.prepared-by').val();
 
             const hasIngredient = $('#form-ingredient .ingredient-wrapper, #form-ingredient .new-ingredient-wrapper').length > 0;
             
@@ -1051,12 +893,14 @@
                         .find('.display-ingredient, .display-packaging')
                         .css('outline', '2px solid red');
                     if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
+					if (!$('.ingredient-description').val()) $('.ingredient-description').css('outline', '2px solid red');
+                    if (!$('.prepared-by').val()) $('.prepared-by').css('outline', '2px solid red');
                 });
         }
 
         $(document).on('click', '#save-btn', function(event) {
             const [isValid, hasIngredient] = $.fn.checkFormValidity();
-            if (isValid) {
+            if (isValid && hasIngredient) {
                 Swal.fire({
                     title: action == 'add' ? 'Do you want to save this item?' : 'Do you want to save the changes?',
                     icon: 'warning',
@@ -1067,7 +911,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.fn.submitForm('save');
-                    }
+                    }    
                 });
             } else {
                 $.fn.formatInvalidInputs(isValid);
@@ -1089,8 +933,7 @@
 
             if (
                 !item.attr('item_id') && !item.attr('menu_item_id') && 
-                !item.attr('new_ingredients_id') && !item.attr('new_packagings_id') &&
-                !item.attr('batching_ingredients_id')) return;
+                !item.attr('new_ingredients_id') && !item.attr('new_packagings_id')) return;
             if (item.attr('item_id') && !item.attr('menu_item_id')) {
                 entry.find('.item-from')
                     .removeClass('label-info label-warning label-success label-secondary label-primary')
@@ -1101,27 +944,20 @@
                     .removeClass('label-info label-warning label-success label-secondary label-primary')
                     .addClass('label-warning')
                     .text('MIMF')
-            } else if (item.attr('batching_ingredients_id')) {
-                entry.find('.item-from')
-                    .removeClass('label-info label-warning label-success label-secondary label-primary')
-                    .addClass('label-secondary')
-                    .text('BATCH')
             }
             
             entry.find('.label-danger').text('');
             entry.find('.date-updated').text('');
-            ingredient_packaging.val(item.attr('item_id') || item.attr('menu_item_id') || item.attr('batching_ingredients_id'));
+            ingredient_packaging.val(item.attr('item_id') || item.attr('menu_item_id'));
             ingredient_packaging.attr({
-                cost: item.attr('cost'),
-                food_cost_temp: item.attr('food_cost_temp'),
-                uom: item.attr('uom'),
-                item_id: item.attr('item_id'),
-                menu_item_id: item.attr('menu_item_id'),
-                batching_ingredients_id: item.attr('batching_ingredients_id'),
+                cost: $(this).attr('cost'),
+                food_cost_temp: $(this).attr('food_cost_temp'),
+                uom: $(this).attr('uom'),
+                item_id: $(this).attr('item_id'),
+                menu_item_id: $(this).attr('menu_item_id'),
             });
-            if (!item.attr('item_id')) ingredient_packaging.removeAttr('item_id ');
+            if (!item.attr('item_id')) ingredient_packaging.removeAttr('item_id');
             if (!item.attr('menu_item_id')) ingredient_packaging.removeAttr('menu_item_id');
-            if (!item.attr('batching_ingredients_id')) ingredient_packaging.removeAttr('batching_ingredients_id');
             entry.find(`
                 .display-ingredient, 
                 .display-packaging, 
@@ -1129,8 +965,7 @@
                 .packaging-name
             `).val(item.attr('item_desc'))
                 .attr('new_ingredients_id', item.attr('new_ingredients_id'))
-                .attr('new_packagings_id', item.attr('new_packagings_id'))
-                .attr('batching_ingredients_id', item.attr('batching_ingredients_id'));
+                .attr('new_packagings_id', item.attr('new_packagings_id'));
             entry.find('.uom').val(item.attr('uom'));
             entry.find('.display-uom').val(item.attr('uom_desc'));
             entry.find('uom').val(item.attr('uoms_id'));
@@ -1331,6 +1166,7 @@
         $.fn.reload();
         $.fn.formatSelected();
         $.fn.sumCost();
-    }); 
+    });
 </script>
+
 @endpush

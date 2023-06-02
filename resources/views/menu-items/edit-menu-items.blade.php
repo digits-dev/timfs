@@ -4,8 +4,17 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <style>
+    .swal2-html-container {
+        line-height: 3rem;
+    }
+
+    .swal2-popup, .swal2-modal, .swal2-icon-warning .swal2-show {
+        font-size: 1.6rem !important;
+    }
 
     .form-column{
     margin: 0 3vw;
@@ -111,13 +120,17 @@
   <div class='panel panel-default'>
     <div class='panel-heading'>Edit Menu Items</div>
     <div class='panel-body'>
-        <form method="POST" action="{{CRUDBooster::mainpath('edit-save/'.$row->id)}}">
+        <form method="POST" action="{{$table == 'menu_items' ? CRUDBooster::mainpath('edit-save/'.$row->id) : route('edit_new_menu', ['id' => $row->id])}}" id="form-edit">
             @csrf
+            @if ($rnd_menu_items_id)
+            <input type="text" class="hidden" name="rnd_menu_items_id" value="{{$rnd_menu_items_id}}">
+            @endif
             <div class="add-content">
                 <div class="form-column">
+                    @if (!$rnd_menu_items_id)
                     <label> Tasteless Menu Code</label>
                     <fieldset>
-                        <input type="text" name="pos_item_code_1" value="{{ $row->tasteless_menu_code }}" readonly>
+                        <input type="text" name="tasteless_menu_code" value="{{ $row->tasteless_menu_code }}" readonly>
                     </fieldset>
                     <label> POS Old Item Code 1</label>
                     <fieldset>
@@ -135,6 +148,7 @@
                     <fieldset>
                         <input type="text" name="pos_item_description" placeholder="Enter pos old item description" value="{{ $row->pos_old_item_description }}" oninput="this.value = this.value.toUpperCase()">
                     </fieldset>
+                    @endif
                     <label><span id="required">*</span> Menu Description</label>
                     <fieldset>
                         <input type="text" name="menu_item_description" placeholder="Enter menu description" required value="{{ $row->menu_item_description }}" oninput="this.value = this.value.toUpperCase()">
@@ -241,6 +255,7 @@
                             @endforeach
                         </select> 
                     </fieldset>
+                    @if (!$rnd_menu_items_id)
                     <label><span id="required">*</span> Price - Dine In</label>
                     <fieldset>
                         <input type="number" name="price_dine_in" placeholder="Enter price - dine in" value="{{ $row->menu_price_dine }}" required oninput="this.value = this.value.toUpperCase()">
@@ -252,7 +267,8 @@
                     <label> Price - Take Out</label>
                     <fieldset>
                         <input type="number" name="price_take_out" placeholder="Leave blank if same as dine in" value="{{ $row->menu_price_take }}">
-                    </fieldset>  
+                    </fieldset> 
+                    @endif 
                     <label><span id="required">*</span> Original Concept</label>
                     <fieldset>
                         <input type="text" name="original_concept" placeholder="Enter original concept" value="{{ $row->original_concept }}" required oninput="this.value = this.value.toUpperCase()">
@@ -279,15 +295,31 @@
                     </fieldset>
                 </div>
             </div>
-            <div class="panel-footer">
-                <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-                <input type='submit' class='btn btn-primary pull-right' value='Edit Menu' onclick=""/>
-            </div>
+            <button id="submit-button" type="submit" class="hide">Submit</button>
         </form>
+        @if ($rnd_menu_items_id)
+        <div class="row">
+            <div class="col-md-6">
+                <hr>
+                <h4 class="text-center">Comments</h4>
+                @include('rnd-menu/chat-app', $comments_data)
+            </div>
+        </div>
+        @endif
+    </div>
+    <div class="panel-footer">
+        <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
+        @if ($rnd_menu_items_id)
+        <button type="button" class="btn btn-primary pull-right save-btn" id="save-edit-rnd"><i class="fa fa-save"></i> Save</button>
+        <button class="btn btn-warning pull-right return-btn" type="button" _return_to="chef" style="margin-right: 10px;"><i class="fa fa-mail-reply" ></i> Return to Chef</button>
+        @else
+        <input type="button" id="save-edit-btn" class='btn btn-primary pull-right' value='Edit Menu' onclick=""/>
+        @endif
     </div>
 </div>
 
 <script>
+const table = {!! json_encode($table) !!};
 
 $('#menu_type_select1').select2({
         placeholder: "Select a menu segmentation",
@@ -404,6 +436,109 @@ $('#menu_type_select1').select2({
             $('#menu_type_select_sku1').attr('required', false)
         }
     }); 
+
+    $('#save-edit-btn').on('click', function() {
+        $('#submit-button').click();
+    });
+
+    @if ($rnd_menu_items_id)
+        $(document).on('click', '#save-edit-rnd', function() {
+            Swal.fire({
+                title: 'Do you want to save this item?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                returnFocus: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#submit-button').click();
+                }
+            });
+        });
+
+        $('#form-edit').submit(function(event) {
+            const formData = $('#form-edit').serialize();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('edit_new_menu', ['id' => $row->id]) }}",
+                data: formData,
+                dataType: "json",
+                encode: true,
+                success: function(response) {
+                    Swal.fire({
+                        title: `✔️ New Menu Item Updated!`,
+                        html: '📄 Do you want to continue to Costing?',
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: 'Not now',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.href = "{{ CRUDBooster::mainPath() }}" + '/edit/' + "{{ $rnd_menu_items_id }}";
+                        } else {
+                            location.href = "{{ CRUDBooster::mainPath() }}";
+                        }
+                    });
+                },
+                error: function(response) { 
+                    console.log(response);
+                    Swal.fire({
+                        title: 'Oops',
+                        html: 'Something went wrong.',
+                        icon: 'error'
+                    });
+                } 
+            });
+
+            event.preventDefault();
+        });
+
+        $(document).on('click', '.return-btn', function() {
+        const returnTo = $(this).attr('_return_to');
+        const action = 'return';
+        Swal.fire({
+            title: `Do you want to return this item?`,
+            html: `🟠 Doing so will return this item to <label class="label label-warning">${returnTo.toUpperCase()}</label>.` +
+                `<br/> ⚠️ You won't be able to revert this.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = $(document.createElement('form'))
+                    .attr('method', 'POST')
+                    .attr('action', "{{ route('return_rnd_menu') }}")
+                    .hide();
+
+                const csrf = $(document.createElement('input'))
+                    .attr('name', '_token')
+                    .val("{{csrf_token()}}");
+
+                const actionInput = $(document.createElement('input'))
+                    .attr('name','action')
+                    .val('return');
+
+                const returnToInput = $(document.createElement('input'))
+                    .attr('name', 'return_to')
+                    .val(returnTo)
+
+                const rndMenuItemsId = $(document.createElement('input'))
+                    .attr('name', 'rnd_menu_items_id')
+                    .val("{{ $rnd_menu_items_id }}");
+
+                form.append(csrf, actionInput, returnToInput, rndMenuItemsId);
+                $('.panel-body').append(form);
+                form.submit();
+            }
+        });
+    });
+    @endif
 
 </script>
 @endsection
