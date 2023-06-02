@@ -75,7 +75,7 @@ class CreateRndComputedFoodCostView extends Migration
         ");
 
         DB::statement("
-            CREATE VIEW RND_MENU_COMPUTED_PACKAGING_COST AS 
+            CREATE VIEW rnd_menu_computed_packaging_cost AS 
                 SELECT
                     rnd_menu_items.id,
                     rnd_menu_items.rnd_menu_description,
