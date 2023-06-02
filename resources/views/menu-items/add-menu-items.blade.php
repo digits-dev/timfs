@@ -138,7 +138,7 @@
   </p>
   <div class='panel panel-default'>
     <div class='panel-heading'>Add Menu Items</div>
-    <form method="POST" action="{{$item->rnd_menu_items_id ? route('add_new_menu') : CRUDBooster::mainpath('add-save')}}" id="form-add">
+    <form method="POST" action="{{$item->rnd_menu_items_id ? route('add_new_menu') : CRUDBooster::mainpath('add-save')}}" id="form-add" autocomplete="off">
         <div class='panel-body'>
             @csrf
             @if ($item->rnd_menu_items_id) 
