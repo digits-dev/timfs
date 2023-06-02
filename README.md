@@ -252,6 +252,7 @@
   - `new_packagings`
   - `new_items_comments`
 - ### 👁️ SQL Views
+
   - `batching_ingredients_auto_compute`
   - `batching_ingredients_computed_food_cost`
   - `menu_computed_food_cost`
@@ -261,6 +262,13 @@
   - `rnd_menu_costing`
   - `rnd_menu_ingredients_auto_compute`
   - `rnd_menu_packagings_auto_compute`
+
+- ### 🔏 User Privileges to be Added
+  - Chef
+  - Marketing Encoder
+  - Marketing Approver
+  - Accounting Approver
+  - Purchasing Staff
 - ### 🔄️ RND Workflow
 
   - #### 🧑‍🍳 Chef
@@ -271,6 +279,7 @@
     - add new ingredients to **New Ingredients** Module
     - create batching ingredients in **Batching Ingredients** Module
     - edit the rnd menu if they wish to
+    - can add unpublished rnd menu items to archived items
     - submit the rnd menu to next step (**publish**)
 
   - #### 💹 Marketing
