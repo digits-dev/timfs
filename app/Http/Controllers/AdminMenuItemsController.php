@@ -356,6 +356,8 @@
 					$query->where('menu_items.id', null);
 				}
 
+				$query->where('menu_items.tasteless_menu_code', '!=', null);
+
 			}
 	    }
 
