@@ -14,7 +14,7 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
     public function up()
     {
         DB::statement("
-            CREATE VIEW RND_MENU_INGREDIENTS_AUTO_COMPUTE AS 
+            CREATE VIEW rnd_menu_ingredients_auto_compute AS 
                 SELECT
                     rnd_menu_ingredients_details.id,
                     rnd_menu_ingredients_details.rnd_menu_items_id,
@@ -138,7 +138,7 @@ class CreateRndMenuIngredientsAutoComputeView extends Migration
         ");
 
         DB::statement("
-            CREATE VIEW RND_MENU_PACKAGINGS_AUTO_COMPUTE AS 
+            CREATE VIEW rnd_menu_packagings_auto_compute AS 
                 SELECT
                     rnd_menu_packagings_details.id,
                     rnd_menu_packagings_details.rnd_menu_items_id,

@@ -14,7 +14,7 @@ class CreateBatchingIngredientsAutoComputeView extends Migration
     public function up()
     {
         DB::statement("
-            CREATE VIEW BATCHING_INGREDIENTS_AUTO_COMPUTE AS 
+            CREATE VIEW batching_ingredients_auto_compute AS 
                 SELECT
                     batching_ingredients_details.id,
                     batching_ingredients_details.batching_ingredients_id,
@@ -135,6 +135,6 @@ class CreateBatchingIngredientsAutoComputeView extends Migration
      */
     public function down()
     {
-        DB::statement("DROP VIEW IF EXISTS BATCHING_INGREDIENTS_AUTO_COMPUTE;");
+        DB::statement("DROP VIEW IF EXISTS batching_ingredients_auto_compute;");
     }
 }

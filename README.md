@@ -197,13 +197,13 @@
   - ⚠️ **Important:** Make sure that the sql views are the last ones to be migrated to the database as they require some tables to already exist before it can be migrated.
   - ⚠️ **Important:** Make sure that you follow the order of these sql files when migrating them.
 
-    1. `database/migrations/2023_03_29_170000_edited_create_menu_ingredients_auto_compute_view.php`
-    2. `database/migrations/2023_03_29_180000_create_menu_food_cost_view.php`
-    3. `database/migrations/2023_04_03_094234_create_rnd_menu_ingredients_auto_compute_view.php` (2 views inside: Ingredients / Packagings)
-    4. `database/migrations/2023_04_03_144811_create_rnd_computed_food_cost_view.php`
-    5. `database/migrations/2023_04_19_130328_create_rnd_menu_costing_view.php`
-    6. `database/migrations/2023_05_11_085328_create_batching_ingredients_auto_compute_view.php`
-    7. `database/migrations/2023_05_11_093632_create_batching_ingredients_computed_food_cost_view.php`
+    1. `database/migrations/2023_05_11_085328_create_batching_ingredients_auto_compute_view.php`
+    2. `database/migrations/2023_05_11_093632_create_batching_ingredients_computed_food_cost_view.php`
+    3. `database/migrations/2023_03_29_170000_edited_create_menu_ingredients_auto_compute_view.php`
+    4. `database/migrations/2023_03_29_180000_create_menu_food_cost_view.php`
+    5. `database/migrations/2023_04_03_094234_create_rnd_menu_ingredients_auto_compute_view.php` (2 views inside: Ingredients / Packagings)
+    6. `database/migrations/2023_04_03_144811_create_rnd_computed_food_cost_view.php`
+    7. `database/migrations/2023_04_19_130328_create_rnd_menu_costing_view.php`
     8. `database/migrations/2023_05_12_115455_update_menu_ingredients_auto_compute_sql_view.php`
 
 - ### 🔵 List of Modules Need to be Added to Production

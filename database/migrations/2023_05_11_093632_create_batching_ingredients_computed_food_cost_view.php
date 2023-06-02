@@ -14,7 +14,7 @@ class CreateBatchingIngredientsComputedFoodCostView extends Migration
     public function up()
     {
         DB::statement("
-            CREATE VIEW BATCHING_INGREDIENTS_COMPUTED_FOOD_COST 
+            CREATE VIEW batching_ingredients_computed_food_cost 
                 AS 
                     SELECT
                         batching_ingredients.id,
@@ -79,6 +79,6 @@ class CreateBatchingIngredientsComputedFoodCostView extends Migration
      */
     public function down()
     {
-        DB::statement("DROP VIEW IF EXISTS BATCHING_INGREDIENTS_COMPUTED_FOOD_COST;");
+        DB::statement("DROP VIEW IF EXISTS batching_ingredients_computed_food_cost;");
     }
 }

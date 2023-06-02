@@ -14,7 +14,7 @@ class CreateRndMenuCostingView extends Migration
     public function up()
     {
         DB::statement("
-            CREATE VIEW RND_MENU_COSTING AS 
+            CREATE VIEW rnd_menu_costing AS 
                 SELECT
                     rnd_menu_items.id AS rnd_menu_items_id,
                     rnd_menu_items.rnd_menu_description,
