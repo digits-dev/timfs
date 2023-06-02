@@ -120,7 +120,7 @@
   <div class='panel panel-default'>
     <div class='panel-heading'>Edit Menu Items</div>
     <div class='panel-body'>
-        <form method="POST" action="{{$table == 'menu_items' ? CRUDBooster::mainpath('edit-save/'.$row->id) : route('edit_new_menu', ['id' => $row->id])}}" id="form-edit">
+        <form method="POST" action="{{$table == 'menu_items' ? CRUDBooster::mainpath('edit-save/'.$row->id) : route('edit_new_menu', ['id' => $row->id])}}" id="form-edit" autocomplete="off">
             @csrf
             @if ($rnd_menu_items_id)
             <input type="text" class="hidden" name="rnd_menu_items_id" value="{{$rnd_menu_items_id}}">
