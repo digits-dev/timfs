@@ -5,6 +5,7 @@
 	use DB;
 	use CRUDBooster;
 	use Excel;
+	use App\Exports\PurchasePrice;
 
 	class AdminHistoryItemMasterfileController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -335,122 +336,7 @@
 	    //2022-07-04
 
 		public function exportPurchasePrice(Request $request) {
-			Excel::create('Purchase-Price-History-' . date("d M Y - h.i.sa"), function ($excel) {
-				// Set the title
-				$excel->setTitle('PurchasePriceHistory');
-				// Chain the setters
-				$excel->setCreator('Tasteless IMFS')->setCompany('Tasteless');
-				$excel->setDescription('Purchase Price History Export');
-	
-				$excel->sheet('bartender', function ($sheet) {
-					// Set auto size for sheet
-					$sheet->setAutoSize(true);
-					$sheet->setColumnFormat(array(
-						'A' => '@', //for tasteless code
-						'D' => '0.00', //for ttp
-						'F' => '0.00', //for ttp
-
-					));
-	
-					$data_ppHistory = DB::table('history_item_masterfile');
-					$data_ppHistory->select('history_item_masterfile.tasteless_code', 'item_masters.full_item_description', 'groups.group_description', 
-					'history_item_masterfile.purchase_price', 'history_item_masterfile.old_purchase_price','cms_users.name as updatedby','history_item_masterfile.updated_at as updateddate')
-					->join('item_masters','history_item_masterfile.item_id','=','item_masters.id')
-					->leftJoin('groups','history_item_masterfile.group_id','=','groups.id')
-					->leftJoin('cms_users','history_item_masterfile.updated_by','=','cms_users.id')
-					->whereNotNull('history_item_masterfile.purchase_price');
-
-					if(\Request::get('filter_column')) {
-	
-						$filter_column = \Request::get('filter_column');
-						$data_ppHistory->where(function($w) use ($filter_column,$fc) {
-							foreach($filter_column as $key=>$fc) {
-	
-								$value = @$fc['value'];
-								$type  = @$fc['type'];
-	
-								if($type == 'empty') {
-									$w->whereNull($key)->orWhere($key,'');
-									continue;
-								}
-	
-								if($value=='' || $type=='') continue;
-	
-								if($type == 'between') continue;
-	
-								switch($type) {
-									default:
-										if($key && $type && $value) $w->where($key,$type,$value);
-									break;
-									case 'like':
-									case 'not like':
-										$value = '%'.$value.'%';
-										if($key && $type && $value) $w->where($key,$type,$value);
-									break;
-									case 'in':
-									case 'not in':
-										if($value) {
-											$value = explode(',',$value);
-											if($key && $value) $w->whereIn($key,$value);
-										}
-									break;
-								}
-							}
-						});
-	
-						foreach($filter_column as $key=>$fc) {
-							$value = @$fc['value'];
-							$type  = @$fc['type'];
-							$sorting = @$fc['sorting'];
-	
-							if($sorting!='') {
-								if($key) {
-									$data_ppHistory->orderby($key,$sorting);
-									$filter_is_orderby = true;
-								}
-							}
-	
-							if ($type=='between') {
-								if($key && $value) $data_ppHistory->whereBetween($key,$value);
-							}
-	
-							else {
-								continue;
-							}
-						}
-					}
-						
-					$datas_ppHistories = $data_ppHistory->get();
-					$headings = array('Tasteless Code', 'Item Description', 'Group','Old Purchase Price','Purchase Price','Updated By','Updated Date');
-	
-					foreach ($datas_ppHistories as $value) {
-						$datas[] = array(
-							$value->tasteless_code,
-							$value->full_item_description,
-							$value->group_description,
-							$value->old_purchase_price,
-							$value->purchase_price,
-							$value->updatedby,
-							$value->updateddate
-						);
-					}
-	
-					$sheet->fromArray($datas, null, 'A1', false, false);
-					$sheet->prependRow(1, $headings);
-					$sheet->row(1, function ($row) {
-						$row->setBackground('#FFFF00');
-						$row->setAlignment('center');
-					});
-					$sheet->cells('A1:I1', function ($cells) {
-						// Set font weight to bold
-						$cells->setFontWeight('bold');
-						// Set all borders (top, right, bottom, left)
-						$cells->setBorder('none', 'none', 'solid', 'none');
-					});
-	
-				});
-			})->export('csv');
-			
+			return Excel::download(new PurchasePrice($request), 'Purchase-Price-History-' . date("d M Y - h.i.sa") . '.csv');
 		}
 
 		public function exportSalePrice(Request $request) {
