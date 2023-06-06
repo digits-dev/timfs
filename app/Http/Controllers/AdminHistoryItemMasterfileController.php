@@ -6,6 +6,7 @@
 	use CRUDBooster;
 	use Excel;
 	use App\Exports\PurchasePrice;
+	use App\Exports\SalesPrice;
 
 	class AdminHistoryItemMasterfileController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -340,123 +341,7 @@
 		}
 
 		public function exportSalePrice(Request $request) {
-			Excel::create('TTP-History-' . date("d M Y - h.i.sa"), function ($excel) {
-				// Set the title
-				$excel->setTitle('TTPHistory');
-				// Chain the setters
-				$excel->setCreator('Tasteless IMFS')->setCompany('Tasteless');
-				$excel->setDescription('TTPHistory Export');
-	
-				$excel->sheet('bartender', function ($sheet) {
-					// Set auto size for sheet
-					$sheet->setAutoSize(true);
-					$sheet->setColumnFormat(array(
-						'A' => '@', //for tasteless code
-						'D' => '0.00', //for ttp
-						'F' => '0.00', //for ttp
-
-					));
-	
-					$data_ttpHistory = DB::table('history_item_masterfile');
-					$data_ttpHistory->select('history_item_masterfile.tasteless_code', 'item_masters.full_item_description', 'groups.group_description', 
-					'history_item_masterfile.ttp', 'history_item_masterfile.ttp_percentage','history_item_masterfile.old_ttp', 'history_item_masterfile.old_ttp_percentage','cms_users.name as updatedby','history_item_masterfile.updated_at as updateddate')
-					->join('item_masters','history_item_masterfile.item_id','=','item_masters.id')
-					->leftJoin('groups','history_item_masterfile.group_id','=','groups.id')
-					->leftJoin('cms_users','history_item_masterfile.updated_by','=','cms_users.id')
-					->whereNotNull('history_item_masterfile.ttp');
-
-					if(\Request::get('filter_column')) {
-	
-						$filter_column = \Request::get('filter_column');
-						$data_ttpHistory->where(function($w) use ($filter_column,$fc) {
-							foreach($filter_column as $key=>$fc) {
-	
-								$value = @$fc['value'];
-								$type  = @$fc['type'];
-	
-								if($type == 'empty') {
-									$w->whereNull($key)->orWhere($key,'');
-									continue;
-								}
-	
-								if($value=='' || $type=='') continue;
-	
-								if($type == 'between') continue;
-	
-								switch($type) {
-									default:
-										if($key && $type && $value) $w->where($key,$type,$value);
-									break;
-									case 'like':
-									case 'not like':
-										$value = '%'.$value.'%';
-										if($key && $type && $value) $w->where($key,$type,$value);
-									break;
-									case 'in':
-									case 'not in':
-										if($value) {
-											$value = explode(',',$value);
-											if($key && $value) $w->whereIn($key,$value);
-										}
-									break;
-								}
-							}
-						});
-	
-						foreach($filter_column as $key=>$fc) {
-							$value = @$fc['value'];
-							$type  = @$fc['type'];
-							$sorting = @$fc['sorting'];
-	
-							if($sorting!='') {
-								if($key) {
-									$data_ttpHistory->orderby($key,$sorting);
-									$filter_is_orderby = true;
-								}
-							}
-	
-							if ($type=='between') {
-								if($key && $value) $data_ttpHistory->whereBetween($key,$value);
-							}
-	
-							else {
-								continue;
-							}
-						}
-					}
-						
-					$datas_ttpHistories = $data_ttpHistory->get();
-					$headings = array('Tasteless Code', 'Item Description', 'Group','Old TTP','Old TTP Percentage','TTP','TTP Percentage','Updated By','Updated Date');
-	
-					foreach ($datas_ttpHistories as $value) {
-						$datas[] = array(
-							$value->tasteless_code,
-							$value->full_item_description,
-							$value->group_description,
-							$value->old_ttp,
-							$value->old_ttp_percentage,
-							$value->ttp,
-							$value->ttp_percentage,
-							$value->updatedby,
-							$value->updateddate
-						);
-					}
-	
-					$sheet->fromArray($datas, null, 'A1', false, false);
-					$sheet->prependRow(1, $headings);
-					$sheet->row(1, function ($row) {
-						$row->setBackground('#FFFF00');
-						$row->setAlignment('center');
-					});
-					$sheet->cells('A1:I1', function ($cells) {
-						// Set font weight to bold
-						$cells->setFontWeight('bold');
-						// Set all borders (top, right, bottom, left)
-						$cells->setBorder('none', 'none', 'solid', 'none');
-					});
-	
-				});
-			})->export('csv');
+			return Excel::download(new SalesPrice($request), 'TTP-History-' . date("d M Y - h.i.sa") . '.csv');
 		}
 
 		//end-2022-07-04
