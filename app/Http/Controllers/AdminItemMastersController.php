@@ -1608,15 +1608,15 @@
 
 	    }
 
-		// public function getAdd() {
-		// 	if (!CRUDBooster::isCreate())
-		// 		CRUDBooster::redirect(
-		// 		CRUDBooster::adminPath(),
-		// 		trans('crudbooster.denied_access')
-		// 	);
+		public function getAdd() {
+			if (!CRUDBooster::isCreate())
+				CRUDBooster::redirect(
+				CRUDBooster::adminPath(),
+				trans('crudbooster.denied_access')
+			);
 
-		// 	return self::getEdit(null, 'add');
-		// }
+			return self::getEdit(null, 'add');
+		}
 
 		public function getBrandData($id) {
 			
@@ -1625,7 +1625,7 @@
 			return response()->json($brand);
 		}
 
-		public function getEdit($id, $action = 'edit'){
+		public function getEdit($id, $action = 'edit') {
 
 			// $item_info = ItemMasterApproval::find($id);
 
@@ -1642,15 +1642,25 @@
 			
 			$data = [];
 
+			$data['action'] = $action;
+
 			if ($id) {
 				
 				$item = self::getItemDetails($id);
 				
 				$data['item'] = $item;
-				return $this->view('item-master/edit-item', $data);
+
+				$brand_description = DB::table('brands')
+					->where('status', 'ACTIVE')
+					->get()
+					->toArray();	
 			}
 
+			$submaster_details = self::getSubmasters();
+
+			$data = array_merge($data, $submaster_details);
 			
+			return $this->view('item-master/edit-item', $data);
 		}
 
 		public function getItemDetails($id) {
@@ -1661,6 +1671,96 @@
 				->first();
 
 			return $item;
+		}
+
+		public function getSubmasters() {
+
+			$data = [];
+
+			$data['brands'] = DB::table('brands')
+				->where('status', 'ACTIVE')
+				->orderBy('brand_description')
+				->get()
+				->toArray();
+
+			$data['tax_codes'] = DB::table('tax_codes')
+				->where('status', 'ACTIVE')
+				->orderBy('tax_description')
+				->get()
+				->toArray();
+
+			$data['accounts'] = DB::table('accounts')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['cogs_accounts'] = DB::table('cogs_accounts')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['asset_accounts'] = DB::table('asset_accounts')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['fulfillment_types'] = DB::table('fulfillment_methods')
+				->where('status', 'ACTIVE')
+				->orderBy('fulfillment_method')
+				->get()
+				->toArray();
+
+			$data['uoms'] = DB::table('uoms')
+				->where('status', 'ACTIVE')
+				->orderBy('uom_description')
+				->get()
+				->toArray();
+
+			$data['uom_sets'] = DB::table('uoms_set')
+				->where('status', 'ACTIVE')
+				->orderBy('uom_description')
+				->get()
+				->toArray();
+
+			$data['currencies'] = DB::table('currencies')
+				->where('status', 'ACTIVE')
+				->orderBy('currency_code')
+				->get()
+				->toArray();
+
+			$data['suppliers'] = DB::table('suppliers')
+				->orderBy('last_name')
+				->get()
+				->toArray();
+
+			$data['groups'] = DB::table('groups')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['categories'] = DB::table('categories')
+				->where('status', 'ACTIVE')
+				->orderBy('category_description')
+				->get()
+				->toArray();
+
+			$data['subcategories'] = DB::table('subcategories')
+				->where('status', 'ACTIVE')
+				->orderBy('subcategory_description')
+				->get()
+				->toArray();
+
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()
+				->toArray();
+
+			return $data;
 		}
 
 		public function exportItems(Request $request)
