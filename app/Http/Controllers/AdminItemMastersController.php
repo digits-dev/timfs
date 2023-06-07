@@ -914,7 +914,7 @@
 	        |
 	        */
 	        $this->load_js = array();
-	        $this->load_js[] = asset("js/item_master.js");
+	        // $this->load_js[] = asset("js/item_master.js");
 	        
 	        /*
 	        | ---------------------------------------------------------------------- 
@@ -1077,137 +1077,137 @@
 	    | @id = last insert id
 	    | 
 	    */
-	    public function hook_after_add($id){}
-        // {        
-		// 	//Your code here
-		// 	$item_details = ItemMaster::where('id',$id)->get()->toArray();
+	    public function hook_after_add($id)
+        {        
+			//Your code here
+			$item_details = ItemMaster::where('id',$id)->get()->toArray();
 
-		// 	//Insert data to temporary table
-		// 	ItemMasterApproval::insert($item_details);
-        //     $new_items = ItemMaster::where('id',$id)->first();
+			//Insert data to temporary table
+			ItemMasterApproval::insert($item_details);
+            $new_items = ItemMaster::where('id',$id)->first();
 
-        //     if(CRUDBooster::isSuperadmin())
-        //     {
-		// 		//create item to trs
+            if(CRUDBooster::isSuperadmin())
+            {
+				//create item to trs
 
-        //                 DB::connection('mysql_trs')->statement('insert into items (
-		// 					tasteless_code, 
-		// 					supplier_item_code,  
-		// 					full_item_description,  
-		// 					brand_id, 
-		// 					group_id, 
-		// 					fulfillment_type_id, 
-		// 					category_id, 
-		// 					subcategory_id, 
-		// 					uom_id, 
-		// 					packaging_id, 
-		// 					skustatus_id, 
-		// 					currency_id, 
-		// 					cost_price, 
-		// 					ttp, 
-		// 					landed_cost,
-		// 					moq_store,
-		// 					myob_item_description,
-		// 					created_by, 
-		// 					updated_by) values (?,?,?,?,?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$new_items['tasteless_code'], $new_items['supplier_itemcode'], $new_items['full_item_description'],  $new_items['brands_id'],$new_items['groups_id'],$new_items['fulfillment_type_id'],$new_items['categories_id'], $new_items['subcategories_id'], $new_items['uoms_id'], $new_items['uoms_set_id'], $new_items['sku_statuses_id'], $new_items['currencies_id'], $new_items['purchase_price'], $new_items['ttp'], $new_items['landed_cost'], $new_items['moq_store'], $new_items['full_item_description'], $new_items['created_by'], $new_items['updated_by']]);
-        //                 //-------------------------                         
+                        // DB::connection('mysql_trs')->statement('insert into items (
+						// 	tasteless_code, 
+						// 	supplier_item_code,  
+						// 	full_item_description,  
+						// 	brand_id, 
+						// 	group_id, 
+						// 	fulfillment_type_id, 
+						// 	category_id, 
+						// 	subcategory_id, 
+						// 	uom_id, 
+						// 	packaging_id, 
+						// 	skustatus_id, 
+						// 	currency_id, 
+						// 	cost_price, 
+						// 	ttp, 
+						// 	landed_cost,
+						// 	moq_store,
+						// 	myob_item_description,
+						// 	created_by, 
+						// 	updated_by) values (?,?,?,?,?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$new_items['tasteless_code'], $new_items['supplier_itemcode'], $new_items['full_item_description'],  $new_items['brands_id'],$new_items['groups_id'],$new_items['fulfillment_type_id'],$new_items['categories_id'], $new_items['subcategories_id'], $new_items['uoms_id'], $new_items['uoms_set_id'], $new_items['sku_statuses_id'], $new_items['currencies_id'], $new_items['purchase_price'], $new_items['ttp'], $new_items['landed_cost'], $new_items['moq_store'], $new_items['full_item_description'], $new_items['created_by'], $new_items['updated_by']]);
+                        // -------------------------                         
 			            
-		// 				foreach($this->segments as $segment)
-        //                 {
-		// 					    //--added by cris 20200629---
-        //                             if ($new_items[$segment->segment_column_name] == "X" || $new_items[$segment->segment_column_name] == null) {
-        //                             } else {
+						// foreach($this->segments as $segment)
+                        // {
+						// 	    //--added by cris 20200629---
+                        //             if ($new_items[$segment->segment_column_name] == "X" || $new_items[$segment->segment_column_name] == null) {
+                        //             } else {
                     
-        //                                 $segmentation = DB::connection('mysql_trs')->table('segmentation')->where('segmentation_column1', $segment->segment_column_name)
-        //                                     ->orWhere('segmentation_column2', $segment->segment_column_name)->first();
+                        //                 $segmentation = DB::connection('mysql_trs')->table('segmentation')->where('segmentation_column1', $segment->segment_column_name)
+                        //                     ->orWhere('segmentation_column2', $segment->segment_column_name)->first();
                     
-        //                                 $store_ids = DB::connection('mysql_trs')->table('stores')->select('id')->where('store_code', $segmentation->segmentation_code)->get()->toArray();
+                        //                 $store_ids = DB::connection('mysql_trs')->table('stores')->select('id')->where('store_code', $segmentation->segmentation_code)->get()->toArray();
                                         
-        //                                 $store_array = array();
-        //                                 foreach ($store_ids as $id) {
-        //                                     array_push($store_array, $id->id);
-        //                                 }
+                        //                 $store_array = array();
+                        //                 foreach ($store_ids as $id) {
+                        //                     array_push($store_array, $id->id);
+                        //                 }
 
-        //                                 $stores = array();
-        //                                 $trs_users_stores = DB::connection('mysql_trs')->table('cms_users')->select('stores_id', 'id')->where('status', 'ACTIVE')->get();
-        //                                 $superadmin_admin = DB::connection('mysql_trs')->table('cms_users')->select('id')->where('id_cms_privileges', 1) //superAdmin
-        //                                     ->orWhere('id_cms_privileges', 4) //admin
-        //                                     ->where('status', 'ACTIVE')->get()->toArray();
+                        //                 $stores = array();
+                        //                 $trs_users_stores = DB::connection('mysql_trs')->table('cms_users')->select('stores_id', 'id')->where('status', 'ACTIVE')->get();
+                        //                 $superadmin_admin = DB::connection('mysql_trs')->table('cms_users')->select('id')->where('id_cms_privileges', 1) //superAdmin
+                        //                     ->orWhere('id_cms_privileges', 4) //admin
+                        //                     ->where('status', 'ACTIVE')->get()->toArray();
                     
-        //                                 foreach ($trs_users_stores as $value) {
-        //                                     $list = array_map('intval', explode(",", $value->stores_id));
+                        //                 foreach ($trs_users_stores as $value) {
+                        //                     $list = array_map('intval', explode(",", $value->stores_id));
                     
-        //                                     $value->stores_id = $list;
+                        //                     $value->stores_id = $list;
                     
-        //                                     array_push($stores, $value);
-        //                                 }
+                        //                     array_push($stores, $value);
+                        //                 }
                     
-        //                                 //check kung may kaparehas sa stores_id
-        //                                 $id_to_send = array();
-        //                                 foreach ($stores as $store) {
+                        //                 //check kung may kaparehas sa stores_id
+                        //                 $id_to_send = array();
+                        //                 foreach ($stores as $store) {
                     
-        //                                     for ($i = 0; $i <= count($store->stores_id); $i++) {
+                        //                     for ($i = 0; $i <= count($store->stores_id); $i++) {
                     
-        //                                         if (in_array($store->stores_id[$i], $store_array)) {
-        //                                             array_push($id_to_send, $store->id);
-        //                                         }
-        //                                     }
-        //                                 }
+                        //                         if (in_array($store->stores_id[$i], $store_array)) {
+                        //                             array_push($id_to_send, $store->id);
+                        //                         }
+                        //                     }
+                        //                 }
                     
-        //                                 //send notification
-        //                                 foreach ($id_to_send as $id) {
-        //                                     $content = " New item code ".$new_items->item. " has been added in ".$segmentation->segmentation_code. " at " . date('Y-m-d H:i:s');
-        //                                     $to = "https://replenishment.tasteless.com.ph/public/admin/items?q=".$new_items->tasteless_code;
+                        //                 //send notification
+                        //                 foreach ($id_to_send as $id) {
+                        //                     $content = " New item code ".$new_items->item. " has been added in ".$segmentation->segmentation_code. " at " . date('Y-m-d H:i:s');
+                        //                     $to = "https://replenishment.tasteless.com.ph/public/admin/items?q=".$new_items->tasteless_code;
                                             
                     
-        //                                     DB::connection('mysql_trs')->statement('insert into cms_notifications (id_cms_users,content,url,created_at,is_read) VALUES (?,?,?,?,?)', [$id, $content, $to, date('Y-m-d H:i:s'), 0]);
-        //                                 }
+                        //                     DB::connection('mysql_trs')->statement('insert into cms_notifications (id_cms_users,content,url,created_at,is_read) VALUES (?,?,?,?,?)', [$id, $content, $to, date('Y-m-d H:i:s'), 0]);
+                        //                 }
 										
-        //                                 foreach ($superadmin_admin as $id) {
-        //                                     $content = "New item code ".$new_items->item. " has been added in ".$segmentation->segmentation_code. " at " . date('Y-m-d H:i:s');
-        //                                     $to = "https://replenishment.tasteless.com.ph/public/admin/items?q=".$new_items->tasteless_code;
+                        //                 foreach ($superadmin_admin as $id) {
+                        //                     $content = "New item code ".$new_items->item. " has been added in ".$segmentation->segmentation_code. " at " . date('Y-m-d H:i:s');
+                        //                     $to = "https://replenishment.tasteless.com.ph/public/admin/items?q=".$new_items->tasteless_code;
                     
-        //                                     DB::connection('mysql_trs')->statement('insert into cms_notifications (id_cms_users,content,url,created_at,is_read) VALUES (?,?,?,?,?)', [$id->id, $content, $to, date('Y-m-d H:i:s'), 0]);
-        //                                 }
-        //                             }
-        //                             //----------------------------
+                        //                     DB::connection('mysql_trs')->statement('insert into cms_notifications (id_cms_users,content,url,created_at,is_read) VALUES (?,?,?,?,?)', [$id->id, $content, $to, date('Y-m-d H:i:s'), 0]);
+                        //                 }
+                        //             }
+                        //             //----------------------------
 							    
-        //                        $sku_value = "'".$new_items[$segment->segment_column_name]."'";
+                        //        $sku_value = "'".$new_items[$segment->segment_column_name]."'";
                                             
-        //                         DB::connection('mysql_trs')->statement('update items set '.$segment->segment_column_name.' = '.$sku_value.' where tasteless_code = '.$new_items['tasteless_code'].'');
-		// 				}
+                        //         DB::connection('mysql_trs')->statement('update items set '.$segment->segment_column_name.' = '.$sku_value.' where tasteless_code = '.$new_items['tasteless_code'].'');
+						// }
 						
-		// 				//--added by cris 20200629---
-        //                 unset($store_array);
-        //                 unset($stores);
-        //                 unset($id_to_send);
-        //                 //---------------------------
+						// //--added by cris 20200629---
+                        // unset($store_array);
+                        // unset($stores);
+                        // unset($id_to_send);
+                        // //---------------------------
 										
-        //                 DB::disconnect('mysql_trs');
+                        // DB::disconnect('mysql_trs');
                         
-        //                 CRUDBooster::redirect(CRUDBooster::mainpath(),"Your item has been created successfully .","info");
-        //     }else{   
-		// 	    $for_approval = ItemMasterApproval::where('id',$id)->first();
-		// 	    $approvers = ApprovalWorkflowSetting::where('status','ACTIVE')->where('action_type','Create')
-		// 					->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->get();
+                        CRUDBooster::redirect(CRUDBooster::mainpath(),"Your item has been created successfully .","info");
+            }else{   
+			    $for_approval = ItemMasterApproval::where('id',$id)->first();
+			    $approvers = ApprovalWorkflowSetting::where('status','ACTIVE')->where('action_type','Create')
+							->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->get();
 
-		// 	    foreach ($approvers as $approvers_list){
-		// 		    $approver_privilege_for =	DB::table('cms_privileges')->where('id',$approvers_list->encoder_privilege_id)->first();
-		// 		    $approver_privilege =		DB::table('cms_privileges')->where('id',$approvers_list->approver_privilege_id)->first();	
+			    foreach ($approvers as $approvers_list){
+				    $approver_privilege_for =	DB::table('cms_privileges')->where('id',$approvers_list->encoder_privilege_id)->first();
+				    $approver_privilege =		DB::table('cms_privileges')->where('id',$approvers_list->approver_privilege_id)->first();	
 			
-		// 		    if($for_approval->encoder_privilege_id == $approver_privilege_for->id){
-		// 			    $send_to =	DB::table('cms_users')->where('id_cms_privileges',$approver_privilege->id)->get();
-		// 			    foreach ($send_to as $send_now){
-		// 				    $config['content'] = "An item has been created at Item Masterfile Module, please check item for approval!";
-		// 				    $config['to'] = CRUDBooster::adminPath('item_approval?q='.$for_approval->id);
-		// 				    $config['id_cms_users'] = [$send_now->id];
-		// 				    CRUDBooster::sendNotification($config);	
-		// 			    }
-		// 		    }
-		// 	    }
-		// 	    CRUDBooster::redirect(CRUDBooster::mainpath(),"Your item has been created and pending for approval.","info");
-        //     }
-	    // }
+				    if($for_approval->encoder_privilege_id == $approver_privilege_for->id){
+					    $send_to =	DB::table('cms_users')->where('id_cms_privileges',$approver_privilege->id)->get();
+					    foreach ($send_to as $send_now){
+						    $config['content'] = "An item has been created at Item Masterfile Module, please check item for approval!";
+						    $config['to'] = CRUDBooster::adminPath('item_approval?q='.$for_approval->id);
+						    $config['id_cms_users'] = [$send_now->id];
+						    CRUDBooster::sendNotification($config);	
+					    }
+				    }
+			    }
+			    CRUDBooster::redirect(CRUDBooster::mainpath(),"Your item has been created and pending for approval.","info");
+            }
+	    }
 
 	    /* 
 	    | ---------------------------------------------------------------------- 
@@ -1639,21 +1639,24 @@
 			// $editform_approval_views = DB::table('settings_form_accesses')->where('cms_privileges_id',$priv->id)->where('action_type','EDIT APPROVAL')->first();
 
 			// return parent::getEdit($id);
+
+			if ($action == 'edit') {
+				if (!CRUDBooster::isUpdate())
+					CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+			}
+
+			
 			
 			$data = [];
 
 			$data['action'] = $action;
 
 			if ($id) {
-				
-				$item = self::getItemDetails($id);
-				
-				$data['item'] = $item;
-
-				$brand_description = DB::table('brands')
-					->where('status', 'ACTIVE')
-					->get()
-					->toArray();	
+				$tasteless_code = ItemMaster::where('id', $id)->first()->tasteless_code;
+				$data['item'] = self::getItemDetails($tasteless_code);
 			}
 
 			$submaster_details = self::getSubmasters();
@@ -1663,11 +1666,35 @@
 			return $this->view('item-master/edit-item', $data);
 		}
 
-		public function getItemDetails($id) {
-			$item = ItemMaster::find($id)
-				->select('*')
-				->leftJoin('suppliers', 'item_masters.suppliers_id', 'suppliers.id')
-				->get()
+		public function getTastelessCode($group) {
+			if (strtolower(substr($group->group_description, 0, 4)) == 'food') {
+				$code_column = "code_1";
+			} else if (strtolower($group->group_description) == 'beverage') {
+				$code_column = "code_2";
+			} else if (strtolower($group->group_description) == 'finished goods') {
+				$code_column = "code_1";
+			} else if (strtolower(substr($group->group_description, -8)) == 'supplies') {
+				$code_column = "code_3";
+			} else if (strtolower($group->group_description) == 'capex') {
+				$code_column = "code_5";
+			} else if (strtolower($group->group_description) == 'complimentary') {
+				$code_column = "code_7";
+			} else if (strtolower(substr($group->group_description, -4)) == 'fees') {
+				$code_column = "code_4";
+			} else {
+				$code_column = "code_6";
+			}
+			$tasteless_code = CodeCounter::where('id', 1)->where('type', 'ITEM MASTER')->value($code_column);
+			CodeCounter::where('type', 'ITEM MASTER')->where('id', 1)->increment($code_column);
+			return $tasteless_code;
+		}
+
+		public function getItemDetails($tasteless_code) {
+			$item = ItemMasterApproval::where('tasteless_code', $tasteless_code)
+				->select(
+					'*',
+				)
+				->leftJoin('suppliers', 'item_master_approvals.suppliers_id', 'suppliers.id')
 				->first();
 
 			return $item;
@@ -1754,6 +1781,12 @@
 				->get()
 				->toArray();
 
+			$data['packagings'] = DB::table('packagings')
+				->where('status', 'ACTIVE')
+				->orderBy('packaging_description')
+				->get()
+				->toArray();
+
 			$data['segmentations'] = DB::table('segmentations')
 				->where('status', 'ACTIVE')
 				->orderBy('segment_column_description')
@@ -1763,14 +1796,64 @@
 			return $data;
 		}
 
-		public function exportItems(Request $request)
-		{
+		public function submitAddOrEdit(Request $request) {
+			$input = $request->all();
+			$group = Group::findOrFail($input['groups_id']);
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$my_privilege_id = CRUDBooster::myPrivilegeId();
+			$segment_columns = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->pluck('segment_column_name')
+				->toArray();
+
+			$segmentation_statuses = [
+				'segmentation_core', 
+				'segmentation_depletion', 
+				'segmentation_non_core', 
+				'segmentation_perishable',
+				'segmentation_alternative',
+			];
+
+			$data = $request->all();
+			unset($data['_token']);
+			$data['myob_item_description'] = $data['full_item_description'];
+			$data['sku_statuses_id'] = 1;
+			$data['action_type'] = 'Create';
+			$data['type'] = 'Inventory Part';
+			$data['tax_status'] = $data['tax_codes_id'];
+			$data['tasteless_code'] = self::getTastelessCode($group);
+
+			//segmentation => initializing all to 'X'
+			foreach ($segment_columns as $segment_column) {
+				$data[$segment_column] = 'X';
+			}
+
+			//overwriting the selected segmentations
+			foreach ($segmentation_statuses as $segmentation_status) {
+				unset($data[$segmentation_status]);
+				if (!$input[$segmentation_status]) continue;
+				foreach ($input[$segmentation_status] as $column) {
+					$segmentation_value = str_replace('segmentation_', '', $segmentation_status);
+					$segmentation_value = strtoupper($segmentation_value);
+					$data[$column] = $segmentation_value;
+				}
+			}
+			$data['encoder_privilege_id'] =	$my_privilege_id;
+			$data['created_by']	= $action_by;
+			$data['created_at'] = $time_stamp;
+			$data['approval_status'] = 1;
+	    
+			$inserted_id = ItemMasterApproval::insertGetId($data);
+			dd($inserted_id);
+		}
+
+		public function exportItems(Request $request) {
 			$filename = $request->input('filename');
 			return Excel::download(new ItemExport, $filename.'.xlsx');
 		}
 		
-		public function exportQBFormat(Request $request)
-		{
+		public function exportQBFormat(Request $request) {
 			$filename = $request->input('filename');
 			return Excel::download(new QBExport, $filename.'.xlsx');
 		}
@@ -1785,7 +1868,7 @@
 		   	return Excel::download(new BartenderExport, $filename.'.xlsx');
 		}		
 		
-		public function getUploadModule(){
+		public function getUploadModule() {
 			$this->cbLoader();
 			$data['page_title'] = 'Upload Module';
 			return view("upload.upload", $data);

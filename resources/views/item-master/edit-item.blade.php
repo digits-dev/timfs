@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="{{asset('css/custom.css')}}">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js" integrity="sha512-jVMFsAksn8aljb9IJ+3OCAq38dJpquMBjgEuz7Q5Oqu5xenfin/jxdbKw4P5eKjUF4xiG/GPT5CvCX3Io54gyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
     table, tbody, td, th {
         border: 1px solid black !important;
@@ -65,8 +66,8 @@
         <h3 class="text-center text-bold">Item Masterfile</h3>
     </div>
     <div class="panel-body">
-        <form action="" class="form-main" autocomplete="off">
-            <H3 class="text-center text-bold">ITEM DETAILS</H3>
+        <form action="{{ route('item_maters_submit_add_or_edit') }}" method="POST" class="form-main" autocomplete="off">
+            <h3 class="text-center text-bold">ITEM DETAILS</h3>
             @csrf
             <div class="row">
                 <div class="col-md-6">
@@ -123,7 +124,7 @@
                             <tr>
                                 <th><span class="required-star">*</span>  Asset Account</th>
                                 <td>
-                                    <select name="assets_accounts_id" id="assets_accounts_id" class="form-control" required>
+                                    <select name="asset_accounts_id" id="asset_accounts_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($asset_accounts as $asset_account)
                                         <option value="{{ $asset_account->id }}">{{ $asset_account->group_description }}</option>
@@ -137,12 +138,6 @@
                                     <input type="text" class="form-control" name="purchase_description" id="purchase_description" readonly>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <table class="table-responsive table">
-                        <tbody>
                             <tr>
                                 <th><span class="required-star">*</span> Fulfillment Type</th>
                                 <td>
@@ -154,6 +149,12 @@
                                     </select>
                                 </td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table-responsive table">
+                        <tbody>
                             <tr>
                                 <th><span class="required-star">*</span> U/M</th>
                                 <td>
@@ -202,10 +203,32 @@
                             <tr>
                                 <th><span class="required-star">*</span> Commi Margin</th>
                                 <td>
-                                    <input type="number" step="any" class="form-control" name="ttp_percentage" id="ttp_percentage">
+                                    <input type="number" step="any" class="form-control" name="ttp_percentage" id="ttp_percentage" readonly>
                                 </td>
                             </tr>
-
+                            <tr>
+                                <th><span class="required-star">*</span> Landed Cost</th>
+                                <td>
+                                    <input type="number" step="any" class="form-control" name="landed_cost" id="landed_cost" required>
+                                </td>
+                                <tr>
+                                    <th><span class="required-star">*</span> Price</th>
+                                    <td>
+                                        <input type="number" step="any" class="form-control" name="price" id="price">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th><span class="required-star">*</span> Preferred Vendor</th>
+                                    <td>
+                                        <select name="suppliers_id" id="suppliers_id" class="form-control" required>
+                                            <option value="" disabled selected>None selected...</option>
+                                            @foreach ($suppliers as $supplier)
+                                            <option value="{{ $supplier->id }}">{{ $supplier->last_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -214,23 +237,6 @@
                 <div class="col-md-6">
                     <table class="table table-responsive">
                         <tbody>
-                            <tr>
-                                <th><span class="required-star">*</span> Landed Cost</th>
-                                <td>
-                                    <input type="number" step="any" class="form-control" name="landed_cost" id="landed_cost">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th><span class="required-star">*</span> Preferred Vendor</th>
-                                <td>
-                                    <select name="suppliers_id" id="suppliers_id" class="form-control" required>
-                                        <option value="" disabled selected>None selected...</option>
-                                        @foreach ($suppliers as $supplier)
-                                        <option value="{{ $supplier->id }}">{{ $supplier->last_name }}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                            </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Reorder Pt (Min)</th>
                                 <td>
@@ -283,6 +289,17 @@
                                 </td>
                             </tr>
                             <tr>
+                                <th><span class="required-star">*</span> Packaging UOM</th>
+                                <td>
+                                    <select name="packagings_id" id="packagings_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($packagings as $packaging)
+                                        <option value="{{ $packaging->id }}">{{ $packaging->packaging_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
                                 <th><span class="required-star">*</span> Supplier Item Code</th>
                                 <td>
                                     <input type="text" class="form-control" name="supplier_item_code" id="supplier_item_code">
@@ -302,9 +319,9 @@
                     <table class="table table-reponsive">
                         <tbody>
                             <tr>
-                                <th><span class="required-star">*</span> Segmentation (Core)</th>
+                                <th>Segmentation (Core)</th>
                                 <td>
-                                    <select class="segmentation_select" name="segmentation_core[]" id="segmentation_core" class="form-control" multiple="multiple" required>
+                                    <select class="segmentation_select" name="segmentation_core[]" id="segmentation_core" class="form-control" multiple="multiple" >
                                         @foreach ($segmentations as $segmentation)
                                         <option class="{{ $segmentation->segment_column_name }}" value="{{ $segmentation->segment_column_name }}">{{ $segmentation->segment_column_description }}</option>
                                         @endforeach
@@ -312,9 +329,9 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Segmentation (Depletion)</th>
+                                <th>Segmentation (Depletion)</th>
                                 <td>
-                                    <select class="segmentation_select" name="segmentation_depletion[]" id="segmentation_depletion" class="form-control" multiple="multiple" required>
+                                    <select class="segmentation_select" name="segmentation_depletion[]" id="segmentation_depletion" class="form-control" multiple="multiple" >
                                         @foreach ($segmentations as $segmentation)
                                         <option class="{{ $segmentation->segment_column_name }}" value="{{ $segmentation->segment_column_name }}">{{ $segmentation->segment_column_description }}</option>
                                         @endforeach
@@ -322,9 +339,9 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Segmentation (Non Core)</th>
+                                <th>Segmentation (Non Core)</th>
                                 <td>
-                                    <select class="segmentation_select" name="segmentation_non_core[]" id="segmentation_non_core" class="form-control" multiple="multiple" required>
+                                    <select class="segmentation_select" name="segmentation_non_core[]" id="segmentation_non_core" class="form-control" multiple="multiple" >
                                         @foreach ($segmentations as $segmentation)
                                         <option class="{{ $segmentation->segment_column_name }}" value="{{ $segmentation->segment_column_name }}">{{ $segmentation->segment_column_description }}</option>
                                         @endforeach
@@ -332,9 +349,9 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Segmentation (Perishable)</th>
+                                <th>Segmentation (Perishable)</th>
                                 <td>
-                                    <select class="segmentation_select" name="segmentation_perishable[]" id="segmentation_perishable" class="form-control" multiple="multiple" required>
+                                    <select class="segmentation_select" name="segmentation_perishable[]" id="segmentation_perishable" class="form-control" multiple="multiple" >
                                         @foreach ($segmentations as $segmentation)
                                         <option class="{{ $segmentation->segment_column_name }}" value="{{ $segmentation->segment_column_name }}">{{ $segmentation->segment_column_description }}</option>
                                         @endforeach
@@ -342,9 +359,9 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Segmentation (Alternative)</th>
+                                <th>Segmentation (Alternative)</th>
                                 <td>
-                                    <select class="segmentation_select" name="segmentation_alternative[]" id="segmentation_alternative" class="form-control" multiple="multiple" required>
+                                    <select class="segmentation_select" name="segmentation_alternative[]" id="segmentation_alternative" class="form-control" multiple="multiple">
                                         @foreach ($segmentations as $segmentation)
                                         <option class="{{ $segmentation->segment_column_name }}" value="{{ $segmentation->segment_column_name }}">{{ $segmentation->segment_column_description }}</option>
                                         @endforeach
@@ -355,6 +372,7 @@
                     </table>
                 </div>
             </div>
+            <button id="sumit-form-btn" class="btn btn-primary" type="submit">submit</button>
         </form>
     </div>
     <div class="panel-footer">
@@ -366,12 +384,48 @@
 
 <script type="application/javascript">
     const allSubcategories = {!! json_encode($subcategories) !!};
+
+    function updateCommiMargin() {
+        const salesPrice = parseFloat($('#ttp').val() || 0);
+        const landedCost = parseFloat($('#landed_cost').val() || 0);
+        if (!landedCost || !salesPrice) return;
+        const commiMargin = math.round((salesPrice - landedCost) / salesPrice, 2);
+
+        $('#ttp_percentage').val(commiMargin);
+    }
+
+    function restrictDecimals(jqueryElement, number) {
+        const [int, dec] = jqueryElement.val().split('.');
+        number = parseInt(number);
+        if (dec && dec.length > number) {
+            const value = `${int}.${dec.slice(0,number)}`
+            jqueryElement.val(value);
+        }
+    }
+
+    function updatePrice() {
+        const pp = $('#purchase_price').val();
+        const taxCode = $('#tax_codes_id').val();
+        const ttpPercentage = $('#ttp_percentage').val();
+        const ttp = $('#ttp').val();
+        
+        if (taxCode == 1)
+        {
+            let price = parseFloat(pp / 1.12);
+            const markup = (parseFloat(ttpPercentage) / 100) + 1;
+            price = math.round(price * markup, 5);
+             $('#price').val(price);
+        }else{
+            $('#price').val(ttp);
+        }
+    }
+
     $(`
         #brands_id,
         #tax_codes_id,
         #accounts_id,
         #cogs_accounts_id,
-        #assets_accounts_id,
+        #asset_accounts_id,
         #fulfillment_type_id,
         #uoms_id,
         #uoms_set_id,
@@ -380,6 +434,7 @@
         #groups_id,
         #categories_id,
         #subcategories_id,
+        #packagings_id,
         #segmentation_core,
         #segmentation_depletion,
         #segmentation_non_core,
@@ -429,8 +484,39 @@
         const otherOptions = $(`.segmentation_select option.${className}`).attr('disabled', false);
     });
 
-    // $(document).on('input', '.full_item_description', function() {
-    //     console.log($(this).val());
-    // })
+    $('#tax_codes_id').on('change', function() {        
+        $('#purchase_price').val("");
+        $('#ttp').val("");
+        $('#ttp_percentage').val("");
+        $('#landed_cost').val("");
+        $('#price').val("");
+    });
+
+    $('#full_item_description').on('input', function() {
+        const text = $(this).val();
+        $('#purchase_description').val(text);
+    });
+
+    $('#ttp, #landed_cost').on('input', function() {
+        restrictDecimals($(this), 2);
+        updateCommiMargin();
+    });
+
+    $('#purchase_price').on('input', function() {
+        restrictDecimals($(this), 5);
+    });
+
+    $(`
+        #tax_codes_id,
+        #purchase_price,
+        #ttp,
+        #ttp_percentage
+    `).on('change keyup click', function() {
+        updatePrice();
+    });
+
+    $('#save-btn').on('click', function() {
+        $('#sumit-form-btn').click();
+    });
 </script>
 @endsection
