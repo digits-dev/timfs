@@ -16,6 +16,17 @@
         width: 35%;
     }
 
+    .photo-section {
+        max-width: 400px;
+        margin: 0 auto; 
+    }
+
+    .photo-section img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+
     .swal2-html-container {
         line-height: 3rem !important;
     }
@@ -176,12 +187,6 @@
                                     </select>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <table class="table-responsive table">
-                        <tbody>
                             <tr>
                                 <th><span class="required-star">*</span> U/M</th>
                                 <td>
@@ -227,6 +232,12 @@
                                     <input value="{{ $item->ttp }}"  type="number" step="any" class="form-control" name="ttp" id="ttp" required readonly>
                                 </td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table-responsive table">
+                        <tbody>
                             @if ($item->tasteless_code)
                             <tr>
                                 <th>Sales Price Change</th>
@@ -278,14 +289,6 @@
                                 </tr>
                                 @endif
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <table class="table table-responsive">
-                        <tbody>
                             <tr>
                                 <th><span class="required-star">*</span> Reorder Pt (Min)</th>
                                 <td>
@@ -363,6 +366,8 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <h3 class="text-center text-bold">SEGMENTATIONS</h3>
                     <input type="text" class="hide" name="segmentations" id="segmentations">
@@ -398,6 +403,14 @@
                     @endforeach
                     </table>
                 </div>
+                @if ($item->image_filename)
+                <div class="col-md-6">
+                    <div class="photo-section">
+                        <h3 class="text-center text-bold">ITEM PHOTO</h3>
+                        <img src="{{ asset('/img/item-master/' . $item->image_filename) }}" alt="Item Photo">
+                    </div>
+                </div>
+                @endif
             </div>
             <button id="sumit-form-btn" class="btn btn-primary hide" type="submit">submit</button>
         </form>

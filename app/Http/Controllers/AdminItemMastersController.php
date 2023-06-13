@@ -24,6 +24,10 @@
 	use Illuminate\Support\Facades\Redirect;
 	use Carbon\Carbon;
 	use Illuminate\Support\Facades\Schema;
+	use Intervention\Image\Facades\Image;
+	use Spatie\ImageOptimizer\OptimizerChainFactory;
+	use Illuminate\Support\Str;
+
 
 	class AdminItemMastersController extends \crocodicstudio\crudbooster\controllers\CBController {
 	    
@@ -50,7 +54,7 @@
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
 			$this->button_add = true;
-			$this->button_edit = true;
+			$this->button_edit = false;
 			$this->button_delete = false;
 			$this->button_detail = true;
 			$this->button_show = true;
@@ -314,6 +318,13 @@
 	        | 
 	        */
 	        $this->addaction = array();
+			$this->addaction[] = [
+				'title'=>'Edit',
+				'url'=>CRUDBooster::mainpath('edit/[id]'),
+				'icon'=>'fa fa-pencil',
+				'color' => ' ',
+				"showIf"=>"[status_of_approval] != '202'",
+			];
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -605,6 +616,10 @@
 			// 	$sub_query->orWhere('item_masters.approval_status',	$update_item_status_1);
 		
 			// });
+
+			$query
+				->leftJoin('item_master_approvals', 'item_masters.tasteless_code', '=', 'item_master_approvals.tasteless_code')
+				->addSelect('item_master_approvals.approval_status as status_of_approval');
 	    }
 
 	    /*
@@ -889,6 +904,28 @@
 
 		public function submitAddOrEdit(Request $request) {
 			$input = $request->all();
+			if ($input['item_photo']) {
+				$random_string = Str::random(10);
+				$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', $random_string);
+				$item_description = str_replace(['/', ':', ' ', ','], '_', $input['full_item_description']);
+				$item_description = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', $item_description);
+	
+				$img_file = $input['item_photo'];
+				$filename = "$item_description(" . date('Y-m-d') . ")$random_string." . $img_file->getClientOriginalExtension();
+				$image = Image::make($img_file);
+				
+				$image->resize(1024, 768, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
+	
+				// Save the resized image to the public folder
+				$image->save(public_path('img/item-master/' . $filename));
+				// Optimize the uploaded image
+				$optimizerChain = OptimizerChainFactory::create();
+				$optimizerChain->optimize(public_path('img/item-master/' . $filename));
+			}
+
 			$segmentations = (array) json_decode($input['segmentations']);
 			$group = Group::findOrFail($input['groups_id']);
 			$tasteless_code = $input['tasteless_code'];
@@ -908,13 +945,14 @@
 
 			$data = $request->all();
 
-			unset($data['_token'], $data['segmentations']);
+			unset($data['_token'], $data['segmentations'], $data['item_photo']);
 			$data['price'] = $data['ttp'];
 			$data['myob_item_description'] = $data['full_item_description'];
 			$data['sku_statuses_id'] = 1;
 			$data['type'] = 'Inventory Part';
 			$data['tax_status'] = $data['tax_codes_id'];
 			$data['tasteless_code'] = $tasteless_code;
+			$data['image_filename'] = $filename;
 
 			//segmentation => initializing all to 'X'
 			foreach ($segment_columns as $segment_column) {

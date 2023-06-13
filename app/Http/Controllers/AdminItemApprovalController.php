@@ -14,6 +14,8 @@
 	use Illuminate\Http\Request;
 	use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Schema;
+	use Intervention\Image\Facades\Image;
+	use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 	class AdminItemApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
 
