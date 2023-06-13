@@ -16,6 +16,17 @@
         width: 35%;
     }
 
+    .photo-section {
+        max-width: 400px;
+        margin: 0 auto; 
+    }
+
+    .photo-section img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+
     .swal2-html-container {
         line-height: 3rem !important;
     }
@@ -70,7 +81,7 @@
         <h3 class="text-center text-bold">Item Masterfile</h3>
     </div>
     <div class="panel-body">
-        <form action="{{ route('item_maters_submit_add_or_edit') }}" method="POST" class="form-main" autocomplete="off">
+        <form action="{{ route('item_maters_submit_add_or_edit') }}" enctype="multipart/form-data" method="POST" class="form-main" autocomplete="off">
             <h3 class="text-center text-bold">ITEM DETAILS</h3>
             @csrf
             <input value="{{ $item->tasteless_code }}" name="tasteless_code" type="text" class="tasteless_code hide">
@@ -84,6 +95,10 @@
                                 <td><input value="{{ $item->tasteless_code}}" type="text" name="tasteless_code" id="tasteless_code" class="form-control" readonly></td>
                             </tr>
                             @endif
+                            <tr>
+                                <th><span class="required-star">{{ $item->image_filename ? '' : '*' }}</span> Item Photo</th>
+                                <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ $item->image_filename ? '' : 'required' }} ></td>
+                            </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Item Description</th>
                                 <td><input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
@@ -174,12 +189,6 @@
                                     </select>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <table class="table-responsive table">
-                        <tbody>
                             <tr>
                                 <th><span class="required-star">*</span> U/M</th>
                                 <td>
@@ -225,6 +234,12 @@
                                     <input value="{{ $item->ttp }}"  type="number" step="any" class="form-control" name="ttp" id="ttp" required>
                                 </td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table-responsive table">
+                        <tbody>
                             @if ($item->tasteless_code)
                             <tr>
                                 <th>Sales Price Change</th>
@@ -276,14 +291,6 @@
                                 </tr>
                                 @endif
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <table class="table table-responsive">
-                        <tbody>
                             <tr>
                                 <th><span class="required-star">*</span> Reorder Pt (Min)</th>
                                 <td>
@@ -361,6 +368,8 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <h3 class="text-center text-bold">SEGMENTATIONS</h3>
                     <input type="text" class="hide" name="segmentations" id="segmentations">
@@ -396,6 +405,14 @@
                     @endforeach
                     </table>
                 </div>
+                @if ($item->image_filename)
+                <div class="col-md-6">
+                    <div class="photo-section">
+                        <h3 class="text-center text-bold">ITEM PHOTO</h3>
+                        <img src="{{ asset('/img/item-master/' . $item->image_filename) }}" alt="Item Photo">
+                    </div>
+                </div>
+                @endif
             </div>
             <button id="sumit-form-btn" class="btn btn-primary hide" type="submit">submit</button>
         </form>
@@ -555,6 +572,13 @@
                 $('#sumit-form-btn').click();
             }
         });
+    });
+
+    $('form input').on('keyup keypress', function(event) {
+        if (event.keyCode == 13) {
+            event.preventDefault();
+            return;
+        }
     });
 
     disableSelected();
