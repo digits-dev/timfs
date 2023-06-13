@@ -174,7 +174,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
+        Spatie\LaravelImageOptimizer\ImageOptimizerServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class,
     ],
 
     /*
@@ -224,7 +225,9 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Input' => Illuminate\Support\Facades\Request::class,
-        'Str'       => Illuminate\Support\Str::class,
+        'Str' => Illuminate\Support\Str::class,
+        'ImageOptimizer' => Spatie\LaravelImageOptimizer\Facades\ImageOptimizer::class,
+        'Image' => Intervention\Image\Facades\Image::class,
     ],
 
 ];
