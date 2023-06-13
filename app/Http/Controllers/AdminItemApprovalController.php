@@ -321,22 +321,29 @@
 			// 	'icon'=>'fa fa-eye',
 			// 	'color' => ' ',
 			// ];
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			$to_edit = in_array($my_privilege, ['Purchasing Staff', 'Encoder', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
+			$to_approve = in_array($my_privilege, ['Manager (Purchaser)', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
 
-			$this->addaction[] = [
-				'title'=>'Approve',
-				'url'=>CRUDBooster::mainpath('edit/[id]'),
-				'icon'=>'fa fa-pencil',
-				'color' => ' ',
-				"showIf"=>"[approval_status] == '400'",
-			];
+			if ($to_edit) {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url'=>CRUDBooster::mainpath('edit/[id]'),
+					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"[approval_status] == '400'",
+				];
+			}
 
-			$this->addaction[] = [
-				'title'=>'Approve',
-				'url'=>CRUDBooster::mainpath('approve_or_reject/[id]'),
-				'icon'=>'fa fa-thumbs-up',
-				'color' => ' ',
-				"showIf"=>"[approval_status] == '202'",
-			];
+			if ($to_approve) {
+				$this->addaction[] = [
+					'title'=>'Approve',
+					'url'=>CRUDBooster::mainpath('approve_or_reject/[id]'),
+					'icon'=>'fa fa-thumbs-up',
+					'color' => ' ',
+					"showIf"=>"[approval_status] == '202'",
+				];
+			}
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -671,33 +678,9 @@
 	    }
 
 		public function getEdit($id) {
-			// $module_id = DB::table('cms_moduls')->where('controller','AdminItemMastersController')->value('id');
-		    
-			// $item_info = ItemMasterApproval::find($id);
-		
-            // if(CRUDBooster::myPrivilegeName() == 'Supervisor (Purchaser)'){
-			//     $create_update_status = ApprovalWorkflowSetting::where('workflow_number', 1)->where('action_type', 'Create')->where('approver_privilege_id', CRUDBooster::myPrivilegeId())->where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->value('current_state');
-			//     $supplier_update_status = ApprovalWorkflowSetting::where('workflow_number', 1)->where('action_type', 'Update')->where('approver_privilege_id', CRUDBooster::myPrivilegeId())->where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->value('current_state');
-            // }elseif(CRUDBooster::myPrivilegeName() == 'Manager (Accounting)'){
-			//     $create_update_status = ApprovalWorkflowSetting::where('workflow_number',  4)->where('action_type', 'Create')->where('approver_privilege_id', CRUDBooster::myPrivilegeId())->where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->value('current_state');
-			//     $supplier_update_status = ApprovalWorkflowSetting::where('workflow_number',4)->where('action_type', 'Update')->where('approver_privilege_id', CRUDBooster::myPrivilegeId())->where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->value('current_state');                
-            // }else{
-            //     $create_update_status = "";
-            //     $supplier_update_status = "";
-            // }
-			// if ($item_info->approval_status == $create_update_status || $item_info->approval_status == $supplier_update_status) {
-			// 	CRUDBooster::redirect(CRUDBooster::mainpath(""),"You're not allowed to edit pending items for approval.","warning");
-			// }
-            // if(CRUDBooster::myPrivilegeName() == 'Manager (Purchaser)'){
-            //     if ($item_info->action_type == "Update") {
-                    
-			// 	    CRUDBooster::redirect(CRUDBooster::mainpath(""),"You're not allowed to edit pending items for approval.","warning");
-			//     }
-            // }
-            
-			// return parent::getEdit($id);
-
-			if (!CRUDBooster::isUpdate())
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			$to_edit = in_array($my_privilege, ['Purchasing Staff', 'Encoder', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
+			if (!CRUDBooster::isUpdate() || !$to_edit)
 					CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
@@ -718,8 +701,9 @@
 
 
 		public function getApproveOrReject($id) {
-
-			if (!CRUDBooster::isUpdate())
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			$to_approve = in_array($my_privilege, ['Manager (Purchaser)', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
+			if (!CRUDBooster::isUpdate() || !$to_approve)
 					CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
