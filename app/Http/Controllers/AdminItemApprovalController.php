@@ -317,12 +317,6 @@
 	        | 
 	        */
 	        $this->addaction = array();
-			// $this->addaction[] = [
-			// 	'title'=>'Detail',
-			// 	'url'=>CRUDBooster::mainpath('detail/[id]'),
-			// 	'icon'=>'fa fa-eye',
-			// 	'color' => ' ',
-			// ];
 			$my_privilege = CRUDBooster::myPrivilegeName();
 			$to_edit = in_array($my_privilege, ['Purchasing Staff', 'Encoder', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
 			$to_approve = in_array($my_privilege, ['Manager (Purchaser)', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
@@ -454,8 +448,8 @@
 	        |
 	        */
 	        $this->load_js = array();
-			$module_id = DB::table('cms_moduls')->where('controller','AdminItemMastersController')->value('id');
-			$approver_checker = ApprovalWorkflowSetting::where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->where('approver_privilege_id',CRUDBooster::myPrivilegeId())->where('status','ACTIVE')->first();
+			// $module_id = DB::table('cms_moduls')->where('controller','AdminItemMastersController')->value('id');
+			// $approver_checker = ApprovalWorkflowSetting::where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->where('approver_privilege_id',CRUDBooster::myPrivilegeId())->where('status','ACTIVE')->first();
 	        
 	        
 	        /*
@@ -508,8 +502,19 @@
 	    public function hook_query_index(&$query) {
 
 			$query
-				->where('item_master_approvals.created_at', '>=', date('2023-06-07'))
-				->orWhere('item_master_approvals.updated_at', '>=', date('2023-06-07'));
+			->where(function($sub) {
+					$sub
+						->where('item_master_approvals.created_at', '>=', date('2023-06-07'))
+						->orWhere('item_master_approvals.updated_at', '>=', date('2023-06-07'));
+				});
+
+			if (CRUDBooster::myPrivilegeName() == 'Purchasing Staff') {
+				$query->where(function($sub) {
+					$my_id = CRUDBooster::myId();
+						$sub->whereRaw(DB::raw("(item_master_approvals.action_type = 'Create' and item_master_approvals.created_by = $my_id) or (item_master_approvals.action_type = 'Update' and item_master_approvals.updated_by = $my_id)"));
+					});
+			}
+			$query->orderBy('item_master_approvals.updated_at', 'asc');
 	    }
 
 	    /*
@@ -575,85 +580,8 @@
 	    | 
 	    */
 	    public function hook_after_edit($id) {
-			//Your code here 
-			$created_item = ItemMasterApproval::where('id',$id)->first();
 
-			switch($created_item->action_type){
-
-				case 'Create' :
-				$module_id = DB::table('cms_moduls')->where('controller','AdminItemMastersController')->value('id');
-				$approver_checker = ApprovalWorkflowSetting::where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->where('action_type', 'Create')
-									->where('approver_privilege_id',CRUDBooster::myPrivilegeId())
-									->where('status','ACTIVE')->first();
-
-					switch ($approver_checker->workflow_number){
-						case 2:
-						CRUDBooster::redirect(CRUDBooster::mainpath(),"The item has been edited and pending for approval.","info");
-						break;
-
-						case 3:
-						CRUDBooster::redirect(CRUDBooster::mainpath(),"The item has been edited and pending for approval.","info");
-						break;
-
-						default:
-						$created_item = ItemMasterApproval::where('id',$id)->first();
-						$module_id = DB::table('cms_moduls')->where('controller','AdminItemMastersController')->value('id');
-						$for_approval = ItemMasterApproval::where('id',$id)->first();
-						$approvers = 	ApprovalWorkflowSetting::where('status','ACTIVE')->where('action_type', 'Create')
-										->where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->get();
-					
-						foreach ($approvers as $approvers_list){
-							$approver_privilege_for =	DB::table('cms_privileges')->where('id',$approvers_list->encoder_privilege_id)->first();
-							$approver_privilege =		DB::table('cms_privileges')->where('id',$approvers_list->approver_privilege_id)->first();	
-						
-							if($for_approval->encoder_privilege_id == $approver_privilege_for->id){
-								
-								$send_to =	DB::table('cms_users')->where('id_cms_privileges',$approver_privilege->id)->get();
-								foreach ($send_to as $send_now){
-									$config['content'] = "An item has been edited at Item Masterfile Module, please check item for approval!";
-									$config['to'] = CRUDBooster::adminPath('item_approval?q='.$for_approval->id);
-									$config['id_cms_users'] = [$send_now->id];
-									CRUDBooster::sendNotification($config);	
-								}
-							}
-
-						}
-						CRUDBooster::redirect(CRUDBooster::mainpath(),"The item has been edited and pending for approval.","info");
-						break;
-					}
-				break;
-
-				case 'Update' :
-
-					$module_id = DB::table('cms_moduls')->where('controller','AdminItemMastersController')->value('id');
-
-					$for_approval = ItemMasterApproval::where('id',$id)->first();
-					$approvers = 	ApprovalWorkflowSetting::where('status','ACTIVE')->where('action_type', 'Update')
-									->where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->get();
-		
-					foreach ($approvers as $approvers_list){
-						$approver_privilege_for =	DB::table('cms_privileges')->where('id',$approvers_list->encoder_privilege_id)->first();
-						$approver_privilege =		DB::table('cms_privileges')->where('id',$approvers_list->approver_privilege_id)->first();	
-					
-						if($for_approval->encoder_privilege_id == $approver_privilege_for->id){
-							$send_to =	DB::table('cms_users')->where('id_cms_privileges',$approver_privilege->id)->get();
-							foreach ($send_to as $send_now){
-								$config['content'] = "An item has been edited at Item Masterfile Module, please check item for approval!";
-								$config['to'] = CRUDBooster::adminPath('item_approval?q='.$for_approval->tasteless_code);
-								$config['id_cms_users'] = [$send_now->id];
-								CRUDBooster::sendNotification($config);	
-							}
-						}
-						
-					}
-					CRUDBooster::redirect(CRUDBooster::mainpath(),"Your item has been edited and pending for approval.","info");
-				break;
-
-				default:
-				break;
-
-			}
-	    }
+		}
 
 	    /* 
 	    | ---------------------------------------------------------------------- 
@@ -681,7 +609,7 @@
 
 		public function getEdit($id) {
 			$my_privilege = CRUDBooster::myPrivilegeName();
-			$to_edit = in_array($my_privilege, ['Purchasing Staff', 'Encoder', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
+			$to_edit = in_array($my_privilege, ['Purchasing Staff', 'Encoder', 'Super Administrator', 'Supervisor (Purchaser)']) || CRUDBooster::isSuperAdmin();
 			if (!CRUDBooster::isUpdate() || !$to_edit)
 					CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
