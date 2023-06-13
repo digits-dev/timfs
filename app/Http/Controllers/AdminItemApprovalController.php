@@ -794,7 +794,7 @@
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => $message_type,
-					'message' => '✔️ Item added to Pending Items...',
+					'message' => $message,
 				])->send();
 		}
 	}
