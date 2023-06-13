@@ -335,6 +335,7 @@
 				'url'=>CRUDBooster::mainpath('approve_or_reject/[id]'),
 				'icon'=>'fa fa-thumbs-up',
 				'color' => ' ',
+				"showIf"=>"[approval_status] == '202'",
 			];
 
 	        /* 
