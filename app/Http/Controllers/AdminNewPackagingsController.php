@@ -523,6 +523,7 @@
 			$data['uoms'] = DB::table('uoms')
 				->where('uoms.status', 'ACTIVE')
 				->orderBy('uoms.uom_description')
+				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
 				->get()
 				->toArray();
 

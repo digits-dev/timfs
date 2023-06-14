@@ -37,6 +37,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"Approval Status","name"=>"id","join"=>"rnd_menu_approvals,approval_status","join_id"=>"rnd_menu_items_id"];
+			$this->col[] = ["label"=>"Concept","name"=>"segmentations_id","join"=>"segmentations,segment_column_description"];
 			$this->col[] = ["label"=>"Release Date","name"=>"release_date"];
 			$this->col[] = ["label"=>"End Date","name"=>"end_date"];
 			$this->col[] = ["label"=>"RND Code","name"=>"rnd_code"];

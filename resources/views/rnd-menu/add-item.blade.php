@@ -270,7 +270,7 @@
                     <input type="text" class="form-control display-uom" value="" readonly>
                 </div>
             </label>
-            <label class="label-wide">
+            <label class="label-wide" style="display: none">
                 <span class="required-star">*</span> Preparation
                 <select class="form-control preparation" disabled>
                     @foreach ($preparations as $preparation)
@@ -278,7 +278,7 @@
                     @endforeach
                 </select>
             </label>
-            <label class="label-wide">
+            <label class="label-wide" style="display: none">
                 <span class="required-star">*</span> Yield %
                 <input value="" class="form-control yield" type="number" readonly required>
             </label>
@@ -286,7 +286,7 @@
                 <span class="required-star">*</span> TTP <span class="date-updated"></span>
                 <input value="" class="form-control ttp" type="number" readonly required>
             </label>
-            <label>
+            <label style="display: none">
                 <span class="required-star">*</span> Packaging Qty
                 <input value="" class="form-control pack-quantity" type="number" readonly required>
             </label>
@@ -331,7 +331,7 @@
                     <input type="text" class="form-control display-uom" value="" readonly>
                 </div>
             </label>
-            <label class="label-wide">
+            <label class="label-wide" style="display: none">
                 <span class="required-star">*</span> Preparation
                 <select class="form-control preparation" disabled>
                     @foreach ($preparations as $preparation)
@@ -339,7 +339,7 @@
                     @endforeach
                 </select>
             </label>
-            <label class="label-wide">
+            <label class="label-wide" style="display: none">
                 <span class="required-star">*</span> Yield %
                 <input value="" class="form-control yield" type="number" readonly required>
             </label>
@@ -347,7 +347,7 @@
                 <span class="required-star">*</span> TTP <span class="date-updated"></span>
                 <input value="" class="form-control ttp" type="number" readonly required>
             </label>
-            <label>
+            <label style="display: none">
                 <span class="required-star">*</span> Packaging Qty
                 <input value="" class="form-control pack-quantity" type="number" readonly required>
             </label>
@@ -392,7 +392,7 @@
                 <input type="text" class="form-control display-uom" value="" readonly>
             </div>
         </label>
-        <label class="label-wide">
+        <label class="label-wide" style="display: none">
             <span class="required-star">*</span> Preparation
             <select class="form-control preparation" disabled>
                 @foreach ($preparations as $preparation)
@@ -400,7 +400,7 @@
                 @endforeach
             </select>
         </label>
-        <label class="label-wide">
+        <label class="label-wide" style="display: none">
             <span class="required-star">*</span> Yield %
             <input value="" class="form-control yield" type="number" readonly required>
         </label>
@@ -408,7 +408,7 @@
             <span class="required-star">*</span> TTP <span class="date-updated"></span>
             <input value="" class="form-control ttp" type="number" readonly required>
         </label>
-        <label>
+        <label style="display: none">
             <span class="required-star">*</span> Packaging Qty
             <input value="" class="form-control pack-quantity" type="number" readonly required>
         </label>
@@ -444,7 +444,7 @@
                 <input type="text" class="form-control display-uom" value="" readonly>
             </div>
         </label>
-        <label class="label-wide">
+        <label class="label-wide" style="display: none">
             <span class="required-star">*</span> Preparation
             <select class="form-control preparation" disabled>
                 @foreach ($preparations as $preparation)
@@ -452,7 +452,7 @@
                 @endforeach
             </select>
         </label>
-        <label class="label-wide">
+        <label class="label-wide" style="display: none">
             <span class="required-star">*</span> Yield %
             <input value="" class="form-control yield" type="number" readonly required>
         </label>
@@ -460,7 +460,7 @@
             <span class="required-star">*</span> TTP <span class="date-updated"></span>
             <input value="" class="form-control ttp" type="number" readonly required>
         </label>
-        <label>
+        <label style="display: none">
             <span class="required-star">*</span> Packaging Qty
             <input value="" class="form-control pack-quantity" type="number" readonly required>
         </label>
@@ -518,7 +518,7 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label">RND Menu Item Code</label>
+                        <label for="" class="control-label">RND Code</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
@@ -529,12 +529,17 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label">Tasteless Menu Code</label>
+                        <label for="" class="control-label"><span class="required-star">*</span> Concept</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input value="{{$item ? $item->menu_items_code : ''}}" type="text" class="form-control rnd_tasteless_code" placeholder="XXXXXX" readonly>
+                            <select class="segmentation form-control" id="segmentation" required>
+                                <option value="" selected disabled>Nothing selected...</option>
+                                @foreach ($segmentations as $segmentation)
+                                <option {{$segmentation->id == $item->segmentations_id ? 'selected' : ''}} value="{{ $segmentation->id }}">{{ $segmentation->segment_column_description }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -1031,6 +1036,10 @@
             $('.rnd_menu_srp').keyup(function() {
                 $.fn.sumCost();
             });
+
+            $('.segmentation').on('change', function() {
+                $(this).css('outline', '');
+            })
         }
 
         $.fn.sumCost = function() {
@@ -1315,6 +1324,10 @@
                 .attr('name', 'portion_size')
                 .val($('.portion').val());
 
+            const segmentationData = $(document.createElement('input'))
+                .attr('name', 'segmentations_id')
+                .val($('.segmentation').val());
+
             form.append(
                 csrf,
                 ingredientsData,
@@ -1323,6 +1336,7 @@
                 rndMenuIdData,
                 srpData,
                 portionData,
+                segmentationData,
             );
             $('.panel-body').append(form);
             form.submit();
@@ -1333,7 +1347,8 @@
                 .ingredient-section input, 
                 .ingredient-section select,
                 .packaging-section input, 
-                .packaging-section select
+                .packaging-section select,
+                .segmentation
             `);
 
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
@@ -1364,6 +1379,7 @@
                     if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
 					if (!$('.rnd_menu_description').val()) $('.rnd_menu_description').css('outline', '2px solid red');
 					if (!$('.rnd_menu_srp').val() || $('.rnd_menu_srp').val() <= 0) $('.rnd_menu_srp').css('outline', '2px solid red');
+					if (!$('.segmentation').val()) $('.segmentation').css('outline', '2px solid red');
                 });
         }
 

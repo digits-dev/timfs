@@ -39,7 +39,7 @@
                     <input type="text" class="form-control display-uom" value="" readonly>
                 </div>
             </label>
-            <label class="label-wide">
+            <label class="label-wide" style="display: none">
                 <span class="required-star">*</span> Preparation
                 <select class="form-control preparation" disabled>
                     @foreach ($preparations as $preparation)
@@ -47,7 +47,7 @@
                     @endforeach
                 </select>
             </label>
-            <label class="label-wide">
+            <label class="label-wide" style="display: none">
                 <span class="required-star">*</span> Yield %
                 <input value="" class="form-control yield" type="number" readonly required>
             </label>
@@ -55,7 +55,7 @@
                 <span class="required-star">*</span> TTP <span class="date-updated"></span>
                 <input value="" class="form-control ttp" type="number" readonly required>
             </label>
-            <label>
+            <label style="display: none">
                 <span class="required-star">*</span> Packaging Qty
                 <input value="" class="form-control pack-quantity" type="number" readonly required>
             </label>
@@ -100,7 +100,7 @@
                     <input type="text" class="form-control display-uom" value="" readonly>
                 </div>
             </label>
-            <label class="label-wide">
+            <label class="label-wide" style="display: none">
                 <span class="required-star">*</span> Preparation
                 <select class="form-control preparation" disabled>
                     @foreach ($preparations as $preparation)
@@ -108,7 +108,7 @@
                     @endforeach
                 </select>
             </label>
-            <label class="label-wide">
+            <label class="label-wide" style="display: none">
                 <span class="required-star">*</span> Yield %
                 <input value="" class="form-control yield" type="number" readonly required>
             </label>
@@ -116,7 +116,7 @@
                 <span class="required-star">*</span> TTP <span class="date-updated"></span>
                 <input value="" class="form-control ttp" type="number" readonly required>
             </label>
-            <label>
+            <label style="display: none">
                 <span class="required-star">*</span> Packaging Qty
                 <input value="" class="form-control pack-quantity" type="number" readonly required>
             </label>
@@ -161,7 +161,7 @@
                 <input type="text" class="form-control display-uom" value="" readonly>
             </div>
         </label>
-        <label class="label-wide">
+        <label class="label-wide" style="display: none">
             <span class="required-star">*</span> Preparation
             <select class="form-control preparation" disabled>
                 @foreach ($preparations as $preparation)
@@ -169,7 +169,7 @@
                 @endforeach
             </select>
         </label>
-        <label class="label-wide">
+        <label class="label-wide" style="display: none">
             <span class="required-star">*</span> Yield %
             <input value="" class="form-control yield" type="number" readonly required>
         </label>
@@ -177,7 +177,7 @@
             <span class="required-star">*</span> TTP <span class="date-updated"></span>
             <input value="" class="form-control ttp" type="number" readonly required>
         </label>
-        <label>
+        <label style="display: none">
             <span class="required-star">*</span> Packaging Qty
             <input value="" class="form-control pack-quantity" type="number" readonly required>
         </label>
@@ -213,7 +213,7 @@
                 <input type="text" class="form-control display-uom" value="" readonly>
             </div>
         </label>
-        <label class="label-wide">
+        <label class="label-wide" style="display: none">
             <span class="required-star">*</span> Preparation
             <select class="form-control preparation" disabled>
                 @foreach ($preparations as $preparation)
@@ -221,7 +221,7 @@
                 @endforeach
             </select>
         </label>
-        <label class="label-wide">
+        <label class="label-wide" style="display: none">
             <span class="required-star">*</span> Yield %
             <input value="" class="form-control yield" type="number" readonly required>
         </label>
@@ -229,7 +229,7 @@
             <span class="required-star">*</span> TTP <span class="date-updated"></span>
             <input value="" class="form-control ttp" type="number" readonly required>
         </label>
-        <label>
+        <label style="display: none">
             <span class="required-star">*</span> Packaging Qty
             <input value="" class="form-control pack-quantity" type="number" readonly required>
         </label>
@@ -296,14 +296,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-group">
-                        <label for="" class="control-label">Tasteless Menu Code</label>
+                        <label for="" class="control-label"><span class="required-star">*</span> Concept</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input value="{{$item ? $item->menu_items_code : ''}}" type="text" class="form-control rnd_tasteless_code" placeholder="XXXXXX" readonly>
+                            <select class="segmentation form-control" id="segmentation" required disabled>
+                                <option value="" selected disabled>Nothing selected...</option>
+                                @foreach ($segmentations as $segmentation)
+                                <option {{$segmentation->id == $item->segmentations_id ? 'selected' : ''}} value="{{ $segmentation->id }}">{{ $segmentation->segment_column_description }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>

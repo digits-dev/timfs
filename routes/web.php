@@ -21,6 +21,8 @@ use App\Http\Controllers\AdminRndMenuItemsApprovedController;
 use App\Http\Controllers\AdminNewIngredientsController;
 use App\Http\Controllers\AdminNewPackagingsController;
 use App\Http\Controllers\AdminBatchingIngredientsController;
+use App\Http\Controllers\AdminItemMastersController;
+use App\Http\Controllers\AdminItemApprovalController;
 
 Route::get('/', function () {
     return redirect('admin/login');
@@ -137,5 +139,9 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     
     // batching ingredients
     Route::post('/admin/batching_ingredients/edit-batching-ingredient', [AdminBatchingIngredientsController::class, 'editBatchingIngredient'])->name('edit_batching_ingredient');
-    
+
+    //item master
+    Route::post('/admin/item_masters/submit-add-or-edit', [AdminItemMastersController::class, 'submitAddOrEdit'])->name('item_maters_submit_add_or_edit');
+    Route::post('/admin/item_masters/approve-or-reject', [AdminItemApprovalController::class, 'approveOrReject'])->name('item_maters_approve_or_reject');
+    Route::get('/admin/item_approval/approve_or_reject/{id}', [AdminItemApprovalController::class, 'getApproveOrReject']);
 });

@@ -39,6 +39,7 @@
 			$this->col = [];
 			$this->col[] = ["label"=>"Approval Status","name"=>"id","join"=>"rnd_menu_approvals,approval_status","join_id"=>"rnd_menu_items_id"];
 			$this->col[] = ["label"=>"RND Code","name"=>"rnd_code"];
+			$this->col[] = ["label"=>"Concept","name"=>"segmentations_id","join"=>"segmentations,segment_column_description"];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"menu_items_id","join"=>"menu_items,tasteless_menu_code"];
 			$this->col[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description"];
 			$this->col[] = ["label"=>"SRP","name"=>"rnd_menu_srp"];
@@ -527,6 +528,11 @@
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
 			if ($id) {
 				$data['ingredients'] = DB::table('rnd_menu_ingredients_auto_compute')
 					->where('rnd_menu_items_id', $id)
@@ -633,6 +639,7 @@
 
 			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
 			$rnd_menu_description = $request->get('rnd_menu_description');
+			$segmentations_id = $request->get('segmentations_id');
 			$food_cost = $request->get('food_cost');
 			$food_cost_percentage = $request->get('food_cost_percentage');
 			$rnd_menu_srp = $request->get('rnd_menu_srp');
@@ -652,6 +659,7 @@
 				$rnd_menu_items_id = DB::table('rnd_menu_items')
 					->insertGetId([
 						'rnd_menu_description' => $rnd_menu_description,
+						'segmentations_id' => $segmentations_id,
 						'rnd_code' => $rnd_code,
 						'portion_size' => $portion_size,
 						'rnd_menu_srp' => $rnd_menu_srp,
@@ -666,6 +674,7 @@
 					->where('id', $rnd_menu_items_id)
 					->update([
 						'rnd_menu_description' => $rnd_menu_description,
+						'segmentations_id' => $segmentations_id,
 						'rnd_menu_srp' => $rnd_menu_srp,
 						'portion_size' => $portion_size,
 						'updated_at' => $time_stamp,

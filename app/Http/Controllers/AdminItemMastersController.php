@@ -24,6 +24,10 @@
 	use Illuminate\Support\Facades\Redirect;
 	use Carbon\Carbon;
 	use Illuminate\Support\Facades\Schema;
+	use Intervention\Image\Facades\Image;
+	use Spatie\ImageOptimizer\OptimizerChainFactory;
+	use Illuminate\Support\Str;
+
 
 	class AdminItemMastersController extends \crocodicstudio\crudbooster\controllers\CBController {
 	    
@@ -50,8 +54,8 @@
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
 			$this->button_add = true;
-			$this->button_edit = true;
-			$this->button_delete = true;
+			$this->button_edit = false;
+			$this->button_delete = false;
 			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
@@ -88,568 +92,203 @@
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 
-			if (in_array(CRUDBooster::getCurrentMethod(), ['getAdd','postAddSave'])){
-
-                $this->form[] = [
-                    'label' => 'Description', 'name' => 'full_item_description', 'type' => 'text',
-                    'validation' => CRUDBooster::myAddForm()->full_item_description ? 'required|min:5|max:255' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->full_item_description ?: 'display:none;'
-                ];
-                
-                $this->form[] = ['label'=>'Brand Description','name'=>'brands_id','type'=>'select2',
-    				'validation'=>CRUDBooster::myAddForm()->brand_description ? 'required|integer|min:0' : '','width'=>'col-sm-4',
-    				'datatable'=>'brands,brand_description','datatable_where'=>"status='ACTIVE'",'style'=> CRUDBooster::myAddForm()->brand_description ? : 'display:none;'];
-    
-    
-                $this->form[] = [
-    				'label' => 'Tax Code', 'name' => 'tax_codes_id', 'type' => 'select2',
-    				'validation' => CRUDBooster::myAddForm()->tax_code ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-    				'datatable' => 'tax_codes,tax_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->tax_code ?: 'display:none;'
-    			];
-    
-                $this->form[] = [
-                    'label' => 'Account', 'name' => 'accounts_id', 'type' => 'select2',
-                    'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-                    'datatable' => 'accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'COGS Account', 'name' => 'cogs_accounts_id', 'type' => 'select2',
-                    'validation' => CRUDBooster::myAddForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'cogs_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Asset Account', 'name' => 'asset_accounts_id', 'type' => 'select2',
-                    'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-                    'datatable' => 'asset_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Purchase Description', 'name' => 'purchase_description', 'type' => 'text',
-                    'validation' => 'required|min:5|max:255', 'width' => 'col-sm-4', 'readonly' => true
-                ];
-              
-                $this->form[] = [
-    				'label' => 'Fulfillment Type', 'name' => 'fulfillment_type_id', 'type' => 'select2',
-    				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-    				'datatable' => 'fulfillment_methods,fulfillment_method', 'datatable_where' => "status='ACTIVE'"
-    			];
-    
-                $this->form[] = [
-    				'label' => 'U/M', 'name' => 'uoms_id', 'type' => 'select2',
-    				'validation' => CRUDBooster::myAddForm()->uom ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-    				'datatable' => 'uoms,uom_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->uom ?: 'display:none;'
-    			];
-    
-    			$this->form[] = [
-    				'label' => 'U/M Set', 'name' => 'uoms_set_id', 'type' => 'select2',
-    				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-    				'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'"
-    			];
-    			
-    			$this->form[] = ['label'=>'Currency','name'=>'currencies_id','type'=>'select2',
-					'validation'=>CRUDBooster::myAddForm()->currency ? 'required|integer|min:0' : '','width'=>'col-sm-4',
-					'datatable'=>'currencies,currency_code','datatable_where'=>"status='ACTIVE'",'style'=> CRUDBooster::myAddForm()->currency ? : 'display:none;'];
-    
-                $this->form[] = [
-                    'label' => 'Supplier Cost', 'name' => 'purchase_price', 'type' => 'number',
-                    'validation' => CRUDBooster::myAddForm()->purchase_price ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->purchase_price ?: 'display:none;'
-                ];
-				
-				$this->form[] = [
-                    'label' => 'Sales Price', 'name' => 'ttp', 'type' => 'number',
-                    'validation' => CRUDBooster::myAddForm()->ttp ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->ttp ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Commi Margin', 'name' => 'ttp_percentage', 'type' => 'number', 'readonly' => true,
-                    'validation' => CRUDBooster::myAddForm()->ttp_percentage ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->ttp_percentage ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Landed Cost', 'name' => 'landed_cost', 'type' => 'number',
-                    'validation' => CRUDBooster::myAddForm()->landed_cost ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->landed_cost ?: 'display:none;'
-                ];
-                
-                $this->form[] = [
-                    'label' => 'Sales Price', 'name' => 'price', 'type' => 'number',
-                    'validation' => 'required', 'width' => 'col-sm-4', 'readonly' => true, 'style' => 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Preferred Vendor', 'name' => 'suppliers_id', 'type' => 'select2',
-                    'disabled' => CRUDBooster::myEditReadOnly()->supplier ? true : false,
-                    'validation' => CRUDBooster::myEditForm()->supplier ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'suppliers,last_name', 'datatable_where' => "approval_status != 'NULL'", 'style' => CRUDBooster::myAddForm()->supplier ?: 'display:none;'
-                ];
-				
-                $this->form[] = [
-                    'label' => 'Reorder Pt (Min)', 'name' => 'reorder_pt', 'type' => 'number',
-                    'validation' => 'required|min:0.00', 'width' => 'col-sm-4'
-                ];
-				
-                $this->form[] = [
-                    'label' => 'Group', 'name' => 'groups_id', 'type' => 'select2',
-                    'validation' => CRUDBooster::myAddForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'groups,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Category Description', 'name' => 'categories_id', 'type' => 'select',
-                    'validation' => CRUDBooster::myAddForm()->category_description ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'categories,category_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->category_description ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Subcategory Description', 'name' => 'subcategories_id', 'type' => 'select',
-                    'validation' => CRUDBooster::myAddForm()->subcategory ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'subcategories,subcategory_description', 'datatable_where' => "status=%27ACTIVE%27", 'parent_select' => 'categories_id', 'style' => CRUDBooster::myAddForm()->subcategory ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Dimension', 'name' => 'packaging_dimension', 'type' => 'text',
-                    'validation' => CRUDBooster::myAddForm()->packaging_dimension ? 'max:50' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->packaging_dimension ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Packaging Size', 'name' => 'packaging_size', 'type' => 'number',
-                    'validation' => CRUDBooster::myAddForm()->packaging_size ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->packaging_size ?: 'display:none;'
-                ];
-				
-                $this->form[] = [
-                    'label' => 'Tax Status', 'name' => 'tax_status', 'type' => 'text',
-                    'validation' => 'required', 'width' => 'col-sm-4', 'readonly' => true
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Supplier Item Code', 'name' => 'supplier_item_code', 'type' => 'text',
-                    'validation' => CRUDBooster::myAddForm()->supplier_item_code ? 'max:50' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->supplier_item_code ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'MOQ Store', 'name' => 'moq_store', 'type' => 'number',
-                    'validation' => CRUDBooster::myAddForm()->moq_store ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->moq_store ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Segmentation', 'name' => 'segmentation', 'type' => 'checkbox-custom',
-                    'validation' => CRUDBooster::myAddForm()->segmentation ? 'required' : '', 'width' => 'col-sm-6',
-                    'datatable' => 'segmentations,segment_column_description,segment_column_name', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->segmentation ?: 'display:none;'
-                ];
-                //-----------------------------------
-
-			}
-			elseif (in_array(CRUDBooster::getCurrentMethod(), ['getEdit','postEditSave'])){
-				
-				
-			    $this->form[] = ['label'=>'Item','name'=>'tasteless_code','type'=>'text','readonly'=>true,'width'=>'col-sm-4'];
-
-			    //----added by cris 20200630
-                $this->form[] = ['label' => 'Active Status', 'name' => 'sku_statuses_id', 'type' => 'select2', CRUDBooster::myEditForm()->sku_status ? : 'readonly' => true,
-                    'validation' => CRUDBooster::myEditForm()->sku_status ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'sku_statuses,sku_status_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->sku_status ?: 'display:none;'
-                ];
-                    
-                $this->form[] = [
-                    'label' => 'Type', 'name' => 'type', 'type' => 'select',
-                    'validation' => 'required', 'width' => 'col-sm-4', 'dataenum'=>'Inventory Part'
-                ];
-				
-                $this->form[] = [
-                    'label' => 'Description', 'name' => 'full_item_description', 'type' => 'text', CRUDBooster::myEditForm()->full_item_description ? : 'readonly' => true,
-                    'validation' => CRUDBooster::myEditForm()->full_item_description ? 'required|min:5|max:255' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myEditForm()->full_item_description ?: 'display:none;'
-                ];
-                    
-                $this->form[] = ['label'=>'Brand Description','name'=>'brands_id','type'=>'select2', CRUDBooster::myEditForm()->brands_id ? : 'readonly' => true,
-                    'validation'=>CRUDBooster::myEditForm()->brand_description ? 'required|integer|min:0' : '','width'=>'col-sm-4',
-                    'datatable'=>'brands,brand_description','datatable_where'=>"status='ACTIVE'",'style'=> CRUDBooster::myEditForm()->brand_description ? : 'display:none;'];
-    
-    
-                $this->form[] = [
-                    'label' => 'Tax Code', 'name' => 'tax_codes_id', 'type' => 'select2', CRUDBooster::myEditForm()->tax_codes_id ? : 'readonly' => true,
-                    'validation' => CRUDBooster::myEditForm()->tax_code ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'tax_codes,tax_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->tax_code ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Account', 'name' => 'accounts_id', 'type' => 'select2', CRUDBooster::myEditForm()->accounts_id ? : 'readonly' => true,
-                    'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-                    'datatable' => 'accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->group ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'COGS Account', 'name' => 'cogs_accounts_id', 'type' => 'select2', CRUDBooster::myEditForm()->cogs_accounts_id ? : 'readonly' => true,
-                    'validation' => CRUDBooster::myEditForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'cogs_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->group ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Asset Account', 'name' => 'asset_accounts_id', 'type' => 'select2', CRUDBooster::myEditForm()->asset_accounts_id ? : 'readonly' => true,
-                    'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-                    'datatable' => 'asset_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->group ?: 'display:none;'
-                ];
-				
-                $this->form[] = [
-                    'label' => 'Purchase Description', 'name' => 'purchase_description', 'type' => 'text', CRUDBooster::myEditForm()->purchase_description ? : 'readonly' => true,
-                    'validation' => 'required|min:5|max:255', 'width' => 'col-sm-4', 'readonly' => true
-                ];
-				
-                $this->form[] = [
-    				'label' => 'Fulfillment Type', 'name' => 'fulfillment_type_id', 'type' => 'select2',
-    				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-    				'datatable' => 'fulfillment_methods,fulfillment_method', 'datatable_where' => "status='ACTIVE'"
-    			];
-
-                $this->form[] = [
-                    'label' => 'U/M', 'name' => 'uoms_id', 'type' => 'select2', CRUDBooster::myEditForm()->uoms_id ? : 'readonly' => true,
-                    'validation' => CRUDBooster::myEditForm()->uom ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'uoms,uom_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->uom ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'U/M Set', 'name' => 'uoms_set_id', 'type' => 'select2', CRUDBooster::myEditForm()->uoms_set_id ? : 'readonly' => true,
-                    'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-                    'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'"
-                ];
-
-                $this->form[] = ['label'=>'Currency','name'=>'currencies_id','type'=>'select2', CRUDBooster::myEditForm()->currency ? : 'readonly' => true,
-                    // 'disabled'=>CRUDBooster::myEditReadOnly()->currency ? true : false,
-                    'validation'=>CRUDBooster::myEditForm()->currency ? 'required|integer|min:0' : '','width'=>'col-sm-4',
-                    'datatable'=>'currencies,currency_code','datatable_where'=>"status='ACTIVE'",'style'=> CRUDBooster::myEditForm()->currency ? : 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Supplier Cost', 'name' => 'purchase_price', 'type' => 'number',
-                    'validation' => CRUDBooster::myEditForm()->purchase_price ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myEditForm()->purchase_price ?: 'display:none;'
-                ];
-				
-                $this->form[] = [
-                    'label' => 'Sales Price', 'name' => 'ttp', 'type' => 'number',
-                    'validation' => CRUDBooster::myEditForm()->ttp ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myEditForm()->ttp ?: 'display:none;'
-                ];
-
-				$this->form[] = [
-                    'label' => 'Sales Price Change', 'name' => 'ttp_price_change', 'type' => 'number',
-                    'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myEditForm()->ttp ?: 'display:none;'
-                ];
-
-				$this->form[] = [
-                    'label' => 'Sales Price Effective Date', 'name' => 'ttp_price_effective_date', 'type' => 'date',
-                    'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myEditForm()->ttp ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Commi Margin', 'name' => 'ttp_percentage', 'type' => 'number', 'readonly' => true,
-                    'validation' => CRUDBooster::myEditForm()->ttp_percentage ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myEditForm()->ttp_percentage ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Landed Cost', 'name' => 'landed_cost', 'type' => 'number',
-                    'validation' => CRUDBooster::myEditForm()->landed_cost ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myEditForm()->landed_cost ?: 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Sales Price', 'name' => 'price', 'type' => 'number',
-                    'validation' => 'required', 'width' => 'col-sm-4', 'readonly' => true, 'style' => 'display:none;'
-                ];
-    
-                $this->form[] = [
-                    'label' => 'Preferred Vendor', 'name' => 'suppliers_id', 'type' => 'select2', CRUDBooster::myEditForm()->suppliers_id ? : 'readonly' => true,
-                    // 'disabled' => CRUDBooster::myEditReadOnly()->supplier ? true : false,
-                    'validation' => CRUDBooster::myEditForm()->supplier ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'suppliers,last_name', 'datatable_where' => "approval_status != 'NULL'", 'style' => CRUDBooster::myEditForm()->supplier ?: 'display:none;'
-                ];
-        
-                    // $this->form[] = ['label' => 'Tax Agency', 'name' => 'tax_agency', 'type' => 'text', 'width' => 'col-sm-4'];
-        
-                    $this->form[] = [
-                        'label' => 'Reorder Pt (Min)', 'name' => 'reorder_pt', 'type' => 'number',
-                        'validation' => 'required|min:0.00', 'width' => 'col-sm-4'
-                    ];
-        
-                    // $this->form[] = ['label' => 'MPN', 'name' => 'mpn', 'type' => 'text', 'width' => 'col-sm-4'];
-        
-                    $this->form[] = [
-                        'label' => 'Group', 'name' => 'groups_id', 'type' => 'select2', CRUDBooster::myEditForm()->groups_id ? : 'readonly' => true,
-                        'validation' => CRUDBooster::myEditForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                        'datatable' => 'groups,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->group ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Category Description', 'name' => 'categories_id', 'type' => 'select',
-                        'validation' => CRUDBooster::myEditForm()->category_description ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                        'datatable' => 'categories,category_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->category_description ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Subcategory Description', 'name' => 'subcategories_id', 'type' => 'select', 
-                        'validation' => CRUDBooster::myEditForm()->subcategory ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                        'datatable' => 'subcategories,subcategory_description', 'datatable_where' => "status=%27ACTIVE%27", 'parent_select' => 'categories_id', 'style' => CRUDBooster::myEditForm()->subcategory ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Dimension', 'name' => 'packaging_dimension', 'type' => 'text', CRUDBooster::myEditForm()->packaging_dimension ? : 'readonly' => true,
-                        'validation' => CRUDBooster::myEditForm()->packaging_dimension ? 'max:50' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myEditForm()->packaging_dimension ?: 'display:none;'
-                    ];
-                    
-                    $this->form[] = [
-                        'label' => 'Packaging Size', 'name' => 'packaging_size', 'type' => 'number',
-                        'validation' => CRUDBooster::myEditForm()->packaging_size ? 'required' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myEditForm()->packaging_size ?: 'display:none;'
-                    ];
-
-					$this->form[] = [
-        				'label' => 'Packaging UOM', 'name' => 'packagings_id', 'type' => 'select2',
-						'validation' => CRUDBooster::myEditForm()->packagings_id ? 'required|integer|min:0' : '', 'width' => 'col-sm-4', 'readonly' => true,
-						'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'",
-						'style' => CRUDBooster::myEditForm()->packagings_id ?: 'display:none;'
-        			];
-
-					$this->form[] = [
-                        'label' => 'Ingredient Cost', 'name' => 'ingredient_cost', 'type' => 'number',
-                        'validation' => CRUDBooster::myEditForm()->ingredient_cost ? 'required' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myEditForm()->ingredient_cost ?: 'display:none;'
-                    ];
-					
-                    $this->form[] = [
-                        'label' => 'Tax Status', 'name' => 'tax_status', 'type' => 'text', CRUDBooster::myEditForm()->tax_status ? : 'readonly' => true,
-                        'validation' => 'required', 'width' => 'col-sm-4', 'readonly' => true
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Supplier Item Code', 'name' => 'supplier_item_code', 'type' => 'text', CRUDBooster::myEditForm()->supplier_item_code ? : 'readonly' => true,
-                        'validation' => CRUDBooster::myEditForm()->supplier_item_code ? 'max:50' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myEditForm()->supplier_item_code ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'MOQ Store', 'name' => 'moq_store', 'type' => 'number', CRUDBooster::myEditForm()->moq_store ? : 'readonly' => true,
-                        'validation' => CRUDBooster::myEditForm()->moq_store ? 'required' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myEditForm()->moq_store ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Segmentation', 'name' => 'segmentation', 'type' => 'checkbox-custom', CRUDBooster::myEditForm()->segmentation ? : 'readonly' => true,
-                        // 'disabled' => CRUDBooster::myEditReadOnly()->segmentation ? true : false,
-                        'validation' => CRUDBooster::myEditForm()->segmentation ? 'required' : '', 'width' => 'col-sm-6',
-                        'datatable' => 'segmentations,segment_column_description,segment_column_name', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->segmentation ?: 'display:none;'
-                    ];
-
-			}
-			else{
+			
 
                 //----added by cris 20200630----------------------
-                    $this->form[] = ['label' => 'Item', 'name' => 'tasteless_code', 'type' => 'text', 'readonly' => true, 'width' => 'col-sm-4'];
-                   
-                  $this->form[] = [
-        				'label' => 'Active Status', 'name' => 'sku_statuses_id', 'type' => 'select2',
-        				'validation' => CRUDBooster::myAddForm()->sku_status ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-        				'datatable' => 'sku_statuses,sku_status_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->sku_status ?: 'display:none;'
-        			];
-                   
-                    $this->form[] = [
-        				'label' => 'Type', 'name' => 'type', 'type' => 'select',
-        				'validation' => 'required', 'width' => 'col-sm-4', 'dataenum'=>'Inventory Part'
-        			];
-					
-                    $this->form[] = [
-                        'label' => 'Description', 'name' => 'full_item_description', 'type' => 'text',
-                        'validation' => CRUDBooster::myAddForm()->full_item_description ? 'required|min:5|max:255' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->full_item_description ?: 'display:none;'
-                    ];
-                    
-                    $this->form[] = ['label'=>'Brand Description','name'=>'brands_id','type'=>'select2',
-        				'validation'=>CRUDBooster::myAddForm()->brand_description ? 'required|integer|min:0' : '','width'=>'col-sm-4',
-        				'datatable'=>'brands,brand_description','datatable_where'=>"status='ACTIVE'",'style'=> CRUDBooster::myAddForm()->brand_description ? : 'display:none;'];
-        
-        
-                    $this->form[] = [
-        				'label' => 'Tax Code', 'name' => 'tax_codes_id', 'type' => 'select2',
-        				'validation' => CRUDBooster::myAddForm()->tax_code ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-        				'datatable' => 'tax_codes,tax_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->tax_code ?: 'display:none;'
-        			];
-        
-                    $this->form[] = [
-                        'label' => 'Account', 'name' => 'accounts_id', 'type' => 'select2',
-                        'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-                        'datatable' => 'accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'COGS Account', 'name' => 'cogs_accounts_id', 'type' => 'select2',
-                        'validation' => CRUDBooster::myAddForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                        'datatable' => 'cogs_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Asset Account', 'name' => 'asset_accounts_id', 'type' => 'select2',
-                        'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-                        'datatable' => 'asset_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
-                    ];
-					
-                    $this->form[] = [
-                        'label' => 'Purchase Description', 'name' => 'purchase_description', 'type' => 'text',
-                        'validation' => 'required|min:5|max:255', 'width' => 'col-sm-4', 'readonly' => true
-                    ];
-					
-                    $this->form[] = [
-        				'label' => 'Fulfillment Type', 'name' => 'fulfillment_type_id', 'type' => 'select2',
-        				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-        				'datatable' => 'fulfillment_methods,fulfillment_method', 'datatable_where' => "status='ACTIVE'"
-        			];
-        
-                    $this->form[] = [
-        				'label' => 'U/M', 'name' => 'uoms_id', 'type' => 'select2',
-        				'validation' => CRUDBooster::myAddForm()->uom ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-        				'datatable' => 'uoms,uom_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->uom ?: 'display:none;'
-        			];
-        
-        			$this->form[] = [
-        				'label' => 'U/M Set', 'name' => 'uoms_set_id', 'type' => 'select2',
-        				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-        				'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'"
-        			];
-        
-                     $this->form[] = ['label'=>'Currency','name'=>'currencies_id','type'=>'select2','width'=>'col-sm-4',
-					'datatable'=>'currencies,currency_code','datatable_where'=>"status='ACTIVE'"];
-        
-                    $this->form[] = [
-                        'label' => 'Supplier Cost', 'name' => 'purchase_price', 'type' => 'number',
-                        'validation' => CRUDBooster::myAddForm()->purchase_price ? 'required' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->purchase_price ?: 'display:none;'
-                    ];
-					
-					$this->form[] = [
-                        'label' => 'Sales Price', 'name' => 'ttp', 'type' => 'number',
-                        'validation' => CRUDBooster::myAddForm()->ttp ? 'required' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->ttp ?: 'display:none;'
-                    ];
+			$this->form[] = ['label' => 'Item', 'name' => 'tasteless_code', 'type' => 'text', 'readonly' => true, 'width' => 'col-sm-4'];
+			
+			$this->form[] = [
+				'label' => 'Active Status', 'name' => 'sku_statuses_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->sku_status ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'sku_statuses,sku_status_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->sku_status ?: 'display:none;'
+			];
+			
+			$this->form[] = [
+				'label' => 'Type', 'name' => 'type', 'type' => 'select',
+				'validation' => 'required', 'width' => 'col-sm-4', 'dataenum'=>'Inventory Part'
+			];
+			
+			$this->form[] = [
+				'label' => 'Description', 'name' => 'full_item_description', 'type' => 'text',
+				'validation' => CRUDBooster::myAddForm()->full_item_description ? 'required|min:5|max:255' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->full_item_description ?: 'display:none;'
+			];
+			
+			$this->form[] = ['label'=>'Brand Description','name'=>'brands_id','type'=>'select2',
+				'validation'=>CRUDBooster::myAddForm()->brand_description ? 'required|integer|min:0' : '','width'=>'col-sm-4',
+				'datatable'=>'brands,brand_description','datatable_where'=>"status='ACTIVE'",'style'=> CRUDBooster::myAddForm()->brand_description ? : 'display:none;'];
 
-					$this->form[] = [
-						'label' => 'Sales Price Change', 'name' => 'ttp_price_change', 'type' => 'number',
-						'width' => 'col-sm-4',
-						'style' => CRUDBooster::myAddForm()->ttp ?: 'display:none;'
-					];
-	
-					$this->form[] = [
-						'label' => 'Sales Price Effective Date', 'name' => 'ttp_price_effective_date', 'type' => 'date',
-						'width' => 'col-sm-4',
-						'style' => CRUDBooster::myAddForm()->ttp ?: 'display:none;'
-					];
-        
-                    $this->form[] = [
-                        'label' => 'Commi Margin', 'name' => 'ttp_percentage', 'type' => 'number', 'readonly' => true,
-                        'validation' => CRUDBooster::myAddForm()->ttp_percentage ? 'required' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->ttp_percentage ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Landed Cost', 'name' => 'landed_cost', 'type' => 'number',
-                        'validation' => CRUDBooster::myAddForm()->landed_cost ? 'required' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->landed_cost ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Sales Price', 'name' => 'price', 'type' => 'number',
-                        'validation' => 'required', 'width' => 'col-sm-4', 'readonly' => true, 'style' => 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Preferred Vendor', 'name' => 'suppliers_id', 'type' => 'select2',
-                        'disabled' => CRUDBooster::myEditReadOnly()->supplier ? true : false,
-                        'validation' => CRUDBooster::myEditForm()->supplier ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                        'datatable' => 'suppliers,last_name', 'datatable_where' => "approval_status != 'NULL'", 'style' => CRUDBooster::myAddForm()->supplier ?: 'display:none;'
-                    ];
-					
-                    $this->form[] = [
-                        'label' => 'Reorder Pt (Min)', 'name' => 'reorder_pt', 'type' => 'number',
-                        'validation' => 'required|min:0.00', 'width' => 'col-sm-4'
-                    ];
-					
-                    $this->form[] = [
-                        'label' => 'Group', 'name' => 'groups_id', 'type' => 'select2',
-                        'validation' => CRUDBooster::myAddForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                        'datatable' => 'groups,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Category Description', 'name' => 'categories_id', 'type' => 'select',
-                        'validation' => CRUDBooster::myAddForm()->category_description ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                        'datatable' => 'categories,category_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->category_description ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Subcategory Description', 'name' => 'subcategories_id', 'type' => 'select',
-                        'validation' => CRUDBooster::myAddForm()->subcategory ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                        'datatable' => 'subcategories,subcategory_description', 'datatable_where' => "status=%27ACTIVE%27", 'parent_select' => 'categories_id', 'style' => CRUDBooster::myAddForm()->subcategory ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Dimension', 'name' => 'packaging_dimension', 'type' => 'text',
-                        'validation' => CRUDBooster::myAddForm()->packaging_dimension ? 'max:50' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->packaging_dimension ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'Packaging Size', 'name' => 'packaging_size', 'type' => 'number',
-                        'validation' => CRUDBooster::myAddForm()->packaging_size ? 'required' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->packaging_size ?: 'display:none;'
-                    ];
-					
-                    $this->form[] = [
-        				'label' => 'Packaging UOM', 'name' => 'packagings_id', 'type' => 'select2',
-						'validation' => 'required|integer|min:0', 'width' => 'col-sm-4', 'readonly' => true,
-						'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'"
-        			];
-        
-                    $this->form[] = [
-        				'label' => 'Tax Status', 'name' => 'tax_codes_id', 'type' => 'select2',
-        				'validation' => CRUDBooster::myAddForm()->tax_code ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-        				'datatable' => 'tax_codes,tax_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->tax_code ?: 'display:none;'
-        			];
-        
-                    
-        
-                    $this->form[] = [
-                        'label' => 'Supplier Item Code', 'name' => 'supplier_item_code', 'type' => 'text',
-                        'validation' => CRUDBooster::myAddForm()->supplier_item_code ? 'max:50' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->supplier_item_code ?: 'display:none;'
-                    ];
-        
-                    $this->form[] = [
-                        'label' => 'MOQ Store', 'name' => 'moq_store', 'type' => 'number',
-                        'validation' => CRUDBooster::myAddForm()->moq_store ? 'required' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->moq_store ?: 'display:none;'
-                    ];
-        
-                    
-        
-                    $this->form[] = ['label' => 'Account Number', 'name' => 'chart_accounts_id', 'type' => 'select2', 'datatable' => 'chart_accounts,account_number', 'width' => 'col-sm-4'];
-        
-                    foreach ($this->segments as $segment) {
-        
-                        $this->form[] = ['label' => '+' . " " . $segment->segment_column_description, 'name' => $segment->segment_column_name, 'type' => 'checkbox-custom',
-						'datatable' => 'segmentations,segment_column_description,segment_column_name', 'datatable_where' => "status='ACTIVE'", 'width' => 'col-sm-4'];
-                    }
-					
+
+			$this->form[] = [
+				'label' => 'Tax Code', 'name' => 'tax_codes_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->tax_code ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'tax_codes,tax_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->tax_code ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Account', 'name' => 'accounts_id', 'type' => 'select2',
+				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
+				'datatable' => 'accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'COGS Account', 'name' => 'cogs_accounts_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'cogs_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Asset Account', 'name' => 'asset_accounts_id', 'type' => 'select2',
+				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
+				'datatable' => 'asset_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
+			];
+			
+			$this->form[] = [
+				'label' => 'Purchase Description', 'name' => 'purchase_description', 'type' => 'text',
+				'validation' => 'required|min:5|max:255', 'width' => 'col-sm-4', 'readonly' => true
+			];
+			
+			$this->form[] = [
+				'label' => 'Fulfillment Type', 'name' => 'fulfillment_type_id', 'type' => 'select2',
+				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
+				'datatable' => 'fulfillment_methods,fulfillment_method', 'datatable_where' => "status='ACTIVE'"
+			];
+
+			$this->form[] = [
+				'label' => 'U/M', 'name' => 'uoms_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->uom ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'uoms,uom_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->uom ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'U/M Set', 'name' => 'uoms_set_id', 'type' => 'select2',
+				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
+				'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'"
+			];
+
+				$this->form[] = ['label'=>'Currency','name'=>'currencies_id','type'=>'select2','width'=>'col-sm-4',
+			'datatable'=>'currencies,currency_code','datatable_where'=>"status='ACTIVE'"];
+
+			$this->form[] = [
+				'label' => 'Supplier Cost', 'name' => 'purchase_price', 'type' => 'number',
+				'validation' => CRUDBooster::myAddForm()->purchase_price ? 'required' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->purchase_price ?: 'display:none;'
+			];
+			
+			$this->form[] = [
+				'label' => 'Sales Price', 'name' => 'ttp', 'type' => 'number',
+				'validation' => CRUDBooster::myAddForm()->ttp ? 'required' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->ttp ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Sales Price Change', 'name' => 'ttp_price_change', 'type' => 'number',
+				'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->ttp ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Sales Price Effective Date', 'name' => 'ttp_price_effective_date', 'type' => 'date',
+				'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->ttp ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Commi Margin', 'name' => 'ttp_percentage', 'type' => 'number', 'readonly' => true,
+				'validation' => CRUDBooster::myAddForm()->ttp_percentage ? 'required' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->ttp_percentage ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Landed Cost', 'name' => 'landed_cost', 'type' => 'number',
+				'validation' => CRUDBooster::myAddForm()->landed_cost ? 'required' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->landed_cost ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Sales Price', 'name' => 'price', 'type' => 'number',
+				'validation' => 'required', 'width' => 'col-sm-4', 'readonly' => true, 'style' => 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Preferred Vendor', 'name' => 'suppliers_id', 'type' => 'select2',
+				'disabled' => CRUDBooster::myEditReadOnly()->supplier ? true : false,
+				'validation' => CRUDBooster::myEditForm()->supplier ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'suppliers,last_name', 'datatable_where' => "approval_status != 'NULL'", 'style' => CRUDBooster::myAddForm()->supplier ?: 'display:none;'
+			];
+			
+			$this->form[] = [
+				'label' => 'Reorder Pt (Min)', 'name' => 'reorder_pt', 'type' => 'number',
+				'validation' => 'required|min:0.00', 'width' => 'col-sm-4'
+			];
+			
+			$this->form[] = [
+				'label' => 'Group', 'name' => 'groups_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'groups,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Category Description', 'name' => 'categories_id', 'type' => 'select',
+				'validation' => CRUDBooster::myAddForm()->category_description ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'categories,category_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->category_description ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Subcategory Description', 'name' => 'subcategories_id', 'type' => 'select',
+				'validation' => CRUDBooster::myAddForm()->subcategory ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'subcategories,subcategory_description', 'datatable_where' => "status=%27ACTIVE%27", 'parent_select' => 'categories_id', 'style' => CRUDBooster::myAddForm()->subcategory ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Dimension', 'name' => 'packaging_dimension', 'type' => 'text',
+				'validation' => CRUDBooster::myAddForm()->packaging_dimension ? 'max:50' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->packaging_dimension ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Packaging Size', 'name' => 'packaging_size', 'type' => 'number',
+				'validation' => CRUDBooster::myAddForm()->packaging_size ? 'required' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->packaging_size ?: 'display:none;'
+			];
+			
+			$this->form[] = [
+				'label' => 'Packaging UOM', 'name' => 'packagings_id', 'type' => 'select2',
+				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4', 'readonly' => true,
+				'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'"
+			];
+
+			$this->form[] = [
+				'label' => 'Tax Status', 'name' => 'tax_codes_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->tax_code ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'tax_codes,tax_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->tax_code ?: 'display:none;'
+			];
+
+			
+
+			$this->form[] = [
+				'label' => 'Supplier Item Code', 'name' => 'supplier_item_code', 'type' => 'text',
+				'validation' => CRUDBooster::myAddForm()->supplier_item_code ? 'max:50' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->supplier_item_code ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'MOQ Store', 'name' => 'moq_store', 'type' => 'number',
+				'validation' => CRUDBooster::myAddForm()->moq_store ? 'required' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->moq_store ?: 'display:none;'
+			];
+
+			
+
+			$this->form[] = ['label' => 'Account Number', 'name' => 'chart_accounts_id', 'type' => 'select2', 'datatable' => 'chart_accounts,account_number', 'width' => 'col-sm-4'];
+
+			foreach ($this->segments as $segment) {
+
+				$this->form[] = ['label' => '+' . " " . $segment->segment_column_description, 'name' => $segment->segment_column_name, 'type' => 'checkbox-custom',
+				'datatable' => 'segmentations,segment_column_description,segment_column_name', 'datatable_where' => "status='ACTIVE'", 'width' => 'col-sm-4'];
 			}
+					
+			
 			
 			# END FORM DO NOT REMOVE THIS LINE
 
@@ -679,6 +318,13 @@
 	        | 
 	        */
 	        $this->addaction = array();
+			$this->addaction[] = [
+				'title'=>'Edit',
+				'url'=>CRUDBooster::mainpath('edit/[id]'),
+				'icon'=>'fa fa-pencil',
+				'color' => ' ',
+				"showIf"=>"[status_of_approval] != '202'",
+			];
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -914,7 +560,7 @@
 	        |
 	        */
 	        $this->load_js = array();
-	        $this->load_js[] = asset("js/item_master.js");
+	        // $this->load_js[] = asset("js/item_master.js");
 	        
 	        /*
 	        | ---------------------------------------------------------------------- 
@@ -960,16 +606,20 @@
 	    public function hook_query_index(&$query) 
         {
 	        //Your code here
-			$query->where(function($sub_query){
-			    $create_item_status = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Create')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
-			    $update_item_status = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Update')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
-			    $update_item_status_1 = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Update')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
+			// $query->where(function($sub_query){
+			//     $create_item_status = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Create')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
+			//     $update_item_status = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Update')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
+			//     $update_item_status_1 = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Update')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
 			
-				$sub_query->where('item_masters.approval_status',	$create_item_status);
-				$sub_query->orWhere('item_masters.approval_status',	$update_item_status);
-				$sub_query->orWhere('item_masters.approval_status',	$update_item_status_1);
+			// 	$sub_query->where('item_masters.approval_status',	$create_item_status);
+			// 	$sub_query->orWhere('item_masters.approval_status',	$update_item_status);
+			// 	$sub_query->orWhere('item_masters.approval_status',	$update_item_status_1);
 		
-			});
+			// });
+
+			$query
+				->leftJoin('item_master_approvals', 'item_masters.tasteless_code', '=', 'item_master_approvals.tasteless_code')
+				->addSelect('item_master_approvals.approval_status as status_of_approval');
 	    }
 
 	    /*
@@ -994,80 +644,7 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 			//Your code here
-			$inputs = \Input::all();
-			if(CRUDBooster::isSuperadmin())
-            {
-			    $postdata["myob_item_description"] = $postdata['full_item_description'];
-                $postdata["packagings_id"] = $postdata['uoms_set_id'];
-                $postdata["sku_statuses_id"] = 1;
-                $postdata["type"] = "Inventory Part";
-                $postdata["tax_status"] = $postdata['tax_codes_id'];
-    			$postdata["sku_statuses_id"] = 1;
-
-			    foreach($this->segments as $segment){
-				    $segment_search = $inputs[$segment->segment_column_name];
-				    $postdata[$segment->segment_column_name] = $segment_search;
-			    }
-			    
-			    $tasteless_code = 0;
-			    $code_column ="";
-			    
-			    $group = Group::findOrFail($postdata["groups_id"]);
-			    
-				if (substr($group->group_description, 0, 4) == 'FOOD' || substr($group->group_description, 0, 4) == 'food') {
-						$tasteless_code = CodeCounter::where('id', 1)->where('type', 'ITEM MASTER')->value('code_1');
-						
-						$code_column = "code_1";
-				}elseif ($group->group_description == 'BEVERAGE' || $group->group_description == 'beverage') {
-						$tasteless_code = CodeCounter::where('id', 1)->where('type', 'ITEM MASTER')->value('code_2');
-						
-						$code_column = "code_2";
-				} elseif ($group->group_description == 'FINISHED GOODS' || $group->group_description == 'finished goods') {
-						$tasteless_code = CodeCounter::where('id', 1)->where('type', 'ITEM MASTER')->value('code_1');
-						
-						$code_column = "code_1";
-				} elseif (substr($group->group_description, -8) == 'SUPPLIES' || substr($group->group_description, -8) == 'supplies') {
-						$tasteless_code = CodeCounter::where('id', 1)->where('type', 'ITEM MASTER')->value('code_3');
-						
-						$code_column = "code_3";
-				} elseif ($group->group_description == 'CAPEX' || $group->group_description == 'capex') {
-						$tasteless_code = CodeCounter::where('id', 1)->where('type', 'ITEM MASTER')->value('code_5');
-						
-						$code_column = "code_5";
-				} elseif ($group->group_description == 'COMPLIMENTARY' || $group->group_description == 'complimentary') {
-						$tasteless_code = CodeCounter::where('id', 1)->where('type', 'ITEM MASTER')->value('code_7');
-						
-						$code_column = "code_7";
-				} elseif (substr($group->group_description, -4) == 'FEES' || substr($group->group_description, -4) == 'fees') {
-						$tasteless_code = CodeCounter::where('id', 1)->where('type', 'ITEM MASTER')->value('code_4');
-						
-						$code_column = "code_4";
-				} else {
-						$tasteless_code = CodeCounter::where('id', 1)->where('type', 'ITEM MASTER')->value('code_6');
-						
-						$code_column = "code_6";
-				}
-						
-                $postdata["tasteless_code"]	    	    =   $tasteless_code;
-			    $postdata["encoder_privilege_id"]		=	CRUDBooster::myPrivilegeId();
-			    $postdata["created_by"]					=	CRUDBooster::myId();
-			    $postdata["action_type"]				=	"Create";
-			    $postdata['approval_status']			= 	ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Create')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');			    
 			
-			    CodeCounter::where('type', 'ITEM MASTER')->where('id', 1)->increment($code_column);
-			    
-			}else{
-			    foreach($this->segments as $segment){
-				    $segment_search = $inputs[$segment->segment_column_name];
-				    $postdata[$segment->segment_column_name] = $segment_search;
-			    }
-
-			    $postdata["encoder_privilege_id"]		=	CRUDBooster::myPrivilegeId();
-			    $postdata["created_by"]					=	CRUDBooster::myId();
-			    $postdata["action_type"]				=	"Create";
-			    $postdata['approval_status']			= 	ApprovalWorkflowSetting::where('workflow_number', 1)->where('action_type', 'Create')->where('encoder_privilege_id', CRUDBooster::myPrivilegeId())->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('current_state');
-	    
-			}
 	    }
 
 	    /* 
@@ -1080,133 +657,6 @@
 	    public function hook_after_add($id)
         {        
 			//Your code here
-			$item_details = ItemMaster::where('id',$id)->get()->toArray();
-
-			//Insert data to temporary table
-			ItemMasterApproval::insert($item_details);
-            $new_items = ItemMaster::where('id',$id)->first();
-
-            if(CRUDBooster::isSuperadmin())
-            {
-				//create item to trs
-
-                        DB::connection('mysql_trs')->statement('insert into items (
-							tasteless_code, 
-							supplier_item_code,  
-							full_item_description,  
-							brand_id, 
-							group_id, 
-							fulfillment_type_id, 
-							category_id, 
-							subcategory_id, 
-							uom_id, 
-							packaging_id, 
-							skustatus_id, 
-							currency_id, 
-							cost_price, 
-							ttp, 
-							landed_cost,
-							moq_store,
-							myob_item_description,
-							created_by, 
-							updated_by) values (?,?,?,?,?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$new_items['tasteless_code'], $new_items['supplier_itemcode'], $new_items['full_item_description'],  $new_items['brands_id'],$new_items['groups_id'],$new_items['fulfillment_type_id'],$new_items['categories_id'], $new_items['subcategories_id'], $new_items['uoms_id'], $new_items['uoms_set_id'], $new_items['sku_statuses_id'], $new_items['currencies_id'], $new_items['purchase_price'], $new_items['ttp'], $new_items['landed_cost'], $new_items['moq_store'], $new_items['full_item_description'], $new_items['created_by'], $new_items['updated_by']]);
-                        //-------------------------                         
-			            
-						foreach($this->segments as $segment)
-                        {
-							    //--added by cris 20200629---
-                                    if ($new_items[$segment->segment_column_name] == "X" || $new_items[$segment->segment_column_name] == null) {
-                                    } else {
-                    
-                                        $segmentation = DB::connection('mysql_trs')->table('segmentation')->where('segmentation_column1', $segment->segment_column_name)
-                                            ->orWhere('segmentation_column2', $segment->segment_column_name)->first();
-                    
-                                        $store_ids = DB::connection('mysql_trs')->table('stores')->select('id')->where('store_code', $segmentation->segmentation_code)->get()->toArray();
-                                        
-                                        $store_array = array();
-                                        foreach ($store_ids as $id) {
-                                            array_push($store_array, $id->id);
-                                        }
-
-                                        $stores = array();
-                                        $trs_users_stores = DB::connection('mysql_trs')->table('cms_users')->select('stores_id', 'id')->where('status', 'ACTIVE')->get();
-                                        $superadmin_admin = DB::connection('mysql_trs')->table('cms_users')->select('id')->where('id_cms_privileges', 1) //superAdmin
-                                            ->orWhere('id_cms_privileges', 4) //admin
-                                            ->where('status', 'ACTIVE')->get()->toArray();
-                    
-                                        foreach ($trs_users_stores as $value) {
-                                            $list = array_map('intval', explode(",", $value->stores_id));
-                    
-                                            $value->stores_id = $list;
-                    
-                                            array_push($stores, $value);
-                                        }
-                    
-                                        //check kung may kaparehas sa stores_id
-                                        $id_to_send = array();
-                                        foreach ($stores as $store) {
-                    
-                                            for ($i = 0; $i <= count($store->stores_id); $i++) {
-                    
-                                                if (in_array($store->stores_id[$i], $store_array)) {
-                                                    array_push($id_to_send, $store->id);
-                                                }
-                                            }
-                                        }
-                    
-                                        //send notification
-                                        foreach ($id_to_send as $id) {
-                                            $content = " New item code ".$new_items->item. " has been added in ".$segmentation->segmentation_code. " at " . date('Y-m-d H:i:s');
-                                            $to = "https://replenishment.tasteless.com.ph/public/admin/items?q=".$new_items->tasteless_code;
-                                            
-                    
-                                            DB::connection('mysql_trs')->statement('insert into cms_notifications (id_cms_users,content,url,created_at,is_read) VALUES (?,?,?,?,?)', [$id, $content, $to, date('Y-m-d H:i:s'), 0]);
-                                        }
-										
-                                        foreach ($superadmin_admin as $id) {
-                                            $content = "New item code ".$new_items->item. " has been added in ".$segmentation->segmentation_code. " at " . date('Y-m-d H:i:s');
-                                            $to = "https://replenishment.tasteless.com.ph/public/admin/items?q=".$new_items->tasteless_code;
-                    
-                                            DB::connection('mysql_trs')->statement('insert into cms_notifications (id_cms_users,content,url,created_at,is_read) VALUES (?,?,?,?,?)', [$id->id, $content, $to, date('Y-m-d H:i:s'), 0]);
-                                        }
-                                    }
-                                    //----------------------------
-							    
-                               $sku_value = "'".$new_items[$segment->segment_column_name]."'";
-                                            
-                                DB::connection('mysql_trs')->statement('update items set '.$segment->segment_column_name.' = '.$sku_value.' where tasteless_code = '.$new_items['tasteless_code'].'');
-						}
-						
-						//--added by cris 20200629---
-                        unset($store_array);
-                        unset($stores);
-                        unset($id_to_send);
-                        //---------------------------
-										
-                        DB::disconnect('mysql_trs');
-                        
-                        CRUDBooster::redirect(CRUDBooster::mainpath(),"Your item has been created successfully .","info");
-            }else{   
-			    $for_approval = ItemMasterApproval::where('id',$id)->first();
-			    $approvers = ApprovalWorkflowSetting::where('status','ACTIVE')->where('action_type','Create')
-							->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->get();
-
-			    foreach ($approvers as $approvers_list){
-				    $approver_privilege_for =	DB::table('cms_privileges')->where('id',$approvers_list->encoder_privilege_id)->first();
-				    $approver_privilege =		DB::table('cms_privileges')->where('id',$approvers_list->approver_privilege_id)->first();	
-			
-				    if($for_approval->encoder_privilege_id == $approver_privilege_for->id){
-					    $send_to =	DB::table('cms_users')->where('id_cms_privileges',$approver_privilege->id)->get();
-					    foreach ($send_to as $send_now){
-						    $config['content'] = "An item has been created at Item Masterfile Module, please check item for approval!";
-						    $config['to'] = CRUDBooster::adminPath('item_approval?q='.$for_approval->id);
-						    $config['id_cms_users'] = [$send_now->id];
-						    CRUDBooster::sendNotification($config);	
-					    }
-				    }
-			    }
-			    CRUDBooster::redirect(CRUDBooster::mainpath(),"Your item has been created and pending for approval.","info");
-            }
 	    }
 
 	    /* 
@@ -1219,247 +669,7 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) 
         {
-			$inputs = \Input::all();
-			$ItemValue = DB::table('item_masters')->where('id', $id)->first();
-			$CheckTableColumn = Schema::getColumnListing('item_masters');
-			
-			$ItemValueArray = [];
-			foreach($CheckTableColumn as $ctcname => $ctc){
-				if(!empty($postdata[$ctc]) && $ctc != "updated_at"){
-					if($ctc == "tax_status"){
-						$keyname = "tax_codes_id";
-					}else{
-						$keyname = $ctc;
-					}
-	
-					if($postdata[$keyname] != $ItemValue->$keyname){
-						array_push($ItemValueArray, ['name' => $keyname, 'old' => $ItemValue->$keyname, 'new' => $postdata[$keyname]]);
-					}
-				}
-			}
 
-			if(count($ItemValueArray) > 0){
-				$DetailsOfItem = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
-				foreach ($ItemValueArray as $key => $ItemVal) {
-					$DetailsOfItem .= "<tr><td>".$ItemVal['name']."</td><td>".$ItemVal['old']."</td><td>".$ItemVal['new']."</td></tr>";
-				}
-				$DetailsOfItem .= '</tbody></table>';
-
-                if(!empty($ItemValue->brands_id)){
-					$brand_id = $ItemValue->brands_id;
-				}else{
-					$brand_id = $postdata['brands_id'];
-				}
-
-				DB::table('history_item_masterfile')->insert([
-					'tasteless_code'	=>	$ItemValue->tasteless_code,
-					'item_id'			=>	$id,
-					'brand_id'			=>	$brand_id,
-					'group_id'			=>	$ItemValue->groups_id,
-					'action'			=>	"Update",
-					'ttp'               => $postdata['ttp'],
-					'ttp_percentage'   => $postdata['ttp_percentage'],
-					'old_ttp'           => $ItemValue->ttp,
-					'old_ttp_percentage' => $ItemValue->ttp_percentage,
-					'purchase_price'    => $postdata['purchase_price'],
-					'old_purchase_price' => $ItemValue->purchase_price,
-					'details'			=>	$DetailsOfItem,
-					'created_by'		=>	$ItemValue->created_by,
-					'updated_by'		=>	CRUDBooster::myId()
-				]);
-			}
-			//********************************************************************* */
-  
-			//Your code here
-			if(CRUDBooster::isSuperadmin() || CRUDBooster::myPrivilegeId() == 8 || CRUDBooster::myPrivilegeId() == 13) // 	Manager (Purchaser) //View III (TTP and Purchase Price) 	
-            {
-                $crnt_ttp_price = DB::table('item_masters')->where('id', $id)->first();
-    
-                $this->counter = 0;
-                $this->pre_ttp_price = 0;
-                $this->pre_ttp_price = $crnt_ttp_price->ttp;
-                unset($this->segmentation_editForm);
-			    
-                $postdata["encoder_privilege_id"] =	CRUDBooster::myPrivilegeId();
-			    $postdata["action_type"] = "Update";
-			    $postdata["updated_by"] = CRUDBooster::myId();	 
-                $postdata["packagings_id"] = $postdata['uoms_set_id'];
-                $postdata["tax_status"] = $postdata['tax_codes_id'];
-                $this->segmentation_editForm = [];
-				
-				DB::connection('mysql_trs')->table('items')->where('tasteless_code',$postdata["tasteless_code"])->update([
-					'supplier_item_code' 	=> $postdata['supplier_item_code'],
-					'full_item_description' => $postdata['full_item_description'],
-					'myob_item_description' => $postdata['full_item_description'],
-					'brand_id' 				=> $postdata['brands_id'],
-					'group_id' 				=> $postdata['groups_id'],
-                    'fulfillment_type_id'   => $postdata['fulfillment_type_id'],
-					'category_id' 			=> $postdata['categories_id'],
-					'subcategory_id' 		=> $postdata['subcategories_id'],
-					'uom_id' 				=> $postdata['uoms_id'],
-					'packaging_id' 			=> $postdata['uoms_set_id'],
-					'skustatus_id' 			=> $postdata['sku_statuses_id'],
-					'currency_id' 			=> $postdata['currencies_id'],
-					'cost_price' 			=> $postdata['purchase_price'],
-					'ttp' 					=> $postdata['ttp'],
-					'landed_cost' 			=> $postdata['landed_cost'],
-					'moq_supplier' 			=> $postdata['moq_supplier'],
-					'moq_store' 			=> $postdata['moq_store'],
-					'updated_by' 			=> CRUDBooster::myId(),
-					'updated_at' 			=> date('Y-m-d H:i:s'),
-				]);
-
-				foreach($this->segments as $segment)
-				{
-					$segment_search = $inputs[$segment->segment_column_name];
-				
-					ItemMasterApproval::where('id',$id)->update([
-						$segment->segment_column_name => $segment_search
-					]);
-					
-					ItemMaster::where('id',$id)->update([
-						$segment->segment_column_name => $segment_search
-					]);
-			
-					DB::connection('mysql_trs')->table('items')->where('tasteless_code','=',(string)$postdata["tasteless_code"])->update([
-                        $segment->segment_column_name => $segment_search
-                    ]);
-					
-					if ($segment_search == "X" || $segment_search == null) {
-					}else{
-						$this->counter = 1;
-						array_push($this->segmentation_editForm, $segment->segment_column_name);
-					}
-				}
-			    
-			    DB::disconnect('mysql_trs');
-			    
-			}else{
-			    
-                // Fullfillment Type
-			    if(!empty($postdata['fulfillment_type_id']))
-			    {
-			        // TIMFS item_masters table
-			        DB::table('item_masters')->where('tasteless_code',$postdata["tasteless_code"])->update([
-					    'fulfillment_type_id'   =>  $postdata['fulfillment_type_id']
-				    ]);
-				    
-				    // TRS items table
-				    DB::connection('mysql_trs')->table('items')->where('tasteless_code',$postdata["tasteless_code"])->update([
-                        'fulfillment_type_id'   =>  $postdata['fulfillment_type_id']
-                    ]);
-			    }
-
-			    $item_status = "";
-		    	$encoder_checker = ApprovalWorkflowSetting::where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->where('action_type', 'Update')
-								->where('encoder_privilege_id',CRUDBooster::myPrivilegeId())
-								->where('status','ACTIVE')->first();
-
-			    switch ($encoder_checker->workflow_number){
-				case '4' :
-
-					$item_status =	ApprovalWorkflowSetting::where('workflow_number', 4)->where('action_type', 'Update')->where('encoder_privilege_id', CRUDBooster::myPrivilegeId())->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('current_state');
-				
-					ItemMasterApproval::where('id',$id)->update([
-						'chart_accounts_id' 			=> $postdata['chart_accounts_id'],
-						'updated_by'					=> CRUDBooster::myId(),
-						'encoder_privilege_id'			=> CRUDBooster::myPrivilegeId(),
-						'action_type'					=> 'Update',
-						'approval_status'				=> $item_status
-					]);
-				break;
-
-				default:
-				
-					foreach($this->segments as $segment){					
-						ItemMasterApproval::where('id',$id)->update([
-                            $segment->segment_column_name => $inputs[$segment->segment_column_name]
-						]);
-					}
-
-					$item_status = 	ApprovalWorkflowSetting::where('workflow_number', 1)->where('action_type', 'Update')->where('encoder_privilege_id', CRUDBooster::myPrivilegeId())->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('current_state');
-
-					ItemMasterApproval::where('id',$id)->update([
-						'tasteless_code' 				=> $postdata['tasteless_code'],
-						'suppliers_id' 					=> $postdata['suppliers_id'],
-						'trademarks_id' 				=> $postdata['trademarks_id'],
-						'classifications_id' 			=> $postdata['classifications_id'],
-						'supplier_item_code' 			=> $postdata['supplier_item_code'],
-						'myob_item_description' 		=> $postdata['myob_item_description'],
-						'full_item_description' 		=> $postdata['full_item_description'],
-						'brands_id' 					=> $postdata['brands_id'],
-						'groups_id' 					=> $postdata['groups_id'],
-						'categories_id' 				=> $postdata['categories_id'],
-						'subcategories_id'				=> $postdata['subcategories_id'],
-						'types_id'						=> $postdata['types_id'],
-						'colors_id'						=> $postdata['colors_id'],
-						'actual_color'					=> $postdata['actual_color'],
-						'flavor'						=> $postdata['flavor'],
-						'packaging_size'				=> $postdata['packaging_size'],
-						'packaging_dimension'			=> $postdata['packaging_dimension'],
-						'uoms_id' 						=> $postdata['uoms_id'],
-						'packagings_id' 				=> $postdata['packagings_id'],
-						'vendor_types_id' 				=> $postdata['vendor_types_id'],
-						'vendor_types_id' 				=> $postdata['vendor_types_id'],
-						'sku_statuses_id' 				=> $postdata['sku_statuses_id'],
-						'tax_codes_id' 					=> $postdata['tax_codes_id'],
-						'currencies_id' 				=> $postdata['currencies_id'],
-						'purchase_price' 				=> $postdata['purchase_price'],
-						'ttp' 							=> $postdata['ttp'],
-						'ttp_percentage' 				=> $postdata['ttp_percentage'],
-						'ttp_price_change' 				=> $postdata['ttp_price_change'],
-						'ttp_price_effective_date' 		=> $postdata['ttp_price_effective_date'],
-						'landed_cost' 					=> $postdata['landed_cost'],
-						'moq_supplier' 					=> $postdata['moq_supplier'],
-						'moq_store' 					=> $postdata['moq_store'],
-						'segmentation' 					=> $postdata['segmentation'],
-						//'chart_accounts_id' 			=> $postdata['chart_accounts_id'],
-						'updated_by'					=> CRUDBooster::myId(),
-						'encoder_privilege_id'			=> CRUDBooster::myPrivilegeId(),
-						'action_type'					=> 'Update',
-						'approval_status'				=> $item_status
-					]);
-				break;	
-			}
-				
-            if(CRUDBooster::myPrivilegeId() == 4){ //Supervisor (Purchaser)
-			    foreach($this->segments as $segment)
-				{
-					$segment_search = $inputs[$segment->segment_column_name];
-					
-				    if(ItemMasterApproval::where('id',$id)->get()){
-				        ItemMasterApproval::where('id',$id)->update([
-    						$segment->segment_column_name => $segment_search
-    					]);
-				    }
-					
-					ItemMaster::where('id',$id)->update([
-						$segment->segment_column_name => $segment_search
-					]);
-
-					DB::connection('mysql_trs')->table('items')->where('tasteless_code',$postdata["tasteless_code"])->update([
-                        $segment->segment_column_name => $segment_search
-                    ]);
-
-					if ($segment_search == "X" || $segment_search == null) {
-					}else{
-						$this->counter = 1;
-						array_push($this->segmentation_editForm, $segment->segment_column_name);
-					}
-					//----------------------------------------------
-				}
-				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Your item has been edited successfully!"), 'success');
-			}
-
-			    unset($postdata);
-			    unset($this->arr);
-
-			    $this->arr["encoder_privilege_id"]		=	CRUDBooster::myPrivilegeId();
-			    $this->arr["action_type"]				=	"Update";
-			    $this->arr["updated_by"]				=	CRUDBooster::myId();
-			 //   $this->arr['approval_status']			= 	ApprovalWorkflowSetting::where('workflow_number', 1)->where('action_type', 'Update')->where('encoder_privilege_id', CRUDBooster::myPrivilegeId())->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('current_state');
-		
-			}  
 		}
 
 	    /* 
@@ -1471,107 +681,8 @@
 	    */
 	    public function hook_after_edit($id) 
         {
-	        //Your code here 
-	        if(CRUDBooster::isSuperadmin())
-            {
-	            	//CRUDBooster::redirect(CRUDBooster::mainpath(),"Your item has been edited successfully .","sucess");
-	            	//---added by cris 20200623------
-                        if ($this->counter == 1) 
-                        {
-                            $ttp = DB::table('item_masters')->where('id', $id)->first();
-                            if ($this->pre_ttp_price != $ttp->ttp) 
-                            {
-                                foreach ($this->segmentation_editForm as  $loop) 
-                                {            
-                                    $segmentation = DB::connection('mysql_trs')->table('segmentation')->where('segmentation_column1', $loop)
-                                        ->orWhere('segmentation_column2', $loop)->first();
-            
-                                    $store_ids = DB::connection('mysql_trs')->table('stores')->select('id')->where('store_code', $segmentation->segmentation_code)->get()->toArray();
-            
-                                    // dd("ey");
-                                    $store_array = array();
-                                    foreach ($store_ids as $id) {
-                                        array_push($store_array, $id->id);
-                                    }
-                                    $stores = array();
-                                    $trs_users_stores = DB::connection('mysql_trs')->table('cms_users')->select('stores_id', 'id')->where('status', 'ACTIVE')->get();
-                                    $superadmin_admin = DB::connection('mysql_trs')->table('cms_users')->select('id')->where('id_cms_privileges', 1) //superAdmin
-                                        ->orWhere('id_cms_privileges', 4) //admin
-                                        ->where('status', 'ACTIVE')->get()->toArray();
-            
-                                    foreach ($trs_users_stores as $value) {
-                                        // array_push($stores, $value->stores_id);
-                                        $list = array_map('intval', explode(",", $value->stores_id));
-            
-                                        $value->stores_id = $list;
-            
-                                        array_push($stores, $value);
-                                    }
-            
-                                    //check kung may kaparehas sa stores_id
-                                    $id_to_send = array();
-                                    foreach ($stores as $store) {
-            
-                                        for ($i = 0; $i <= count($store->stores_id); $i++) {
-            
-                                            if (in_array($store->stores_id[$i], $store_array)) {
-                                                array_push($id_to_send, $store->id);
-                                            }
-                                        }
-                                    }
-            
-                                    //send notification
-                                    foreach ($id_to_send as $id) {
-                                        $content = " Item has been edited successfully with price change with Tasteless code " . $ttp->tasteless_code . " at " . date('Y-m-d H:i:s');
-                                        $to = "https://replenishment.tasteless.com.ph/public/admin/items?q=".$ttp->tasteless_code;
-            
-                                        DB::connection('mysql_trs')->statement('insert into cms_notifications (id_cms_users,content,url,created_at,is_read) VALUES (?,?,?,?,?)', [$id, $content, $to, date('Y-m-d H:i:s'), 0]);
-                                    }
-            
-                                    foreach ($superadmin_admin as $id) {
-                                        $content = " Item has been edited successfully with price change with Tasteless code " . $ttp->tasteless_code . " in store code " . $segmentation->segmentation_code . " at " . date('Y-m-d H:i:s');
-                                        $to = "https://replenishment.tasteless.com.ph/public/admin/items?q=".$ttp->tasteless_code;
-            
-                                        DB::connection('mysql_trs')->statement('insert into cms_notifications (id_cms_users,content,url,created_at,is_read) VALUES (?,?,?,?,?)', [$id->id, $content, $to, date('Y-m-d H:i:s'), 0]);
-                                    }
-                                }
-            
-                                CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Your item has been edited successfully with price change!"), 'success');
-                            }
-                            CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Your item has been edited successfully!"), 'success');
-                        } else {
-                            CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Your item has been edited successfully!"), 'success');
-                        }
-            
-                        unset($this->segmentation_editForm);
-                        unset($store_array);
-                        unset($stores);
-                        unset($id_to_send);
-	            	
-	        }else{
-			$for_approval = ItemMasterApproval::where('id',$id)->first();
-			$approvers = 	ApprovalWorkflowSetting::where('status','ACTIVE')->where('action_type', 'Update')
-							->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->get();
 
-			foreach ($approvers as $approvers_list){
-				$approver_privilege_for =	DB::table('cms_privileges')->where('id',$approvers_list->encoder_privilege_id)->first();
-				$approver_privilege =		DB::table('cms_privileges')->where('id',$approvers_list->approver_privilege_id)->first();	
-			
-				if($for_approval->encoder_privilege_id == $approver_privilege_for->id){
-					$send_to =	DB::table('cms_users')->where('id_cms_privileges',$approver_privilege->id)->get();
-					foreach ($send_to as $send_now){
-						$config['content'] = "An item has been edited at Item Masterfile Module, please check item for approval!";
-						$config['to'] = CRUDBooster::adminPath('item_approval?q='.$for_approval->tasteless_code);
-						$config['id_cms_users'] = [$send_now->id];
-						CRUDBooster::sendNotification($config);	
-					}
-				}
-				
-			}
-// 			CRUDBooster::redirect(CRUDBooster::mainpath(),"Your item has been edited and pending for approval.","info");
-			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Your item has been edited successfully!"), 'success');
-	        }
-	    }
+		}
 
 	    /* 
 	    | ---------------------------------------------------------------------- 
@@ -1608,37 +719,288 @@
 
 	    }
 
-		public function getBrandData($id) {
-			
-			$brand = Brand::where('id', $id)->first();
+		public function getAdd() {
+			if (!CRUDBooster::isCreate())
+				CRUDBooster::redirect(
+				CRUDBooster::adminPath(),
+				trans('crudbooster.denied_access')
+			);
 
-			return response()->json($brand);
+			return self::getEdit(null, 'add');
 		}
 
-		public function getEdit($id){
-
-			$item_info = ItemMasterApproval::find($id);
-
-			$item_update_status = ApprovalWorkflowSetting::where('workflow_number', 1)->where('action_type', 'Update')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('current_state');
-			$item_update_status1 = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Update')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('current_state');
-			
-			if($item_info->approval_status == $item_update_status || $item_info->item_update_status1 == $item_update_status ){
-				CRUDBooster::redirect(CRUDBooster::mainpath(""),"You're not allowed to edit pending items for approval.","warning");
+		public function getEdit($id, $action = 'edit', $approval_id = null) {
+			if ($action == 'edit') {
+				if (!CRUDBooster::isUpdate())
+					CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
 			}
 
-			$editform_approval_views = DB::table('settings_form_accesses')->where('cms_privileges_id',$priv->id)->where('action_type','EDIT APPROVAL')->first();
+			$data = [];
 
-			return parent::getEdit($id);
+			$data['action'] = $action;
+
+			if ($id) {
+				$tasteless_code = ItemMaster::where('id', $id)->first()->tasteless_code;
+				$data['item'] = self::getItemDetails($tasteless_code);
+				if ($data['item']->approval_status == 202) {
+					return redirect(CRUDBooster::mainpath())->with([
+						'message_type' => 'danger',
+						'message' => '✖️ You cannot edit a pending item...',
+					]);
+				}
+			}
+
+			$submaster_details = self::getSubmasters();
+
+			$data = array_merge($data, $submaster_details);
+			
+			return $this->view('item-master/edit-item', $data);
 		}
 
-		public function exportItems(Request $request)
-		{
+		public function getTastelessCode($group) {
+			if (strtolower(substr($group->group_description, 0, 4)) == 'food') {
+				$code_column = "code_1";
+			} else if (strtolower($group->group_description) == 'beverage') {
+				$code_column = "code_2";
+			} else if (strtolower($group->group_description) == 'finished goods') {
+				$code_column = "code_1";
+			} else if (strtolower(substr($group->group_description, -8)) == 'supplies') {
+				$code_column = "code_3";
+			} else if (strtolower($group->group_description) == 'capex') {
+				$code_column = "code_5";
+			} else if (strtolower($group->group_description) == 'complimentary') {
+				$code_column = "code_7";
+			} else if (strtolower(substr($group->group_description, -4)) == 'fees') {
+				$code_column = "code_4";
+			} else {
+				$code_column = "code_6";
+			}
+			$tasteless_code = CodeCounter::where('id', 1)->where('type', 'ITEM MASTER')->value($code_column);
+			CodeCounter::where('type', 'ITEM MASTER')->where('id', 1)->increment($code_column);
+			return $tasteless_code;
+		}
+
+		public function getItemDetails($tasteless_code) {
+			$item = DB::table('item_master_approvals')
+				->where('tasteless_code', $tasteless_code)
+				->get()
+				->first();
+
+			return $item;
+		}
+
+		public function getSubmasters() {
+
+			$data = [];
+
+			$data['brands'] = DB::table('brands')
+				->where('status', 'ACTIVE')
+				->orderBy('brand_description')
+				->get()
+				->toArray();
+
+			$data['tax_codes'] = DB::table('tax_codes')
+				->where('status', 'ACTIVE')
+				->orderBy('tax_description')
+				->get()
+				->toArray();
+
+			$data['accounts'] = DB::table('accounts')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['cogs_accounts'] = DB::table('cogs_accounts')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['asset_accounts'] = DB::table('asset_accounts')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['fulfillment_types'] = DB::table('fulfillment_methods')
+				->where('status', 'ACTIVE')
+				->orderBy('fulfillment_method')
+				->get()
+				->toArray();
+
+			$data['uoms'] = DB::table('uoms')
+				->where('status', 'ACTIVE')
+				->orderBy('uom_description')
+				->get()
+				->toArray();
+
+			$data['uom_sets'] = DB::table('uoms_set')
+				->where('status', 'ACTIVE')
+				->orderBy('uom_description')
+				->get()
+				->toArray();
+
+			$data['currencies'] = DB::table('currencies')
+				->where('status', 'ACTIVE')
+				->orderBy('currency_code')
+				->get()
+				->toArray();
+
+			$data['suppliers'] = DB::table('suppliers')
+				->orderBy('last_name')
+				->get()
+				->toArray();
+
+			$data['groups'] = DB::table('groups')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['categories'] = DB::table('categories')
+				->where('status', 'ACTIVE')
+				->orderBy('category_description')
+				->get()
+				->toArray();
+
+			$data['subcategories'] = DB::table('subcategories')
+				->select('id', 'subcategory_description', 'categories_id')
+				->where('status', 'ACTIVE')
+				->orderBy('subcategory_description')
+				->get()
+				->toArray();
+
+			$data['packagings'] = DB::table('packagings')
+				->where('status', 'ACTIVE')
+				->orderBy('packaging_description')
+				->get()
+				->toArray();
+
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()
+				->toArray();
+
+			$data['sku_legends'] = DB::table('sku_legends')
+				->where('status', 'ACTIVE')
+				->where('sku_legend', '!=', 'X')
+				->get()
+				->toArray();
+
+			// EDIT ITEM
+			$data['types'] = DB::table('types')
+				->where('status', 'ACTIVE')
+				->orderBy('type_description')
+				->get()
+				->toArray();
+
+			return $data;
+		}
+
+		public function submitAddOrEdit(Request $request) {
+			$input = $request->all();
+			if ($input['item_photo']) {
+				$random_string = Str::random(10);
+				$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', $random_string);
+				$item_description = str_replace(['/', ':', ' ', ','], '_', $input['full_item_description']);
+				$item_description = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', $item_description);
+	
+				$img_file = $input['item_photo'];
+				$filename = "$item_description(" . date('Y-m-d') . ")$random_string." . $img_file->getClientOriginalExtension();
+				$image = Image::make($img_file);
+				
+				$image->resize(1024, 768, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
+	
+				// Save the resized image to the public folder
+				$image->save(public_path('img/item-master/' . $filename));
+				// Optimize the uploaded image
+				$optimizerChain = OptimizerChainFactory::create();
+				$optimizerChain->optimize(public_path('img/item-master/' . $filename));
+			}
+
+			$segmentations = (array) json_decode($input['segmentations']);
+			$group = Group::findOrFail($input['groups_id']);
+			$tasteless_code = $input['tasteless_code'];
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$my_privilege_id = CRUDBooster::myPrivilegeId();
+			$segment_columns = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->pluck('segment_column_name')
+				->toArray();
+
+			$segmentation_statuses = DB::table('sku_legends')
+				->where('status', 'ACTIVE')
+				->where('sku_legend', '!=', 'X')
+				->pluck('sku_legend')
+				->toArray();
+
+			$data = $request->all();
+
+			unset($data['_token'], $data['segmentations'], $data['item_photo']);
+			$data['price'] = $data['ttp'];
+			$data['myob_item_description'] = $data['full_item_description'];
+			$data['sku_statuses_id'] = 1;
+			$data['type'] = 'Inventory Part';
+			$data['tax_status'] = $data['tax_codes_id'];
+			$data['tasteless_code'] = $tasteless_code;
+			$data['image_filename'] = $filename;
+
+			//segmentation => initializing all to 'X'
+			foreach ($segment_columns as $segment_column) {
+				$data[$segment_column] = 'X';
+			}
+
+			//overwriting the selected segmentations
+			foreach ($segmentations as $value => $columns) {
+				foreach ($columns as $column_name) {
+					$data[$column_name] = $value;
+				}
+			}
+
+			$data['encoder_privilege_id'] =	$my_privilege_id;
+			$data['approval_status'] = 202;
+			
+			$is_existing = ItemMasterApproval::where('tasteless_code', $tasteless_code)->exists();
+
+			if ($is_existing && $tasteless_code) {
+				$data['updated_by'] = $action_by;
+				$data['updated_at'] = $time_stamp;
+			} else {
+				$data['created_by'] = $action_by;
+				$data['created_at'] = $time_stamp;
+			}
+
+			if (!$tasteless_code) {
+				$data['action_type'] = 'CREATE';
+				ItemMasterApproval::insert($data);
+			} else {
+				$data['action_type'] = 'UPDATE';
+				ItemMasterApproval::where('tasteless_code', $tasteless_code)->update($data);
+			}
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => '✔️ Item added to Pending Items...',
+				]);
+			
+		}
+
+		public function exportItems(Request $request) {
 			$filename = $request->input('filename');
 			return Excel::download(new ItemExport, $filename.'.xlsx');
 		}
 		
-		public function exportQBFormat(Request $request)
-		{
+		public function exportQBFormat(Request $request) {
 			$filename = $request->input('filename');
 			return Excel::download(new QBExport, $filename.'.xlsx');
 		}
@@ -1653,7 +1015,7 @@
 		   	return Excel::download(new BartenderExport, $filename.'.xlsx');
 		}		
 		
-		public function getUploadModule(){
+		public function getUploadModule() {
 			$this->cbLoader();
 			$data['page_title'] = 'Upload Module';
 			return view("upload.upload", $data);
