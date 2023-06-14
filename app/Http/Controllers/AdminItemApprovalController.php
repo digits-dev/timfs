@@ -626,6 +626,15 @@
 				->where('id', $id)
 				->get()
 				->first();
+
+			$data['action'] = 'edit';
+
+			if ($data['item']->approval_status == 202) {
+				return redirect(CRUDBooster::mainpath())->with([
+					'message_type' => 'danger',
+					'message' => '✖️ You cannot edit a pending item...',
+				]);
+			}
 			
 			$submaster_details = $this->main_controller->getSubmasters();
 
@@ -633,7 +642,6 @@
 
 			return $this->view('item-master/edit-item', $data);
 		}
-
 
 		public function getApproveOrReject($id) {
 			$my_privilege = CRUDBooster::myPrivilegeName();
@@ -692,16 +700,16 @@
 					ItemMasterApproval::where('id', $id)->update([
 						'approval_status' => '200',
 						'tasteless_code' => $tasteless_code,
-						'updated_by' => $action_by,
-						'updated_at' => $time_stamp,
+						'approved_by_1' => $action_by,
+						'approved_at_1' => $time_stamp,
 					]);
 					unset($item->id);
 					ItemMaster::updateOrInsert(['tasteless_code' => $item->tasteless_code], (array) $item);
 				} else if ($action == 'reject') {
 					ItemMasterApproval::where('id', $id)->update([
 						'approval_status' => '400',
-						'updated_at' => $time_stamp,
-						'updated_by' => $action_by,
+						'approved_by_1' => $action_by,
+						'approved_at_1' => $time_stamp,
 					]);
 				} 
 					
