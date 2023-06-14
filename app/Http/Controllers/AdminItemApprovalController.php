@@ -317,12 +317,6 @@
 	        | 
 	        */
 	        $this->addaction = array();
-			// $this->addaction[] = [
-			// 	'title'=>'Detail',
-			// 	'url'=>CRUDBooster::mainpath('detail/[id]'),
-			// 	'icon'=>'fa fa-eye',
-			// 	'color' => ' ',
-			// ];
 			$my_privilege = CRUDBooster::myPrivilegeName();
 			$to_edit = in_array($my_privilege, ['Purchasing Staff', 'Encoder', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
 			$to_approve = in_array($my_privilege, ['Manager (Purchaser)', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
@@ -358,7 +352,7 @@
 	        | 
 	        */
 	        $this->button_selected = array();
-			if(CRUDBooster::isUpdate() && (in_array(CRUDBooster::myPrivilegeName(),['Administrator','Supervisor (Purchaser)','Supervisor (Accounting)','Cost Accounting','Manager (Accounting)','Manager (Purchaser)']) || CRUDBooster::isSuperadmin()) ) {
+			if (CRUDBooster::isUpdate() && (in_array(CRUDBooster::myPrivilegeName(),['Administrator','Supervisor (Purchaser)','Supervisor (Accounting)','Cost Accounting','Manager (Accounting)','Manager (Purchaser)']) || CRUDBooster::isSuperadmin()) ) {
 	        	$this->button_selected[] = ['label'=>'APPROVE','icon'=>'fa fa-check','name'=>'approve'];
 				$this->button_selected[] = ['label'=>'REJECT','icon'=>'fa fa-times','name'=>'reject'];
 			}
@@ -454,8 +448,8 @@
 	        |
 	        */
 	        $this->load_js = array();
-			$module_id = DB::table('cms_moduls')->where('controller','AdminItemMastersController')->value('id');
-			$approver_checker = ApprovalWorkflowSetting::where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->where('approver_privilege_id',CRUDBooster::myPrivilegeId())->where('status','ACTIVE')->first();
+			// $module_id = DB::table('cms_moduls')->where('controller','AdminItemMastersController')->value('id');
+			// $approver_checker = ApprovalWorkflowSetting::where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->where('approver_privilege_id',CRUDBooster::myPrivilegeId())->where('status','ACTIVE')->first();
 	        
 	        
 	        /*
@@ -506,10 +500,26 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
+			$my_privilege = CRUDBooster::myPrivilegeName();
 
-			$query
-				->where('item_master_approvals.created_at', '>=', date('2023-06-07'))
-				->orWhere('item_master_approvals.updated_at', '>=', date('2023-06-07'));
+			$query->where(function($sub) {
+					$sub
+						->where('item_master_approvals.created_at', '>=', date('2023-06-07'))
+						->orWhere('item_master_approvals.updated_at', '>=', date('2023-06-07'));
+				});
+
+			if ($my_privilege == 'Purchasing Staff') {
+				$my_id = CRUDBooster::myId();
+				$query->whereRaw("
+					(item_master_approvals.action_type = 'CREATE' and item_master_approvals.created_by = $my_id)
+					or
+					(item_master_approvals.action_type = 'UPDATE' and item_master_approvals.updated_by = $my_id)
+				");
+			} else if ($my_privilege == 'Manager (Purchaser)') {
+				$query->where('item_master_approvals.approval_status', '202');
+			}
+
+			$query->orderBy(DB::raw('COALESCE(item_master_approvals.updated_at, item_master_approvals.created_at)'), 'desc');
 	    }
 
 	    /*
@@ -575,85 +585,8 @@
 	    | 
 	    */
 	    public function hook_after_edit($id) {
-			//Your code here 
-			$created_item = ItemMasterApproval::where('id',$id)->first();
 
-			switch($created_item->action_type){
-
-				case 'Create' :
-				$module_id = DB::table('cms_moduls')->where('controller','AdminItemMastersController')->value('id');
-				$approver_checker = ApprovalWorkflowSetting::where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->where('action_type', 'Create')
-									->where('approver_privilege_id',CRUDBooster::myPrivilegeId())
-									->where('status','ACTIVE')->first();
-
-					switch ($approver_checker->workflow_number){
-						case 2:
-						CRUDBooster::redirect(CRUDBooster::mainpath(),"The item has been edited and pending for approval.","info");
-						break;
-
-						case 3:
-						CRUDBooster::redirect(CRUDBooster::mainpath(),"The item has been edited and pending for approval.","info");
-						break;
-
-						default:
-						$created_item = ItemMasterApproval::where('id',$id)->first();
-						$module_id = DB::table('cms_moduls')->where('controller','AdminItemMastersController')->value('id');
-						$for_approval = ItemMasterApproval::where('id',$id)->first();
-						$approvers = 	ApprovalWorkflowSetting::where('status','ACTIVE')->where('action_type', 'Create')
-										->where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->get();
-					
-						foreach ($approvers as $approvers_list){
-							$approver_privilege_for =	DB::table('cms_privileges')->where('id',$approvers_list->encoder_privilege_id)->first();
-							$approver_privilege =		DB::table('cms_privileges')->where('id',$approvers_list->approver_privilege_id)->first();	
-						
-							if($for_approval->encoder_privilege_id == $approver_privilege_for->id){
-								
-								$send_to =	DB::table('cms_users')->where('id_cms_privileges',$approver_privilege->id)->get();
-								foreach ($send_to as $send_now){
-									$config['content'] = "An item has been edited at Item Masterfile Module, please check item for approval!";
-									$config['to'] = CRUDBooster::adminPath('item_approval?q='.$for_approval->id);
-									$config['id_cms_users'] = [$send_now->id];
-									CRUDBooster::sendNotification($config);	
-								}
-							}
-
-						}
-						CRUDBooster::redirect(CRUDBooster::mainpath(),"The item has been edited and pending for approval.","info");
-						break;
-					}
-				break;
-
-				case 'Update' :
-
-					$module_id = DB::table('cms_moduls')->where('controller','AdminItemMastersController')->value('id');
-
-					$for_approval = ItemMasterApproval::where('id',$id)->first();
-					$approvers = 	ApprovalWorkflowSetting::where('status','ACTIVE')->where('action_type', 'Update')
-									->where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->get();
-		
-					foreach ($approvers as $approvers_list){
-						$approver_privilege_for =	DB::table('cms_privileges')->where('id',$approvers_list->encoder_privilege_id)->first();
-						$approver_privilege =		DB::table('cms_privileges')->where('id',$approvers_list->approver_privilege_id)->first();	
-					
-						if($for_approval->encoder_privilege_id == $approver_privilege_for->id){
-							$send_to =	DB::table('cms_users')->where('id_cms_privileges',$approver_privilege->id)->get();
-							foreach ($send_to as $send_now){
-								$config['content'] = "An item has been edited at Item Masterfile Module, please check item for approval!";
-								$config['to'] = CRUDBooster::adminPath('item_approval?q='.$for_approval->tasteless_code);
-								$config['id_cms_users'] = [$send_now->id];
-								CRUDBooster::sendNotification($config);	
-							}
-						}
-						
-					}
-					CRUDBooster::redirect(CRUDBooster::mainpath(),"Your item has been edited and pending for approval.","info");
-				break;
-
-				default:
-				break;
-
-			}
-	    }
+		}
 
 	    /* 
 	    | ---------------------------------------------------------------------- 
@@ -681,7 +614,7 @@
 
 		public function getEdit($id) {
 			$my_privilege = CRUDBooster::myPrivilegeName();
-			$to_edit = in_array($my_privilege, ['Purchasing Staff', 'Encoder', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
+			$to_edit = in_array($my_privilege, ['Purchasing Staff', 'Encoder', 'Super Administrator', 'Supervisor (Purchaser)']) || CRUDBooster::isSuperAdmin();
 			if (!CRUDBooster::isUpdate() || !$to_edit)
 					CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
@@ -693,6 +626,15 @@
 				->where('id', $id)
 				->get()
 				->first();
+
+			$data['action'] = 'edit';
+
+			if ($data['item']->approval_status == 202) {
+				return redirect(CRUDBooster::mainpath())->with([
+					'message_type' => 'danger',
+					'message' => '✖️ You cannot edit a pending item...',
+				]);
+			}
 			
 			$submaster_details = $this->main_controller->getSubmasters();
 
@@ -700,7 +642,6 @@
 
 			return $this->view('item-master/edit-item', $data);
 		}
-
 
 		public function getApproveOrReject($id) {
 			$my_privilege = CRUDBooster::myPrivilegeName();
@@ -743,6 +684,10 @@
 					->where('id', $id)
 					->first();
 
+				if ($item->approval_status != '202') {
+					continue;
+				}
+
 				$tasteless_code = $item->tasteless_code;
 				if (!$tasteless_code) {
 					$groups_id = ItemMasterApproval::where('id', $id)->first()->groups_id;
@@ -755,16 +700,16 @@
 					ItemMasterApproval::where('id', $id)->update([
 						'approval_status' => '200',
 						'tasteless_code' => $tasteless_code,
-						'updated_by' => $action_by,
-						'updated_at' => $time_stamp,
+						'approved_by_1' => $action_by,
+						'approved_at_1' => $time_stamp,
 					]);
 					unset($item->id);
 					ItemMaster::updateOrInsert(['tasteless_code' => $item->tasteless_code], (array) $item);
 				} else if ($action == 'reject') {
 					ItemMasterApproval::where('id', $id)->update([
 						'approval_status' => '400',
-						'updated_at' => $time_stamp,
-						'updated_by' => $action_by,
+						'approved_by_1' => $action_by,
+						'approved_at_1' => $time_stamp,
 					]);
 				} 
 					
