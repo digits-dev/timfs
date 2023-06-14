@@ -352,7 +352,7 @@
 	        | 
 	        */
 	        $this->button_selected = array();
-			if(CRUDBooster::isUpdate() && (in_array(CRUDBooster::myPrivilegeName(),['Administrator','Supervisor (Purchaser)','Supervisor (Accounting)','Cost Accounting','Manager (Accounting)','Manager (Purchaser)']) || CRUDBooster::isSuperadmin()) ) {
+			if (CRUDBooster::isUpdate() && (in_array(CRUDBooster::myPrivilegeName(),['Administrator','Supervisor (Purchaser)','Supervisor (Accounting)','Cost Accounting','Manager (Accounting)','Manager (Purchaser)']) || CRUDBooster::isSuperadmin()) ) {
 	        	$this->button_selected[] = ['label'=>'APPROVE','icon'=>'fa fa-check','name'=>'approve'];
 				$this->button_selected[] = ['label'=>'REJECT','icon'=>'fa fa-times','name'=>'reject'];
 			}
@@ -500,21 +500,26 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
+			$my_privilege = CRUDBooster::myPrivilegeName();
 
-			$query
-			->where(function($sub) {
+			$query->where(function($sub) {
 					$sub
 						->where('item_master_approvals.created_at', '>=', date('2023-06-07'))
 						->orWhere('item_master_approvals.updated_at', '>=', date('2023-06-07'));
 				});
 
-			if (CRUDBooster::myPrivilegeName() == 'Purchasing Staff') {
-				$query->where(function($sub) {
-					$my_id = CRUDBooster::myId();
-						$sub->whereRaw(DB::raw("(item_master_approvals.action_type = 'Create' and item_master_approvals.created_by = $my_id) or (item_master_approvals.action_type = 'Update' and item_master_approvals.updated_by = $my_id)"));
-					});
+			if ($my_privilege == 'Purchasing Staff') {
+				$my_id = CRUDBooster::myId();
+				$query->whereRaw("
+					(item_master_approvals.action_type = 'CREATE' and item_master_approvals.created_by = $my_id)
+					or
+					(item_master_approvals.action_type = 'UPDATE' and item_master_approvals.updated_by = $my_id)
+				");
+			} else if ($my_privilege == 'Manager (Purchaser)') {
+				$query->where('item_master_approvals.approval_status', '202');
 			}
-			$query->orderBy('item_master_approvals.updated_at', 'asc');
+
+			$query->orderBy(DB::raw('COALESCE(item_master_approvals.updated_at, item_master_approvals.created_at)'), 'desc');
 	    }
 
 	    /*
