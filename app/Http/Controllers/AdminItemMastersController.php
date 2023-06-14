@@ -318,13 +318,15 @@
 	        | 
 	        */
 	        $this->addaction = array();
-			$this->addaction[] = [
-				'title'=>'Edit',
-				'url'=>CRUDBooster::mainpath('edit/[id]'),
-				'icon'=>'fa fa-pencil',
-				'color' => ' ',
-				"showIf"=>"[status_of_approval] != '202'",
-			];
+			if (CRUDBooster::myPrivilegeName() == 'Purchasing Staff' || CRUDBooster::isSuperAdmin()) {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url'=>CRUDBooster::mainpath('edit/[id]'),
+					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"[status_of_approval] != '202'",
+				];
+			}
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
