@@ -676,6 +676,10 @@
 					->where('id', $id)
 					->first();
 
+				if ($item->approval_status != '202') {
+					continue;
+				}
+
 				$tasteless_code = $item->tasteless_code;
 				if (!$tasteless_code) {
 					$groups_id = ItemMasterApproval::where('id', $id)->first()->groups_id;
