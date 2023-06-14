@@ -971,7 +971,7 @@
 			
 			$is_existing = ItemMasterApproval::where('tasteless_code', $tasteless_code)->exists();
 
-			if ($is_existing) {
+			if ($is_existing && $tasteless_code) {
 				$data['updated_by'] = $action_by;
 				$data['updated_at'] = $time_stamp;
 			} else {
