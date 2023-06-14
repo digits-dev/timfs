@@ -503,10 +503,10 @@
 			$my_privilege = CRUDBooster::myPrivilegeName();
 
 			$query->where(function($sub) {
-					$sub
-						->where('item_master_approvals.created_at', '>=', date('2023-06-07'))
-						->orWhere('item_master_approvals.updated_at', '>=', date('2023-06-07'));
-				});
+				$sub
+					->where('item_master_approvals.created_at', '>=', date('2023-06-07'))
+					->orWhere('item_master_approvals.updated_at', '>=', date('2023-06-07'));
+			});
 
 			if ($my_privilege == 'Purchasing Staff') {
 				$my_id = CRUDBooster::myId();
