@@ -103,26 +103,26 @@ class ItemCostPriceUploadController extends Controller
                 }
             }
 
-            if(count($currentItemCodeArray) > 0){
-                $DetailsOfItem = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
-                foreach ($currentItemCodeArray as $key => $ItemVal) {
-                    $DetailsOfItem .= "<tr><td>".$ItemVal['name']."</td><td>".$ItemVal['old']."</td><td>".$ItemVal['new']."</td></tr>";
-                }
-                $DetailsOfItem .= '</tbody></table>';
+            // if(count($currentItemCodeArray) > 0){
+            //     $DetailsOfItem = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
+            //     foreach ($currentItemCodeArray as $key => $ItemVal) {
+            //         $DetailsOfItem .= "<tr><td>".$ItemVal['name']."</td><td>".$ItemVal['old']."</td><td>".$ItemVal['new']."</td></tr>";
+            //     }
+            //     $DetailsOfItem .= '</tbody></table>';
                 
-                DB::table('history_item_masterfile')->insert([
-                    'tasteless_code'	=>	$currentItemCode->tasteless_code,
-                    'item_id'			=>	$currentItemCode->id,
-                    'brand_id'			=>	$currentItemCode->brands_id,
-                    'group_id'			=>	$currentItemCode->groups_id,
-                    'action'			=>	"Upload (Cost Price)",
-                    'purchase_price'    => $value['cost_price'],
+            //     DB::table('history_item_masterfile')->insert([
+            //         'tasteless_code'	=>	$currentItemCode->tasteless_code,
+            //         'item_id'			=>	$currentItemCode->id,
+            //         'brand_id'			=>	$currentItemCode->brands_id,
+            //         'group_id'			=>	$currentItemCode->groups_id,
+            //         'action'			=>	"Upload (Cost Price)",
+            //         'purchase_price'    => $value['cost_price'],
                     
-                    'details'			=>	$DetailsOfItem,
-                    'created_by'		=>	$currentItemCode->created_by,
-                    'updated_by'		=>	CRUDBooster::myId()
-                ]);
-            }
+            //         'details'			=>	$DetailsOfItem,
+            //         'created_by'		=>	$currentItemCode->created_by,
+            //         'updated_by'		=>	CRUDBooster::myId()
+            //     ]);
+            // }
 
             // $trs_datas = [
             //     'purchase_price' => $value['cost_price'],

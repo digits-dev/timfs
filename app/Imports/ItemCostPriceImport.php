@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\ItemMaster;
+use App\ItemMasterApproval;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -19,15 +19,16 @@ class ItemCostPriceImport implements ToModel, WithHeadingRow, WithChunkReading
     */
     public function model(array $row)
     {   
-        $currentItemCode = ItemMaster::where('tasteless_code', $row['tasteless_code'])->first();
+        $currentItemCode = ItemMasterApproval::where('tasteless_code', $row['tasteless_code'])->first();
         
         $data = [
             'purchase_price' => $row['cost_price'],
             'updated_at' => date('Y-m-d H:i:s'),
-            'updated_by' => CRUDBooster::myId()
+            'updated_by' => CRUDBooster::myId(),
+            'approval_status' => '202',
         ];
 
-        ItemMaster::where('tasteless_code', '=', (string)$row['tasteless_code'])->update($data);
+        ItemMasterApproval::where('tasteless_code', '=', (string)$row['tasteless_code'])->update($data);
     }
 
     public function chunkSize(): int
