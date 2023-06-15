@@ -319,6 +319,7 @@
 				'CHEF' => [],
 				'MARKETING ENCODER' => ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR COSTING'],
 				'MARKETING APPROVER' => ['FOR FOOD TASTING', 'FOR APPROVAL (MARKETING)'],
+				'MARKETING MANAGER' => ['FOR FOOD TASTING', 'FOR APPROVAL (MARKETING)'],
 				'ACCOUNTING APPROVER' => ['FOR APPROVAL (ACCOUNTING)'],
 				'PURCHASING STAFF' => [],
 			];
@@ -328,7 +329,7 @@
 				->whereNotIn('rnd_menu_approvals.approval_status', $not_valid_approval_statuses);
 			
 			if (!CRUDBooster::isSuperAdmin()) {
-				$query->whereIn('rnd_menu_approvals.approval_status', $privileges[$upperCasedPrivilege]);
+				$query->whereIn('rnd_menu_approvals.approval_status', ($privileges[$upperCasedPrivilege] ?? []));
 			}
 	    }
 
