@@ -607,21 +607,11 @@
 	    */
 	    public function hook_query_index(&$query) 
         {
-	        //Your code here
-			// $query->where(function($sub_query){
-			//     $create_item_status = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Create')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
-			//     $update_item_status = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Update')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
-			//     $update_item_status_1 = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Update')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
-			
-			// 	$sub_query->where('item_masters.approval_status',	$create_item_status);
-			// 	$sub_query->orWhere('item_masters.approval_status',	$update_item_status);
-			// 	$sub_query->orWhere('item_masters.approval_status',	$update_item_status_1);
-		
-			// });
 
 			$query
 				->leftJoin('item_master_approvals', 'item_masters.tasteless_code', '=', 'item_master_approvals.tasteless_code')
 				->addSelect('item_master_approvals.approval_status as status_of_approval');
+				// ->orderByRaw(DB::raw('COALESCE(item_masters.updated_at, item_masters.created_at) desc'));
 	    }
 
 	    /*
