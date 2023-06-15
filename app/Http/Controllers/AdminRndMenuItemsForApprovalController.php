@@ -122,7 +122,7 @@
 				];
 			}
 
-			if (CRUDBooster::isSuperAdmin() || $privilege == 'Marketing Approver') {
+			if (CRUDBooster::isSuperAdmin() || $privilege == 'Marketing Manager') {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
@@ -473,6 +473,17 @@
 					trans('crudbooster.denied_access')
 				);
 
+			$upperCasedPrivilege = strtoupper(CRUDBooster::myPrivilegeName());
+
+			$privileges = [
+				'CHEF' => [],
+				'MARKETING ENCODER' => ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR COSTING'],
+				'MARKETING APPROVER' => ['FOR FOOD TASTING', 'FOR APPROVAL (MARKETING)'],
+				'MARKETING MANAGER' => ['FOR FOOD TASTING', 'FOR APPROVAL (MARKETING)'],
+				'ACCOUNTING APPROVER' => ['FOR APPROVAL (ACCOUNTING)'],
+				'PURCHASING STAFF' => [],
+			];
+
 			$status = DB::table('rnd_menu_approvals')
 				->where('rnd_menu_items_id', $id)
 				->first()
@@ -482,15 +493,22 @@
 
 			$is_super_admin = CRUDBooster::isSuperAdmin();
 
-			if ($status == 'FOR PACKAGING' && ($my_privielege_name == 'Marketing Encoder' || $is_super_admin)) {
+			if (!in_array($status, $privileges[$upperCasedPrivilege]) && !$is_super_admin) {
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+			}
+
+			if ($status == 'FOR PACKAGING') {
 				return $this->mainController->getSetPackaging($id);
-			} else if ($status == 'FOR COSTING' && ($my_privielege_name == 'Marketing Encoder' || $is_super_admin)) {
+			} else if ($status == 'FOR COSTING') {
 				return $this->mainController->getSetCosting($id);
-			} else if ($status == 'FOR MENU CREATION' && ($my_privielege_name == 'Marketing Encoder' || $is_super_admin)) {
+			} else if ($status == 'FOR MENU CREATION') {
 				return $this->mainController->getCreateNewMenu($id);
-			} else if ($status == 'FOR APPROVAL (MARKETING)' && ($my_privielege_name == 'Marketing Approver' || $is_super_admin)) {
+			} else if ($status == 'FOR APPROVAL (MARKETING)') {
 				return $this->mainController->getApproveByMarketing($id);
-			} else if ($status == 'FOR APPROVAL (ACCOUNTING)' && ($my_privielege_name == 'Accounting Approver' || $is_super_admin)) {
+			} else if ($status == 'FOR APPROVAL (ACCOUNTING)') {
 				return $this->mainController->getApproveByAccounting($id);
 			} else {
 				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
