@@ -9,10 +9,14 @@
 @endpush
 @section('content')
   <!-- Your html goes here -->
-  <p><a title='Return' href='{{ CRUDBooster::mainpath() }}'><i class='fa fa-chevron-circle-left '></i>&nbsp; Back To Add Menu Item</a></p>
+  <p class="noprint">
+    <a title='Return' href="{{ CRUDBooster::mainPath() }}">
+        <i class='fa fa-chevron-circle-left '></i> &nbsp; {{trans("crudbooster.form_back_to_list",['module'=>CRUDBooster::getCurrentModule()->name])}}
+    </a>
+  </p> 
 
   <div class='panel panel-default'>
-    <div class='panel-heading'>Edit Form</div>
+    <div class='panel-heading'>Details Menu Item</div>
       <div class='panel-body'>      
         <div class='form-group'>
             <div class="box-body" id="parent-form-area">
@@ -118,14 +122,10 @@
                 </table>
             </div>
           </div>
-            <div class="box-footer" style="background: #F5F5F5">
-                <div class="form-group">
-                    <label class="control-label col-sm-2"></label>
-                    <div class="col-sm-10">
-                    </div>
-                </div>
-            </div>
         </div>
-    </div>
+      </div>
+      <div class="panel-footer">
+        <a class="btn btn-primary" href="{{ CRUDBooster::mainpath() }}" type="button" id="export"> <i class="fa fa-arrow-left" ></i> Back </a>
+      </div>
   </div>
 @endsection
