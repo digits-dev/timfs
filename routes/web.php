@@ -68,11 +68,15 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     
     Route::get('/admin/history_item_masterfile/export-ttp-history','AdminHistoryItemMasterfileController@exportSalePrice')->name('exportSalePrice');
     Route::get('/admin/history_item_masterfile/export-purchase-price-history','AdminHistoryItemMasterfileController@exportPurchasePrice')->name('exportPurchasePrice');
-    
-    //bulk upload fulfillment type
+
     Route::post('/admin/item_masters/update-items-upload','ItemUploadController@store')->name('update.imfs');
     Route::get('/admin/item_masters/update-items','ItemUploadController@create')->name('getUpdateItems');
     Route::get('/admin/item_masters/download-item-template','ItemUploadController@downloadItemTemplate')->name('downloadItemTemplate');
+    
+    //bulk upload fulfillment type
+    Route::post('/admin/item_masters/upload_fulfillment_type','ItemFulfillmentTypeUploadController@store')->name('uploadFulfillmentType');
+    Route::get('/admin/item_masters/update-items-fulfillment-type','ItemFulfillmentTypeUploadController@create')->name('getUpdateItemsFulfillmentType');
+    Route::get('/admin/item_masters/download-fulfillment-type-template','ItemFulfillmentTypeUploadController@downloadFulfillmentTypeTemplate')->name('downloadFulfillmentTypeTemplate');
     
     //bulk upload segmentation
     Route::post('/admin/item_masters/upload_sku_legend','ItemSegmentationUploadController@store')->name('uploadSKULegend');

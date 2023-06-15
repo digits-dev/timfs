@@ -24,7 +24,7 @@
                     <td>Item Master Fulfilment Type bulk import (Update)</td>
                     <td>Existing item master Fulfillment Type bulk update</td>
                     <td style="text-align: center">
-                        <a href="{{ route('getUpdateItems') }}" target="_parent"><button class="btn btn-primary" style="width:80%">Update Item Fulfilment Type Import</button></a>
+                        <a href="{{ route('getUpdateItemsFulfillmentType') }}" target="_parent"><button class="btn btn-primary" style="width:80%">Fulfillment Type Import</button></a>
                     </td>
                 </tr>
 
