@@ -321,7 +321,7 @@
 	        $this->addaction = array();
 			$my_privilege = CRUDBooster::myPrivilegeName();
 			$to_edit = in_array($my_privilege, $this->requestor) || CRUDBooster::isSuperAdmin();
-			$to_approve = in_array($my_privilege, ['Manager (Purchaser)', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
+			$to_approve = in_array($my_privilege, $this->approver) || CRUDBooster::isSuperAdmin();
 
 			if ($to_edit) {
 				$this->addaction[] = [
@@ -649,7 +649,7 @@
 
 		public function getApproveOrReject($id) {
 			$my_privilege = CRUDBooster::myPrivilegeName();
-			$to_approve = in_array($my_privilege, ['Manager (Purchaser)', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
+			$to_approve = in_array($my_privilege, $this->approver) || CRUDBooster::isSuperAdmin();
 			if (!CRUDBooster::isUpdate() || !$to_approve)
 					CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
