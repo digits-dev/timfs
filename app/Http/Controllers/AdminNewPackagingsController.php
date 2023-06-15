@@ -11,6 +11,7 @@
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
 			$this->mainController = new AdminNewIngredientsController;
+			$this->tagger = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
 		}
 
 	    public function cbInit() {
@@ -108,7 +109,7 @@
 				'color' => ' ',
 			];
 
-			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Purchasing Staff') {
+			if (in_array($my_privilege, $this->tagger)) {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),

@@ -9,6 +9,7 @@
 	class AdminNewIngredientsController extends \crocodicstudio\crudbooster\controllers\CBController {
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+			$this->tagger = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
 		}
 
 	    public function cbInit() {
@@ -102,7 +103,9 @@
 				'color' => ' ',
 			];
 
-			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Purchasing Staff') {
+			$my_privilege = CRUDBooster::myPrivilegeName();
+
+			if (in_array($my_privilege, $this->tagger)) {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),

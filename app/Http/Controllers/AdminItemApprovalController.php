@@ -22,6 +22,8 @@
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
 			$this->main_controller = new AdminItemMastersController;
+			$this->requestor = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
+			$this->approver = ['Purchasing Manager', 'Manager (Purchaser)'];
 		}
 		
 	    public function cbInit() {
@@ -318,12 +320,7 @@
 	        */
 	        $this->addaction = array();
 			$my_privilege = CRUDBooster::myPrivilegeName();
-			$to_edit = in_array($my_privilege, [
-				'Purchasing Staff', 
-				'Purchasing Encoder', 
-				'Encoder', 
-				'Encoder (Purchaser)'
-			]) || CRUDBooster::isSuperAdmin();
+			$to_edit = in_array($my_privilege, $this->requestor) || CRUDBooster::isSuperAdmin();
 			$to_approve = in_array($my_privilege, ['Manager (Purchaser)', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
 
 			if ($to_edit) {
@@ -507,20 +504,22 @@
 	    public function hook_query_index(&$query) {
 			$my_privilege = CRUDBooster::myPrivilegeName();
 
+
+
 			$query->where(function($sub) {
 				$sub
 					->where('item_master_approvals.created_at', '>=', date('2023-06-07'))
 					->orWhere('item_master_approvals.updated_at', '>=', date('2023-06-07'));
 			});
 
-			if ($my_privilege == 'Purchasing Staff') {
+			if (in_array($my_privilege, $this->requestor)) {
 				$my_id = CRUDBooster::myId();
 				$query->whereRaw("
 					(item_master_approvals.action_type = 'CREATE' and item_master_approvals.created_by = $my_id)
 					or
 					(item_master_approvals.action_type = 'UPDATE' and item_master_approvals.updated_by = $my_id)
 				");
-			} else if ($my_privilege == 'Manager (Purchaser)') {
+			} else if (in_array($my_privilege, $this->approver)) {
 				$query->where('item_master_approvals.approval_status', '202');
 			}
 
@@ -619,7 +618,7 @@
 
 		public function getEdit($id) {
 			$my_privilege = CRUDBooster::myPrivilegeName();
-			$to_edit = in_array($my_privilege, ['Purchasing Staff', 'Encoder', 'Super Administrator', 'Supervisor (Purchaser)']) || CRUDBooster::isSuperAdmin();
+			$to_edit = in_array($my_privilege, $this->requestor) || CRUDBooster::isSuperAdmin();
 			if (!CRUDBooster::isUpdate() || !$to_edit)
 					CRUDBooster::redirect(
 					CRUDBooster::adminPath(),

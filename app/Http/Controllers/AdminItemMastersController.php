@@ -41,6 +41,8 @@
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
 			$this->diffData = [];
 			$this->segments = Segmentation::where('status','ACTIVE')->orderBy('segment_column_description','ASC')->get();
+			$this->requestor = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
+			$this->approver = ['Purchasing Manager', 'Manager (Purchaser)'];
 		}
 	    
 	    public function cbInit() {
@@ -318,7 +320,8 @@
 	        | 
 	        */
 	        $this->addaction = array();
-			if (in_array(CRUDBooster::myPrivilegeName(), ['Purchasing Staff', 'Encoder (Purchaser)']) || CRUDBooster::isSuperAdmin()) {
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			if (in_array($my_privilege, $this->requestor) || CRUDBooster::isSuperAdmin()) {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
