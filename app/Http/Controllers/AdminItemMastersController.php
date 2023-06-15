@@ -318,7 +318,7 @@
 	        | 
 	        */
 	        $this->addaction = array();
-			if (CRUDBooster::myPrivilegeName() == 'Purchasing Staff' || CRUDBooster::isSuperAdmin()) {
+			if (in_array(CRUDBooster::myPrivilegeName(), ['Purchasing Staff', 'Encoder (Purchaser)']) || CRUDBooster::isSuperAdmin()) {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
@@ -894,6 +894,11 @@
 				->get()
 				->toArray();
 
+			$data['sku_statuses'] = DB::table('sku_statuses')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
 			// EDIT ITEM
 			$data['types'] = DB::table('types')
 				->where('status', 'ACTIVE')
@@ -950,7 +955,7 @@
 			unset($data['_token'], $data['segmentations'], $data['item_photo']);
 			$data['price'] = $data['ttp'];
 			$data['myob_item_description'] = $data['full_item_description'];
-			$data['sku_statuses_id'] = 1;
+			$data['sku_statuses_id'] = $input['sku_statuses_id'] ?? 1;
 			$data['type'] = 'Inventory Part';
 			$data['tax_status'] = $data['tax_codes_id'];
 			$data['tasteless_code'] = $tasteless_code;
