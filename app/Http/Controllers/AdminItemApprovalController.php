@@ -318,7 +318,12 @@
 	        */
 	        $this->addaction = array();
 			$my_privilege = CRUDBooster::myPrivilegeName();
-			$to_edit = in_array($my_privilege, ['Purchasing Staff', 'Encoder', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
+			$to_edit = in_array($my_privilege, [
+				'Purchasing Staff', 
+				'Purchasing Encoder', 
+				'Encoder', 
+				'Encoder (Purchaser)'
+			]) || CRUDBooster::isSuperAdmin();
 			$to_approve = in_array($my_privilege, ['Manager (Purchaser)', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
 
 			if ($to_edit) {
@@ -651,14 +656,50 @@
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
 				);
-
+			
+			$submaster_details = $this->main_controller->getSubmasters();
 			$data = [];
-			$data['item'] = DB::table('item_master_approvals')
+
+			$item_for_approval = DB::table('item_master_approvals')
 				->where('id', $id)
 				->get()
 				->first();
-			
-			$submaster_details = $this->main_controller->getSubmasters();
+
+			$current_item = DB::table('item_masters')
+				->where('tasteless_code', $item_for_approval->tasteless_code)
+				->get()
+				->first();
+
+			$differences = array_udiff_assoc(
+				(array) $item_for_approval,
+				(array) $current_item,
+				function ($a, $b) {
+					if (is_numeric($a) && is_numeric($b)) {
+						return (float) $a !== (float) $b;
+					} else {
+						return $a != $b;
+					}
+				}
+			);
+
+			$paired_differences = [];
+			$sku_legends = array_column($submaster_details['sku_legends'], 'sku_legend');
+			$segmentation_differences = [];
+
+			foreach ($differences as $key => $difference) {
+				$paired_differences[$key] = [];
+				$paired_differences[$key]['current'] = $current_item->{$key};
+				$paired_differences[$key]['new'] = $difference;
+				if (in_array($difference, $sku_legends)) {
+					$segmentation_differences[] = $difference;
+				}
+			}
+			// dd($paired_differences);
+
+			$data['item'] = $item_for_approval;
+			$data['differences'] = $differences;
+			$data['segmentation_differences'] = $segmentation_differences;
+
 
 			$data = array_merge($data, $submaster_details);
 
@@ -666,7 +707,6 @@
 		}
 
 		public function approveOrReject(Request $request) {
-
 			$action = $request->get('action');
 			$item_master_approvals_id = $request->get('item_master_approvals_id');
 			return self::approve_or_reject([$item_master_approvals_id], $action);
