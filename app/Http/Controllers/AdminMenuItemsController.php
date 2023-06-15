@@ -19,6 +19,8 @@
     use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 	use Maatwebsite\Excel\Facades\Excel;
 	Use Alert;
+	use Illuminate\Support\Arr;
+
 
 	class AdminMenuItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -934,6 +936,9 @@
 
 		public function getDetail($id) {
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
+			if (CRUDBooster::myPrivilegeName() != 'Chef' && !CRUDBooster::isSuperAdmin()) {
+				return self::getDetailNotChef($id);
+			}
 			$data = [];
 			$data['item'] = DB::table('menu_items')
 				->where('id', $id)
@@ -984,6 +989,87 @@
 
 			$data['ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $ingredients);
 			return $this->view('menu-items/detail-item', $data);
+		}
+
+		public function getDetailNotChef($id) {
+			//Create an Auth
+			if(!CRUDBooster::isRead() && $this->global_privilege==FALSE || $this->button_edit==FALSE) {    
+				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			}
+			
+			$data = [];
+			$data['page_title'] = 'Detail Data';
+			$data['row'] = DB::table('menu_items')->where('menu_items.id',$id)
+				->leftjoin('menu_types', 'menu_items.menu_types_id', '=', 'menu_types.id')
+				->leftjoin('menu_categories', 'menu_items.menu_categories_id', '=', 'menu_categories.id')
+				->leftjoin('menu_subcategories', 'menu_items.menu_subcategories_id', '=', 'menu_subcategories.id')
+				->select('*',
+					'menu_types.menu_type_description as menu_type',
+					'menu_categories.category_description as main_category',
+					'menu_subcategories.subcategory_description as sub_category',
+					'menu_items.status as status')
+			->first();
+			// Menu Segmentations
+			$data['menu_segmentations'] = DB::table('menu_segmentations')
+				->where('status','ACTIVE')
+				->orderBy('menu_segment_column_description')
+				->get();
+			// Choices Group
+			$data['menu_choices_group'] = DB::table('menu_choice_groups')
+				->where('status', 'ACTIVE')
+				->orderBy('menu_choice_group_column_description')
+				->get()->unique('menu_choice_group_column_description');
+			// Product Type
+			$data['menu_product_types'] = DB::table('menu_product_types')
+				->select('menu_product_type_description')
+				->where('status','ACTIVE')
+				->where('id',$data['row']->menu_product_types_id)
+				->value('menu_product_type_description');			
+			// User Menu Segments
+			$user_menu_segmentations = DB::table('menu_segmentations')
+				->where('status','ACTIVE')
+				->select('menu_segment_column_name')
+				->get()->toArray();		
+			$menu_segment = Arr::pluck($user_menu_segmentations, 'menu_segment_column_name');
+			$data['user_menu_segment'] = [];
+			foreach($data['row'] as $key=>$value){
+				if(in_array($key,$menu_segment)){
+					if($data['row']->$key == 1){
+						$data['user_menu_segment'][] = $key;
+					}
+				}
+			}
+			// Menu Group SKU
+			$menu_item_value = [];
+			$menu_item_key = [];
+
+			foreach($data['menu_choices_group'] as $value){
+				$group_name = 'choices_'.'sku'.$value->menu_choice_group_column_name;
+				$group_name_val = explode(', ',$data['row']->$group_name);
+				$group_column_desc = $value->menu_choice_group_column_description;
+				array_push($menu_item_value, $group_name_val);
+				array_push($menu_item_key, $group_column_desc);
+			}
+			
+			foreach($menu_item_value as &$value){
+				foreach($value as &$id){
+					$row_menu_description = DB::table('menu_items')
+						->where('tasteless_menu_code', $id)
+						->value('menu_item_description');
+					
+					$id = $row_menu_description;
+
+				}
+			}
+
+			$implode_menu_item_value = array_map(function($subArray) {
+				return implode(', ', $subArray);
+			}, $menu_item_value);
+
+			$data['groups'] = array_combine($menu_item_key, array_values($implode_menu_item_value));
+		
+			//Please use view method instead view method from laravel
+			return $this->view('menu-items.detail-menu-items',$data);
 		}
 
 		public function searchIngredient(Request $request) {
