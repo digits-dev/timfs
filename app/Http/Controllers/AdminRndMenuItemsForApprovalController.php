@@ -134,7 +134,7 @@
 				];
 			}
 			
-			if (CRUDBooster::isSuperAdmin() || $privilege == 'Accounting Approver') {
+			if (CRUDBooster::isSuperAdmin() || $privilege == 'Sales Accounting') {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
@@ -321,6 +321,7 @@
 				'MARKETING APPROVER' => ['FOR FOOD TASTING', 'FOR APPROVAL (MARKETING)'],
 				'MARKETING MANAGER' => ['FOR FOOD TASTING', 'FOR APPROVAL (MARKETING)'],
 				'ACCOUNTING APPROVER' => ['FOR APPROVAL (ACCOUNTING)'],
+				'SALES ACCOUNTING' => ['FOR APPROVAL (ACCOUNTING)'],
 				'PURCHASING STAFF' => [],
 			];
 
@@ -481,6 +482,7 @@
 				'MARKETING APPROVER' => ['FOR FOOD TASTING', 'FOR APPROVAL (MARKETING)'],
 				'MARKETING MANAGER' => ['FOR FOOD TASTING', 'FOR APPROVAL (MARKETING)'],
 				'ACCOUNTING APPROVER' => ['FOR APPROVAL (ACCOUNTING)'],
+				'SALES ACCOUNTING' => ['FOR APPROVAL (ACCOUNTING)'],
 				'PURCHASING STAFF' => [],
 			];
 
