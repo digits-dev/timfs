@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ExcelTemplate;
-use App\Imports\SalesPriceImport;
+use App\Imports\FulfillmentTypeImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use CRUDBooster;
@@ -14,17 +14,8 @@ use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\HeadingRowImport;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
-class ItemPriceUploadController extends Controller
+class ItemFulfillmentTypeUploadController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        
-    }
 
     /**
      * Show the form for creating a new resource.
@@ -33,9 +24,9 @@ class ItemPriceUploadController extends Controller
      */
     public function create()
     {
-        $data['page_title'] = 'Upload Items Prices';
-        $data['uploadRoute'] = route('uploadItemPrice');
-        $data['uploadTemplate'] = route('downloadPriceTemplate');
+        $data['page_title'] = 'Upload Fulfillment Types';
+        $data['uploadRoute'] = route('uploadFulfillmentType');
+        $data['uploadTemplate'] = route('downloadFulfillmentTypeTemplate');
         return view("upload.uploader", $data);
     }
 
@@ -55,20 +46,24 @@ class ItemPriceUploadController extends Controller
         HeadingRowFormatter::default('none');
         $headings = (new HeadingRowImport)->toArray($path);
         HeadingRowFormatter::default('slug');
-        $excelData = Excel::toArray(new SalesPriceImport, $path);
+        $excelData = Excel::toArray(new FulfillmentTypeImport, $path);
+        $allowed_values = DB::table('fulfillment_methods')
+            ->where('status', 'ACTIVE')
+            ->pluck('fulfillment_method')
+            ->toArray();
         
-        $header = array("TASTELESS CODE","SALES PRICE","SALES PRICE EFFECTIVE DATE");
-
+        $header = array("TASTELESS CODE","FULFILLMENT TYPE");
+        
         for ($i=0; $i < sizeof($headings[0][0]); $i++) {
             if (!in_array($headings[0][0][$i], $header)) {
                 $unMatch[] = $headings[0][0][$i];
             }
         }
-
+        
         if(!empty($unMatch)) {
             return redirect()->back()->with(['message_type' => 'danger', 'message' => 'Failed ! Please check template headers, mismatched detected.']);
         }
-
+        
         $items = array_unique(array_column($excelData[0], "tasteless_code"));
         $uploaded_items = array_column($excelData[0], "tasteless_code");
         
@@ -84,49 +79,38 @@ class ItemPriceUploadController extends Controller
                 array_push($errors, 'no item found!');
             }
         }
-
+        
         foreach ($excelData[0] as $key => $value){
             //check if sale price is null
-            if(is_null($value['sales_price'])){
-                array_push($errors, 'Item code '.$value['tasteless_code'].' has blank sales price.');
+            if(is_null($value['fulfillment_type'])){
+                array_push($errors, 'Item code '.$value['tasteless_code'].' has blank fulfillment type.');
             }
-            //check if sales price effective date is null
-            if(is_null($value['sales_price_effective_date'])){
-                array_push($errors, 'Item code '.$value['tasteless_code'].' has blank sales price effective date.');
-            }
-            if(!Carbon::parse($value['sales_price_effective_date'])){
-                array_push($errors, 'Item code '.$value['tasteless_code'].' has invalid sales price effective date.');
+
+            if (!in_array($value['fulfillment_type'], $allowed_values)) {
+                array_push($errors, 'Item code '.$value['tasteless_code'].' has invalid fulfillment type.');
             }
         }
-
+        
         if(!empty($errors)){
             return redirect('admin/item_masters')->with(['message_type' => 'danger', 'message' => 'Failed ! Please check '.implode(", ",$errors)]);
         }
         
-        // foreach ($excelData[0] as $key => $value)
-        // {
-        //     $currentItemCode = ItemMaster::where('tasteless_code', (string)$value['tasteless_code'])->first();
+        foreach ($excelData[0] as $key => $value)
+        {
+            $currentItemCode = ItemMaster::where('tasteless_code', (string)$value['tasteless_code'])->first();
             
-        //     if($value['sales_price'] != 0){
-        //         $commi_margin = ($value['sales_price'] - $currentItemCode->landed_cost)/$value['sales_price'];
-        //     }else{
-        //         $commi_margin = 0.00;
-        //     }
             
-        //     // History logs for item master
-        //     $currentItemCodeArray = []; 
-        //     $CheckTableColumn = Schema::getColumnListing('item_masters');
-        //     foreach($CheckTableColumn as $keyname){   
-        //         if(!empty($keyname)){
+            // History logs for item master
+            $currentItemCodeArray = []; 
+            $CheckTableColumn = Schema::getColumnListing('item_masters');
+            foreach($CheckTableColumn as $keyname){   
+                if(!empty($keyname)){
                     
-        //             if($keyname == "ttp"){
-        //                 array_push($currentItemCodeArray, ['name' => ucwords($header[1]), 'old' => $currentItemCode->$keyname, 'new' => $value['sales_price']]);
-        //             }
-        //             elseif($keyname == "ttp_price_effective_date"){
-        //                 array_push($currentItemCodeArray, ['name' => ucwords($header[2]), 'old' => $currentItemCode->$keyname, 'new' => $value['sales_price_effective_date']]);
-        //             }
-        //         }
-        //     }
+                    if($keyname == "purchase_price"){
+                        array_push($currentItemCodeArray, ['name' => ucwords($header[1]), 'old' => $currentItemCode->$keyname, 'new' => $value['cost_price']]);
+                    }
+                }
+            }
 
             // if(count($currentItemCodeArray) > 0){
             //     $DetailsOfItem = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
@@ -140,30 +124,33 @@ class ItemPriceUploadController extends Controller
             //         'item_id'			=>	$currentItemCode->id,
             //         'brand_id'			=>	$currentItemCode->brands_id,
             //         'group_id'			=>	$currentItemCode->groups_id,
-            //         'action'			=>	"Upload (Costing)",
-            //         'ttp'               => $value['sales_price'],
-            //         'ttp_percentage'    => $commi_margin,
-            //         'old_ttp'           => $currentItemCode->ttp,
-            //         'old_ttp_percentage' => $currentItemCode->ttp_percentage,
+            //         'action'			=>	"Upload (Cost Price)",
+            //         'purchase_price'    => $value['cost_price'],
+                    
             //         'details'			=>	$DetailsOfItem,
             //         'created_by'		=>	$currentItemCode->created_by,
             //         'updated_by'		=>	CRUDBooster::myId()
             //     ]);
             // }
 
-        // }
+            // $trs_datas = [
+            //     'purchase_price' => $value['cost_price'],
+            //     'updated_at' => date('Y-m-d H:i:s')
+            // ];
 
-        Excel::import(new SalesPriceImport, $path);
+            // DB::connection('mysql_trs')->table('items')->where('tasteless_code', '=', (string)$value['tasteless_code'])->update($trs_datas);
+        }
+
+        Excel::import(new FulfillmentTypeImport, $path);
         return redirect('admin/item_masters')->with(['message_type' => 'success', 'message' => 'Upload complete!']);
 
 
     }
 
-    public function downloadPriceTemplate() 
-    {
-        $header = array("TASTELESS CODE","SALES PRICE","SALES PRICE EFFECTIVE DATE");
+    public function downloadFulfillmentTypeTemplate() {
+        $header = array("TASTELESS CODE","FULFILLMENT TYPE");
         
         $export = new ExcelTemplate([$header]);
-        return Excel::download($export, 'costing-format-'.date("Ymd").'-'.date("h.i.sa").'.csv');
+        return Excel::download($export, 'item-fulfillment-type-format-'.date("Ymd").'-'.date("h.i.sa").'.csv');
     }
 }

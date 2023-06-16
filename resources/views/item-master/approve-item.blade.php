@@ -7,6 +7,11 @@
 <link rel="stylesheet" href="{{asset('css/custom.css')}}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js" integrity="sha512-jVMFsAksn8aljb9IJ+3OCAq38dJpquMBjgEuz7Q5Oqu5xenfin/jxdbKw4P5eKjUF4xiG/GPT5CvCX3Io54gyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
+
+    .edited-field {
+        color: red;
+        outline: 2px solid red;
+    }
     table, tbody, td, th {
         border: 1px solid black !important;
         padding-left: 50px;
@@ -99,7 +104,7 @@
                             @endif
                             <tr>
                                 <th><span class="required-star">*</span> Item Description</th>
-                                <td><input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
+                                <td><input value="{{ $item->full_item_description ?: '' }}" title="{{ $item->full_item_description }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  Brand Description</th>
@@ -363,6 +368,19 @@
                                     <input value="{{ $item->moq_store }}" type="number" step="any" class="form-control" name="moq_store" id="moq_store" required readonly>
                                 </td>
                             </tr>
+                            @if ($item->tasteless_code)
+                            <tr>
+                                <th><span class="required-star">*</span> SKU Status</th>
+                                <td>
+                                    <select name="sku_statuses_id" id="sku_statuses_id" class="form-control" required disabled>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($sku_statuses as $sku_status)
+                                        <option value="{{ $sku_status->id }}" {{ $sku_status->id == $item->sku_statuses_id ? 'selected' : '' }}>{{ $sku_status->sku_status_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -391,13 +409,21 @@
 
                         @endphp
                         <tr>
-                            <th>Segmentation ({{ $value }})</th>
+                            <th>
+                                Segmentation ({{ $value }})
+                            </th>
                             <td>
+
                                 @foreach ($segmentations as $segmentation)
                                     @if (in_array($segmentation->segment_column_name, $selected[$id_name]))
                                     <span class="label label-info">{{ $segmentation->segment_column_description }}</span>
                                     @endif
                                 @endforeach
+                            </td>
+                            <td>
+                                @if (in_array($value, $segmentation_differences))
+                                🔴
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -423,6 +449,16 @@
 </div>
 
 <script type="application/javascript">
+    let differences = {!! json_encode($differences) !!} || {};
+    differences = Object.keys(differences);
+    console.log(differences);
+
+    $('input, select').each(function() {
+        const name = $(this).attr('name')
+        if (differences.includes(name)) {
+            $(this).addClass('edited-field');
+        }
+    });
 
     $('.action-btn').on('click', function() {
         const action = $(this).attr('_action');

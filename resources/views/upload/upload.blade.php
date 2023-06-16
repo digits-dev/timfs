@@ -24,34 +24,34 @@
                     <td>Item Master Fulfilment Type bulk import (Update)</td>
                     <td>Existing item master Fulfillment Type bulk update</td>
                     <td style="text-align: center">
-                        <a href="{{ route('getUpdateItems') }}" target="_parent"><button class="btn btn-primary" style="width:80%">Update Item Fulfilment Type Import</button></a>
+                        <a href="{{ route('getUpdateItemsFulfillmentType') }}" target="_parent"><button class="btn btn-primary" style="width:80%">Fulfillment Type Import</button></a>
                     </td>
                 </tr>
 
                 <tr>
                     <th scope="row">2</th>
-                    <td>Item price bulk import (Update)</td>
-                    <td>Scheduled item price bulk update</td>
+                    <td>Sales price bulk import (Update)</td>
+                    <td>Scheduled sales price bulk update</td>
                     <td style="text-align: center">
-                        <a href="{{ route('getUpdateItemsPrice') }}" target="_parent"><button class="btn btn-primary" style="width:80%">Item Price Import</button></a>
+                        <a href="{{ route('getUpdateItemsPrice') }}" target="_parent"><button class="btn btn-primary" style="width:80%">Sales Price Import</button></a>
                     </td>
                 </tr>
 
                 <tr>
                     <th scope="row">3</th>
-                    <td>Item SKU legend bulk import (Update)</td>
+                    <td>SKU legend bulk import (Update)</td>
                     <td>SKU legend bulk update</td>
                     <td style="text-align: center">
-                        <a href="{{ route('getUpdateItemsSkuLegend') }}" target="_parent"><button class="btn btn-primary" style="width:80%">Item SKU Legend Import</button></a>
+                        <a href="{{ route('getUpdateItemsSkuLegend') }}" target="_parent"><button class="btn btn-primary" style="width:80%">SKU Legend Import</button></a>
                     </td>
                 </tr>
 
                 <tr>
                     <th scope="row">4</th>
-                    <td>Item cost price bulk import (Update)</td>
-                    <td>Item cost price bulk update</td>
+                    <td>Cost price bulk import (Update)</td>
+                    <td>Cost price bulk update</td>
                     <td style="text-align: center">
-                        <a href="{{ route('getUpdateItemsCostPrice') }}" target="_parent"><button class="btn btn-primary" style="width:80%">Item Cost Price Import</button></a>
+                        <a href="{{ route('getUpdateItemsCostPrice') }}" target="_parent"><button class="btn btn-primary" style="width:80%">Cost Price Import</button></a>
                     </td>
                 </tr>
                 

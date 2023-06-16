@@ -41,6 +41,8 @@
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
 			$this->diffData = [];
 			$this->segments = Segmentation::where('status','ACTIVE')->orderBy('segment_column_description','ASC')->get();
+			$this->requestor = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
+			$this->approver = ['Purchasing Manager', 'Manager (Purchaser)'];
 		}
 	    
 	    public function cbInit() {
@@ -318,7 +320,8 @@
 	        | 
 	        */
 	        $this->addaction = array();
-			if (CRUDBooster::myPrivilegeName() == 'Purchasing Staff' || CRUDBooster::isSuperAdmin()) {
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			if (in_array($my_privilege, $this->requestor) || CRUDBooster::isSuperAdmin()) {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
@@ -607,21 +610,11 @@
 	    */
 	    public function hook_query_index(&$query) 
         {
-	        //Your code here
-			// $query->where(function($sub_query){
-			//     $create_item_status = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Create')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
-			//     $update_item_status = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Update')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
-			//     $update_item_status_1 = ApprovalWorkflowSetting::where('workflow_number', 2)->where('action_type', 'Update')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
-			
-			// 	$sub_query->where('item_masters.approval_status',	$create_item_status);
-			// 	$sub_query->orWhere('item_masters.approval_status',	$update_item_status);
-			// 	$sub_query->orWhere('item_masters.approval_status',	$update_item_status_1);
-		
-			// });
 
 			$query
 				->leftJoin('item_master_approvals', 'item_masters.tasteless_code', '=', 'item_master_approvals.tasteless_code')
 				->addSelect('item_master_approvals.approval_status as status_of_approval');
+				// ->orderByRaw(DB::raw('COALESCE(item_masters.updated_at, item_masters.created_at) desc'));
 	    }
 
 	    /*
@@ -894,6 +887,11 @@
 				->get()
 				->toArray();
 
+			$data['sku_statuses'] = DB::table('sku_statuses')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
 			// EDIT ITEM
 			$data['types'] = DB::table('types')
 				->where('status', 'ACTIVE')
@@ -950,7 +948,7 @@
 			unset($data['_token'], $data['segmentations'], $data['item_photo']);
 			$data['price'] = $data['ttp'];
 			$data['myob_item_description'] = $data['full_item_description'];
-			$data['sku_statuses_id'] = 1;
+			$data['sku_statuses_id'] = $input['sku_statuses_id'] ?? 1;
 			$data['type'] = 'Inventory Part';
 			$data['tax_status'] = $data['tax_codes_id'];
 			$data['tasteless_code'] = $tasteless_code;

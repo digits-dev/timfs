@@ -96,7 +96,7 @@
                             </tr>
                             @endif
                             <tr>
-                                <th><span class="required-star">{{ $action == 'edit' && !$item->image_filename ? '*' : '' }}</span> Item Photo</th>
+                                <th><span class="required-star">{{ $item->tasteless_code && !$item->image_filename ? '*' : '' }}</span> Item Photo</th>
                                 <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ $action == 'edit' && !$item->image_filename ? 'required' : '' }} ></td>
                             </tr>
                             <tr>
@@ -365,6 +365,19 @@
                                     <input value="{{ $item->moq_store }}" type="number" step="any" class="form-control" name="moq_store" id="moq_store" required>
                                 </td>
                             </tr>
+                            @if ($item->tasteless_code)
+                            <tr>
+                                <th><span class="required-star">*</span> SKU Status</th>
+                                <td>
+                                    <select name="sku_statuses_id" id="sku_statuses_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($sku_statuses as $sku_status)
+                                        <option value="{{ $sku_status->id }}" {{ $sku_status->id == $item->sku_statuses_id ? 'selected' : '' }}>{{ $sku_status->sku_status_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -482,7 +495,8 @@
         #groups_id,
         #categories_id,
         #subcategories_id,
-        #packagings_id
+        #packagings_id,
+        #sku_statuses_id
     `).select2({
         width: '100%',
         height: '100%',

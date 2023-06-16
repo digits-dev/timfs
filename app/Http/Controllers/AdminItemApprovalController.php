@@ -22,6 +22,8 @@
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
 			$this->main_controller = new AdminItemMastersController;
+			$this->requestor = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
+			$this->approver = ['Purchasing Manager', 'Manager (Purchaser)'];
 		}
 		
 	    public function cbInit() {
@@ -47,247 +49,247 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			//----added by cris 20200630
-        $this->col[] = ["label" => "Action Type", "name" => "action_type"];
-        $this->col[] = ["label" => "Approval Status", "name" => "approval_status"];
-        $this->col[] = ["label" => "Tasteless Code", "name" => "tasteless_code"];
-        $this->col[] = ["label" => "Type", "name" => "types_id", "join" => "types,type_description", "visible" => CRUDBooster::myColumnView()->type ? true : false];
-        $this->col[] = ["label" => "Item", "name" => "item", "visible" =>  true];
-        $this->col[] = ["label" => "Description", "name" => "full_item_description", "visible" => CRUDBooster::myColumnView()->full_item_description ? true : false];
-        $this->col[] = ["label" => "Tax Code", "name" => "tax_codes_id", "join" => "tax_codes,tax_code", "visible" => CRUDBooster::myColumnView()->tax_code ? true : false];
-        $this->col[] = ["label" => "Account", "name" => "accounts_id", "join" => "accounts,group_description", "visible" =>  true];
-        $this->col[] = ["label" => "COGS Account", "name" => "cogs_accounts_id", "join" => "cogs_accounts,group_description", "visible" =>  true];
-        $this->col[] = ["label" => "Asset Account", "name" => "asset_accounts_id", "join" => "asset_accounts,group_description", "visible" =>  true];
-        $this->col[] = ["label" => "Accumulated Depreciation", "name" => "accumulated_depreciation", "visible" =>  true];
-        $this->col[] = ["label" => "Purchase Description", "name" => "purchase_description", "visible" =>  true];
-        $this->col[] = ["label" => "Quantity On Hand", "name" => "quantity_on_hand", "visible" =>  true];
-        $this->col[] = ["label" => "Fulfillment Type", "name" => "fulfillment_type_id", "join" => "fulfillment_methods,fulfillment_method"];
-        $this->col[] = ["label" => "UOM", "name" => "uoms_id", "join" => "uoms,uom_description", "visible" => CRUDBooster::myColumnView()->uom ? true : false];
-        $this->col[] = ["label" => "UOM Set", "name" => "uoms_set_id", "join" => "uoms_set,uom_description", "visible" =>  true];
-        $this->col[] = ["label" => "Cost", "name" => "purchase_price", "visible" => CRUDBooster::myColumnView()->purchase_price ? true : false];
-        $this->col[] = ["label" => "TTP", "name" => "ttp", "visible" => CRUDBooster::myColumnView()->ttp ? true : false];
-        $this->col[] = ["label" => "Commi Margin", "name" => "ttp_percentage", "visible" => CRUDBooster::myColumnView()->ttp_percentage ? true : false];
-        $this->col[] = ["label" => "Landed Cost", "name" => "landed_cost", "visible" => CRUDBooster::myColumnView()->landed_cost ? true : false];
-        $this->col[] = ["label" => "Preffered Vendor", "name" => "suppliers_id", "join" => "suppliers,last_name", "visible" => CRUDBooster::myColumnView()->supplier ? true : false];
-        $this->col[] = ["label" => "Tax Agency", "name" => "tax_agency", "visible" =>  true];
-        $this->col[] = ["label" => "Reorder Pt (Min)", "name" => "reorder_pt", "visible" =>  true];
-        $this->col[] = ["label" => "MPN", "name" => "mpn", "visible" =>  true];
-        $this->col[] = ["label" => "Group", "name" => "groups_id", "join" => "groups,group_description", "visible" => CRUDBooster::myColumnView()->group ? true : false];
-        $this->col[] = ["label" => "Category Description", "name" => "categories_id", "join" => "categories,category_description", "visible" => CRUDBooster::myColumnView()->category_description ? true : false];
-        $this->col[] = ["label" => "Subcategory Description", "name" => "subcategories_id", "join" => "subcategories,subcategory_description", "visible" => CRUDBooster::myColumnView()->subcategory ? true : false];
-        $this->col[] = ["label" => "Dimension", "name" => "packaging_dimension", "visible" => CRUDBooster::myColumnView()->packaging_dimension ? true : false];
-        $this->col[] = ["label" => "Packaging Size", "name" => "packaging_size", "visible" => CRUDBooster::myColumnView()->packaging_size ? true : false];
-        $this->col[] = ["label" => "Packaging UOM", "name" => "packagings_id", "join" => "packagings,packaging_description", "visible" => CRUDBooster::myColumnView()->packaging ? true : false];
-        $this->col[] = ["label" => "Tax Status", "name" => "tax_codes_id", "join" => "tax_codes,tax_code", "visible" => CRUDBooster::myColumnView()->tax_code ? true : false];
-        // $this->col[] = ["label" => "Price", "name" => "price", "visible" =>  true];
-        $this->col[] = ["label" => "Supplier Item Code", "name" => "supplier_item_code", "visible" => CRUDBooster::myColumnView()->supplier_item_code ? true : false];
-        $this->col[] = ["label" => "MOQ Store", "name" => "moq_store", "visible" => CRUDBooster::myColumnView()->moq_store ? true : false];
-        $this->col[] = ["label" => "Account Number", "name" => "chart_accounts_id", "join" => "chart_accounts,account_number", "visible" => CRUDBooster::myColumnView()->chart_accounts ? true : false];
-        $this->col[] = ["label" => "Created Date", "name" => "created_at", "visible" => CRUDBooster::myColumnView()->create_date ? true : false];
-        $this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->create_by ? true : false];
-        $this->col[] = ["label" => "Updated Date", "name" => "updated_at", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
-        $this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
-        //--------------------------
+			$this->col[] = ["label" => "Action Type", "name" => "action_type"];
+			$this->col[] = ["label" => "Approval Status", "name" => "approval_status"];
+			$this->col[] = ["label" => "Tasteless Code", "name" => "tasteless_code"];
+			$this->col[] = ["label" => "Type", "name" => "types_id", "join" => "types,type_description", "visible" => CRUDBooster::myColumnView()->type ? true : false];
+			$this->col[] = ["label" => "Item", "name" => "item", "visible" =>  true];
+			$this->col[] = ["label" => "Description", "name" => "full_item_description", "visible" => CRUDBooster::myColumnView()->full_item_description ? true : false];
+			$this->col[] = ["label" => "Tax Code", "name" => "tax_codes_id", "join" => "tax_codes,tax_code", "visible" => CRUDBooster::myColumnView()->tax_code ? true : false];
+			$this->col[] = ["label" => "Account", "name" => "accounts_id", "join" => "accounts,group_description", "visible" =>  true];
+			$this->col[] = ["label" => "COGS Account", "name" => "cogs_accounts_id", "join" => "cogs_accounts,group_description", "visible" =>  true];
+			$this->col[] = ["label" => "Asset Account", "name" => "asset_accounts_id", "join" => "asset_accounts,group_description", "visible" =>  true];
+			$this->col[] = ["label" => "Accumulated Depreciation", "name" => "accumulated_depreciation", "visible" =>  true];
+			$this->col[] = ["label" => "Purchase Description", "name" => "purchase_description", "visible" =>  true];
+			$this->col[] = ["label" => "Quantity On Hand", "name" => "quantity_on_hand", "visible" =>  true];
+			$this->col[] = ["label" => "Fulfillment Type", "name" => "fulfillment_type_id", "join" => "fulfillment_methods,fulfillment_method"];
+			$this->col[] = ["label" => "UOM", "name" => "uoms_id", "join" => "uoms,uom_description", "visible" => CRUDBooster::myColumnView()->uom ? true : false];
+			$this->col[] = ["label" => "UOM Set", "name" => "uoms_set_id", "join" => "uoms_set,uom_description", "visible" =>  true];
+			$this->col[] = ["label" => "Cost", "name" => "purchase_price", "visible" => CRUDBooster::myColumnView()->purchase_price ? true : false];
+			$this->col[] = ["label" => "TTP", "name" => "ttp", "visible" => CRUDBooster::myColumnView()->ttp ? true : false];
+			$this->col[] = ["label" => "Commi Margin", "name" => "ttp_percentage", "visible" => CRUDBooster::myColumnView()->ttp_percentage ? true : false];
+			$this->col[] = ["label" => "Landed Cost", "name" => "landed_cost", "visible" => CRUDBooster::myColumnView()->landed_cost ? true : false];
+			$this->col[] = ["label" => "Preffered Vendor", "name" => "suppliers_id", "join" => "suppliers,last_name", "visible" => CRUDBooster::myColumnView()->supplier ? true : false];
+			$this->col[] = ["label" => "Tax Agency", "name" => "tax_agency", "visible" =>  true];
+			$this->col[] = ["label" => "Reorder Pt (Min)", "name" => "reorder_pt", "visible" =>  true];
+			$this->col[] = ["label" => "MPN", "name" => "mpn", "visible" =>  true];
+			$this->col[] = ["label" => "Group", "name" => "groups_id", "join" => "groups,group_description", "visible" => CRUDBooster::myColumnView()->group ? true : false];
+			$this->col[] = ["label" => "Category Description", "name" => "categories_id", "join" => "categories,category_description", "visible" => CRUDBooster::myColumnView()->category_description ? true : false];
+			$this->col[] = ["label" => "Subcategory Description", "name" => "subcategories_id", "join" => "subcategories,subcategory_description", "visible" => CRUDBooster::myColumnView()->subcategory ? true : false];
+			$this->col[] = ["label" => "Dimension", "name" => "packaging_dimension", "visible" => CRUDBooster::myColumnView()->packaging_dimension ? true : false];
+			$this->col[] = ["label" => "Packaging Size", "name" => "packaging_size", "visible" => CRUDBooster::myColumnView()->packaging_size ? true : false];
+			$this->col[] = ["label" => "Packaging UOM", "name" => "packagings_id", "join" => "packagings,packaging_description", "visible" => CRUDBooster::myColumnView()->packaging ? true : false];
+			$this->col[] = ["label" => "Tax Status", "name" => "tax_codes_id", "join" => "tax_codes,tax_code", "visible" => CRUDBooster::myColumnView()->tax_code ? true : false];
+			// $this->col[] = ["label" => "Price", "name" => "price", "visible" =>  true];
+			$this->col[] = ["label" => "Supplier Item Code", "name" => "supplier_item_code", "visible" => CRUDBooster::myColumnView()->supplier_item_code ? true : false];
+			$this->col[] = ["label" => "MOQ Store", "name" => "moq_store", "visible" => CRUDBooster::myColumnView()->moq_store ? true : false];
+			$this->col[] = ["label" => "Account Number", "name" => "chart_accounts_id", "join" => "chart_accounts,account_number", "visible" => CRUDBooster::myColumnView()->chart_accounts ? true : false];
+			$this->col[] = ["label" => "Created Date", "name" => "created_at", "visible" => CRUDBooster::myColumnView()->create_date ? true : false];
+			$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->create_by ? true : false];
+			$this->col[] = ["label" => "Updated Date", "name" => "updated_at", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
+			$this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
+			//--------------------------
 
-        # START FORM DO NOT REMOVE THIS LINE
-        $this->form = [];
-        //----added by cris 20200630
-		$this->form[] = ['label' => 'Tasteless Code', 'name' => 'tasteless_code', 'type' => 'text', 'readonly' => true, 'width' => 'col-sm-4'];
-		$this->form[] = [
-			'label' => 'Type', 'name' => 'types_id', 'type' => 'select2',
-			'validation' => CRUDBooster::myAddForm()->type ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-			'datatable' => 'types,type_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->type ?: 'display:none;'
-		];
-
-
-		$this->form[] = [
-			'label' => 'Item', 'name' => 'item', 'type' => 'text',
-			'validation' => 'required', 'width' => 'col-sm-4'
-		];
-
-		$this->form[] = [
-			'label' => 'Description', 'name' => 'full_item_description', 'type' => 'text',
-			'validation' => CRUDBooster::myAddForm()->full_item_description ? 'required|min:5|max:255' : '', 'width' => 'col-sm-4',
-			'style' => CRUDBooster::myAddForm()->full_item_description ?: 'display:none;'
-		];
-
-		$this->form[] = [
-			'label' => 'Tax Code', 'name' => 'tax_codes_id', 'type' => 'select2',
-			'validation' => CRUDBooster::myAddForm()->tax_code ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-			'datatable' => 'tax_codes,tax_code', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->tax_code ?: 'display:none;'
-		];
-
-		$this->form[] = [
-			'label' => 'Account', 'name' => 'accounts_id', 'type' => 'select2',
-			'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-			'datatable' => 'accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
-		];
-
-		$this->form[] = [
-			'label' => 'COGS Account', 'name' => 'cogs_accounts_id', 'type' => 'select2',
-			'validation' => CRUDBooster::myAddForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-			'datatable' => 'cogs_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
-		];
-
-		$this->form[] = [
-			'label' => 'Asset Account', 'name' => 'asset_accounts_id', 'type' => 'select2',
-			'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-			'datatable' => 'asset_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
-		];
-
-		$this->form[] = [
-			'label' => 'Accumulated Depreciation', 'name' => 'accumulated_depreciation', 'type' => 'number',
-			'validation' => 'min:0.00', 'width' => 'col-sm-4'
-		];
-
-		$this->form[] = [
-			'label' => 'Purchase Description', 'name' => 'purchase_description', 'type' => 'text',
-			'validation' => 'required|min:5|max:255', 'width' => 'col-sm-4', 'readonly' => true
-		];
-
-		$this->form[] = [
-			'label' => 'Quantity On Hand', 'name' => 'quantity_on_hand', 'type' => 'number',
-			'validation' => 'min:0.00', 'width' => 'col-sm-4'
-		];
-
-		$this->form[] = [
-			'label' => 'Fulfillment Type', 'name' => 'fulfillment_type_id', 'type' => 'select2',
-			'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-			'datatable' => 'fulfillment_methods,fulfillment_method', 'datatable_where' => "status='ACTIVE'"
-		];
-
-		$this->form[] = [
-			'label' => 'UOM', 'name' => 'uoms_id', 'type' => 'select2',
-			'validation' => CRUDBooster::myAddForm()->uom ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-			'datatable' => 'uoms,uom_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->uom ?: 'display:none;'
-		];
-
-		$this->form[] = [
-			'label' => 'UOM Set', 'name' => 'uoms_set_id', 'type' => 'select2',
-			'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-			'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'"
-		];
-
-		$this->form[] = [
-			'label' => 'Supplier Cost', 'name' => 'purchase_price', 'type' => 'number',
-			'validation' => CRUDBooster::myAddForm()->purchase_price ? 'required' : '', 'width' => 'col-sm-4',
-			'style' => CRUDBooster::myAddForm()->purchase_price ?: 'display:none;'
-		];
-
-		$this->form[] = [
-			'label' => 'Sales Price', 'name' => 'ttp', 'type' => 'number',
-			'validation' => CRUDBooster::myAddForm()->ttp ? 'required' : '', 'width' => 'col-sm-4',
-			'style' => CRUDBooster::myAddForm()->ttp ?: 'display:none;'
-		];
-
-		$this->form[] = [
-			'label' => 'Commi Margin', 'name' => 'ttp_percentage', 'type' => 'number', 'readonly' => true,
-			'validation' => CRUDBooster::myAddForm()->ttp_percentage ? 'required' : '', 'width' => 'col-sm-4',
-			'style' => CRUDBooster::myAddForm()->ttp_percentage ?: 'display:none;'
-		];
-
-		$this->form[] = [
-			'label' => 'Landed Cost', 'name' => 'landed_cost', 'type' => 'number',
-			'validation' => CRUDBooster::myAddForm()->landed_cost ? 'required' : '', 'width' => 'col-sm-4',
-			'style' => CRUDBooster::myAddForm()->landed_cost ?: 'display:none;'
-		];
+			# START FORM DO NOT REMOVE THIS LINE
+			$this->form = [];
+			//----added by cris 20200630
+			$this->form[] = ['label' => 'Tasteless Code', 'name' => 'tasteless_code', 'type' => 'text', 'readonly' => true, 'width' => 'col-sm-4'];
+			$this->form[] = [
+				'label' => 'Type', 'name' => 'types_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->type ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'types,type_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->type ?: 'display:none;'
+			];
 
 
+			$this->form[] = [
+				'label' => 'Item', 'name' => 'item', 'type' => 'text',
+				'validation' => 'required', 'width' => 'col-sm-4'
+			];
 
-		$this->form[] = [
-			'label' => 'Preferred Vendor', 'name' => 'suppliers_id', 'type' => 'select2',
-			'disabled' => CRUDBooster::myEditReadOnly()->supplier ? true : false,
-			'validation' => CRUDBooster::myEditForm()->supplier ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-			'datatable' => 'suppliers,last_name', 'style' => CRUDBooster::myAddForm()->supplier ?: 'display:none;'
-		];
+			$this->form[] = [
+				'label' => 'Description', 'name' => 'full_item_description', 'type' => 'text',
+				'validation' => CRUDBooster::myAddForm()->full_item_description ? 'required|min:5|max:255' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->full_item_description ?: 'display:none;'
+			];
 
-		$this->form[] = ['label' => 'Tax Agency', 'name' => 'tax_agency', 'type' => 'text', 'width' => 'col-sm-4'];
+			$this->form[] = [
+				'label' => 'Tax Code', 'name' => 'tax_codes_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->tax_code ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'tax_codes,tax_code', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->tax_code ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Account', 'name' => 'accounts_id', 'type' => 'select2',
+				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
+				'datatable' => 'accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'COGS Account', 'name' => 'cogs_accounts_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'cogs_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Asset Account', 'name' => 'asset_accounts_id', 'type' => 'select2',
+				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
+				'datatable' => 'asset_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Accumulated Depreciation', 'name' => 'accumulated_depreciation', 'type' => 'number',
+				'validation' => 'min:0.00', 'width' => 'col-sm-4'
+			];
+
+			$this->form[] = [
+				'label' => 'Purchase Description', 'name' => 'purchase_description', 'type' => 'text',
+				'validation' => 'required|min:5|max:255', 'width' => 'col-sm-4', 'readonly' => true
+			];
+
+			$this->form[] = [
+				'label' => 'Quantity On Hand', 'name' => 'quantity_on_hand', 'type' => 'number',
+				'validation' => 'min:0.00', 'width' => 'col-sm-4'
+			];
+
+			$this->form[] = [
+				'label' => 'Fulfillment Type', 'name' => 'fulfillment_type_id', 'type' => 'select2',
+				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
+				'datatable' => 'fulfillment_methods,fulfillment_method', 'datatable_where' => "status='ACTIVE'"
+			];
+
+			$this->form[] = [
+				'label' => 'UOM', 'name' => 'uoms_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->uom ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'uoms,uom_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->uom ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'UOM Set', 'name' => 'uoms_set_id', 'type' => 'select2',
+				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
+				'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'"
+			];
+
+			$this->form[] = [
+				'label' => 'Supplier Cost', 'name' => 'purchase_price', 'type' => 'number',
+				'validation' => CRUDBooster::myAddForm()->purchase_price ? 'required' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->purchase_price ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Sales Price', 'name' => 'ttp', 'type' => 'number',
+				'validation' => CRUDBooster::myAddForm()->ttp ? 'required' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->ttp ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Commi Margin', 'name' => 'ttp_percentage', 'type' => 'number', 'readonly' => true,
+				'validation' => CRUDBooster::myAddForm()->ttp_percentage ? 'required' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->ttp_percentage ?: 'display:none;'
+			];
+
+			$this->form[] = [
+				'label' => 'Landed Cost', 'name' => 'landed_cost', 'type' => 'number',
+				'validation' => CRUDBooster::myAddForm()->landed_cost ? 'required' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->landed_cost ?: 'display:none;'
+			];
 
 
 
-		$this->form[] = [
-			'label' => 'Reorder Pt (Min)', 'name' => 'reorder_pt', 'type' => 'number',
-			'validation' => 'min:0.00', 'width' => 'col-sm-4'
-		];
+			$this->form[] = [
+				'label' => 'Preferred Vendor', 'name' => 'suppliers_id', 'type' => 'select2',
+				'disabled' => CRUDBooster::myEditReadOnly()->supplier ? true : false,
+				'validation' => CRUDBooster::myEditForm()->supplier ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'suppliers,last_name', 'style' => CRUDBooster::myAddForm()->supplier ?: 'display:none;'
+			];
 
-		$this->form[] = ['label' => 'MPN', 'name' => 'mpn', 'type' => 'text', 'width' => 'col-sm-4'];
+			$this->form[] = ['label' => 'Tax Agency', 'name' => 'tax_agency', 'type' => 'text', 'width' => 'col-sm-4'];
 
-		$this->form[] = [
-			'label' => 'Group', 'name' => 'groups_id', 'type' => 'select2',
-			'validation' => CRUDBooster::myAddForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-			'datatable' => 'groups,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
-		];
 
-		$this->form[] = [
-			'label' => 'Category Description', 'name' => 'categories_id', 'type' => 'select',
-			'validation' => CRUDBooster::myAddForm()->category_description ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-			'datatable' => 'categories,category_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->category_description ?: 'display:none;'
-		];
 
-		$this->form[] = [
-			'label' => 'Subcategory Description', 'name' => 'subcategories_id', 'type' => 'select',
-			'validation' => CRUDBooster::myAddForm()->subcategory ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-			'datatable' => 'subcategories,subcategory_description', 'datatable_where' => "status=%27ACTIVE%27", 'parent_select' => 'categories_id', 'style' => CRUDBooster::myAddForm()->subcategory ?: 'display:none;'
-		];
+			$this->form[] = [
+				'label' => 'Reorder Pt (Min)', 'name' => 'reorder_pt', 'type' => 'number',
+				'validation' => 'min:0.00', 'width' => 'col-sm-4'
+			];
 
-		$this->form[] = [
-			'label' => 'Dimension', 'name' => 'packaging_dimension', 'type' => 'text',
-			'validation' => CRUDBooster::myAddForm()->packaging_dimension ? 'required|max:50' : '', 'width' => 'col-sm-4',
-			'style' => CRUDBooster::myAddForm()->packaging_dimension ?: 'display:none;'
-		];
+			$this->form[] = ['label' => 'MPN', 'name' => 'mpn', 'type' => 'text', 'width' => 'col-sm-4'];
 
-		$this->form[] = [
-			'label' => 'Packaging Size', 'name' => 'packaging_size', 'type' => 'number',
-			'validation' => CRUDBooster::myAddForm()->packaging_size ? 'required' : '', 'width' => 'col-sm-4',
-			'style' => CRUDBooster::myAddForm()->packaging_size ?: 'display:none;'
-		];
+			$this->form[] = [
+				'label' => 'Group', 'name' => 'groups_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'groups,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
+			];
 
-		$this->form[] = [
-			'label' => 'Cost', 'name' => 'cost', 'type' => 'number',
-			'validation' => 'required', 'width' => 'col-sm-4', 'readonly' => true
-		];
+			$this->form[] = [
+				'label' => 'Category Description', 'name' => 'categories_id', 'type' => 'select',
+				'validation' => CRUDBooster::myAddForm()->category_description ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'categories,category_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->category_description ?: 'display:none;'
+			];
 
-		$this->form[] = [
-			'label' => 'Packaging UOM', 'name' => 'packagings_id', 'type' => 'select2',
-			'validation' => CRUDBooster::myAddForm()->packaging ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-			'datatable' => 'packagings,packaging_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->packaging ?: 'display:none;'
-		];
+			$this->form[] = [
+				'label' => 'Subcategory Description', 'name' => 'subcategories_id', 'type' => 'select',
+				'validation' => CRUDBooster::myAddForm()->subcategory ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'subcategories,subcategory_description', 'datatable_where' => "status=%27ACTIVE%27", 'parent_select' => 'categories_id', 'style' => CRUDBooster::myAddForm()->subcategory ?: 'display:none;'
+			];
 
-		$this->form[] = [
-			'label' => 'Tax Status', 'name' => 'tax_status', 'type' => 'text',
-			'validation' => 'required', 'width' => 'col-sm-4', 'readonly' => true
-		];
+			$this->form[] = [
+				'label' => 'Dimension', 'name' => 'packaging_dimension', 'type' => 'text',
+				'validation' => CRUDBooster::myAddForm()->packaging_dimension ? 'required|max:50' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->packaging_dimension ?: 'display:none;'
+			];
 
-		$this->form[] = [
-			'label' => 'Price', 'name' => 'price', 'type' => 'number',
-			'validation' => 'required', 'width' => 'col-sm-4', 'readonly' => true
-		];
+			$this->form[] = [
+				'label' => 'Packaging Size', 'name' => 'packaging_size', 'type' => 'number',
+				'validation' => CRUDBooster::myAddForm()->packaging_size ? 'required' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->packaging_size ?: 'display:none;'
+			];
 
-		$this->form[] = [
-			'label' => 'Supplier Item Code', 'name' => 'supplier_item_code', 'type' => 'text',
-			'validation' => CRUDBooster::myAddForm()->supplier_item_code ? 'max:50' : '', 'width' => 'col-sm-4',
-			'style' => CRUDBooster::myAddForm()->supplier_item_code ?: 'display:none;'
-		];
+			$this->form[] = [
+				'label' => 'Cost', 'name' => 'cost', 'type' => 'number',
+				'validation' => 'required', 'width' => 'col-sm-4', 'readonly' => true
+			];
 
-		$this->form[] = [
-			'label' => 'MOQ Store', 'name' => 'moq_store', 'type' => 'number',
-			'validation' => CRUDBooster::myAddForm()->moq_store ? 'required' : '', 'width' => 'col-sm-4',
-			'style' => CRUDBooster::myAddForm()->moq_store ?: 'display:none;'
-		];
+			$this->form[] = [
+				'label' => 'Packaging UOM', 'name' => 'packagings_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->packaging ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'packagings,packaging_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->packaging ?: 'display:none;'
+			];
 
-		$this->form[] = [
-			'label' => 'SKU Status', 'name' => 'sku_statuses_id', 'type' => 'select2',
-			'validation' => CRUDBooster::myAddForm()->sku_status ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-			'datatable' => 'sku_statuses,sku_status_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->sku_status ?: 'display:none;'
-		];
+			$this->form[] = [
+				'label' => 'Tax Status', 'name' => 'tax_status', 'type' => 'text',
+				'validation' => 'required', 'width' => 'col-sm-4', 'readonly' => true
+			];
 
-		$this->form[] = ['label' => 'Account Number', 'name' => 'chart_accounts_id', 'type' => 'select2', 'datatable' => 'chart_accounts,account_number', 'width' => 'col-sm-4'];
+			$this->form[] = [
+				'label' => 'Price', 'name' => 'price', 'type' => 'number',
+				'validation' => 'required', 'width' => 'col-sm-4', 'readonly' => true
+			];
 
-		$segmentation_data = DB::table('segmentations')->where('status', 'ACTIVE')->orderBy('segment_column_code', 'asc')->get();
+			$this->form[] = [
+				'label' => 'Supplier Item Code', 'name' => 'supplier_item_code', 'type' => 'text',
+				'validation' => CRUDBooster::myAddForm()->supplier_item_code ? 'max:50' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->supplier_item_code ?: 'display:none;'
+			];
 
-		foreach ($segmentation_data as $segment) {
+			$this->form[] = [
+				'label' => 'MOQ Store', 'name' => 'moq_store', 'type' => 'number',
+				'validation' => CRUDBooster::myAddForm()->moq_store ? 'required' : '', 'width' => 'col-sm-4',
+				'style' => CRUDBooster::myAddForm()->moq_store ?: 'display:none;'
+			];
 
-			$this->form[] = ['label' => '+' . " " . $segment->segment_column_description, 'name' => $segment->segment_column_name, 'type' => 'checkbox-custom', 'width' => 'col-sm-4'];
-		}
+			$this->form[] = [
+				'label' => 'SKU Status', 'name' => 'sku_statuses_id', 'type' => 'select2',
+				'validation' => CRUDBooster::myAddForm()->sku_status ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+				'datatable' => 'sku_statuses,sku_status_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->sku_status ?: 'display:none;'
+			];
+
+			$this->form[] = ['label' => 'Account Number', 'name' => 'chart_accounts_id', 'type' => 'select2', 'datatable' => 'chart_accounts,account_number', 'width' => 'col-sm-4'];
+
+			$segmentation_data = DB::table('segmentations')->where('status', 'ACTIVE')->orderBy('segment_column_code', 'asc')->get();
+
+			foreach ($segmentation_data as $segment) {
+
+				$this->form[] = ['label' => '+' . " " . $segment->segment_column_description, 'name' => $segment->segment_column_name, 'type' => 'checkbox-custom', 'width' => 'col-sm-4'];
+			}
 			# END FORM DO NOT REMOVE THIS LINE
 
 			/* 
@@ -318,8 +320,8 @@
 	        */
 	        $this->addaction = array();
 			$my_privilege = CRUDBooster::myPrivilegeName();
-			$to_edit = in_array($my_privilege, ['Purchasing Staff', 'Encoder', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
-			$to_approve = in_array($my_privilege, ['Manager (Purchaser)', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
+			$to_edit = in_array($my_privilege, $this->requestor) || CRUDBooster::isSuperAdmin();
+			$to_approve = in_array($my_privilege, $this->approver) || CRUDBooster::isSuperAdmin();
 
 			if ($to_edit) {
 				$this->addaction[] = [
@@ -502,20 +504,22 @@
 	    public function hook_query_index(&$query) {
 			$my_privilege = CRUDBooster::myPrivilegeName();
 
+
+
 			$query->where(function($sub) {
 				$sub
 					->where('item_master_approvals.created_at', '>=', date('2023-06-07'))
 					->orWhere('item_master_approvals.updated_at', '>=', date('2023-06-07'));
 			});
 
-			if ($my_privilege == 'Purchasing Staff') {
+			if (in_array($my_privilege, $this->requestor)) {
 				$my_id = CRUDBooster::myId();
 				$query->whereRaw("
 					(item_master_approvals.action_type = 'CREATE' and item_master_approvals.created_by = $my_id)
 					or
 					(item_master_approvals.action_type = 'UPDATE' and item_master_approvals.updated_by = $my_id)
 				");
-			} else if ($my_privilege == 'Manager (Purchaser)') {
+			} else if (in_array($my_privilege, $this->approver)) {
 				$query->where('item_master_approvals.approval_status', '202');
 			}
 
@@ -614,7 +618,7 @@
 
 		public function getEdit($id) {
 			$my_privilege = CRUDBooster::myPrivilegeName();
-			$to_edit = in_array($my_privilege, ['Purchasing Staff', 'Encoder', 'Super Administrator', 'Supervisor (Purchaser)']) || CRUDBooster::isSuperAdmin();
+			$to_edit = in_array($my_privilege, $this->requestor) || CRUDBooster::isSuperAdmin();
 			if (!CRUDBooster::isUpdate() || !$to_edit)
 					CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
@@ -645,20 +649,57 @@
 
 		public function getApproveOrReject($id) {
 			$my_privilege = CRUDBooster::myPrivilegeName();
-			$to_approve = in_array($my_privilege, ['Manager (Purchaser)', 'Super Administrator']) || CRUDBooster::isSuperAdmin();
+			$to_approve = in_array($my_privilege, $this->approver) || CRUDBooster::isSuperAdmin();
 			if (!CRUDBooster::isUpdate() || !$to_approve)
 					CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
 				);
-
+			
+			$submaster_details = $this->main_controller->getSubmasters();
 			$data = [];
-			$data['item'] = DB::table('item_master_approvals')
+
+			$item_for_approval = DB::table('item_master_approvals')
 				->where('id', $id)
 				->get()
 				->first();
-			
-			$submaster_details = $this->main_controller->getSubmasters();
+
+			if ($item_for_approval->tasteless_code) {
+				$current_item = DB::table('item_masters')
+					->where('tasteless_code', $item_for_approval->tasteless_code)
+					->get()
+					->first();
+	
+				$differences = array_udiff_assoc(
+					(array) $item_for_approval,
+					(array) $current_item,
+					function ($a, $b) {
+						if (is_numeric($a) && is_numeric($b)) {
+							return (float) $a !== (float) $b;
+						} else {
+							return $a != $b;
+						}
+					}
+				);
+	
+				$paired_differences = [];
+				$sku_legends = array_column($submaster_details['sku_legends'], 'sku_legend');
+				$segmentation_differences = [];
+	
+				foreach ($differences as $key => $difference) {
+					$paired_differences[$key] = [];
+					$paired_differences[$key]['current'] = $current_item->{$key};
+					$paired_differences[$key]['new'] = $difference;
+					if (in_array($difference, $sku_legends)) {
+						$segmentation_differences[] = $difference;
+					}
+				}
+			}
+
+
+			$data['item'] = $item_for_approval;
+			$data['differences'] = $differences ?? [];
+			$data['segmentation_differences'] = $segmentation_differences ?? [];
 
 			$data = array_merge($data, $submaster_details);
 
@@ -666,7 +707,6 @@
 		}
 
 		public function approveOrReject(Request $request) {
-
 			$action = $request->get('action');
 			$item_master_approvals_id = $request->get('item_master_approvals_id');
 			return self::approve_or_reject([$item_master_approvals_id], $action);
