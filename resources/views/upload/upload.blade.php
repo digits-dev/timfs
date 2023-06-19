@@ -22,7 +22,7 @@
                 <tr>
                     <th scope="row">1</th>
                     <td>Item Master Fulfilment Type bulk import (Update)</td>
-                    <td>Existing item master Fulfillment Type bulk update</td>
+                    <td>Fulfillment Type bulk update</td>
                     <td style="text-align: center">
                         <a href="{{ route('getUpdateItemsFulfillmentType') }}" target="_parent"><button class="btn btn-primary" style="width:80%">Fulfillment Type Import</button></a>
                     </td>
