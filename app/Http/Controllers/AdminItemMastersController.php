@@ -952,7 +952,7 @@
 			$data['type'] = 'Inventory Part';
 			$data['tax_status'] = $data['tax_codes_id'];
 			$data['tasteless_code'] = $tasteless_code;
-			$data['image_filename'] = $filename;
+			if ($filename) $data['image_filename'] = $filename;
 
 			//segmentation => initializing all to 'X'
 			foreach ($segment_columns as $segment_column) {

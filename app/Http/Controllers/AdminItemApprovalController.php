@@ -664,42 +664,11 @@
 				->get()
 				->first();
 
-			if ($item_for_approval->tasteless_code) {
-				$current_item = DB::table('item_masters')
-					->where('tasteless_code', $item_for_approval->tasteless_code)
-					->get()
-					->first();
-	
-				$differences = array_udiff_assoc(
-					(array) $item_for_approval,
-					(array) $current_item,
-					function ($a, $b) {
-						if (is_numeric($a) && is_numeric($b)) {
-							return (float) $a !== (float) $b;
-						} else {
-							return $a != $b;
-						}
-					}
-				);
-	
-				$paired_differences = [];
-				$sku_legends = array_column($submaster_details['sku_legends'], 'sku_legend');
-				$segmentation_differences = [];
-	
-				foreach ($differences as $key => $difference) {
-					$paired_differences[$key] = [];
-					$paired_differences[$key]['current'] = $current_item->{$key};
-					$paired_differences[$key]['new'] = $difference;
-					if (in_array($difference, $sku_legends)) {
-						$segmentation_differences[] = $difference;
-					}
-				}
-			}
-
+			$differences = self::getUpdatedDetails($id);
 
 			$data['item'] = $item_for_approval;
-			$data['differences'] = $differences ?? [];
-			$data['segmentation_differences'] = $segmentation_differences ?? [];
+			$data['differences'] = $differences['differences'] ?? [];
+			$data['segmentation_differences'] = $differences['segmentation_differences'] ?? [];
 
 			$data = array_merge($data, $submaster_details);
 
@@ -737,6 +706,9 @@
 				}
 
 				if ($action == 'approve') {
+					$differences = self::getUpdatedDetails($id);
+					$paired_differences = $differences['paired_differences'];
+
 					ItemMasterApproval::where('id', $id)->update([
 						'approval_status' => '200',
 						'tasteless_code' => $tasteless_code,
@@ -744,7 +716,71 @@
 						'approved_at_1' => $time_stamp,
 					]);
 					unset($item->id);
-					ItemMaster::updateOrInsert(['tasteless_code' => $item->tasteless_code], (array) $item);
+					$inserted_item = ItemMaster::updateOrCreate(['tasteless_code' => $item->tasteless_code], (array) $item);
+
+					$details_of_item = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
+					$new_values = $differences['new_values'];
+					$old_values = $differences['old_values'];
+
+					if ($paired_differences) {
+						foreach ($paired_differences as $column_name => $paired_difference) {
+							$details_of_item .= "<tr><td>".$column_name."</td><td>".$paired_difference['current']."</td><td>".$paired_difference['new']."</td></tr>";
+						}
+	
+						$details_of_item .= '</tbody></table>';
+	
+						DB::table('history_item_masterfile')->insert([
+							'tasteless_code' =>	$new_values->tasteless_code,
+							'item_id' => $old_values->id ?? $inserted_item->id,
+							'brand_id' => $new_values->brands_id,
+							'group_id' => $new_values->groups_id,
+							'action' => "UPDATE",
+							'brand_id' => $new_values->brands_id,
+							'ttp' => $new_values->sales_price,
+							'ttp_percentage' => $new_values->commi_margin,
+							'old_ttp' => $new_values->ttp,
+							'old_ttp_percentage' => $new_values->ttp_percentage,
+							'details' => $details_of_item,
+							'created_by' => $new_values->created_by,
+							'updated_by' => $new_values->updated_by,
+						]);
+					}
+
+					if (array_key_exists('ttp', $paired_differences) || !$old_values) {
+						DB::table('history_ttps')
+							->insert([
+								'tasteless_code' => $new_values->tasteless_code,
+								'item_id' => $old_values->id ?? $inserted_item->id,
+								'brand_id' => $new_values->brands_id,
+								'ttp' => $new_values->ttp,
+								'ttp_percentage' => $new_values->ttp_percentage,
+								'created_at' => $time_stamp,
+							]);
+					}
+
+					if (array_key_exists('purchase_price') || !$old_values) {
+						DB::table('history_purchase_prices')
+							->insert([
+								'tasteless_code' => $new_values->tasteless_code,
+								'item_id' => $old_values->id ?? $inserted_item->id,
+								'brand_id' => $new_values->brands_id,
+								'purchase_price' => $new_values->purchase_price,
+								'currencies_id' => $new_values->currencies_id,
+								'created_at' => $time_stamp
+							]);
+					}
+
+					if (array_key_exists('landed_cost') || !$old_values) {
+						DB::table('history_landed_costs')
+							->insert([
+								'tasteless_code' => $new_values->tasteless_code,
+								'item_id' => $old_values->id,
+								'brand_id' => $new_values->brands_id,
+								'landed_cost' => $new_values->landed_cost,
+								'created_at' => $time_stamp
+							]);
+					}
+
 				} else if ($action == 'reject') {
 					ItemMasterApproval::where('id', $id)->update([
 						'approval_status' => '400',
@@ -768,5 +804,54 @@
 					'message_type' => $message_type,
 					'message' => $message,
 				])->send();
+		}
+
+		public function getUpdatedDetails($item_master_approvals_id) {
+			$item_for_approval = DB::table('item_master_approvals')
+				->where('id', $item_master_approvals_id)
+				->get()
+				->first();
+
+			if ($item_for_approval->tasteless_code) {
+				$submaster_details = $this->main_controller->getSubmasters();
+				$current_item = DB::table('item_masters')
+					->where('tasteless_code', $item_for_approval->tasteless_code)
+					->get()
+					->first();
+	
+				$differences = array_udiff_assoc(
+					(array) $item_for_approval,
+					(array) $current_item,
+					function ($a, $b) {
+						if (is_numeric($a) && is_numeric($b)) {
+							return (float) $a !== (float) $b;
+						} else {
+							return $a != $b;
+						}
+					}
+				);
+	
+				$paired_differences = [];
+				$sku_legends = array_column($submaster_details['sku_legends'], 'sku_legend');
+				$segmentation_differences = [];
+	
+				foreach ($differences as $key => $difference) {
+					$paired_differences[$key] = [];
+					$paired_differences[$key]['current'] = $current_item->{$key};
+					$paired_differences[$key]['new'] = $difference;
+					if (in_array($difference, $sku_legends)) {
+						$segmentation_differences[] = $difference;
+					}
+				}
+			}
+
+			return [
+				'differences' => $differences,
+				'paired_differences' => $paired_differences,
+				'segmentation_differences' => $segmentation_differences,
+				'old_values' => $current_item,
+				'new_values' => $item_for_approval,
+			];
+			
 		}
 	}
