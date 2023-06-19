@@ -313,6 +313,42 @@
 
 ---
 
+## 🔖 Item Master
+
+- ### ✅ TODOS:
+  - [x] Creation of new item
+    1. Purchasing Encoder encodes the new item in create page.
+    2. Item will be pushed to pending items.
+    3. Purchasing Manager approves or rejects the item. If approved, new item will be added to main table `item_masters`, if rejected, purchasing encoder can still edit the item. ⚠️ **Important:** Pending items can not be edited again until approved or rejected by the approver.
+  - [x] Update of existing item
+    1. Purchasing Encoder edits the details of an existing item in edit page.
+    2. Item will be pushed to pending items.
+    3. Purchasing Manager approves or rejects the item. If approved, new details of item will be updated to main table `item_masters`, if rejected, purchasing encoder can still edit the item. ⚠️ **Important:** Pending items can not be edited again until approved or rejected by the approver.
+  - [x] Merge Encoder and View III
+  - [x] Fix the errors on export
+    - TTP History
+    - Purchase Price History
+    - Add button
+  - [x] Once rejected, should be able to edit again
+  - [x] Show **Updated by** column in index page
+  - [x] Highlight changed / updated details on approval page
+  - [x] Update the SKU statuses
+    - Active
+    - Inactive
+    - For Depletion
+  - [x] Update SKU legends
+    - Core
+    - Alternative
+    - Perishable
+    - X
+  - [x] Bulk upload (for approval)
+    - Item Master Fulfilment Type bulk import (Update)
+    - Sales price bulk import (Update)
+    - SKU legend bulk import (Update)
+    - Cost price bulk import (Update)
+
+---
+
 ## 🖋️ Author:
 
 - Fillinor Gunio
