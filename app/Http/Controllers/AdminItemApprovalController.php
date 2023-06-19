@@ -699,7 +699,7 @@
 
 				$tasteless_code = $item->tasteless_code;
 				if (!$tasteless_code) {
-					$groups_id = ItemMasterApproval::where('id', $id)->first()->groups_id;
+					$groups_id = $item->groups_id;
 					$group = Group::find($groups_id);
 					$tasteless_code = $this->main_controller->getTastelessCode($group);
 					$item->tasteless_code = $tasteless_code;
@@ -758,7 +758,7 @@
 							]);
 					}
 
-					if (array_key_exists('purchase_price') || !$old_values) {
+					if (array_key_exists('purchase_price', $paired_differences) || !$old_values) {
 						DB::table('history_purchase_prices')
 							->insert([
 								'tasteless_code' => $new_values->tasteless_code,
@@ -770,7 +770,7 @@
 							]);
 					}
 
-					if (array_key_exists('landed_cost') || !$old_values) {
+					if (array_key_exists('landed_cost', $paired_differences) || !$old_values) {
 						DB::table('history_landed_costs')
 							->insert([
 								'tasteless_code' => $new_values->tasteless_code,
