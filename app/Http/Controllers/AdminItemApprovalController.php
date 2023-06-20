@@ -850,9 +850,9 @@
 						$segmentation_differences[] = $current_item->{$key};
 					} 
 				}
+				$segmentation_differences = array_unique($segmentation_differences);
 			}
 
-			$segmentation_differences = array_unique($segmentation_differences);
 
 			return [
 				'differences' => $differences,
