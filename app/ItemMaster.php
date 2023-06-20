@@ -9,7 +9,7 @@ class ItemMaster extends Model
 {
     protected $table = 'item_masters';
 
-    protected $fillable = ['tasteless_code'];
+    protected $guarded = [];
 
     public static function boot()
     {

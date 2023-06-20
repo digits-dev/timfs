@@ -87,7 +87,7 @@
 			$this->col[] = ["label" => "Created Date", "name" => "created_at", "visible" => CRUDBooster::myColumnView()->create_date ? true : false];
 			$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->create_by ? true : false];
 			$this->col[] = ["label" => "Updated Date", "name" => "updated_at", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
-			$this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
+			$this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->update_by ? true : false];
 			//--------------------------
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -707,7 +707,7 @@
 
 				if ($action == 'approve') {
 					$differences = self::getUpdatedDetails($id);
-					$paired_differences = $differences['paired_differences'];
+					$paired_differences = $differences['paired_differences'] ?? [];
 
 					ItemMasterApproval::where('id', $id)->update([
 						'approval_status' => '200',
@@ -716,44 +716,50 @@
 						'approved_at_1' => $time_stamp,
 					]);
 					unset($item->id);
-					$inserted_item = ItemMaster::updateOrCreate(['tasteless_code' => $item->tasteless_code], (array) $item);
+
+					$inserted_item = ItemMaster::updateOrCreate(
+						['tasteless_code' => $item->tasteless_code],
+						(array) $item,
+					);
 
 					$details_of_item = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
 					$new_values = $differences['new_values'];
 					$old_values = $differences['old_values'];
 
-					if ($paired_differences) {
-						foreach ($paired_differences as $column_name => $paired_difference) {
+					if ($paired_differences || !$old_values) {
+						foreach ($paired_differences  as $column_name => $paired_difference) {
 							$details_of_item .= "<tr><td>".$column_name."</td><td>".$paired_difference['current']."</td><td>".$paired_difference['new']."</td></tr>";
 						}
 	
 						$details_of_item .= '</tbody></table>';
+
+						if (!$old_values) $details_of_item = 'NEW ITEM';
 	
 						DB::table('history_item_masterfile')->insert([
-							'tasteless_code' =>	$new_values->tasteless_code,
+							'tasteless_code' =>	$inserted_item->tasteless_code,
 							'item_id' => $old_values->id ?? $inserted_item->id,
-							'brand_id' => $new_values->brands_id,
-							'group_id' => $new_values->groups_id,
-							'action' => "UPDATE",
-							'brand_id' => $new_values->brands_id,
-							'ttp' => $new_values->sales_price,
-							'ttp_percentage' => $new_values->commi_margin,
-							'old_ttp' => $new_values->ttp,
-							'old_ttp_percentage' => $new_values->ttp_percentage,
+							'brand_id' => $inserted_item->brands_id,
+							'group_id' => $inserted_item->groups_id,
+							'action' => $inserted_item->action_type,
+							'brand_id' => $inserted_item->brands_id,
+							'ttp' => $inserted_item->sales_price,
+							'ttp_percentage' => $inserted_item->ttp_percentage,
+							'old_ttp' => $inserted_item->ttp,
+							'old_ttp_percentage' => $old_values->ttp_percentage,
 							'details' => $details_of_item,
-							'created_by' => $new_values->created_by,
-							'updated_by' => $new_values->updated_by,
+							'created_by' => $inserted_item->created_by,
+							'updated_by' => $inserted_item->updated_by,
 						]);
 					}
 
 					if (array_key_exists('ttp', $paired_differences) || !$old_values) {
 						DB::table('history_ttps')
 							->insert([
-								'tasteless_code' => $new_values->tasteless_code,
+								'tasteless_code' => $inserted_item->tasteless_code,
 								'item_id' => $old_values->id ?? $inserted_item->id,
-								'brand_id' => $new_values->brands_id,
-								'ttp' => $new_values->ttp,
-								'ttp_percentage' => $new_values->ttp_percentage,
+								'brand_id' => $inserted_item->brands_id,
+								'ttp' => $inserted_item->ttp,
+								'ttp_percentage' => $inserted_item->ttp_percentage,
 								'created_at' => $time_stamp,
 							]);
 					}
@@ -761,11 +767,11 @@
 					if (array_key_exists('purchase_price', $paired_differences) || !$old_values) {
 						DB::table('history_purchase_prices')
 							->insert([
-								'tasteless_code' => $new_values->tasteless_code,
+								'tasteless_code' => $inserted_item->tasteless_code,
 								'item_id' => $old_values->id ?? $inserted_item->id,
-								'brand_id' => $new_values->brands_id,
-								'purchase_price' => $new_values->purchase_price,
-								'currencies_id' => $new_values->currencies_id,
+								'brand_id' => $inserted_item->brands_id,
+								'purchase_price' => $inserted_item->purchase_price,
+								'currencies_id' => $inserted_item->currencies_id,
 								'created_at' => $time_stamp
 							]);
 					}
@@ -773,10 +779,10 @@
 					if (array_key_exists('landed_cost', $paired_differences) || !$old_values) {
 						DB::table('history_landed_costs')
 							->insert([
-								'tasteless_code' => $new_values->tasteless_code,
-								'item_id' => $old_values->id,
-								'brand_id' => $new_values->brands_id,
-								'landed_cost' => $new_values->landed_cost,
+								'tasteless_code' => $inserted_item->tasteless_code,
+								'item_id' => $old_values->id ?? $inserted_item->id,
+								'brand_id' => $inserted_item->brands_id,
+								'landed_cost' => $inserted_item->landed_cost,
 								'created_at' => $time_stamp
 							]);
 					}
@@ -799,11 +805,11 @@
 				$message = '✖️ Item successfully rejected.';
 			}
 
-			return redirect(CRUDBooster::mainpath())
-				->with([
-					'message_type' => $message_type,
-					'message' => $message,
-				])->send();
+			return CRUDBooster::redirect(
+				CRUDBooster::mainPath(), 
+				$message, 
+				$message_type
+			)->send();
 		}
 
 		public function getUpdatedDetails($item_master_approvals_id) {

@@ -87,7 +87,7 @@
     		$this->col[] = ["label" => "Landed Cost", "name" => "landed_cost", "visible" => CRUDBooster::myColumnView()->landed_cost ? true : false];
             $this->col[] = ["label" => "Commi Margin", "name" => "ttp_percentage", "visible" => CRUDBooster::myColumnView()->landed_cost ? true : false];
             $this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->create_by ? true : false];
-    		$this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
+    		$this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->update_by ? true : false];
 		
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
@@ -991,7 +991,7 @@
 				->with([
 					'message_type' => 'success',
 					'message' => '✔️ Item added to Pending Items...',
-				]);
+				])->send();
 			
 		}
 
