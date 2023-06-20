@@ -354,7 +354,7 @@
 	        | 
 	        */
 	        $this->button_selected = array();
-			if (CRUDBooster::isUpdate() && (in_array(CRUDBooster::myPrivilegeName(),['Administrator','Supervisor (Purchaser)','Supervisor (Accounting)','Cost Accounting','Manager (Accounting)','Manager (Purchaser)']) || CRUDBooster::isSuperadmin()) ) {
+			if (in_array(CRUDBooster::myPrivilegeName(), $this->approver) || CRUDBooster::isSuperadmin()) {
 	        	$this->button_selected[] = ['label'=>'APPROVE','icon'=>'fa fa-check','name'=>'approve'];
 				$this->button_selected[] = ['label'=>'REJECT','icon'=>'fa fa-times','name'=>'reject'];
 			}
