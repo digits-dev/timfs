@@ -112,37 +112,10 @@ class ItemFulfillmentTypeUploadController extends Controller
                 }
             }
 
-            // if(count($currentItemCodeArray) > 0){
-            //     $DetailsOfItem = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
-            //     foreach ($currentItemCodeArray as $key => $ItemVal) {
-            //         $DetailsOfItem .= "<tr><td>".$ItemVal['name']."</td><td>".$ItemVal['old']."</td><td>".$ItemVal['new']."</td></tr>";
-            //     }
-            //     $DetailsOfItem .= '</tbody></table>';
-                
-            //     DB::table('history_item_masterfile')->insert([
-            //         'tasteless_code'	=>	$currentItemCode->tasteless_code,
-            //         'item_id'			=>	$currentItemCode->id,
-            //         'brand_id'			=>	$currentItemCode->brands_id,
-            //         'group_id'			=>	$currentItemCode->groups_id,
-            //         'action'			=>	"Upload (Cost Price)",
-            //         'purchase_price'    => $value['cost_price'],
-                    
-            //         'details'			=>	$DetailsOfItem,
-            //         'created_by'		=>	$currentItemCode->created_by,
-            //         'updated_by'		=>	CRUDBooster::myId()
-            //     ]);
-            // }
-
-            // $trs_datas = [
-            //     'purchase_price' => $value['cost_price'],
-            //     'updated_at' => date('Y-m-d H:i:s')
-            // ];
-
-            // DB::connection('mysql_trs')->table('items')->where('tasteless_code', '=', (string)$value['tasteless_code'])->update($trs_datas);
         }
 
         Excel::import(new FulfillmentTypeImport, $path);
-        return redirect('admin/item_masters')->with(['message_type' => 'success', 'message' => 'Upload complete!']);
+        return CRUDBooster::redirect(CRUDBooster::adminPath('item_masters'), 'Upload Complete!', 'success')->send();
 
 
     }

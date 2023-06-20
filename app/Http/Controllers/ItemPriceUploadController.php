@@ -102,59 +102,9 @@ class ItemPriceUploadController extends Controller
         if(!empty($errors)){
             return redirect('admin/item_masters')->with(['message_type' => 'danger', 'message' => 'Failed ! Please check '.implode(", ",$errors)]);
         }
-        
-        // foreach ($excelData[0] as $key => $value)
-        // {
-        //     $currentItemCode = ItemMaster::where('tasteless_code', (string)$value['tasteless_code'])->first();
-            
-        //     if($value['sales_price'] != 0){
-        //         $commi_margin = ($value['sales_price'] - $currentItemCode->landed_cost)/$value['sales_price'];
-        //     }else{
-        //         $commi_margin = 0.00;
-        //     }
-            
-        //     // History logs for item master
-        //     $currentItemCodeArray = []; 
-        //     $CheckTableColumn = Schema::getColumnListing('item_masters');
-        //     foreach($CheckTableColumn as $keyname){   
-        //         if(!empty($keyname)){
-                    
-        //             if($keyname == "ttp"){
-        //                 array_push($currentItemCodeArray, ['name' => ucwords($header[1]), 'old' => $currentItemCode->$keyname, 'new' => $value['sales_price']]);
-        //             }
-        //             elseif($keyname == "ttp_price_effective_date"){
-        //                 array_push($currentItemCodeArray, ['name' => ucwords($header[2]), 'old' => $currentItemCode->$keyname, 'new' => $value['sales_price_effective_date']]);
-        //             }
-        //         }
-        //     }
-
-            // if(count($currentItemCodeArray) > 0){
-            //     $DetailsOfItem = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
-            //     foreach ($currentItemCodeArray as $key => $ItemVal) {
-            //         $DetailsOfItem .= "<tr><td>".$ItemVal['name']."</td><td>".$ItemVal['old']."</td><td>".$ItemVal['new']."</td></tr>";
-            //     }
-            //     $DetailsOfItem .= '</tbody></table>';
-                
-            //     DB::table('history_item_masterfile')->insert([
-            //         'tasteless_code'	=>	$currentItemCode->tasteless_code,
-            //         'item_id'			=>	$currentItemCode->id,
-            //         'brand_id'			=>	$currentItemCode->brands_id,
-            //         'group_id'			=>	$currentItemCode->groups_id,
-            //         'action'			=>	"Upload (Costing)",
-            //         'ttp'               => $value['sales_price'],
-            //         'ttp_percentage'    => $commi_margin,
-            //         'old_ttp'           => $currentItemCode->ttp,
-            //         'old_ttp_percentage' => $currentItemCode->ttp_percentage,
-            //         'details'			=>	$DetailsOfItem,
-            //         'created_by'		=>	$currentItemCode->created_by,
-            //         'updated_by'		=>	CRUDBooster::myId()
-            //     ]);
-            // }
-
-        // }
 
         Excel::import(new SalesPriceImport, $path);
-        return redirect('admin/item_masters')->with(['message_type' => 'success', 'message' => 'Upload complete!']);
+        return CRUDBooster::redirect(CRUDBooster::adminPath('item_masters'), 'Upload Complete!', 'success')->send();
 
 
     }

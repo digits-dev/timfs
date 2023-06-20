@@ -112,7 +112,7 @@ class ItemSegmentationUploadController extends Controller
         }
 
         Excel::import(new ItemSegmentationImport, $path);
-        return redirect('admin/item_masters')->with(['message_type' => 'success', 'message' => 'Upload complete!']);
+        return CRUDBooster::redirect(CRUDBooster::adminPath('item_masters'), 'Upload Complete!', 'success')->send();
     }
 
     public function downloadSKULegendTemplate() {
