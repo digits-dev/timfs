@@ -845,11 +845,14 @@
 					$paired_differences[$key] = [];
 					$paired_differences[$key]['current'] = $current_item->{$key};
 					$paired_differences[$key]['new'] = $difference;
-					if (in_array($difference, $sku_legends)) {
+					if (in_array($difference, $sku_legends) || $difference == 'X') {
 						$segmentation_differences[] = $difference;
-					}
+						$segmentation_differences[] = $current_item->{$key};
+					} 
 				}
 			}
+
+			$segmentation_differences = array_unique($segmentation_differences);
 
 			return [
 				'differences' => $differences,
