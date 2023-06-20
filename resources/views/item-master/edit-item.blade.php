@@ -97,7 +97,7 @@
                             @endif
                             <tr>
                                 <th><span class="required-star">{{ $item->tasteless_code && !$item->image_filename ? '*' : '' }}</span> Item Photo</th>
-                                <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ $action == 'edit' && !$item->image_filename ? 'required' : '' }} ></td>
+                                <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ $item->tasteless_code && !$item->image_filename ? 'required' : '' }} ></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Item Description</th>
