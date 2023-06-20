@@ -2,7 +2,8 @@
 
 namespace App\Imports;
 
-use App\ItemMaster;
+use DB;
+use App\ItemMasterApproval;
 use App\Segmentation;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\Importable;
@@ -20,7 +21,10 @@ class ItemSegmentationImport implements ToModel, WithHeadingRow, WithChunkReadin
     */
     public function model(array $row)
     {  
-        $sku_datas = array();  
+        $sku_datas = DB::table('sku_legends') 
+            ->where('status', 'ACTIVE')
+            ->pluck('sku_legend')
+            ->toArray();
         $data_segments = array();
         $segment_cols = self::getActiveSkuLegend();
 
@@ -32,7 +36,10 @@ class ItemSegmentationImport implements ToModel, WithHeadingRow, WithChunkReadin
             }
         }
 
-        ItemMaster::where('tasteless_code', '=', (string)$row['tasteless_code'])->update($data_segments);
+        $data_segments['approval_status'] = '202';
+
+
+        ItemMasterApproval::where('tasteless_code', '=', (string)$row['tasteless_code'])->update($data_segments);
     }
 
     public function chunkSize(): int

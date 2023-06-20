@@ -88,7 +88,7 @@ class ItemSegmentationUploadController extends Controller
         $data_segments = array();
         $sku_datas = array();
         $skus =  DB::table('sku_legends')->where('status','ACTIVE')->orderBy('sku_legend','ASC')->get();
-            
+        
         foreach($skus as $sku){
             array_push($sku_datas, $sku->sku_legend);
         }
@@ -109,56 +109,6 @@ class ItemSegmentationUploadController extends Controller
 
         if(!empty($errors)){
             return redirect('admin/item_masters')->with(['message_type' => 'danger', 'message' => 'Failed ! Please check '.implode(", ",$errors)]);
-        }
-
-        foreach ($excelData[0] as $key => $value){
-
-            $oldItemDetail = ItemMaster::where('tasteless_code', (string)$value['tasteless_code'])->first();							
-            $itemHistory = [];
-            // $collection = collect($value->keys());
-            foreach($segment_cols as $k_seg => $seg){
-                // if($collection->search($seg, true) != false)
-                // {
-                    if($value[$seg] != $oldItemDetail->$k_seg){
-                        array_push($itemHistory, [
-                            'fullname' 	=> $seg, 
-                            'name' 		=> $k_seg, 
-                            'old' 		=> $oldItemDetail->$k_seg, 
-                            'new' 		=> $value[$seg]
-                        ]);
-                    }
-                // }
-            }
-
-            if(count($itemHistory) > 0){
-                $DetailsOfItem = '<table class="table table-striped"><thead><tr><th>Name</th><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
-                foreach ($itemHistory as $key => $item) {
-                    $DetailsOfItem .= "<tr><td>".$item['fullname']."</td><td>".$item['name']."</td><td>".$item['old']."</td><td>".$item['new']."</td></tr>";
-                }
-                $DetailsOfItem .= '</tbody></table>';
-
-                DB::table('history_item_masterfile')->insert([
-                    'tasteless_code'	=>	$oldItemDetail->tasteless_code,
-                    'item_id'			=>	$oldItemDetail->id,
-                    'brand_id'			=>	$oldItemDetail->brands_id,
-                    'group_id'			=>	$oldItemDetail->groups_id,
-                    'action'			=>	"Upload (Segmentation)",
-                    'details'			=>	$DetailsOfItem,
-                    'created_by'		=>	$oldItemDetail->created_by,
-                    'updated_by'		=>	CRUDBooster::myId()
-                ]);
-            }
-
-            foreach($segment_cols as $k_seg => $seg){
-                if(!is_null($value[$seg])){
-                    if(in_array($value[$seg],$sku_datas)){
-                        $data_segments[$k_seg] = $value[$seg];
-                    }
-                        
-                }
-            }
-
-            DB::connection('mysql_trs')->table('items')->where('tasteless_code', '=', (string)$value->tasteless_code)->update($data_segments);
         }
 
         Excel::import(new ItemSegmentationImport, $path);
