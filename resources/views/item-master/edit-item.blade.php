@@ -81,10 +81,13 @@
         <h3 class="text-center text-bold">Item Masterfile</h3>
     </div>
     <div class="panel-body">
-        <form action="{{ route('item_maters_submit_add_or_edit') }}" enctype="multipart/form-data" method="POST" class="form-main" autocomplete="off">
+        <form action="{{ $table == 'item_master_approvals' ? route('item_mater_approvals_submit_edit') : route('item_maters_submit_add_or_edit') }}" enctype="multipart/form-data" method="POST" class="form-main" autocomplete="off">
             <h3 class="text-center text-bold">ITEM DETAILS</h3>
             @csrf
             <input value="{{ $item->tasteless_code }}" name="tasteless_code" type="text" class="tasteless_code hide">
+            @if ($item_masters_approvals_id)
+            <input type="text" name="item_masters_approvals_id" value="{{ $item_masters_approvals_id }}" class="hide">
+            @endif
             <div class="row">
                 <div class="col-md-6">
                     <table class="table-responsive table">

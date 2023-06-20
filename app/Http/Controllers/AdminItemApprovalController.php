@@ -633,6 +633,10 @@
 
 			$data['action'] = 'edit';
 
+			$data['item_masters_approvals_id'] = $id;
+
+			$data['from'] = 'item_master_approvals';
+
 			if ($data['item']->approval_status == 202) {
 				return redirect(CRUDBooster::mainpath())->with([
 					'message_type' => 'danger',
@@ -645,6 +649,10 @@
 			$data = array_merge($data, $submaster_details);
 
 			return $this->view('item-master/edit-item', $data);
+		}
+
+		public function submitEdit(Request $request) {
+			return $this->main_controller->submitAddOrEdit($request);
 		}
 
 		public function getApproveOrReject($id) {

@@ -737,6 +737,8 @@
 
 			$data['action'] = $action;
 
+			$data['from'] = 'item_masters';
+
 			if ($id) {
 				$tasteless_code = ItemMaster::where('id', $id)->first()->tasteless_code;
 				$data['item'] = self::getItemDetails($tasteless_code);
@@ -945,7 +947,12 @@
 
 			$data = $request->all();
 
-			unset($data['_token'], $data['segmentations'], $data['item_photo']);
+			unset(
+				$data['_token'], 
+				$data['segmentations'], 
+				$data['item_photo'], 
+				$data['item_masters_approvals_id'],
+			);
 			$data['price'] = $data['ttp'];
 			$data['myob_item_description'] = $data['full_item_description'];
 			$data['sku_statuses_id'] = $input['sku_statuses_id'] ?? 1;
@@ -979,12 +986,15 @@
 				$data['created_at'] = $time_stamp;
 			}
 
-			if (!$tasteless_code) {
+			if (!$tasteless_code && !$input['item_masters_approvals_id']) {
 				$data['action_type'] = 'CREATE';
 				ItemMasterApproval::insert($data);
-			} else {
+			} else if ($tasteless_code) {
 				$data['action_type'] = 'UPDATE';
 				ItemMasterApproval::where('tasteless_code', $tasteless_code)->update($data);
+			} else {
+				$data['action_type'] = 'CREATE';
+				ItemMasterApproval::where('id', $input['item_masters_approvals_id'])->update($data);
 			}
 
 			return redirect(CRUDBooster::mainpath())
