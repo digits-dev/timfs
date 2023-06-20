@@ -9,6 +9,8 @@ class ItemMaster extends Model
 {
     protected $table = 'item_masters';
 
+    protected $guarded = [];
+
     public static function boot()
     {
        parent::boot();

@@ -87,7 +87,7 @@
 			$this->col[] = ["label" => "Created Date", "name" => "created_at", "visible" => CRUDBooster::myColumnView()->create_date ? true : false];
 			$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->create_by ? true : false];
 			$this->col[] = ["label" => "Updated Date", "name" => "updated_at", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
-			$this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
+			$this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->update_by ? true : false];
 			//--------------------------
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -664,7 +664,162 @@
 				->get()
 				->first();
 
+			$differences = self::getUpdatedDetails($id);
+
+			$data['item'] = $item_for_approval;
+			$data['differences'] = $differences['differences'] ?? [];
+			$data['segmentation_differences'] = $differences['segmentation_differences'] ?? [];
+
+			$data = array_merge($data, $submaster_details);
+
+			return $this->view('item-master/approve-item', $data);
+		}
+
+		public function approveOrReject(Request $request) {
+			$action = $request->get('action');
+			$item_master_approvals_id = $request->get('item_master_approvals_id');
+			return self::approve_or_reject([$item_master_approvals_id], $action);
+		}
+
+		public function approve_or_reject($item_ids, $action) {
+			$action_by = CRUDBooster::myId();
+			$privilege_name = CRUDBooster::myPrivilegeName();
+			$time_stamp = date('Y-m-d H:i:s');
+
+			if (!is_array($item_ids)) $item_ids = [$item_ids];
+
+			foreach ($item_ids as $id) {
+				$item = DB::table('item_master_approvals')
+					->where('id', $id)
+					->first();
+
+				if ($item->approval_status != '202') {
+					continue;
+				}
+
+				$tasteless_code = $item->tasteless_code;
+				if (!$tasteless_code) {
+					$groups_id = $item->groups_id;
+					$group = Group::find($groups_id);
+					$tasteless_code = $this->main_controller->getTastelessCode($group);
+					$item->tasteless_code = $tasteless_code;
+				}
+
+				if ($action == 'approve') {
+					$differences = self::getUpdatedDetails($id);
+					$paired_differences = $differences['paired_differences'] ?? [];
+
+					ItemMasterApproval::where('id', $id)->update([
+						'approval_status' => '200',
+						'tasteless_code' => $tasteless_code,
+						'approved_by_1' => $action_by,
+						'approved_at_1' => $time_stamp,
+					]);
+					unset($item->id);
+
+					$inserted_item = ItemMaster::updateOrCreate(
+						['tasteless_code' => $item->tasteless_code],
+						(array) $item,
+					);
+
+					$details_of_item = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
+					$new_values = $differences['new_values'];
+					$old_values = $differences['old_values'];
+
+					if ($paired_differences || !$old_values) {
+						foreach ($paired_differences  as $column_name => $paired_difference) {
+							$details_of_item .= "<tr><td>".$column_name."</td><td>".$paired_difference['current']."</td><td>".$paired_difference['new']."</td></tr>";
+						}
+	
+						$details_of_item .= '</tbody></table>';
+
+						if (!$old_values) $details_of_item = 'NEW ITEM';
+	
+						DB::table('history_item_masterfile')->insert([
+							'tasteless_code' =>	$inserted_item->tasteless_code,
+							'item_id' => $old_values->id ?? $inserted_item->id,
+							'brand_id' => $inserted_item->brands_id,
+							'group_id' => $inserted_item->groups_id,
+							'action' => $inserted_item->action_type,
+							'brand_id' => $inserted_item->brands_id,
+							'ttp' => $inserted_item->sales_price,
+							'ttp_percentage' => $inserted_item->ttp_percentage,
+							'old_ttp' => $inserted_item->ttp,
+							'old_ttp_percentage' => $old_values->ttp_percentage,
+							'details' => $details_of_item,
+							'created_by' => $inserted_item->created_by,
+							'updated_by' => $inserted_item->updated_by,
+						]);
+					}
+
+					if (array_key_exists('ttp', $paired_differences) || !$old_values) {
+						DB::table('history_ttps')
+							->insert([
+								'tasteless_code' => $inserted_item->tasteless_code,
+								'item_id' => $old_values->id ?? $inserted_item->id,
+								'brand_id' => $inserted_item->brands_id,
+								'ttp' => $inserted_item->ttp,
+								'ttp_percentage' => $inserted_item->ttp_percentage,
+								'created_at' => $time_stamp,
+							]);
+					}
+
+					if (array_key_exists('purchase_price', $paired_differences) || !$old_values) {
+						DB::table('history_purchase_prices')
+							->insert([
+								'tasteless_code' => $inserted_item->tasteless_code,
+								'item_id' => $old_values->id ?? $inserted_item->id,
+								'brand_id' => $inserted_item->brands_id,
+								'purchase_price' => $inserted_item->purchase_price,
+								'currencies_id' => $inserted_item->currencies_id,
+								'created_at' => $time_stamp
+							]);
+					}
+
+					if (array_key_exists('landed_cost', $paired_differences) || !$old_values) {
+						DB::table('history_landed_costs')
+							->insert([
+								'tasteless_code' => $inserted_item->tasteless_code,
+								'item_id' => $old_values->id ?? $inserted_item->id,
+								'brand_id' => $inserted_item->brands_id,
+								'landed_cost' => $inserted_item->landed_cost,
+								'created_at' => $time_stamp
+							]);
+					}
+
+				} else if ($action == 'reject') {
+					ItemMasterApproval::where('id', $id)->update([
+						'approval_status' => '400',
+						'approved_by_1' => $action_by,
+						'approved_at_1' => $time_stamp,
+					]);
+				} 
+					
+			}
+
+			if ($action == 'approve') {
+				$message_type = 'success';
+				$message = '✔️ Item successfully approved.';
+			} else if ($action == 'reject') {
+				$message_type = 'success';
+				$message = '✖️ Item successfully rejected.';
+			}
+
+			return CRUDBooster::redirect(
+				CRUDBooster::mainPath(), 
+				$message, 
+				$message_type
+			)->send();
+		}
+
+		public function getUpdatedDetails($item_master_approvals_id) {
+			$item_for_approval = DB::table('item_master_approvals')
+				->where('id', $item_master_approvals_id)
+				->get()
+				->first();
+
 			if ($item_for_approval->tasteless_code) {
+				$submaster_details = $this->main_controller->getSubmasters();
 				$current_item = DB::table('item_masters')
 					->where('tasteless_code', $item_for_approval->tasteless_code)
 					->get()
@@ -696,77 +851,13 @@
 				}
 			}
 
-
-			$data['item'] = $item_for_approval;
-			$data['differences'] = $differences ?? [];
-			$data['segmentation_differences'] = $segmentation_differences ?? [];
-
-			$data = array_merge($data, $submaster_details);
-
-			return $this->view('item-master/approve-item', $data);
-		}
-
-		public function approveOrReject(Request $request) {
-			$action = $request->get('action');
-			$item_master_approvals_id = $request->get('item_master_approvals_id');
-			return self::approve_or_reject([$item_master_approvals_id], $action);
-		}
-
-		public function approve_or_reject($item_ids, $action) {
-			$action_by = CRUDBooster::myId();
-			$privilege_name = CRUDBooster::myPrivilegeName();
-			$time_stamp = date('Y-m-d H:i:s');
-
-			if (!is_array($item_ids)) $item_ids = [$item_ids];
-
-			foreach ($item_ids as $id) {
-				$item = DB::table('item_master_approvals')
-					->where('id', $id)
-					->first();
-
-				if ($item->approval_status != '202') {
-					continue;
-				}
-
-				$tasteless_code = $item->tasteless_code;
-				if (!$tasteless_code) {
-					$groups_id = ItemMasterApproval::where('id', $id)->first()->groups_id;
-					$group = Group::find($groups_id);
-					$tasteless_code = $this->main_controller->getTastelessCode($group);
-					$item->tasteless_code = $tasteless_code;
-				}
-
-				if ($action == 'approve') {
-					ItemMasterApproval::where('id', $id)->update([
-						'approval_status' => '200',
-						'tasteless_code' => $tasteless_code,
-						'approved_by_1' => $action_by,
-						'approved_at_1' => $time_stamp,
-					]);
-					unset($item->id);
-					ItemMaster::updateOrInsert(['tasteless_code' => $item->tasteless_code], (array) $item);
-				} else if ($action == 'reject') {
-					ItemMasterApproval::where('id', $id)->update([
-						'approval_status' => '400',
-						'approved_by_1' => $action_by,
-						'approved_at_1' => $time_stamp,
-					]);
-				} 
-					
-			}
-
-			if ($action == 'approve') {
-				$message_type = 'success';
-				$message = '✔️ Item successfully approved.';
-			} else if ($action == 'reject') {
-				$message_type = 'success';
-				$message = '✖️ Item successfully rejected.';
-			}
-
-			return redirect(CRUDBooster::mainpath())
-				->with([
-					'message_type' => $message_type,
-					'message' => $message,
-				])->send();
+			return [
+				'differences' => $differences,
+				'paired_differences' => $paired_differences,
+				'segmentation_differences' => $segmentation_differences,
+				'old_values' => $current_item,
+				'new_values' => $item_for_approval,
+			];
+			
 		}
 	}
