@@ -547,10 +547,10 @@
                 </div>
             </div>
             <section class="ingredient-section">
-                <div class="no-ingredient-warning text-center">
-                    No ingredients currently saved...
-                </div>
             </section>
+            <div class="no-ingredient-warning text-center">
+                No ingredients currently saved...
+            </div>
             <section class="section-footer">
                 <div class="add-buttons">
                     <button class="btn btn-primary" id="add-existing-ingredient" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add existing ingredient</button>
@@ -604,10 +604,10 @@
                 </div>
             </div>
             <section class="packaging-section">
-                <div class="no-packaging-warning text-center">
-                    No packaging currently saved...
-                </div>
             </section>
+            <div class="no-packaging-warning text-center">
+                No packaging currently saved...
+            </div>
             <section class="section-footer">
                 <div class="add-buttons">
                     <button class="btn btn-primary" id="add-existing-packaging" name="button" type="button"> <i class="fa fa-plus" ></i> Add existing packaging</button>
