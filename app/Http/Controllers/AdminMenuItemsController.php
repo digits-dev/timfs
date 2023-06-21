@@ -531,19 +531,6 @@
 
 	    }
 
-	    // public function getEdit($id){
-	    //     $module_id = DB::table('cms_moduls')->where('controller','AdminMenuItemsController')->value('id');
-	        
-	    //     $item_info = MenuItemApproval::find($id);
-	        
-	    //     $create_update_status = ApprovalWorkflowSetting::where('workflow_number', 1)->where('action_type', 'Create')->where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->where('encoder_privilege_id', CRUDBooster::myPrivilegeId())->orWhere('approver_privilege_id', CRUDBooster::myPrivilegeId())->value('current_state');
-
-	    //     if ($item_info->approval_status == $create_update_status){
-		// 		CRUDBooster::redirect(CRUDBooster::mainpath(""),"You're not allowed to edit pending items for approval.","warning");
-		// 	}
-			
-	    //     return parent::getEdit($id);
-	    // }
 	    
 	    public function uploadView(){
 	        if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {
