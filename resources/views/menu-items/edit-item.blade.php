@@ -12,6 +12,9 @@
     A COPY OF INGREDIENT ENTRY!!! FOR CLONING!!
     THIS IS HIDDEN FROM THE DOM!!! --> {display: none}
 --}}
+
+{{-- FOR INGREDIENTS !!!!! --}}
+
 <div class="ingredient-wrapper" style="display: none;">
     <div class="ingredient-entry" isExisting="true">
         <div class="ingredient-inputs">
@@ -240,6 +243,237 @@
     </div>
 </div> 
 
+{{-- FOR PACKAGING --}}
+
+<div class="packaging-wrapper" style="display: none;">
+    <div class="packaging-entry" isExisting="true">
+        <div class="packaging-inputs">
+            <label class="packaging-label">
+                <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
+                <div>
+                    <input value="" type="text" class="packaging form-control hidden" required/>
+                    <input value="" type="text" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                    <div class="item-list">
+                    </div>
+                </div>
+            </label>
+            <label>
+                <span class="required-star">*</span> Preparation Qty
+                <input value="" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
+            </label>
+            <label>
+                <span class="required-star">*</span> Packaging UOM
+                <div>
+                    <input type="text" class="form-control uom" name="uom[]" value="" style="display: none;"/>
+                    <input type="text" class="form-control display-uom" value="" readonly>
+                </div>
+            </label>
+            <label class="label-wide" style="display: none">
+                <span class="required-star">*</span> Preparation
+                <select class="form-control preparation" disabled>
+                    @foreach ($preparations as $preparation)
+                    <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
+                    @endforeach
+                </select>
+            </label>
+            <label class="label-wide" style="display: none">
+                <span class="required-star">*</span> Yield %
+                <input value="" class="form-control yield" type="number" readonly required>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> TTP <span class="date-updated"></span>
+                <input value="" class="form-control ttp" type="number" readonly required>
+            </label>
+            <label style="display: none">
+                <span class="required-star">*</span> Packaging Qty
+                <input value="" class="form-control pack-quantity" type="number" readonly required>
+            </label>
+            <label>
+                <span class="required-star">*</span> Packaging Cost
+                <input value="" class="form-control cost" type="text" readonly required>
+            </label>
+        </div>
+        <div class="actions">
+            <button class="btn btn-info move-up" title="Move Up" type="button"> <i class="fa fa-arrow-up" ></i></button>
+            <button class="btn btn-info move-down" title="Move Down" type="button"> <i class="fa fa-arrow-down" ></i></button>
+            <button class="btn btn-danger delete" title="Delete Ingredient" type="button"> <i class="fa fa-trash" ></i></button>
+        </div>
+    </div>
+    <div class="add-sub-btn" title="Add Existing Substitute Packaging">
+        <i class="fa fa-plus"></i>
+    </div>
+    <div class="new-add-sub-btn" title="Add New Substitute Packaging">
+        <i class="fa fa-plus"></i>
+    </div>
+</div>
+
+<div class="new-packaging-wrapper" style="display: none;">
+    <div class="packaging-entry" isExisting="false">
+        <div class="packaging-inputs">
+            <label class="packaging-label">
+                <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span>
+                <div>
+                    <input value="" type="text" class="packaging-name form-control" placeholder="Search by Item Description" required/>
+                    <div class="item-list">
+                    </div>
+                </div>
+            </label>
+            <label>
+                <span class="required-star">*</span> Preparation Qty
+                <input value="" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
+            </label>
+            <label>
+                <span class="required-star">*</span> Packaging UOM
+                <div>
+                    <input type="text" class="form-control uom" value="" style="display: none;"/>
+                    <input type="text" class="form-control display-uom" value="" readonly>
+                </div>
+            </label>
+            <label class="label-wide" style="display: none">
+                <span class="required-star">*</span> Preparation
+                <select class="form-control preparation" disabled>
+                    @foreach ($preparations as $preparation)
+                    <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
+                    @endforeach
+                </select>
+            </label>
+            <label class="label-wide" style="display: none">
+                <span class="required-star">*</span> Yield %
+                <input value="" class="form-control yield" type="number" readonly required>
+            </label>
+            <label class="label-wide">
+                <span class="required-star">*</span> TTP <span class="date-updated"></span>
+                <input value="" class="form-control ttp" type="number" readonly required>
+            </label>
+            <label style="display: none">
+                <span class="required-star">*</span> Packaging Qty
+                <input value="" class="form-control pack-quantity" type="number" readonly required>
+            </label>
+            <label>
+                <span class="required-star">*</span> Packaging Cost
+                <input value="" class="form-control cost" type="text" readonly required>
+            </label>
+        </div>
+        <div class="actions">
+            <button class="btn btn-info move-up" title="Move Up" type="button"> <i class="fa fa-arrow-up" ></i></button>
+            <button class="btn btn-info move-down" title="Move Down" type="button"> <i class="fa fa-arrow-down" ></i></button>
+            <button class="btn btn-danger delete" title="Delete Ingredient" type="button"> <i class="fa fa-trash" ></i></button>
+        </div>
+    </div>
+    <div class="add-sub-btn" title="Add Existing Substitute Ingredient">
+        <i class="fa fa-plus"></i>
+    </div>
+    <div class="new-add-sub-btn" title="Add New Substitute Ingredient">
+        <i class="fa fa-plus"></i>
+    </div>
+</div>
+
+<div class="substitute-packaging" style="display: none;" isExisting="true">
+    <div class="packaging-inputs">
+        <label class="packaging-label">
+            <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
+            <div>
+                <input value="" type="text" class="packaging form-control hidden" required/>
+                <input value="" type="text" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                <div class="item-list">
+                </div>
+            </div>
+        </label>
+        <label>
+            <span class="required-star">*</span> Preparation Qty
+            <input value="" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
+        </label>
+        <label>
+            <span class="required-star">*</span> Packaging UOM
+            <div>
+                <input type="text" class="form-control uom" name="uom[]" value="" style="display: none;"/>
+                <input type="text" class="form-control display-uom" value="" readonly>
+            </div>
+        </label>
+        <label class="label-wide" style="display: none">
+            <span class="required-star">*</span> Preparation
+            <select class="form-control preparation" disabled>
+                @foreach ($preparations as $preparation)
+                <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
+                @endforeach
+            </select>
+        </label>
+        <label class="label-wide" style="display: none">
+            <span class="required-star">*</span> Yield %
+            <input value="" class="form-control yield" type="number" readonly required>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> TTP <span class="date-updated"></span>
+            <input value="" class="form-control ttp" type="number" readonly required>
+        </label>
+        <label style="display: none">
+            <span class="required-star">*</span> Packaging Qty
+            <input value="" class="form-control pack-quantity" type="number" readonly required>
+        </label>
+        <label>
+            <span class="required-star">*</span> Packaging Cost
+            <input value="" class="form-control cost" type="text" readonly required>
+        </label>
+    </div>
+    <div class="actions">
+        <button class="btn btn-info set-primary" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
+        <button class="btn btn-danger delete-sub" title="Delete Ingredient" type="button"> <i class="fa fa-minus" ></i></button>
+    </div>
+</div> 
+
+<div class="new-substitute-packaging" style="display: none;" isExisting="false">
+    <div class="packaging-inputs">
+        <label class="packaging-label">
+            <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span>
+            <div>
+                <input value="" type="text" class="packaging-name form-control" placeholder="Search by Item Description" required/>
+                <div class="item-list">
+                </div>
+            </div>
+        </label>
+        <label>
+            <span class="required-star">*</span> Preparation Qty
+            <input value="" class="form-control prep-quantity" type="number" min="0" step="any" readonly required/>
+        </label>
+        <label>
+            <span class="required-star">*</span> Packaging UOM
+            <div>
+                <input type="text" class="form-control uom" value="" style="display: none;"/>
+                <input type="text" class="form-control display-uom" value="" readonly>
+            </div>
+        </label>
+        <label class="label-wide" style="display: none">
+            <span class="required-star">*</span> Preparation
+            <select class="form-control preparation" disabled>
+                @foreach ($preparations as $preparation)
+                <option {{$preparation->preparation_desc == 'NONE' ? 'selected' : ''}} value="{{$preparation->id}}">{{$preparation->preparation_desc}}</option>
+                @endforeach
+            </select>
+        </label>
+        <label class="label-wide" style="display: none">
+            <span class="required-star">*</span> Yield %
+            <input value="" class="form-control yield" type="number" readonly required>
+        </label>
+        <label class="label-wide">
+            <span class="required-star">*</span> TTP <span class="date-updated"></span>
+            <input value="" class="form-control ttp" type="number" readonly required>
+        </label>
+        <label style="display: none">
+            <span class="required-star">*</span> Packaging Qty
+            <input value="" class="form-control pack-quantity" type="number" readonly required>
+        </label>
+        <label>
+            <span class="required-star">*</span> Packaging Cost
+            <input value="" class="form-control cost" type="text" readonly required>
+        </label>
+    </div>
+    <div class="actions">
+        <button class="btn btn-info set-primary" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
+        <button class="btn btn-danger delete-sub" title="Delete Ingredient" type="button"> <i class="fa fa-minus" ></i></button>
+    </div>
+</div> 
+
+
 {{-- 
     END OF COPY
  --}}
@@ -289,6 +523,17 @@
                                 <i class="fa fa-sticky-note"></i>
                             </div>
                             <input value="{{$item->tasteless_menu_code}}" type="text" class="form-control rnd_tasteless_code" placeholder="XXXXXX" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">Total Cost</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <span class="custom-icon"><strong>₱</strong></span>
+                            </div>
+                            <input type="text" class="form-control total-cost" placeholder="0.00" readonly>
                         </div>
                     </div>
                 </div>
@@ -350,6 +595,40 @@
             </section>
         </form>
         <hr>
+        <form action="" id="form-packaging">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box-header text-center">
+                        <h3 class="box-title"><b>Packaging</b></h3>
+                    </div>
+                </div>
+            </div>
+            <section class="packaging-section">
+                <div class="no-packaging-warning text-center">
+                    No packaging currently saved...
+                </div>
+            </section>
+            <section class="section-footer">
+                <div class="add-buttons">
+                    <button class="btn btn-primary" id="add-existing-packaging" name="button" type="button"> <i class="fa fa-plus" ></i> Add existing packaging</button>
+                    <button class="btn btn-success" id="add-new-packaging" name="button" type="button"> <i class="fa fa-plus" ></i> Add new packaging</button>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="" class="control-label">Packaging Cost</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span class="custom-icon"><strong>₱</strong></span>
+                                </div>
+                                <input type="text" class="form-control packaging-cost" placeholder="Packaging Cost" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </form>
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
@@ -391,8 +670,8 @@
         }
 
         $.fn.firstLoad = function() {
-            if (savedIngredients) $('.no-ingredient-warning').remove();
-            if (savedPackagings) $('.no-packaging-warning').remove();
+            if (savedIngredients.length) $('.no-ingredient-warning').hide();
+            if (savedPackagings.length) $('.no-packaging-warning').hide();
 
             const ingredientGroupCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
             const ingredientSection = $('.ingredient-section');
