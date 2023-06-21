@@ -702,8 +702,8 @@
         }
 
         $.fn.firstLoad = function() {
-            if (savedIngredients) $('.no-ingredient-warning').remove();
-            if (savedPackagings) $('.no-packaging-warning').remove();
+            if (savedIngredients.length) $('.no-ingredient-warning').hide();
+            if (savedPackagings.length) $('.no-packaging-warning').hide();
 
             const ingredientGroupCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
             const ingredientSection = $('.ingredient-section');
