@@ -349,6 +349,16 @@
 
 ---
 
+## 🧑‍🦲 Test Accounts Credentials
+
+- **Chef:** chefcook@tasteless.ph
+- **Marketing Encoder:** marketingencoder@tasteless.ph
+- **Marketing Manager:** marketingmanager@tasteless.ph
+- **Sales Accounting:** salesaccounting@tasteless.ph
+- **Purchasing Encoder:** purchasingencoder@tasteless.ph
+- **Purchasing Manager:** purchasingmanager@tasteless.ph
+- pw: qwerty
+
 ## 🖋️ Author:
 
 - Fillinor Gunio

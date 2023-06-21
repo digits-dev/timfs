@@ -424,7 +424,7 @@
         }
 
         $.fn.firstLoad = function() {
-            if (savedPackagings) $('.no-packaging-warning').remove();
+            if (savedPackagings.length) $('.no-packaging-warning').hide();
 
             const packagingGroupCount = [...new Set([...savedPackagings.map(e => e.packaging_group)])];
             const packagingSection = $('.packaging-section');

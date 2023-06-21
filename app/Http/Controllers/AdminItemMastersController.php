@@ -367,19 +367,47 @@
             {
 				$this->index_button[] = ['label' => 'Export Items', "url" => "javascript:showItemExport()", "icon" => "fa fa-download"];
 				
-				if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), ["Administrator","Manager (Purchaser)","Encoder (Purchaser)"])){
-					$this->index_button[] = ['label' => 'Upload Module', "url" => CRUDBooster::mainpath("upload-module").'?'.urldecode(http_build_query(@$_GET)), "icon" => "fa fa-upload"];
-				}
-				if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), ["Administrator","Manager (Purchaser)","Manager (Accounting)","Encoder (Purchaser)","Encoder (Accounting)","Supervisor (Purchaser)"])){
-    				$this->index_button[] = ['label' => 'Bartender Format', 'url'=>"javascript:showBartenderExport()",'icon'=>'fa fa-download'];
-    				$this->index_button[] = ['label' => 'POS Format', "url" => "javascript:showPOSExport()", "icon" => "fa fa-download"];
-    				$this->index_button[] = ['label' => 'QB Item Format', "url" => "javascript:showQBExport()", "icon" => "fa fa-download"];
+				// if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), ["Administrator","Manager (Purchaser)","Encoder (Purchaser)"])){
+				// 	$this->index_button[] = ['label' => 'Upload Module', "url" => CRUDBooster::mainpath("upload-module").'?'.urldecode(http_build_query(@$_GET)), "icon" => "fa fa-upload"];
+				// }
+				// if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), ["Administrator","Manager (Purchaser)","Manager (Accounting)","Encoder (Purchaser)","Encoder (Accounting)","Supervisor (Purchaser)"])){
+    			// 	$this->index_button[] = ['label' => 'Bartender Format', 'url'=>"javascript:showBartenderExport()",'icon'=>'fa fa-download'];
+    			// 	$this->index_button[] = ['label' => 'POS Format', "url" => "javascript:showPOSExport()", "icon" => "fa fa-download"];
+    			// 	$this->index_button[] = ['label' => 'QB Item Format', "url" => "javascript:showQBExport()", "icon" => "fa fa-download"];
 				    
-				}
-                if (!CRUDBooster::isSuperadmin() && in_array(CRUDBooster::myPrivilegeName(), ["View I (TTP)", "View II (Purchase Price)", "View III (TTP and Purchase Price)"])) {
-                    $this->index_button[] = ['label' => 'QB Item Format', "url" => "javascript:showQBExport()", "icon" => "fa fa-download"];
+				// }
+                // if (!CRUDBooster::isSuperadmin() && in_array(CRUDBooster::myPrivilegeName(), ["View I (TTP)", "View II (Purchase Price)", "View III (TTP and Purchase Price)"])) {
+                //     $this->index_button[] = ['label' => 'QB Item Format', "url" => "javascript:showQBExport()", "icon" => "fa fa-download"];
                     
-                }
+                // }
+
+				$my_privilege_name = CRUDBooster::myPrivilegeName();
+				$is_super_admin = CRUDBooster::isSuperAdmin();
+				if ($is_super_admin || in_array($my_privilege_name, $this->requestor) || in_array($my_privilege_name, $this->approver)) {
+					$this->index_button[] = [
+						'label' => 'Upload Module', 
+						"url" => CRUDBooster::mainpath("upload-module").'?'.urldecode(http_build_query(@$_GET)), 
+						"icon" => "fa fa-upload"
+					];
+				}
+
+				if ($is_super_admin || in_array($my_privilege_name, $this->requestor) || in_array($my_privilege_name, $this->approver)) {
+					$this->index_button[] = [
+						'label' => 'Bartender Format', 
+						'url'=>"javascript:showBartenderExport()",
+						'icon'=>'fa fa-download'
+					];
+    				$this->index_button[] = [
+						'label' => 'POS Format', 
+						"url" => "javascript:showPOSExport()", 
+						"icon" => "fa fa-download"
+					];
+    				$this->index_button[] = [
+						'label' => 'QB Item Format', 
+						"url" => "javascript:showQBExport()", 
+						"icon" => "fa fa-download"
+					];
+				}
 			}
 
 	        /* 

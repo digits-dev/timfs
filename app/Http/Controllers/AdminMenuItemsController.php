@@ -531,19 +531,6 @@
 
 	    }
 
-	    // public function getEdit($id){
-	    //     $module_id = DB::table('cms_moduls')->where('controller','AdminMenuItemsController')->value('id');
-	        
-	    //     $item_info = MenuItemApproval::find($id);
-	        
-	    //     $create_update_status = ApprovalWorkflowSetting::where('workflow_number', 1)->where('action_type', 'Create')->where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->where('encoder_privilege_id', CRUDBooster::myPrivilegeId())->orWhere('approver_privilege_id', CRUDBooster::myPrivilegeId())->value('current_state');
-
-	    //     if ($item_info->approval_status == $create_update_status){
-		// 		CRUDBooster::redirect(CRUDBooster::mainpath(""),"You're not allowed to edit pending items for approval.","warning");
-		// 	}
-			
-	    //     return parent::getEdit($id);
-	    // }
 	    
 	    public function uploadView(){
 	        if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {
@@ -771,7 +758,7 @@
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 
-			$ingredients = DB::table('menu_ingredients_auto_compute')
+			$data['ingredients'] = DB::table('menu_ingredients_auto_compute')
 				->where('menu_items_id', $id)
 				->where('menu_ingredients_auto_compute.status', 'ACTIVE')
 				->select(\DB::raw('item_masters.id as item_masters_id'),
@@ -813,6 +800,41 @@
 				->orderBy('row_id', 'ASC')
 				->get()
 				->toArray();
+	
+			$data['packagings'] = DB::table('menu_packagings_auto_compute')
+				->where('menu_items_id', $id)
+				->where('menu_packagings_auto_compute.status', 'ACTIVE')
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'packaging_name',
+					'is_selected',
+					'is_primary',
+					'is_existing',
+					'menu_packagings_auto_compute.packaging_size',
+					'packaging_qty',
+					'cost',
+					'packaging_group',
+					'uom_id',
+					'uom_description',
+					'packagings_id',
+					'packaging_description',
+					'prep_qty',
+					'menu_ingredients_preparations_id',
+					'yield',
+					'menu_packagings_auto_compute.ttp',
+					'menu_packagings_auto_compute.ttp as packaging_cost',
+					'item_masters.full_item_description',
+					'sku_status_description as item_status',
+					'item_masters.updated_at',
+					'item_masters.created_at',
+					'menu_packagings_auto_compute.new_packagings_id',
+					'menu_packagings_auto_compute.item_description')
+				->leftJoin('item_masters', 'item_masters.id', '=', 'menu_packagings_auto_compute.item_masters_id')
+				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->orderBy('packaging_group', 'ASC')
+				->orderBy('row_id', 'ASC')
+				->get()
+				->toArray();
+
 
 			$data['preparations'] = DB::table('menu_ingredients_preparations')
 				->where('status', 'ACTIVE')
@@ -828,13 +850,13 @@
 				->get()
 				->toArray();
 
-			$data['ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $ingredients);
 			return $this->view('menu-items/edit-item', $data);
 		}
 
 		public function submitEdit(Request $request) {
 			$menu_items_id = $request->input('menu_items_id');
 			$ingredients = json_decode($request->input('ingredients'));
+			$packagings = json_decode($request->input('packagings'));
 			$food_cost = $request->input('food_cost');
 			$food_cost_percentage = $request->input('food_cost_percentage');
 			$portion_size = $request->input('portion_size');
@@ -904,6 +926,48 @@
 						'new_ingredients_id' => $ingredient['new_ingredients_id'],
 						'batching_ingredients_id' => $ingredient['batching_ingredients_id']
 					], $ingredient);
+				}
+			}
+
+			foreach ($packagings as $group) {
+				foreach ($group as $packaging) {
+					$packaging = (array) $packaging;
+
+					//checking if the packaging already exists
+					$is_existing = DB::table('menu_packagings_details')
+						->where([
+							'menu_items_id' => $menu_items_id,
+							'item_masters_id' => $packaging['item_masters_id'],
+							'packaging_name' => $packaging['packaging_name'],
+							'new_packagings_id' => $packaging['new_packagings_id'],
+						])->exists();
+
+					if ($is_existing) {
+						$packaging['updated_at'] = $time_stamp;
+						$packaging['updated_by'] = $action_by;
+					} else {
+						$packaging['created_at'] = $time_stamp;
+						$packaging['created_by'] = $action_by;
+					}
+
+					$packaging['status'] = 'ACTIVE';
+					$packaging['deleted_at'] = null;
+
+					//unsetting packagings details that may be outdated in the future
+					unset(
+						$packaging['qty'], 
+						$packaging['cost'], 
+						$packaging['total_cost'],
+						$packaging['ttp']
+					);
+
+					//finally, inserting packaging to the table
+					DB::table('menu_packagings_details')->updateOrInsert([
+						'menu_items_id' => $menu_items_id,
+						'item_masters_id' => $packaging['item_masters_id'],
+						'new_packagings_id' => $packaging['new_packagings_id']
+					], $packaging);
+						
 				}
 			}
 

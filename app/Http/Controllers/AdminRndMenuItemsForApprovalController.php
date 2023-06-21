@@ -491,11 +491,9 @@
 				->first()
 				->approval_status;
 
-			$my_privielege_name = CRUDBooster::myPrivilegeName();
-
 			$is_super_admin = CRUDBooster::isSuperAdmin();
 
-			if (!in_array($status, $privileges[$upperCasedPrivilege]) && !$is_super_admin) {
+			if (!in_array($status, $privileges[$upperCasedPrivilege] ?? []) && !$is_super_admin) {
 				CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
