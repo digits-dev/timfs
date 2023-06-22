@@ -39,8 +39,8 @@
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
 			$this->button_edit = true;
-			$this->button_delete = true;
-			$this->button_detail = true;
+			$this->button_delete = false;
+			$this->button_detail = false;
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
@@ -129,7 +129,26 @@
 	        | @showIf 	   = If condition when action show. Use field alias. e.g : [id] == 1
 	        | 
 	        */
-	        $this->addaction = array(); 
+	        $this->addaction = array();
+			$privilege = CRUDBooster::myPrivilegeName(); 
+			if (CRUDBooster::isSuperAdmin() || $privilege == 'Chef') {
+				$this->addaction[] = [
+					'title'=>'View Ingredients',
+					'url'=>CRUDBooster::mainpath('detail/[id]'),
+					'icon'=>'fa fa-eye',
+					'color' => ' ',
+				];
+			}
+
+			if ($privilege !== 'Chef') {
+				$this->addaction[] = [
+					'title'=>'View Costing',
+					'url'=>CRUDBooster::mainpath('costing-detail/[id]'),
+					'icon'=>'fa fa-eye',
+					'color' => ' ',
+				];
+			}
+
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -736,15 +755,11 @@
 	    }
 
 		public function getEdit($id) {
-			if (CRUDBooster::myPrivilegeName() != 'Chef' &&
-				CRUDBooster::myPrivilegeId() != '1' &&
-				CRUDBooster::myPrivilegeName() != 'Ingredient Approver (Accounting)' &&
-				CRUDBooster::myPrivilegeName() != 'Ingredient Approver (Marketing)') 
-				return redirect('admin/menu_items')
-					->with([
-						'message_type' => 'danger',
-						'message' => 'You do not have the access to edit the item.'
-					]);
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
 
 			$data = [];
 			$data['item'] = DB::table('menu_items')
@@ -850,7 +865,18 @@
 				->get()
 				->toArray();
 
-			return $this->view('menu-items/edit-item', $data);
+			$data['food_cost_data'] = DB::table('menu_computed_food_cost')
+				->where('id', $id)
+				->get()
+				->first();
+
+			$data['menu_items_data'] = self::getMenuItemDetails($id);
+			
+			if (CRUDBooster::isSuperAdmin() || CRUDBooster::myPrivilegeName() == 'Chef') {
+				return $this->view('menu-items/edit-item', $data);
+			} else {
+				return $this->view('menu-items/add-packaging', $data);
+			}
 		}
 
 		public function submitEdit(Request $request) {
@@ -998,11 +1024,68 @@
 			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
 		}
 
-		public function getDetail($id) {
-			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
-			if (CRUDBooster::myPrivilegeName() != 'Chef' && !CRUDBooster::isSuperAdmin()) {
-				return self::getDetailNotChef($id);
+		public function submitPackagings(Request $request) {
+			$menu_items_id = $request->input('menu_items_id');
+			$packagings = json_decode($request->input('packagings'));
+			$action_by = CRUDBooster::myId();
+			$time_stamp = date('Y-m-d H:i:s');
+
+			foreach ($packagings as $group) {
+				foreach ($group as $packaging) {
+					$packaging = (array) $packaging;
+
+					//checking if the packaging already exists
+					$is_existing = DB::table('menu_packagings_details')
+						->where([
+							'menu_items_id' => $menu_items_id,
+							'item_masters_id' => $packaging['item_masters_id'],
+							'packaging_name' => $packaging['packaging_name'],
+							'new_packagings_id' => $packaging['new_packagings_id'],
+						])->exists();
+
+					if ($is_existing) {
+						$packaging['updated_at'] = $time_stamp;
+						$packaging['updated_by'] = $action_by;
+					} else {
+						$packaging['created_at'] = $time_stamp;
+						$packaging['created_by'] = $action_by;
+					}
+
+					$packaging['status'] = 'ACTIVE';
+					$packaging['deleted_at'] = null;
+
+					//unsetting packagings details that may be outdated in the future
+					unset(
+						$packaging['qty'], 
+						$packaging['cost'], 
+						$packaging['total_cost'],
+						$packaging['ttp']
+					);
+
+					//finally, inserting packaging to the table
+					DB::table('menu_packagings_details')->updateOrInsert([
+						'menu_items_id' => $menu_items_id,
+						'item_masters_id' => $packaging['item_masters_id'],
+						'new_packagings_id' => $packaging['new_packagings_id']
+					], $packaging);
+						
+				}
 			}
+
+			return redirect('admin/menu_items')
+				->with([
+					'message_type' => 'success',
+					'message' => 'Packagings Updated!'
+				]);
+
+		}
+
+		public function getDetail($id) {
+			if (!CRUDBooster::isRead())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
 			$data = [];
 			$data['item'] = DB::table('menu_items')
 				->where('menu_items.id', $id)
@@ -1024,6 +1107,83 @@
 			$data['packagings'] = self::getPackagings($id);
 
 			return $this->view('menu-items/detail-item', $data);
+		}
+
+		public function getCostingDetails($id) {
+			$data = [];
+
+			$item = DB::table('menu_costing')
+				->where('menu_costing.menu_items_id', $id)
+				->leftJoin('menu_items', 'menu_items.id', '=', 'menu_costing.menu_items_id')
+				->get()
+				->first();
+
+			$menu_items_data = self::getMenuItemDetails($id);
+
+			$data['item'] = $item;
+			$data['menu_items_data'];
+
+			return $this->view('menu-items/costing-details', $data);
+		}
+
+		function getMenuItemDetails($id) {
+			$data = [];
+
+			if (!$id) return;
+
+			$menu_items_data = DB::table('menu_items')
+				->where('menu_items.id', $id)
+				->select(
+					'*',
+					'menu_items.id as menu_items_id',
+				)
+				->leftJoin('menu_categories', 'menu_categories.id', 'menu_items.menu_categories_id')
+				->leftJoin('menu_types', 'menu_types.id', '=', 'menu_items.menu_types_id')
+				->leftJoin('menu_subcategories', 'menu_subcategories.id', '=', 'menu_items.menu_subcategories_id')
+				->get()
+				->first();
+
+			$all_old_codes = DB::table('menu_old_code_masters')
+					->where('status', 'ACTIVE')
+					->get()
+					->toArray();
+
+			$menu_items_data->old_codes = $all_old_codes;
+
+			$all_segmentations = DB::table('menu_segmentations')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
+			$menu_segmentations = [];
+
+			foreach ($all_segmentations as $segmentation) {
+				if ($menu_items_data->{$segmentation->menu_segment_column_name}) {
+					$menu_segmentations[] = $segmentation->menu_segment_column_description;
+				}
+			}
+
+			$menu_items_data->menu_segmentations = $menu_segmentations;
+
+			$all_menu_choices_groups = DB::table('menu_choice_groups')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
+			$menu_items_data->menu_choice_groups = $all_menu_choices_groups;
+
+			foreach($all_menu_choices_groups as $choice_group) {
+				$column_name = 'choices_sku' . $choice_group->menu_choice_group_column_name;
+				$sku_ids = explode(', ', $menu_items_data->{$column_name});
+				$menu_names = DB::table('menu_items')
+					->whereIn('tasteless_menu_code', $sku_ids)
+					->get('menu_item_description')
+					->toArray();
+
+				$menu_names = array_map(fn($obj) => $obj->menu_item_description, $menu_names);
+				$menu_items_data->{$column_name} = $menu_names;
+			}
+			return $menu_items_data;
 		}
 
 		public function getDetailNotChef($id) {
