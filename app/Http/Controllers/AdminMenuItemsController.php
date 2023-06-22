@@ -1005,53 +1005,24 @@
 			}
 			$data = [];
 			$data['item'] = DB::table('menu_items')
-				->where('id', $id)
-				->get()
+				->where('menu_items.id', $id)
+				->select(
+					'menu_items.tasteless_menu_code',
+					'menu_items.menu_price_dine',
+					'menu_items.menu_item_description',
+					'menu_items.portion_size',
+					'computed_ingredient_total_cost',
+					'computed_food_cost',
+					'computed_food_cost_percentage',
+					'computed_packaging_total_cost'
+				)
+				->leftJoin('menu_computed_food_cost', 'menu_computed_food_cost.id', '=', 'menu_items.id')
+				->leftJoin('menu_computed_packaging_cost', 'menu_computed_packaging_cost.id', '=', 'menu_items.id')
 				->first();
 
-			$ingredients = DB::table('menu_ingredients_auto_compute')
-				->where('menu_items_id', $id)
-				->where('menu_ingredients_auto_compute.status', 'ACTIVE')
-				->select('tasteless_code',
-					'menu_items.status as menu_item_status',
-					'sku_statuses.sku_status_description as item_status',
-					'new_ingredients.status as new_ingredient_status',
-					'batching_ingredients.status as batching_ingredient_status',
-					'menu_ingredients_auto_compute.item_masters_id',
-					'menu_ingredients_auto_compute.menu_item_description',
-					'menu_ingredients_auto_compute.item_description',
-					'menu_ingredients_auto_compute.ingredient_description',
-					'tasteless_menu_code',
-					'ingredient_name',
-					'prep_qty',
-					'ingredient_group',
-					'row_id',
-					'is_primary',
-					'is_selected',
-					'menu_ingredients_auto_compute.packaging_size',
-					'menu_ingredients_auto_compute.full_item_description',
-					'menu_ingredients_preparations.preparation_desc',
-					'ingredient_qty',
-					'menu_ingredients_auto_compute.uom_description',
-					'menu_ingredients_auto_compute.packaging_description',
-					'yield',
-					'menu_ingredients_auto_compute.ttp',
-					'cost',
-					'item_masters.updated_at',
-					'item_masters.created_at',
-					'menu_ingredients_auto_compute.item_description')
-				->leftJoin('item_masters', 'menu_ingredients_auto_compute.item_masters_id', '=', 'item_masters.id')
-				->leftJoin('menu_items', 'menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
-				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
-				->leftJoin('menu_ingredients_preparations', 'menu_ingredients_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
-				->leftJoin('new_ingredients', 'new_ingredients.id', '=', 'menu_ingredients_auto_compute.new_ingredients_id')
-				->leftJoin('batching_ingredients', 'batching_ingredients.id', '=', 'menu_ingredients_auto_compute.batching_ingredients_id')
-				->orderby('ingredient_group', 'asc')
-				->orderby('row_id', 'asc')
-				->get()
-				->toArray();
+			$data['ingredients'] = self::getIngredients($id);
+			$data['packagings'] = self::getPackagings($id);
 
-			$data['ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $ingredients);
 			return $this->view('menu-items/detail-item', $data);
 		}
 
@@ -1248,6 +1219,90 @@
 				//the process keeps going on until there are no more ingredients to be updated
 				self::updateCostOfOtherMenu($to_update);
 
+		}
+
+		function getIngredients($id) {
+			$ingredients = DB::table('menu_ingredients_auto_compute')
+				->where('menu_items_id', $id)
+				->where('menu_ingredients_auto_compute.status', 'ACTIVE')
+				->select('tasteless_code',
+					'menu_items.status as menu_item_status',
+					'sku_statuses.sku_status_description as item_status',
+					'new_ingredients.status as new_ingredient_status',
+					'batching_ingredients.status as batching_ingredient_status',
+					'menu_ingredients_auto_compute.item_masters_id',
+					'menu_ingredients_auto_compute.menu_item_description',
+					'menu_ingredients_auto_compute.item_description',
+					'menu_ingredients_auto_compute.ingredient_description',
+					'tasteless_menu_code',
+					'ingredient_name',
+					'prep_qty',
+					'ingredient_group',
+					'row_id',
+					'is_primary',
+					'is_selected',
+					'menu_ingredients_auto_compute.packaging_size',
+					'menu_ingredients_auto_compute.full_item_description',
+					'menu_ingredients_preparations.preparation_desc',
+					'ingredient_qty',
+					'menu_ingredients_auto_compute.uom_description',
+					'menu_ingredients_auto_compute.packaging_description',
+					'yield',
+					'menu_ingredients_auto_compute.ttp',
+					'cost',
+					'item_masters.updated_at',
+					'item_masters.created_at',
+					'menu_ingredients_auto_compute.item_description')
+				->leftJoin('item_masters', 'menu_ingredients_auto_compute.item_masters_id', '=', 'item_masters.id')
+				->leftJoin('menu_items', 'menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
+				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->leftJoin('menu_ingredients_preparations', 'menu_ingredients_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
+				->leftJoin('new_ingredients', 'new_ingredients.id', '=', 'menu_ingredients_auto_compute.new_ingredients_id')
+				->leftJoin('batching_ingredients', 'batching_ingredients.id', '=', 'menu_ingredients_auto_compute.batching_ingredients_id')
+				->orderby('ingredient_group', 'asc')
+				->orderby('row_id', 'asc')
+				->get()
+				->toArray();
+
+			return $ingredients;
+		}
+
+		function getPackagings($id) {
+			$packagings = DB::table('menu_packagings_auto_compute')
+				->where('menu_items_id', $id)
+				->where('menu_packagings_auto_compute.status', 'ACTIVE')
+				->select('tasteless_code',
+				'sku_statuses.sku_status_description as item_status',
+				'new_packagings.status as new_packaging_status',
+				'menu_packagings_auto_compute.item_masters_id',
+				'packaging_name',
+				'prep_qty',
+				'packaging_group',
+				'row_id',
+				'is_primary',
+				'is_selected',
+				'menu_packagings_auto_compute.packaging_size',
+				'menu_packagings_auto_compute.full_item_description',
+				'menu_ingredients_preparations.preparation_desc',
+				'packaging_qty',
+				'menu_packagings_auto_compute.uom_description',
+				'menu_packagings_auto_compute.packaging_description',
+				'yield',
+				'menu_packagings_auto_compute.ttp',
+				'cost',
+				'item_masters.updated_at',
+				'item_masters.created_at',
+				'menu_packagings_auto_compute.item_description')
+			->leftJoin('item_masters', 'menu_packagings_auto_compute.item_masters_id', '=', 'item_masters.id')
+			->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+			->leftJoin('menu_ingredients_preparations', 'menu_packagings_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
+			->leftJoin('new_packagings', 'new_packagings.id', '=', 'menu_packagings_auto_compute.new_packagings_id')
+			->orderby('packaging_group', 'asc')
+			->orderby('row_id', 'asc')
+			->get()
+			->toArray();
+
+			return $packagings;
 		}
 
 	}	

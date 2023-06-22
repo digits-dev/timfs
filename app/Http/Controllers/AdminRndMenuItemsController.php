@@ -474,15 +474,15 @@
 				->first();
 
 			$ingredients = self::getIngredients($id);
+
 			
 			$packagings = self::getPackagings($id);
 			
 			$rnd_menu_description = $data['item']->rnd_menu_description;
-			$data['ingredients'] = array_map(fn ($object) => (object) array_filter((array) $object), $ingredients);
-			$data['packagings'] = array_map(fn ($object) => (object) array_filter((array) $object), $packagings);
+			$data['ingredients'] = $ingredients;
+			$data['packagings'] = $packagings;
 			$data['page_title'] = "Detail RND Menu Item: $rnd_menu_description";
 			$data['comments_data'] = self::getRNDComments($id);
-			
 			return $this->view('rnd-menu/detail-item', $data);
 
 		}
