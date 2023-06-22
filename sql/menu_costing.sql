@@ -58,27 +58,33 @@ CREATE VIEW MENU_COSTING AS
 	        2
 	    ) AS food_cost_from_final_srp,
 	    ROUND(
-	        ROUND(
-	            menu_computed_packaging_cost.computed_packaging_total_cost / ROUND(
-	                COALESCE(
-	                    menu_items.menu_price_dine,
-	                    menu_items.menu_price_take
-	                ) / 1.12,
-	                4
-	            ) * 100,
-	            2
-	        ) + ROUND(
+	        COALESCE(
 	            ROUND(
-	                menu_computed_food_cost.computed_food_cost * (1 + (menu_items.buffer / 100)) / menu_items.portion_size,
-	                4
-	            ) / ROUND(
-	                COALESCE(
-	                    menu_items.menu_price_dine,
-	                    menu_items.menu_price_take
-	                ) / 1.12,
-	                4
-	            ) * 100,
-	            2
+	                menu_computed_packaging_cost.computed_packaging_total_cost / ROUND(
+	                    COALESCE(
+	                        menu_items.menu_price_dine,
+	                        menu_items.menu_price_take
+	                    ) / 1.12,
+	                    4
+	                ) * 100,
+	                2
+	            ),
+	            0
+	        ) + COALESCE(
+	            ROUND(
+	                ROUND(
+	                    menu_computed_food_cost.computed_food_cost * (1 + (menu_items.buffer / 100)) / menu_items.portion_size,
+	                    4
+	                ) / ROUND(
+	                    COALESCE(
+	                        menu_items.menu_price_dine,
+	                        menu_items.menu_price_take
+	                    ) / 1.12,
+	                    4
+	                ) * 100,
+	                2
+	            ),
+	            0
 	        ),
 	        2
 	    ) AS total_cost,

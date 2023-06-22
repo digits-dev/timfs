@@ -83,29 +83,35 @@ class CreateRndMenuCostingView extends Migration
                         2
                     ) AS food_cost_from_final_srp,
                     ROUND(
-                        ROUND(
-                            rnd_menu_computed_packaging_cost.computed_packaging_total_cost / ROUND(
-                                COALESCE(
-                                    menu_items.menu_price_dine,
-                                    rnd_menu_items.rnd_menu_srp
-                                ) / 1.12,
-                                4
-                            ) * 100,
-                            2
-                        ) + ROUND(
+                        COALESCE(
                             ROUND(
-                                rnd_menu_computed_food_cost.computed_food_cost * (
-                                    1 + (rnd_menu_items.buffer / 100)
-                                ) / rnd_menu_items.portion_size,
-                                4
-                            ) / ROUND(
-                                COALESCE(
-                                    menu_items.menu_price_dine,
-                                    rnd_menu_items.rnd_menu_srp
-                                ) / 1.12,
-                                4
-                            ) * 100,
-                            2
+                                rnd_menu_computed_packaging_cost.computed_packaging_total_cost / ROUND(
+                                    COALESCE(
+                                        menu_items.menu_price_dine,
+                                        rnd_menu_items.rnd_menu_srp
+                                    ) / 1.12,
+                                    4
+                                ) * 100,
+                                2
+                            ),
+                            0
+                        ) + COALESCE(
+                            ROUND(
+                                ROUND(
+                                    rnd_menu_computed_food_cost.computed_food_cost * (
+                                        1 + (rnd_menu_items.buffer / 100)
+                                    ) / rnd_menu_items.portion_size,
+                                    4
+                                ) / ROUND(
+                                    COALESCE(
+                                        menu_items.menu_price_dine,
+                                        rnd_menu_items.rnd_menu_srp
+                                    ) / 1.12,
+                                    4
+                                ) * 100,
+                                2
+                            ),
+                            0
                         ),
                         2
                     ) AS total_cost,
@@ -114,7 +120,7 @@ class CreateRndMenuCostingView extends Migration
                     LEFT JOIN rnd_menu_computed_food_cost ON rnd_menu_computed_food_cost.id = rnd_menu_items.id
                     LEFT JOIN rnd_menu_computed_packaging_cost ON rnd_menu_computed_packaging_cost.id = rnd_menu_items.id
                     LEFT JOIN menu_items ON rnd_menu_items.menu_items_id = (menu_items.id)
-            ;    
+            ; 
         ");
     }
 
