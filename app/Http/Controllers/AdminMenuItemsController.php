@@ -86,9 +86,9 @@
 			}
 			$this->form[] = ['label'=>'Menu Item Description','name'=>'menu_item_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-4'];
 			$this->form[] = ['label'=>'Menu Category','name'=>'menu_categories_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'menu_categories,category_description','datatable_where'=>"status='ACTIVE'"];
-// 			$this->form[] = ['label'=>'Menu Subcategory','name'=>'menu_subcategories_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'menu_subcategories,subcategory_description','datatable_where'=>"status='ACTIVE'"];
-// 			$this->form[] = ['label'=>'Tax Code','name'=>'tax_codes_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'tax_codes,tax_code','datatable_where'=>"status='ACTIVE'"];
-// 			$this->form[] = ['label'=>'Menu Cost Price','name'=>'menu_cost_price','type'=>'number','validation'=>'required|min:0','width'=>'col-sm-4'];
+			// $this->form[] = ['label'=>'Menu Subcategory','name'=>'menu_subcategories_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'menu_subcategories,subcategory_description','datatable_where'=>"status='ACTIVE'"];
+			// $this->form[] = ['label'=>'Tax Code','name'=>'tax_codes_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'tax_codes,tax_code','datatable_where'=>"status='ACTIVE'"];
+			// $this->form[] = ['label'=>'Menu Cost Price','name'=>'menu_cost_price','type'=>'number','validation'=>'required|min:0','width'=>'col-sm-4'];
 			$this->form[] = ['label'=>'Menu Selling Price','name'=>'menu_selling_price','type'=>'number','validation'=>'required|min:0','width'=>'col-sm-4'];
 			if(in_array(CRUDBooster::getCurrentMethod(),['getEdit','postEditSave','getDetail'])){
 				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'ACTIVE;INACTIVE'];

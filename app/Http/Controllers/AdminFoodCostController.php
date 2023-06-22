@@ -338,8 +338,7 @@ class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CB
 
 	//By the way, you can still create your own method in here... :) 
 
-	public function getIndex($low_cost_value = 30)
-	{
+	public function getIndex($low_cost_value = 30) {
 		$low_cost_value = (float) $low_cost_value;
 
 		if (!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
@@ -426,8 +425,7 @@ class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CB
 		return $this->view('menu-items/food-cost', $data);
 	}
 
-	public function filterByCost($concept_id, $filter, $low_cost)
-	{
+	public function filterByCost($concept_id, $filter, $low_cost) {
 		if (!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
 		$privilege = CRUDBooster::myPrivilegeName();
 		$data = [];
@@ -478,37 +476,36 @@ class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CB
 				->toArray();
 
 			if (CRUDBooster::myPrivilegeName() == 'Chef') {
+				$query = DB::table('menu_items')
+					->where('status', 'ACTIVE')
+					->select(DB::raw('id,
+						status,
+						menu_price_dine,
+						menu_price_dlv,
+						menu_price_take,
+						food_cost,
+						food_cost_percentage,
+						menu_item_description,
+						tasteless_menu_code,'
+						. implode(', ', $segmentation_columns)));
 
-			$query = DB::table('menu_items')
-				->where('status', 'ACTIVE')
-				->select(DB::raw('id,
-					status,
-					menu_price_dine,
-					menu_price_dlv,
-					menu_price_take,
-					food_cost,
-					food_cost_percentage,
-					menu_item_description,
-					tasteless_menu_code,'
-					. implode(', ', $segmentation_columns)));
+				if ($concept_column_names) {
+					$query->where(function ($subQuery) use ($concept_column_names) {
+						foreach ($concept_column_names as $concept_column_name) {
+							$subQuery->orWhere($concept_column_name, '1');
+						}
+					});
+				} else {
+					$query->where('menu_items.id', null);
+				}
+				
+				$menu_items = $query->get()->toArray();
 
-			if ($concept_column_names) {
-				$query->where(function ($subQuery) use ($concept_column_names) {
-					foreach ($concept_column_names as $concept_column_name) {
-						$subQuery->orWhere($concept_column_name, '1');
-					}
-				});
-			} else {
-				$query->where('menu_items.id', null);
+				$data['concepts'] = DB::table('menu_segmentations')
+					->where('status', 'ACTIVE')
+					->whereIn('menu_segment_column_name', $concept_column_names)
+					->get();
 			}
-			
-			$menu_items = $query->get()->toArray();
-
-			$data['concepts'] = DB::table('menu_segmentations')
-				->where('status', 'ACTIVE')
-				->whereIn('menu_segment_column_name', $concept_column_names)
-				->get();
-		}
 		}
 
 
