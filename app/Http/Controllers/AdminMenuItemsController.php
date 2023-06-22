@@ -38,7 +38,7 @@
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
-			$this->button_edit = true;
+			$this->button_edit = false;
 			$this->button_delete = false;
 			$this->button_detail = false;
 			$this->button_show = true;
@@ -131,23 +131,20 @@
 	        */
 	        $this->addaction = array();
 			$privilege = CRUDBooster::myPrivilegeName(); 
-			if (CRUDBooster::isSuperAdmin() || $privilege == 'Chef') {
-				$this->addaction[] = [
-					'title'=>'View Ingredients',
-					'url'=>CRUDBooster::mainpath('detail/[id]'),
-					'icon'=>'fa fa-eye',
-					'color' => ' ',
-				];
-			}
 
-			if ($privilege !== 'Chef') {
-				$this->addaction[] = [
-					'title'=>'View Costing',
-					'url'=>CRUDBooster::mainpath('costing-detail/[id]'),
-					'icon'=>'fa fa-eye',
-					'color' => ' ',
-				];
-			}
+			$this->addaction[] = [
+				'title'=>'Detail',
+				'url' => '#[id]',
+				'icon'=>'fa fa-eye',
+				'color' => ' view-menu-details'
+			];
+
+			$this->addaction[] = [
+				'title'=>'Edit',
+				'url' => '#[id]',
+				'icon'=>'fa fa-pencil',
+				'color' => ' edit-menu-item'
+			];
 
 
 	        /* 
@@ -235,11 +232,49 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
+			$main_path = CRUDBooster::mainPath();
 	        $this->script_js = NULL;
             $this->script_js = "
 				function showMenuItemExport() {
 					$('#modal-menu-item-export').modal('show');
 				}
+
+
+				$('.view-menu-details').on('click', function() {
+					const dbId = $(this).attr('href')?.replace('#', '');
+					Swal.fire({
+						title: 'Which details do you want to see?',
+						showDenyButton: true,
+						focusConfirm: false,
+						showCancelButton: true,
+						confirmButtonText: `🍕 Ingredients`,
+						denyButtonText: `💲 Costing`,
+					}).then((result) => {
+						if (result.isConfirmed) {
+							location.href=`$main_path/detail/` + dbId;
+						} else if (result.isDenied) {
+							location.href=`$main_path/costing-detail/` + dbId;
+						}
+					})
+				});
+
+				$('.edit-menu-item').on('click', function() {
+					const dbId = $(this).attr('href')?.replace('#', '');
+					Swal.fire({
+						title: 'Which one do you want to edit?',
+						showDenyButton: true,
+						focusConfirm: false,
+						showCancelButton: true,
+						confirmButtonText: `🍕 Ingredients`,
+						denyButtonText: `🛍️ Packagings`,
+					}).then((result) => {
+						if (result.isConfirmed) {
+							location.href=`$main_path/edit/` + dbId + `/ingredients`;
+						} else if (result.isDenied) {
+							location.href=`$main_path/edit/` + dbId + `/packagings`;
+						}
+					})
+				});
 			";
 
             /*
@@ -302,6 +337,7 @@
 	        |
 	        */
 	        $this->load_js = array();
+			$this->load_js[] = '//cdn.jsdelivr.net/npm/sweetalert2@11';
 	        
 	        
 	        
@@ -326,6 +362,7 @@
 	        |
 	        */
 	        $this->load_css = array();
+			$this->load_css[] = asset('css/custom.css');
 	        
 	        
 	    }
@@ -754,7 +791,7 @@
 		   return Excel::download(new MenuItemsExport, $filename.'.xlsx');
 	    }
 
-		public function getEdit($id) {
+		public function getEdit($id, $to_edit) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
@@ -872,9 +909,21 @@
 
 			$data['menu_items_data'] = self::getMenuItemDetails($id);
 			
-			if (CRUDBooster::isSuperAdmin() || CRUDBooster::myPrivilegeName() == 'Chef') {
+			if ($to_edit == 'ingredients') {
+				if (CRUDBooster::myPrivilegeName() != 'Chef' && !CRUDBooster::isSuperAdmin()) {
+					CRUDBooster::redirect(
+						CRUDBooster::adminPath(),
+						trans('crudbooster.denied_access')
+					);
+				}
 				return $this->view('menu-items/edit-item', $data);
-			} else {
+			} else if ($to_edit == 'packagings') {
+				if (CRUDBooster::myPrivilegeName() == 'Chef') {
+					CRUDBooster::redirect(
+						CRUDBooster::adminPath(),
+						trans('crudbooster.denied_access')
+					);
+				}
 				return $this->view('menu-items/add-packaging', $data);
 			}
 		}
