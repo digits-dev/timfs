@@ -1121,7 +1121,7 @@
 			$menu_items_data = self::getMenuItemDetails($id);
 
 			$data['item'] = $item;
-			$data['menu_items_data'];
+			$data['menu_items_data'] = self::getMenuItemDetails($id);
 
 			return $this->view('menu-items/costing-details', $data);
 		}

@@ -109,7 +109,7 @@
                 </div>
             </div>
             <hr>
-            <h3 class="text-center">RND MENU COSTING</h3>
+            <h3 class="text-center">MENU COSTING</h3>
             <div class="row">
                 <div class="col-md-4">
                     <table class="table table-striped table-bordered costing-table">
@@ -236,7 +236,6 @@
         </form>
         <section class="menu-and-comment">
             <div class="row">
-                @if ($menu_items_data)
                 <div class="col-md-6">
                     <hr>
                     <h3 class="text-center">MENU ITEM DETAILS</h3>
@@ -297,7 +296,6 @@
                         </tbody>
                     </table>
                 </div>
-                @endif
             </div>
         </section>
         <hr>
