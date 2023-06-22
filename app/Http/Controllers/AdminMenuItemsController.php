@@ -143,7 +143,8 @@
 				'title'=>'Edit',
 				'url' => '#[id]',
 				'icon'=>'fa fa-pencil',
-				'color' => ' edit-menu-item'
+				'color' => ' edit-menu-item',
+				'showIf' => '[tasteless_menu_code] != null'
 			];
 
 
