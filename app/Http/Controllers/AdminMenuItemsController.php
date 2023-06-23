@@ -1005,6 +1005,15 @@
 				}
 			}
 
+			DB::table('menu_packagings_details')
+				->where('menu_items_id', $menu_items_id)
+				->where('status', 'ACTIVE')
+				->update([
+					'status' => 'INACTIVE',
+					'row_id' => null,
+					'deleted_at' => $time_stamp
+				]);
+
 			foreach ($packagings as $group) {
 				foreach ($group as $packaging) {
 					$packaging = (array) $packaging;
@@ -1094,6 +1103,15 @@
 			$packagings = json_decode($request->input('packagings'));
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
+
+			DB::table('menu_packagings_details')
+				->where('menu_items_id', $menu_items_id)
+				->where('status', 'ACTIVE')
+				->update([
+					'status' => 'INACTIVE',
+					'row_id' => null,
+					'deleted_at' => $time_stamp
+				]);
 
 			foreach ($packagings as $group) {
 				foreach ($group as $packaging) {
