@@ -290,7 +290,7 @@
 						} else if (result.isDenied) {
 							location.href=`$main_path/edit/` + dbId + `/packagings`;
 						} else if (result.dismiss == 'cancel') {
-							alert('heeey');
+							location.href=`$main_path/edit/` + dbId + `/costing`;
 						}
 					})
 				});
@@ -944,6 +944,12 @@
 					);
 				}
 				return $this->view('menu-items/add-packaging', $data);
+			} else if ($to_edit == 'costing') {
+				$data['item'] = DB::table('menu_costing')
+					->where('menu_items_id', $id)
+					->first();
+
+				return $this->view('menu-items/edit-costing', $data);
 			}
 		}
 
@@ -1128,6 +1134,33 @@
 					'message' => 'Packagings Updated!'
 				]);
 
+		}
+
+		public function submitCosting(Request $request) {
+			$action_by = CRUDBooster::myId();
+			$time_stamp = date('Y-m-d H:i:s');
+			$menu_items_id = $request->input('menu_items_id');
+			$buffer = $request->input('buffer');
+			$ideal_food_cost = $request->input('ideal_food_cost');
+			$menu_price_dine = $request->input('menu_price_dine');
+			$menu_price_take = $request->input('menu_price_take');
+			$menu_price_dlv = $request->input('menu_price_dlv');
+
+			DB::table('menu_items')
+				->where('id', $menu_items_id)
+				->update([
+					'buffer' => $buffer,
+					'ideal_food_cost' => $ideal_food_cost,
+					'menu_price_dine' => $menu_price_dine,
+					'menu_price_take' => $menu_price_take,
+					'menu_price_dlv' => $menu_price_dlv,
+				]);
+
+			return redirect('admin/menu_items')
+				->with([
+					'message_type' => 'success',
+					'message' => 'Costing Updated!'
+				]);
 		}
 
 		public function getDetail($id) {
