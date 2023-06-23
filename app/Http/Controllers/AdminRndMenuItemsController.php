@@ -474,15 +474,15 @@
 				->first();
 
 			$ingredients = self::getIngredients($id);
+
 			
 			$packagings = self::getPackagings($id);
 			
 			$rnd_menu_description = $data['item']->rnd_menu_description;
-			$data['ingredients'] = array_map(fn ($object) => (object) array_filter((array) $object), $ingredients);
-			$data['packagings'] = array_map(fn ($object) => (object) array_filter((array) $object), $packagings);
+			$data['ingredients'] = $ingredients;
+			$data['packagings'] = $packagings;
 			$data['page_title'] = "Detail RND Menu Item: $rnd_menu_description";
 			$data['comments_data'] = self::getRNDComments($id);
-			
 			return $this->view('rnd-menu/detail-item', $data);
 
 		}
@@ -1545,7 +1545,7 @@
 					->get('menu_items_id')
 					->first()
 					->menu_items_id;
-	
+
 				// getting all the active ingredients of the rnd menu
 				$ingredients = DB::table('rnd_menu_ingredients_details')
 					->where('rnd_menu_items_id', $rnd_menu_items_id)
@@ -1567,44 +1567,79 @@
 					$ingredient['menu_items_id'] = $menu_items_id;
 					$ingredients[$index] = $ingredient;
 				}
+
+				// for assurance: set inactive all existing ingredients of the menu
+				DB::table('menu_ingredients_details')
+					->where('menu_items_id', $menu_items_id)
+					->update(['status' => 'INACTIVE']);
 	
+				// finally, inserting all ingredients to the table
 				DB::table('menu_ingredients_details')
 					->insert($ingredients);
-	
-				DB::table('menu_items')
-					->leftJoin('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
-					->where('menu_items.id', $menu_items_id)
-					->update([
-						'menu_items.ingredient_total_cost' => DB::raw('menu_computed_food_cost.computed_ingredient_total_cost'),
-						'menu_items.food_cost' => DB::raw('menu_computed_food_cost.computed_food_cost'),
-						'menu_items.food_cost_percentage' => DB::raw('menu_computed_food_cost.computed_food_cost_percentage')
-					]);
+
+				// getting all active packaging of the rnd menu
+				$packagings = DB::table('rnd_menu_packagings_details')
+					->where('rnd_menu_items_id', $rnd_menu_items_id)
+					->where('status', 'ACTIVE')
+					->get()
+					->toArray();
+
+				// preparing every packaging to be copied as
+				// packaging of the menu item
+				foreach ($packagings as $index => $packaging) {
+					$packaging = (array) $packaging;
+					unset(
+						$packaging['id'],
+						$packaging['rnd_menu_items_id'],
+						$packaging['item_masters_temp_id'],
+						$packaging['deleted_at']
+					);
+
+					$packaging['menu_items_id'] = $menu_items_id;
+					$packagings[$index] = $packaging;
+				}
+
+				// for assurance: set inactive to existing packagings of the menu
+				DB::table('menu_packagings_details')
+					->where('menu_items_id', $menu_items_id)
+					->update(['status' => 'INACTIVE']);
+
+				// finally, inserting all packagings to the table
+				DB::table('menu_packagings_details')
+					->insert($packagings);
 
 				$promo_id = DB::table('menu_types')
 					->select('id')
 					->where('status', 'ACTIVE')
 					->where('menu_type_description', 'PROMO')->value('id');
 
-				$menu_items = DB::table('rnd_menu_items')
-					->where('rnd_menu_items.id', $rnd_menu_items_id)
+				$menu_item = DB::table('menu_items')
+					->where('menu_items.id', $menu_items_id)
 					->select('*')
-					->leftJoin('menu_items', 'menu_items.id', '=', 'rnd_menu_items.menu_items_id')
 					->leftJoin('menu_types', 'menu_types.id', '=', 'menu_items.menu_types_id')
 					->first();
 
-				if ($menu_items->menu_type_description == 'PROMO') {
-					$tasteless_menu_code = (int) DB::table('menu_items')->where('tasteless_menu_code','like',"5%")
+				if ($menu_item->menu_type_description == 'PROMO') {
+					$tasteless_menu_code = (int) DB::table('menu_items')
+						->where('tasteless_menu_code','like',"5%")
 						->select('tasteless_menu_code')
 						->max('tasteless_menu_code');
 				} else {
-					$tasteless_menu_code = (int) DB::table('menu_items')->where('tasteless_menu_code','like',"6%")
+					$tasteless_menu_code = (int) DB::table('menu_items')
+						->where('tasteless_menu_code','like',"6%")
 						->select('tasteless_menu_code')
 						->max('tasteless_menu_code');
 				}
 
 				DB::table('menu_items')
-					->where('id', $menu_items->menu_items_id)
-					->update(['tasteless_menu_code' => $tasteless_menu_code + 1]);
+					->leftJoin('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
+					->where('menu_items.id', $menu_items_id)
+					->update([
+						'menu_items.ingredient_total_cost' => DB::raw('menu_computed_food_cost.computed_ingredient_total_cost'),
+						'menu_items.food_cost' => DB::raw('menu_computed_food_cost.computed_food_cost'),
+						'menu_items.food_cost_percentage' => DB::raw('menu_computed_food_cost.computed_food_cost_percentage'),
+						'menu_items.tasteless_menu_code' => $tasteless_menu_code + 1,
+					]);
 			}
 			
 

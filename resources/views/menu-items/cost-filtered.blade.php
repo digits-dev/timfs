@@ -1,6 +1,8 @@
 @push('head')
 <script src="https://code.jquery.com/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="{{ asset('css/custom.css') }}">
 
 <style>
     table, th, td {
@@ -74,10 +76,10 @@
                     <td>{{$menu_item->food_cost ? (float) $menu_item->food_cost : '0'}}</td>
                     <td>{{$menu_item->food_cost_percentage ? (float) $menu_item->food_cost_percentage : '0.00'}}%</td>
                     <td class="action">
-                        <a href="{{ CRUDBooster::adminPath('menu_items/detail') . "/$menu_item->id" }}" target="_blank">
+                        <a class="action-button" href="#" _menu-item-id="{{ $menu_item->id }}" _action="detail">
                             <i class="fa fa-eye button"></i>
                         </a>
-                        <a href="{{ CRUDBooster::adminPath('menu_items/edit') . "/$menu_item->id" }}" target="_blank">
+                        <a class="action-button" href="#" _menu-item-id="{{ $menu_item->id }}" _action="edit">
                             <i class="fa fa-pencil button"></i>
                         </a>
                     </td>
@@ -107,6 +109,43 @@
         $('table').DataTable({
             pagingType: 'full_numbers',
             pageLength: 50,
+        });
+
+        $(document).on('click', '.action-button', function() {
+            const clickedAction = $(this).attr('_action');
+            const id = $(this).attr('_menu-item-id');
+            const path = "{{ CRUDBooster::adminPath('menu_items') }}";
+            if (clickedAction == 'edit') {
+                Swal.fire({
+                    title: 'Which one do you want to edit?',
+                    showDenyButton: true,
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: `🍕 Ingredients`,
+                    denyButtonText: `🛍️ Packagings`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.open(`${path}/edit/${id}/ingredients`);
+                    } else if (result.isDenied) {
+                        window.open(`${path}/edit/${id}/packagings`);
+                    }
+                });
+            } else if (clickedAction == 'detail') {
+                Swal.fire({
+                    title: 'Which details do you want to see?',
+                    showDenyButton: true,
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: `🍕 Ingredients`,
+                    denyButtonText: `💲 Costing`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.open(`${path}/detail/${id}`);
+                    } else if (result.isDenied) {
+                        window.open(`${path}/costing-detail/${id}`);
+                    }
+                })
+            }
         });
     });
 </script>

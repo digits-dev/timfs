@@ -279,8 +279,7 @@
 			
 	        $query->whereIn('rnd_menu_approvals.approval_status', $approval_status)
 				->addSelect('rnd_menu_approvals.approval_status')
-				->orderBy('rnd_menu_approvals.approval_status', 'desc')
-				->orderBy('rnd_menu_approvals.approval_status', '');
+				->orderBy('rnd_menu_approvals.approval_status', 'desc');
 	    }
 
 	    /*

@@ -38,9 +38,9 @@
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
-			$this->button_edit = true;
-			$this->button_delete = true;
-			$this->button_detail = true;
+			$this->button_edit = false;
+			$this->button_delete = false;
+			$this->button_detail = false;
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
@@ -86,9 +86,9 @@
 			}
 			$this->form[] = ['label'=>'Menu Item Description','name'=>'menu_item_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-4'];
 			$this->form[] = ['label'=>'Menu Category','name'=>'menu_categories_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'menu_categories,category_description','datatable_where'=>"status='ACTIVE'"];
-// 			$this->form[] = ['label'=>'Menu Subcategory','name'=>'menu_subcategories_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'menu_subcategories,subcategory_description','datatable_where'=>"status='ACTIVE'"];
-// 			$this->form[] = ['label'=>'Tax Code','name'=>'tax_codes_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'tax_codes,tax_code','datatable_where'=>"status='ACTIVE'"];
-// 			$this->form[] = ['label'=>'Menu Cost Price','name'=>'menu_cost_price','type'=>'number','validation'=>'required|min:0','width'=>'col-sm-4'];
+			// $this->form[] = ['label'=>'Menu Subcategory','name'=>'menu_subcategories_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'menu_subcategories,subcategory_description','datatable_where'=>"status='ACTIVE'"];
+			// $this->form[] = ['label'=>'Tax Code','name'=>'tax_codes_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'tax_codes,tax_code','datatable_where'=>"status='ACTIVE'"];
+			// $this->form[] = ['label'=>'Menu Cost Price','name'=>'menu_cost_price','type'=>'number','validation'=>'required|min:0','width'=>'col-sm-4'];
 			$this->form[] = ['label'=>'Menu Selling Price','name'=>'menu_selling_price','type'=>'number','validation'=>'required|min:0','width'=>'col-sm-4'];
 			if(in_array(CRUDBooster::getCurrentMethod(),['getEdit','postEditSave','getDetail'])){
 				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'ACTIVE;INACTIVE'];
@@ -129,7 +129,24 @@
 	        | @showIf 	   = If condition when action show. Use field alias. e.g : [id] == 1
 	        | 
 	        */
-	        $this->addaction = array(); 
+	        $this->addaction = array();
+			$privilege = CRUDBooster::myPrivilegeName(); 
+
+			$this->addaction[] = [
+				'title'=>'Detail',
+				'url' => '#[id]',
+				'icon'=>'fa fa-eye',
+				'color' => ' view-menu-details'
+			];
+
+			$this->addaction[] = [
+				'title'=>'Edit',
+				'url' => '#[id]',
+				'icon'=>'fa fa-pencil',
+				'color' => ' edit-menu-item',
+				'showIf' => '[tasteless_menu_code] != null'
+			];
+
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -216,11 +233,49 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
+			$main_path = CRUDBooster::mainPath();
 	        $this->script_js = NULL;
             $this->script_js = "
 				function showMenuItemExport() {
 					$('#modal-menu-item-export').modal('show');
 				}
+
+
+				$('.view-menu-details').on('click', function() {
+					const dbId = $(this).attr('href')?.replace('#', '');
+					Swal.fire({
+						title: 'Which details do you want to see?',
+						showDenyButton: true,
+						focusConfirm: false,
+						showCancelButton: true,
+						confirmButtonText: `🍕 Ingredients`,
+						denyButtonText: `💲 Costing`,
+					}).then((result) => {
+						if (result.isConfirmed) {
+							location.href=`$main_path/detail/` + dbId;
+						} else if (result.isDenied) {
+							location.href=`$main_path/costing-detail/` + dbId;
+						}
+					})
+				});
+
+				$('.edit-menu-item').on('click', function() {
+					const dbId = $(this).attr('href')?.replace('#', '');
+					Swal.fire({
+						title: 'Which one do you want to edit?',
+						showDenyButton: true,
+						focusConfirm: false,
+						showCancelButton: true,
+						confirmButtonText: `🍕 Ingredients`,
+						denyButtonText: `🛍️ Packagings`,
+					}).then((result) => {
+						if (result.isConfirmed) {
+							location.href=`$main_path/edit/` + dbId + `/ingredients`;
+						} else if (result.isDenied) {
+							location.href=`$main_path/edit/` + dbId + `/packagings`;
+						}
+					})
+				});
 			";
 
             /*
@@ -283,6 +338,7 @@
 	        |
 	        */
 	        $this->load_js = array();
+			$this->load_js[] = '//cdn.jsdelivr.net/npm/sweetalert2@11';
 	        
 	        
 	        
@@ -307,6 +363,7 @@
 	        |
 	        */
 	        $this->load_css = array();
+			$this->load_css[] = asset('css/custom.css');
 	        
 	        
 	    }
@@ -735,16 +792,12 @@
 		   return Excel::download(new MenuItemsExport, $filename.'.xlsx');
 	    }
 
-		public function getEdit($id) {
-			if (CRUDBooster::myPrivilegeName() != 'Chef' &&
-				CRUDBooster::myPrivilegeId() != '1' &&
-				CRUDBooster::myPrivilegeName() != 'Ingredient Approver (Accounting)' &&
-				CRUDBooster::myPrivilegeName() != 'Ingredient Approver (Marketing)') 
-				return redirect('admin/menu_items')
-					->with([
-						'message_type' => 'danger',
-						'message' => 'You do not have the access to edit the item.'
-					]);
+		public function getEdit($id, $to_edit) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
 
 			$data = [];
 			$data['item'] = DB::table('menu_items')
@@ -850,7 +903,30 @@
 				->get()
 				->toArray();
 
-			return $this->view('menu-items/edit-item', $data);
+			$data['food_cost_data'] = DB::table('menu_computed_food_cost')
+				->where('id', $id)
+				->get()
+				->first();
+
+			$data['menu_items_data'] = self::getMenuItemDetails($id);
+			
+			if ($to_edit == 'ingredients') {
+				if (CRUDBooster::myPrivilegeName() != 'Chef' && !CRUDBooster::isSuperAdmin()) {
+					CRUDBooster::redirect(
+						CRUDBooster::adminPath(),
+						trans('crudbooster.denied_access')
+					);
+				}
+				return $this->view('menu-items/edit-item', $data);
+			} else if ($to_edit == 'packagings') {
+				if (CRUDBooster::myPrivilegeName() == 'Chef') {
+					CRUDBooster::redirect(
+						CRUDBooster::adminPath(),
+						trans('crudbooster.denied_access')
+					);
+				}
+				return $this->view('menu-items/add-packaging', $data);
+			}
 		}
 
 		public function submitEdit(Request $request) {
@@ -998,61 +1074,166 @@
 			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
 		}
 
-		public function getDetail($id) {
-			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
-			if (CRUDBooster::myPrivilegeName() != 'Chef' && !CRUDBooster::isSuperAdmin()) {
-				return self::getDetailNotChef($id);
+		public function submitPackagings(Request $request) {
+			$menu_items_id = $request->input('menu_items_id');
+			$packagings = json_decode($request->input('packagings'));
+			$action_by = CRUDBooster::myId();
+			$time_stamp = date('Y-m-d H:i:s');
+
+			foreach ($packagings as $group) {
+				foreach ($group as $packaging) {
+					$packaging = (array) $packaging;
+
+					//checking if the packaging already exists
+					$is_existing = DB::table('menu_packagings_details')
+						->where([
+							'menu_items_id' => $menu_items_id,
+							'item_masters_id' => $packaging['item_masters_id'],
+							'packaging_name' => $packaging['packaging_name'],
+							'new_packagings_id' => $packaging['new_packagings_id'],
+						])->exists();
+
+					if ($is_existing) {
+						$packaging['updated_at'] = $time_stamp;
+						$packaging['updated_by'] = $action_by;
+					} else {
+						$packaging['created_at'] = $time_stamp;
+						$packaging['created_by'] = $action_by;
+					}
+
+					$packaging['status'] = 'ACTIVE';
+					$packaging['deleted_at'] = null;
+
+					//unsetting packagings details that may be outdated in the future
+					unset(
+						$packaging['qty'], 
+						$packaging['cost'], 
+						$packaging['total_cost'],
+						$packaging['ttp']
+					);
+
+					//finally, inserting packaging to the table
+					DB::table('menu_packagings_details')->updateOrInsert([
+						'menu_items_id' => $menu_items_id,
+						'item_masters_id' => $packaging['item_masters_id'],
+						'new_packagings_id' => $packaging['new_packagings_id']
+					], $packaging);
+						
+				}
 			}
+
+			return redirect('admin/menu_items')
+				->with([
+					'message_type' => 'success',
+					'message' => 'Packagings Updated!'
+				]);
+
+		}
+
+		public function getDetail($id) {
+			if (!CRUDBooster::isRead())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
 			$data = [];
 			$data['item'] = DB::table('menu_items')
-				->where('id', $id)
+				->where('menu_items.id', $id)
+				->select(
+					'menu_items.tasteless_menu_code',
+					'menu_items.menu_price_dine',
+					'menu_items.menu_item_description',
+					'menu_items.portion_size',
+					'computed_ingredient_total_cost',
+					'computed_food_cost',
+					'computed_food_cost_percentage',
+					'computed_packaging_total_cost'
+				)
+				->leftJoin('menu_computed_food_cost', 'menu_computed_food_cost.id', '=', 'menu_items.id')
+				->leftJoin('menu_computed_packaging_cost', 'menu_computed_packaging_cost.id', '=', 'menu_items.id')
+				->first();
+
+			$data['ingredients'] = self::getIngredients($id);
+			$data['packagings'] = self::getPackagings($id);
+
+			return $this->view('menu-items/detail-item', $data);
+		}
+
+		public function getCostingDetails($id) {
+			$data = [];
+
+			$item = DB::table('menu_costing')
+				->where('menu_costing.menu_items_id', $id)
+				->leftJoin('menu_items', 'menu_items.id', '=', 'menu_costing.menu_items_id')
 				->get()
 				->first();
 
-			$ingredients = DB::table('menu_ingredients_auto_compute')
-				->where('menu_items_id', $id)
-				->where('menu_ingredients_auto_compute.status', 'ACTIVE')
-				->select('tasteless_code',
-					'menu_items.status as menu_item_status',
-					'sku_statuses.sku_status_description as item_status',
-					'new_ingredients.status as new_ingredient_status',
-					'batching_ingredients.status as batching_ingredient_status',
-					'menu_ingredients_auto_compute.item_masters_id',
-					'menu_ingredients_auto_compute.menu_item_description',
-					'menu_ingredients_auto_compute.item_description',
-					'menu_ingredients_auto_compute.ingredient_description',
-					'tasteless_menu_code',
-					'ingredient_name',
-					'prep_qty',
-					'ingredient_group',
-					'row_id',
-					'is_primary',
-					'is_selected',
-					'menu_ingredients_auto_compute.packaging_size',
-					'menu_ingredients_auto_compute.full_item_description',
-					'menu_ingredients_preparations.preparation_desc',
-					'ingredient_qty',
-					'menu_ingredients_auto_compute.uom_description',
-					'menu_ingredients_auto_compute.packaging_description',
-					'yield',
-					'menu_ingredients_auto_compute.ttp',
-					'cost',
-					'item_masters.updated_at',
-					'item_masters.created_at',
-					'menu_ingredients_auto_compute.item_description')
-				->leftJoin('item_masters', 'menu_ingredients_auto_compute.item_masters_id', '=', 'item_masters.id')
-				->leftJoin('menu_items', 'menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
-				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
-				->leftJoin('menu_ingredients_preparations', 'menu_ingredients_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
-				->leftJoin('new_ingredients', 'new_ingredients.id', '=', 'menu_ingredients_auto_compute.new_ingredients_id')
-				->leftJoin('batching_ingredients', 'batching_ingredients.id', '=', 'menu_ingredients_auto_compute.batching_ingredients_id')
-				->orderby('ingredient_group', 'asc')
-				->orderby('row_id', 'asc')
+			$menu_items_data = self::getMenuItemDetails($id);
+
+			$data['item'] = $item;
+			$data['menu_items_data'] = self::getMenuItemDetails($id);
+
+			return $this->view('menu-items/costing-details', $data);
+		}
+
+		function getMenuItemDetails($id) {
+			$data = [];
+
+			if (!$id) return;
+
+			$menu_items_data = DB::table('menu_items')
+				->where('menu_items.id', $id)
+				->select(
+					'*',
+					'menu_items.id as menu_items_id',
+				)
+				->leftJoin('menu_categories', 'menu_categories.id', 'menu_items.menu_categories_id')
+				->leftJoin('menu_types', 'menu_types.id', '=', 'menu_items.menu_types_id')
+				->leftJoin('menu_subcategories', 'menu_subcategories.id', '=', 'menu_items.menu_subcategories_id')
+				->get()
+				->first();
+
+			$all_old_codes = DB::table('menu_old_code_masters')
+					->where('status', 'ACTIVE')
+					->get()
+					->toArray();
+
+			$menu_items_data->old_codes = $all_old_codes;
+
+			$all_segmentations = DB::table('menu_segmentations')
+				->where('status', 'ACTIVE')
 				->get()
 				->toArray();
 
-			$data['ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $ingredients);
-			return $this->view('menu-items/detail-item', $data);
+			$menu_segmentations = [];
+
+			foreach ($all_segmentations as $segmentation) {
+				if ($menu_items_data->{$segmentation->menu_segment_column_name}) {
+					$menu_segmentations[] = $segmentation->menu_segment_column_description;
+				}
+			}
+
+			$menu_items_data->menu_segmentations = $menu_segmentations;
+
+			$all_menu_choices_groups = DB::table('menu_choice_groups')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
+			$menu_items_data->menu_choice_groups = $all_menu_choices_groups;
+
+			foreach($all_menu_choices_groups as $choice_group) {
+				$column_name = 'choices_sku' . $choice_group->menu_choice_group_column_name;
+				$sku_ids = explode(', ', $menu_items_data->{$column_name});
+				$menu_names = DB::table('menu_items')
+					->whereIn('tasteless_menu_code', $sku_ids)
+					->get('menu_item_description')
+					->toArray();
+
+				$menu_names = array_map(fn($obj) => $obj->menu_item_description, $menu_names);
+				$menu_items_data->{$column_name} = $menu_names;
+			}
+			return $menu_items_data;
 		}
 
 		public function getDetailNotChef($id) {
@@ -1248,6 +1429,90 @@
 				//the process keeps going on until there are no more ingredients to be updated
 				self::updateCostOfOtherMenu($to_update);
 
+		}
+
+		function getIngredients($id) {
+			$ingredients = DB::table('menu_ingredients_auto_compute')
+				->where('menu_items_id', $id)
+				->where('menu_ingredients_auto_compute.status', 'ACTIVE')
+				->select('tasteless_code',
+					'menu_items.status as menu_item_status',
+					'sku_statuses.sku_status_description as item_status',
+					'new_ingredients.status as new_ingredient_status',
+					'batching_ingredients.status as batching_ingredient_status',
+					'menu_ingredients_auto_compute.item_masters_id',
+					'menu_ingredients_auto_compute.menu_item_description',
+					'menu_ingredients_auto_compute.item_description',
+					'menu_ingredients_auto_compute.ingredient_description',
+					'tasteless_menu_code',
+					'ingredient_name',
+					'prep_qty',
+					'ingredient_group',
+					'row_id',
+					'is_primary',
+					'is_selected',
+					'menu_ingredients_auto_compute.packaging_size',
+					'menu_ingredients_auto_compute.full_item_description',
+					'menu_ingredients_preparations.preparation_desc',
+					'ingredient_qty',
+					'menu_ingredients_auto_compute.uom_description',
+					'menu_ingredients_auto_compute.packaging_description',
+					'yield',
+					'menu_ingredients_auto_compute.ttp',
+					'cost',
+					'item_masters.updated_at',
+					'item_masters.created_at',
+					'menu_ingredients_auto_compute.item_description')
+				->leftJoin('item_masters', 'menu_ingredients_auto_compute.item_masters_id', '=', 'item_masters.id')
+				->leftJoin('menu_items', 'menu_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
+				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->leftJoin('menu_ingredients_preparations', 'menu_ingredients_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
+				->leftJoin('new_ingredients', 'new_ingredients.id', '=', 'menu_ingredients_auto_compute.new_ingredients_id')
+				->leftJoin('batching_ingredients', 'batching_ingredients.id', '=', 'menu_ingredients_auto_compute.batching_ingredients_id')
+				->orderby('ingredient_group', 'asc')
+				->orderby('row_id', 'asc')
+				->get()
+				->toArray();
+
+			return $ingredients;
+		}
+
+		function getPackagings($id) {
+			$packagings = DB::table('menu_packagings_auto_compute')
+				->where('menu_items_id', $id)
+				->where('menu_packagings_auto_compute.status', 'ACTIVE')
+				->select('tasteless_code',
+				'sku_statuses.sku_status_description as item_status',
+				'new_packagings.status as new_packaging_status',
+				'menu_packagings_auto_compute.item_masters_id',
+				'packaging_name',
+				'prep_qty',
+				'packaging_group',
+				'row_id',
+				'is_primary',
+				'is_selected',
+				'menu_packagings_auto_compute.packaging_size',
+				'menu_packagings_auto_compute.full_item_description',
+				'menu_ingredients_preparations.preparation_desc',
+				'packaging_qty',
+				'menu_packagings_auto_compute.uom_description',
+				'menu_packagings_auto_compute.packaging_description',
+				'yield',
+				'menu_packagings_auto_compute.ttp',
+				'cost',
+				'item_masters.updated_at',
+				'item_masters.created_at',
+				'menu_packagings_auto_compute.item_description')
+			->leftJoin('item_masters', 'menu_packagings_auto_compute.item_masters_id', '=', 'item_masters.id')
+			->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+			->leftJoin('menu_ingredients_preparations', 'menu_packagings_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
+			->leftJoin('new_packagings', 'new_packagings.id', '=', 'menu_packagings_auto_compute.new_packagings_id')
+			->orderby('packaging_group', 'asc')
+			->orderby('row_id', 'asc')
+			->get()
+			->toArray();
+
+			return $packagings;
 		}
 
 	}	

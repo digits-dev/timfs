@@ -442,6 +442,8 @@
                 menu_price_dine: dineIn,
                 menu_price_take: takeOut,
                 menu_price_dlv: delivery,
+                buffer,
+                ideal_food_cost,
             }
 
             const form = $(document.createElement('form'))

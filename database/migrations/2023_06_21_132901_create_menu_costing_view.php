@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRndMenuCostingView extends Migration
+class CreateMenuCostingView extends Migration
 {
     /**
      * Run the migrations.
@@ -14,54 +14,47 @@ class CreateRndMenuCostingView extends Migration
     public function up()
     {
         DB::statement("
-            CREATE VIEW rnd_menu_costing AS 
+            CREATE VIEW menu_costing AS 
                 SELECT
-                    rnd_menu_items.id AS rnd_menu_items_id,
-                    rnd_menu_items.rnd_menu_description,
-                    rnd_menu_items.menu_items_id,
-                    menu_items.menu_item_description,
+                    menu_items.id AS menu_items_id,
                     menu_items.tasteless_menu_code,
-                    rnd_menu_items.rnd_code,
-                    rnd_menu_items.portion_size,
-                    rnd_menu_computed_food_cost.computed_food_cost AS recipe_cost_wo_buffer,
-                    rnd_menu_items.buffer,
+                    menu_items.menu_item_description,
+                    menu_items.portion_size,
+                    menu_computed_food_cost.computed_food_cost AS recipe_cost_wo_buffer,
+                    menu_items.buffer,
                     ROUND(
-                        rnd_menu_computed_food_cost.computed_food_cost * (
-                            1 + (rnd_menu_items.buffer / 100)
-                        ) / rnd_menu_items.portion_size,
+                        menu_computed_food_cost.computed_food_cost * (1 + (menu_items.buffer / 100)) / menu_items.portion_size,
                         4
                     ) AS final_recipe_cost,
-                    rnd_menu_computed_packaging_cost.computed_packaging_total_cost AS packaging_cost,
-                    rnd_menu_items.ideal_food_cost,
+                    menu_computed_packaging_cost.computed_packaging_total_cost AS packaging_cost,
+                    menu_items.ideal_food_cost,
                     ROUND(
                         ROUND(
-                            rnd_menu_computed_food_cost.computed_food_cost * (
-                                1 + (rnd_menu_items.buffer / 100)
-                            ) / rnd_menu_items.portion_size,
+                            menu_computed_food_cost.computed_food_cost * (1 + (menu_items.buffer / 100)) / menu_items.portion_size,
                             4
                         ) / (
-                            rnd_menu_items.ideal_food_cost / 100
+                            menu_items.ideal_food_cost / 100
                         ) * 1.12,
                         4
                     ) AS suggested_final_srp_w_vat,
                     ROUND(
                         COALESCE(
                             menu_items.menu_price_dine,
-                            rnd_menu_items.rnd_menu_srp
+                            menu_items.menu_price_take
                         ) / 1.12,
                         4
                     ) AS final_srp_wo_vat,
                     COALESCE(
                         menu_items.menu_price_dine,
-                        rnd_menu_items.rnd_menu_srp
+                        menu_items.menu_price_take
                     ) AS final_srp_w_vat_dine_in,
                     menu_items.menu_price_take as final_srp_w_vat_take_out,
-                    menu_items.menu_price_dlv as final_srp_w_vat_delivery,
+                    menu_items.menu_price_take as final_srp_w_vat_delivery,
                     ROUND(
-                        rnd_menu_computed_packaging_cost.computed_packaging_total_cost / ROUND(
+                        menu_computed_packaging_cost.computed_packaging_total_cost / ROUND(
                             COALESCE(
                                 menu_items.menu_price_dine,
-                                rnd_menu_items.rnd_menu_srp
+                                menu_items.menu_price_take
                             ) / 1.12,
                             4
                         ) * 100,
@@ -69,14 +62,12 @@ class CreateRndMenuCostingView extends Migration
                     ) AS cost_packaging_from_final_srp,
                     ROUND(
                         ROUND(
-                            rnd_menu_computed_food_cost.computed_food_cost * (
-                                1 + (rnd_menu_items.buffer / 100)
-                            ) / rnd_menu_items.portion_size,
+                            menu_computed_food_cost.computed_food_cost * (1 + (menu_items.buffer / 100)) / menu_items.portion_size,
                             4
                         ) / ROUND(
                             COALESCE(
                                 menu_items.menu_price_dine,
-                                rnd_menu_items.rnd_menu_srp
+                                menu_items.menu_price_take
                             ) / 1.12,
                             4
                         ) * 100,
@@ -85,10 +76,10 @@ class CreateRndMenuCostingView extends Migration
                     ROUND(
                         COALESCE(
                             ROUND(
-                                rnd_menu_computed_packaging_cost.computed_packaging_total_cost / ROUND(
+                                menu_computed_packaging_cost.computed_packaging_total_cost / ROUND(
                                     COALESCE(
                                         menu_items.menu_price_dine,
-                                        rnd_menu_items.rnd_menu_srp
+                                        menu_items.menu_price_take
                                     ) / 1.12,
                                     4
                                 ) * 100,
@@ -98,14 +89,12 @@ class CreateRndMenuCostingView extends Migration
                         ) + COALESCE(
                             ROUND(
                                 ROUND(
-                                    rnd_menu_computed_food_cost.computed_food_cost * (
-                                        1 + (rnd_menu_items.buffer / 100)
-                                    ) / rnd_menu_items.portion_size,
+                                    menu_computed_food_cost.computed_food_cost * (1 + (menu_items.buffer / 100)) / menu_items.portion_size,
                                     4
                                 ) / ROUND(
                                     COALESCE(
                                         menu_items.menu_price_dine,
-                                        rnd_menu_items.rnd_menu_srp
+                                        menu_items.menu_price_take
                                     ) / 1.12,
                                     4
                                 ) * 100,
@@ -115,12 +104,11 @@ class CreateRndMenuCostingView extends Migration
                         ),
                         2
                     ) AS total_cost,
-                    rnd_menu_items.status
-                FROM rnd_menu_items
-                    LEFT JOIN rnd_menu_computed_food_cost ON rnd_menu_computed_food_cost.id = rnd_menu_items.id
-                    LEFT JOIN rnd_menu_computed_packaging_cost ON rnd_menu_computed_packaging_cost.id = rnd_menu_items.id
-                    LEFT JOIN menu_items ON rnd_menu_items.menu_items_id = (menu_items.id)
-            ; 
+                    menu_items.status
+                FROM menu_items
+                    LEFT JOIN menu_computed_food_cost ON menu_computed_food_cost.id = menu_items.id
+                    LEFT JOIN menu_computed_packaging_cost ON menu_computed_packaging_cost.id = menu_items.id
+            
         ");
     }
 
@@ -131,6 +119,6 @@ class CreateRndMenuCostingView extends Migration
      */
     public function down()
     {
-        DB::statement("DROP VIEW IF EXISTS rnd_menu_costing;");
+        DB::statement("DROP VIEW IF EXISTS menu_costing;");
     }
 }

@@ -16,7 +16,7 @@
         font-weight: bold
     }
 
-    .note {
+    .note-ingredients, .note-packagings {
         color: blue;
         font-weight: bold;
         margin-top: 10px;
@@ -31,6 +31,11 @@
         font-style: italic;
         color: slategrey;
     }
+
+    .primary_ingredient_description,
+    .primary_packaging_description {
+        background-color: yellow;
+    }
 </style>
 @endpush
 
@@ -40,7 +45,7 @@
 <p>
     <a title="Return" href="{{ CRUDBooster::mainpath() }}">
         <i class="fa fa-chevron-circle-left "></i>
-        Back To List Data Menu Item Masterfile
+        Back To List Data Menu Items
     </a>
 </p>
 <div class="panel panel-default">
@@ -54,7 +59,7 @@
                 <tr>
                     <th scope="col">Menu Item Code</th>
                     <th scope="col">Menu Item Description</th>
-                    <th scope="col">Menu Item SRP</th>
+                    <th scope="col">Menu SRP</th>
                     <th scope="col">Portion Size</th>
                     <th scope="col">Food Cost</th>
                     <th scope="col">Food Cost Percentage</th>
@@ -64,15 +69,17 @@
                 <tr>
                     <td>{{$item->tasteless_menu_code}}</td>
                     <td>{{$item->menu_item_description}}</td>
-                    <td class="peso">{{'₱ ' . $item->menu_price_dine}}</td>
+                    <td class="peso">{{'₱ ' . (float) $item->menu_price_dine}}</td>
                     <td>{{(float) $item->portion_size}}</td>
-                    <td class="food-cost">{{$item->food_cost ? '₱ ' . (float) $item->food_cost : ''}}</td>
-                    <td class="food-cost-percentage">{{$item->food_cost_percentage ? (float) $item->food_cost_percentage . '%' : '0%'}}</td>
+                    <td class="food-cost">{{$item->computed_food_cost ? '₱ ' . (float) $item->computed_food_cost : '0'}}</td>
+                    <td class="food-cost-percentage">{{$item->computed_food_cost_percentage ? (float) $item->computed_food_cost_percentage . '%' : '0%'}}</td>
                 </tr>
             </tbody>
         </table>
-            <h4 class="no-ingredient-warning" style="color: gray; text-align: center; font-style: italic; display: none"> <i class="fa fa-spoon"></i> No ingredients to show...</h4>
-        <div class="with-ingredient" style="display: none;">
+        @if (!$ingredients)
+        <h4 class="no-ingredient-warning" style="color: gray; text-align: center; font-style: italic;"> <i class="fa fa-spoon"></i> No ingredients to show...</h4>
+        @else
+        <div class="with-ingredient">
             <h4 style="font-weight: 600; text-align: center;">Ingredients List</h4>
             <div class="box-body table-responsive no-padding">
                 <table class="table table-striped table-bordered">
@@ -94,11 +101,208 @@
                         </tr>
                     </thead>
                     <tbody class="ingredient-tbody">
+                        @php
+                            $grouped_ingredients = [];
+                            foreach ($ingredients as $ingredient) {
+                                $key = $ingredient->ingredient_group;
+                                $grouped_ingredients[$key][] = $ingredient;
+                            }
+
+                        @endphp
+                        @foreach ($grouped_ingredients as $group)
+                            @php
+                                $primary = array_filter($group, fn($obj) => $obj->is_selected == 'TRUE');
+                                $column_name = !!$primary ? 'is_selected' : 'is_primary';
+                                $group = array_map(function($obj) use ($column_name) {
+                                    if ($obj->{$column_name} == 'TRUE') {
+                                        $obj->is_checked = 'TRUE';
+                                    }
+                                    return $obj;
+                                }, $group);
+
+                            @endphp
+                            @foreach ($group as $ingredient)
+                                @php
+                                    $status = $ingredient->menu_item_status ??
+                                            $ingredient->item_status ??
+                                            $ingredient->new_ingredient_status ??
+                                            $ingredient->batching_ingredient_status;
+
+                                    $description = $ingredient->full_item_description ??
+                                            $ingredient->menu_item_description ??
+                                            $ingredient->ingredient_description ??
+                                            $ingredient->item_description;
+
+                                @endphp
+                                <tr>
+                                    <td>{{ $ingredient->is_checked ? '✓' : '' }}</td>
+                                    <td>
+                                        @if ($status == 'INACTIVE')
+                                        <span class="label label-danger">INACTIVE</span>
+                                        @elseif ($status == 'ACTIVE')
+                                        <span class="label label-success">ACTIVE</span>
+                                        @else
+                                        <span class="label label-primary">{{ $status }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($ingredient->item_masters_id)
+                                        <span class="label label-info">IMFS</span>
+                                        @elseif ($ingredient->menu_item_description)
+                                        <span class="label label-warning">MIMF</span>
+                                        @elseif ($ingredient->ingredient_description)
+                                        <span class="label label-secondary">BATCH</span>
+                                        @else
+                                        <span class="label label-success">NEW</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $ingredient->tasteless_code ?? $ingredient->tasteless_menu_code ?? '' }}</td>
+                                    <td>
+                                        <span class="{{ $ingredient->is_checked ? 'primary_ingredient_description' : '' }}">
+                                            {{ $description }}
+                                        </span>
+                                    </td>
+                                    <td>{{ (float) $ingredient->packaging_size }}</td>
+                                    <td>{{ (float) $ingredient->prep_qty }}</td>
+                                    <td>{{ $ingredient->packaging_description ?? $ingredient->uom_description }}</td>
+                                    <td>{{ $ingredient->preparation_desc }}</td>
+                                    <td>{{ (float) $ingredient->yield }}%</td>
+                                    <td>
+                                        ₱ {{ (float) $ingredient->ttp }}
+                                        @if ($ingredient->item_masters_id)
+                                            <br>
+                                            <span class="timeago date-updated" datetime={{ $ingredient->updated_at ?? $ingredient->created_at }}></span>
+                                        @endif
+                                    </td>
+                                    <td>{{ (float) $ingredient->ingredient_qty }}</td>
+                                    <td>{{ (float) $ingredient->cost }}</td>
+                                </tr>
+                            @endforeach
+                        @endforeach
+                        <tr class="text-bold">
+                            <td colspan="12" class="total-cost-label">Total Ingredient Cost</td>
+                            <td>₱ {{ (float) $item->computed_ingredient_total_cost }}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-        <p class="note" style="display: none">** Highlighted ingredient names are primary ingredients.</p>
+        <p class="note-ingredients">** Highlighted ingredient names are primary ingredients.</p>
+        @endif
+        <hr>
+        @if (!$packagings)
+        <h4 class="no-packaging-warning" style="color: gray; text-align: center; font-style: italic;"> <i class="fa fa-shopping-bag"></i> No packagings to show...</h4>
+        @else
+        <div class="with-packaging">
+            <h4 style="font-weight: 600; text-align: center;">Packagings List</h4>
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col"> </th>
+                            <th scope="col">Status</th>
+                            <th scope="col">From</th>
+                            <th scope="col">Tasteless Code</th>
+                            <th scope="col">Packaging</th>
+                            <th scope="col">Packaging Size</th>
+                            <th scope="col">Preparation Qty</th>
+                            <th scope="col">UOM</th>
+                            <th scope="col">Preparation</th>
+                            <th scope="col">Yield</th>
+                            <th scope="col">TTP</th>
+                            <th scope="col">Packaging Qty</th>
+                            <th scope="col">Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody class="ingredient-tbody">
+                        @php
+                            $grouped_packagings = [];
+                            foreach ($packagings as $packaging) {
+                                $key = $packaging->packaging_group;
+                                $grouped_packagings[$key][] = $packaging;
+                            }
+
+                        @endphp
+                        @foreach ($grouped_packagings as $group)
+                            @php
+                                $primary = array_filter($group, fn($obj) => $obj->is_selected == 'TRUE');
+                                $column_name = !!$primary ? 'is_selected' : 'is_primary';
+                                $group = array_map(function($obj) use ($column_name) {
+                                    if ($obj->{$column_name} == 'TRUE') {
+                                        $obj->is_checked = 'TRUE';
+                                    }
+                                    return $obj;
+                                }, $group);
+
+                            @endphp
+                            @foreach ($group as $packaging)
+                                @php
+                                    $status = $packaging->menu_item_status ??
+                                            $packaging->item_status ??
+                                            $packaging->new_packaging_status ??
+                                            $packaging->batching_packaging_status;
+
+                                    $description = $packaging->full_item_description ??
+                                            $packaging->menu_item_description ??
+                                            $packaging->packaging_description ??
+                                            $packaging->item_description;
+
+                                @endphp
+                                <tr>
+                                    <td>{{ $packaging->is_checked ? '✓' : '' }}</td>
+                                    <td>
+                                        @if ($status == 'INACTIVE')
+                                        <span class="label label-danger">INACTIVE</span>
+                                        @elseif ($status == 'ACTIVE')
+                                        <span class="label label-success">ACTIVE</span>
+                                        @else
+                                        <span class="label label-primary">{{ $status }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($packaging->item_masters_id)
+                                        <span class="label label-info">IMFS</span>
+                                        @elseif ($packaging->menu_item_description)
+                                        <span class="label label-warning">MIMF</span>
+                                        @elseif ($packaging->packaging_description)
+                                        <span class="label label-secondary">BATCH</span>
+                                        @else
+                                        <span class="label label-success">NEW</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $packaging->tasteless_code ?? $packaging->tasteless_menu_code ?? '' }}</td>
+                                    <td>
+                                        <span class="{{ $packaging->is_checked ? 'primary_packaging_description' : '' }}">
+                                            {{ $description }}
+                                        </span>
+                                    </td>
+                                    <td>{{ (float) $packaging->packaging_size }}</td>
+                                    <td>{{ (float) $packaging->prep_qty }}</td>
+                                    <td>{{ $packaging->packaging_description ?? $packaging->uom_description }}</td>
+                                    <td>{{ $packaging->preparation_desc }}</td>
+                                    <td>{{ (float) $packaging->yield }}%</td>
+                                    <td>
+                                        ₱ {{ (float) $packaging->ttp }}
+                                        @if ($packaging->item_masters_id)
+                                            <br>
+                                            <span class="timeago date-updated" datetime={{ $packaging->updated_at ?? $packaging->created_at }}></span>
+                                        @endif
+                                    </td>
+                                    <td>{{ (float) $packaging->packaging_qty }}</td>
+                                    <td>{{ (float) $packaging->cost }}</td>
+                                </tr>
+                            @endforeach
+                        @endforeach
+                        <tr class="text-bold">
+                            <td colspan="12" class="total-cost-label">Total Packaging Cost</td>
+                            <td>₱ {{ (float) $item->computed_packaging_total_cost }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="note-packagings">** Highlighted packaging names are primary packagings.</p>
+        @endif
     </div>
     <div class="panel-footer">
         <a class="btn btn-primary" href="{{ CRUDBooster::mainpath() }}" type="button" id="export"> <i class="fa fa-arrow-left" ></i> Back </a>
@@ -110,115 +314,9 @@
 <script>
     $(document).ready(function() {
         $('body').addClass('sidebar-collapse');
-        
-        const ingredients = {!! json_encode($ingredients) !!};
-        const item = {!! json_encode($item) !!};
-        document.title = 'View Ingredients: ' + item.menu_item_description;
 
-        function showIngredients() {
-            const ingredientTbody = $('.ingredient-tbody');
-            const groupCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
-            
-            for (const i of groupCount) {
-                const groupedIngredients = ingredients.filter(e => e.ingredient_group == i);
-                const isSelected = groupedIngredients.find(e => e.is_selected == 'TRUE');
-                let primary;
-                if (isSelected) isSelected.checked = true;
-                else groupedIngredients.find(e => e.is_primary == 'TRUE').checked = true;
-                groupedIngredients.forEach(groupedIngredient => {
-                    for (const key in groupedIngredient) {
-                        if (!isNaN(groupedIngredient[key])) groupedIngredient[key] = parseFloat(groupedIngredient[key]) || true;
-                    }
-                    const tr = $(document.createElement('tr'));
-                    const check = $(document.createElement('td'))
-                        .text(groupedIngredient.checked ? '✓' : '')
-                        .css('font-weight', '700');
-                    const status = $(document.createElement('td'));
-                    const from = $(document.createElement('td'))
-                    const tastelessCode = $(document.createElement('td'))
-                        .text(
-                            groupedIngredient.tasteless_code ||
-                            groupedIngredient.tasteless_menu_code ||
-                            'No Item Code'
-                        ).css('font-style', !groupedIngredient.tastelessCode)
-                    const ingredient = $(document.createElement('td'));
-                    const ingredientSpan = $(document.createElement('span'))
-                        .text(
-                            groupedIngredient.full_item_description ||
-                            groupedIngredient.menu_item_description ||
-                            groupedIngredient.ingredient_description ||
-                            groupedIngredient.item_description
-                        ).css('background', groupedIngredient.checked ? 'yellow' : '');
-                    ingredient.html(ingredientSpan);
-                    const packagingSize = $(document.createElement('td')).text(groupedIngredient.packaging_size)
-                    const preparationQty = $(document.createElement('td')).text(groupedIngredient.prep_qty);
-                    const uom = $(document.createElement('td')).text(groupedIngredient.packaging_description || groupedIngredient.uom_description);
-                    const preparation = $(document.createElement('td')).text(groupedIngredient.preparation_desc);
-                    const yield = $(document.createElement('td')).text(groupedIngredient.yield + '%');
-                    const ttpSpan = $(document.createElement('span'))
-                        .addClass('date-updated')
-                        .text(groupedIngredient.item_masters_id ? timeago.format(groupedIngredient.updated_at || groupedIngredient.created_at) : '')
-                    const ttp = $(document.createElement('td')).html('₱ ' + (groupedIngredient.ttp || '0.00') + '<br/>').append(ttpSpan);
-                    const ingredientQty = $(document.createElement('td')).text(groupedIngredient.ingredient_qty);
-                    const cost = $(document.createElement('td')).text('₱ ' + (groupedIngredient.cost || '0.00'));
-    
-                    if (groupedIngredient.full_item_description || groupedIngredient.item_masters_id)
-                        from.html('<span class="label label-info">IMFS</span>')
-                    else if (groupedIngredient.menu_item_description)
-                        from.html('<span class="label label-warning">MIMF</span>')
-                    else if (groupedIngredient.ingredient_description)
-                        from.html('<span class="label label-secondary">BATCH</span>')
-                    else
-                        from.html('<span class="label label-success">NEW</span>')
-    
-                    if (groupedIngredient.menu_item_status == 'INACTIVE' || groupedIngredient.item_status == 'INACTIVE' || groupedIngredient.new_ingredient_status == 'INACTIVE' || groupedIngredient.batching_ingredient_status == 'INACTIVE')
-                        status.html('<span class="label label-danger">INACTIVE</span>')
-                    else if (groupedIngredient.menu_item_status == 'ACTIVE' || groupedIngredient.item_status == 'ACTIVE' || groupedIngredient.new_ingredient_status == 'ACTIVE' || groupedIngredient.batching_ingredient_status == 'ACTIVE')
-                        status.html('<span class="label label-success">ACTIVE</span>')
-                    else if (groupedIngredient.menu_item_status == 'ALTERNATIVE' || groupedIngredient.item_status == 'ALTERNATIVE')
-                        status.html('<span class="label label-primary">ALTERNATIVE</span>')
-                    tr.append(
-                        check,
-                        status,
-                        from,
-                        tastelessCode,
-                        ingredient,
-                        packagingSize,
-                        preparationQty,
-                        uom,
-                        preparation,
-                        yield,
-                        ttp,
-                        ingredientQty,
-                        cost
-                    );
-                    ingredientTbody.append(tr);
-                });
-            }
-    
-            const lastRow = $(document.createElement('tr')).css('font-weight', 'bold');
-            const totalCostLabel = $(document.createElement('td'))
-                .text('Total Ingredient Cost')
-                .attr('colspan', 12)
-                .addClass('total-cost-label');
-            const totalCostValue = $(document.createElement('td')).text('₱ ' + item.ingredient_total_cost);
-            lastRow.append(totalCostLabel, totalCostValue);       
-            ingredientTbody.append(lastRow);
-    
-            if (!ingredients.length) {
-                $('.no-ingredient-warning').css('display', '');
-            } else {
-                $('.with-ingredient').css('display', '');
-                $('.note-ingredients').css('display', '');
-            }
-
-            const lowCost = Number(localStorage.getItem('lowCost')) || 30;
-            
-            if (item.rnd_menu_srp > 0 && item.computed_food_cost_percentage > lowCost) {
-                $('.food-cost-percentage').css('color', 'red');
-            }
-        }
-        showIngredients();
+        const timeAgoNodes = $('.timeago').get();
+        if (timeAgoNodes.length) timeago.render(timeAgoNodes);
         $('table th, table td').css('border', '1px solid #aaaaaa').css('vertical-align', 'middle');
         $('table thead').css('background', '#deeaee');
     });
