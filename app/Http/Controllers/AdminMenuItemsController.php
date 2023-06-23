@@ -1047,25 +1047,40 @@
 				}
 			}
 
-			//getting all menu items where computed value(s) is/are not equal to the saved ones
-			$to_update = DB::table('menu_computed_food_cost')
-				->where(
-					DB::raw('CAST(computed_food_cost AS DECIMAL(18, 4))'),
-					'!=',
-					DB::raw('CAST(food_cost AS DECIMAL(18, 4))')
-				)
-				->orWhere(
-					DB::raw('CAST(computed_food_cost_percentage AS DECIMAL(18, 4))'),
-					'!=',
-					DB::raw('CAST(food_cost_percentage AS DECIMAL(18, 4))')
-				)
-				->orWhere(
-					DB::raw('CAST(computed_ingredient_total_cost AS DECIMAL(18, 4))'),
-					'!=',
-					DB::raw('CAST(ingredient_total_cost AS DECIMAL(18, 4))')
-				)
-				->get('id')
-				->toArray();
+			$to_update = DB::table('menu_items')
+					->leftJoin('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
+					->whereRaw("
+						CAST(
+							menu_items.food_cost AS DECIMAL(18, 4)
+						) != CAST(
+							COALESCE(
+								menu_computed_food_cost.computed_food_cost,
+								0
+							) AS DECIMAL(18, 4)
+						)
+					")
+					->orWhereRaw("
+						CAST(
+							menu_items.food_cost_percentage AS DECIMAL(18, 4)
+						) != CAST(
+							COALESCE(
+								menu_computed_food_cost.computed_food_cost_percentage,
+								0
+							) AS DECIMAL(18, 4)
+						)
+					")
+					->orWhereRaw("
+						CAST(
+							menu_items.ingredient_total_cost AS DECIMAL(18, 4)
+						) != CAST(
+							COALESCE(
+								menu_computed_food_cost.computed_ingredient_total_cost,
+								0
+							) AS DECIMAL(18, 4)
+						)
+					")
+					->pluck('menu_items.id')
+					->toArray();
 
 			//calling the function... should start the recursion
 			self::updateCostOfOtherMenu($to_update);
@@ -1383,51 +1398,57 @@
 			return json_encode($response);
 		}
 
-		function updateCostOfOtherMenu($ingredients_to_update) {
+		function updateCostOfOtherMenu($menu_ids) {
 			//stopping the recursion if array is empty
-			if (!$ingredients_to_update) return;
+			if (!$menu_ids) return;
 
-			foreach($ingredients_to_update as $ingredient_to_update) {
-				
-				//extracting the id of menu item to be updated
-				$id = $ingredient_to_update->id;
+			DB::table('menu_items')
+				->whereIn('menu_items.id', $menu_ids)
+				->leftJoin('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
+				->update([
+					'menu_items.ingredient_total_cost' => DB::raw("menu_computed_food_cost.computed_ingredient_total_cost"),
+					'menu_items.food_cost' => DB::raw("menu_computed_food_cost.computed_food_cost"),
+					'menu_items.food_cost_percentage' => DB::raw("menu_computed_food_cost.computed_food_cost_percentage"),
+				]);
 
-				//updating food cost, percentage, and total cost
-				DB::statement("
-					UPDATE 	IGNORE menu_items 
-					LEFT JOIN menu_computed_food_cost
-					ON menu_computed_food_cost.id = menu_items.id 
-					SET 
-					menu_items.ingredient_total_cost = menu_computed_food_cost.computed_ingredient_total_cost,
-					menu_items.food_cost = menu_computed_food_cost.computed_food_cost,
-					menu_items.food_cost_percentage = menu_computed_food_cost.computed_food_cost_percentage
-					where menu_items.id = '$id';
-				");
-			}
-
-			//another array of menu to be updated
-			$to_update = DB::table('menu_computed_food_cost')
-				->where(
-					DB::raw('CAST(computed_food_cost AS DECIMAL(18, 4))'),
-					'!=',
-					DB::raw('CAST(food_cost AS DECIMAL(18, 4))')
-				)
-				->orWhere(
-					DB::raw('CAST(computed_food_cost_percentage AS DECIMAL(18, 4))'),
-					'!=',
-					DB::raw('CAST(food_cost_percentage AS DECIMAL(18, 4))')
-				)
-				->orWhere(
-					DB::raw('CAST(computed_ingredient_total_cost AS DECIMAL(18, 4))'),
-					'!=',
-					DB::raw('CAST(ingredient_total_cost AS DECIMAL(18, 4))')
-				)
-				->get('id')
+			$to_update = DB::table('menu_items')
+				->leftJoin('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
+				->whereRaw("
+					CAST(
+						menu_items.food_cost AS DECIMAL(18, 4)
+					) != CAST(
+						COALESCE(
+							menu_computed_food_cost.computed_food_cost,
+							0
+						) AS DECIMAL(18, 4)
+					)
+				")
+				->orWhereRaw("
+					CAST(
+						menu_items.food_cost_percentage AS DECIMAL(18, 4)
+					) != CAST(
+						COALESCE(
+							menu_computed_food_cost.computed_food_cost_percentage,
+							0
+						) AS DECIMAL(18, 4)
+					)
+				")
+				->orWhereRaw("
+					CAST(
+						menu_items.ingredient_total_cost AS DECIMAL(18, 4)
+					) != CAST(
+						COALESCE(
+							menu_computed_food_cost.computed_ingredient_total_cost,
+							0
+						) AS DECIMAL(18, 4)
+					)
+				")
+				->pluck('menu_items.id')
 				->toArray();
 
-				//finally, calling the function itself
-				//the process keeps going on until there are no more ingredients to be updated
-				self::updateCostOfOtherMenu($to_update);
+			//finally, calling the function itself
+			//the process keeps going on until there are no more ingredients to be updated
+			self::updateCostOfOtherMenu($to_update);
 
 		}
 
