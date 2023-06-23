@@ -33,7 +33,7 @@ CREATE VIEW MENU_COSTING AS
 	        menu_items.menu_price_take
 	    ) AS final_srp_w_vat_dine_in,
 	    menu_items.menu_price_take as final_srp_w_vat_take_out,
-	    menu_items.menu_price_take as final_srp_w_vat_delivery,
+	    menu_items.menu_price_dlv as final_srp_w_vat_delivery,
 	    ROUND(
 	        menu_computed_packaging_cost.computed_packaging_total_cost / ROUND(
 	            COALESCE(
