@@ -23,14 +23,14 @@
 
 
 	class AdminMenuItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
-		private $to_view = [
+		static $to_view = [
 			'Chef' => ['ingredients', 'packagings', 'costing'],
 			'Marketing Encoder' => ['packagings', 'costing'],
 			'Marketing Manager' => ['ingredients', 'packagings', 'costing'],
 			'Sales Accounting' => ['costing']
 		];
 
-		private $to_edit = [
+		static $to_edit = [
 			'Chef' => ['ingredients'],
 			'Marketing Encoder' => ['packagings', 'costing'],
 		];
@@ -258,17 +258,21 @@
 						title: 'Which details do you want to see?',
 						showDenyButton: true,
 						focusConfirm: false,
+						showCancelButton: true,
 						showCloseButton: true,
 						focusConfirm: true,
 						confirmButtonText: `🍕 Ingredients`,
-						denyButtonText: `💲 Costing`,
+						denyButtonText: `🛍️ Packagings`,
+						cancelButtonText: `💲 Costing`,
 					}).then((result) => {
 						if (result.isConfirmed) {
 							location.href=`$main_path/detail/` + dbId;
 						} else if (result.isDenied) {
+							location.href=`$main_path/packaging-detail/` + dbId;
+						} else if (result.dismiss == 'cancel') {
 							location.href=`$main_path/costing-detail/` + dbId;
 						}
-					})
+					});
 				});
 
 				$('.edit-menu-item').on('click', function() {
@@ -292,7 +296,7 @@
 						} else if (result.dismiss == 'cancel') {
 							location.href=`$main_path/edit/` + dbId + `/costing`;
 						}
-					})
+					});
 				});
 			";
 
@@ -927,24 +931,33 @@
 				->first();
 
 			$data['menu_items_data'] = self::getMenuItemDetails($id);
-			
+
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			$is_superadmin = CRUDBooster::isSuperAdmin();
+
 			if ($to_edit == 'ingredients') {
-				if (CRUDBooster::myPrivilegeName() != 'Chef' && !CRUDBooster::isSuperAdmin()) {
+				if (!in_array($to_edit, self::$to_edit[$my_privilege] ?? []) && !$is_superadmin)
 					CRUDBooster::redirect(
 						CRUDBooster::adminPath(),
 						trans('crudbooster.denied_access')
 					);
-				}
+
 				return $this->view('menu-items/edit-item', $data);
 			} else if ($to_edit == 'packagings') {
-				if (CRUDBooster::myPrivilegeName() == 'Chef') {
+				if (!in_array($to_edit, self::$to_edit[$my_privilege] ?? []) && !$is_superadmin)
 					CRUDBooster::redirect(
 						CRUDBooster::adminPath(),
 						trans('crudbooster.denied_access')
 					);
-				}
+
 				return $this->view('menu-items/add-packaging', $data);
 			} else if ($to_edit == 'costing') {
+				if (!in_array($to_edit, self::$to_edit[$my_privilege] ?? []) && !$is_superadmin)
+					CRUDBooster::redirect(
+						CRUDBooster::adminPath(),
+						trans('crudbooster.denied_access')
+					);
+
 				$data['item'] = DB::table('menu_costing')
 					->where('menu_items_id', $id)
 					->first();
@@ -1169,6 +1182,14 @@
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
 				);
+
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			if (!in_array('ingredients', self::$to_view[$my_privilege] ?? []) && !CRUDBooster::isSuperAdmin())
+					CRUDBooster::redirect(
+						CRUDBooster::adminPath(),
+						trans('crudbooster.denied_access')
+					);
+
 			$data = [];
 			$data['item'] = DB::table('menu_items')
 				->where('menu_items.id', $id)
@@ -1193,6 +1214,18 @@
 		}
 
 		public function getCostingDetails($id) {
+			if (!CRUDBooster::isRead())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			if (!in_array('costing', self::$to_view[$my_privilege] ?? []) && !CRUDBooster::isSuperAdmin())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
 			$data = [];
 
 			$item = DB::table('menu_costing')
@@ -1207,6 +1240,42 @@
 			$data['menu_items_data'] = self::getMenuItemDetails($id);
 
 			return $this->view('menu-items/costing-details', $data);
+		}
+
+		public function getPackagingDetail($id) {
+			if (!CRUDBooster::isRead())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			if (!in_array('packagings', self::$to_view[$my_privilege] ?? []) && !CRUDBooster::isSuperAdmin())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+			$data = [];
+			
+			$data['item'] = DB::table('menu_items')
+				->where('menu_items.id', $id)
+				->select(
+					'menu_items.tasteless_menu_code',
+					'menu_items.menu_price_dine',
+					'menu_items.menu_item_description',
+					'menu_items.portion_size',
+					'computed_ingredient_total_cost',
+					'computed_food_cost',
+					'computed_food_cost_percentage',
+					'computed_packaging_total_cost'
+				)
+				->leftJoin('menu_computed_food_cost', 'menu_computed_food_cost.id', '=', 'menu_items.id')
+				->leftJoin('menu_computed_packaging_cost', 'menu_computed_packaging_cost.id', '=', 'menu_items.id')
+				->first();
+
+			$data['packagings'] = self::getPackagings($id);
+			return $this->view('menu-items/packaging-detail', $data);
+			
 		}
 
 		function getMenuItemDetails($id) {
