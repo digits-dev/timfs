@@ -265,7 +265,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="" class="control-label"><span class="required-star">*</span>Menu Description</label>
+                        <label for="" class="control-label">Menu Description</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
@@ -276,7 +276,7 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label"><span class="required-star">*</span>Menu SRP</label>
+                        <label for="" class="control-label">Menu SRP</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <span class="custom-icon"><strong>₱</strong></span>
@@ -852,43 +852,6 @@
             $('.panel-default').append(form);
 
             form.submit();
-
-            // $.ajax({
-            //     type: 'POST',
-            //     url: "{{ route('add_packaging') }}",
-            //     data: {
-            //         packagings: packagingsJSON,
-            //         rnd_menu_description: $('.rnd_menu_description').val().trim(),
-            //         rnd_menu_items_id: rndMenuItem?.id,
-            //         rnd_menu_srp: $('.rnd_menu_srp').val(),
-            //     },
-            //     success: function(response) {
-            //         Swal.fire({
-            //             title: 'Packagings Saved!',
-            //             html: '📄 Do you want to continue to Menu Creation?',
-            //             icon: 'success',
-            //             showCancelButton: true,
-            //             confirmButtonColor: '#3085d6',
-            //             cancelButtonColor: '#d33',
-            //             confirmButtonText: 'Yes',
-            //             cancelButtonText: 'Not now',
-            //         }).then((result) => {
-            //             if (result.isConfirmed) {
-            //                 location.href = "{{ CRUDBooster::mainPath() }}" + `/edit/${rndMenuItem.id}`;
-            //             } else {
-            //                 location.href = "{{ CRUDBooster::mainPath() }}";
-            //             }
-            //         });
-            //     },
-            //     error: function(response) { 
-            //         console.log(response);
-            //         Swal.fire({
-            //             title: 'Oops',
-            //             html: 'Something went wrong.',
-            //             icon: 'error'
-            //         });
-            //     }  
-            // });
         }
 
         $.fn.checkFormValidity = function() {
