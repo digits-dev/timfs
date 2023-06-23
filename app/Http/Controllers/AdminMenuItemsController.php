@@ -23,6 +23,17 @@
 
 
 	class AdminMenuItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
+		private $to_view = [
+			'Chef' => ['ingredients', 'packagings', 'costing'],
+			'Marketing Encoder' => ['packagings', 'costing'],
+			'Marketing Manager' => ['ingredients', 'packagings', 'costing'],
+			'Sales Accounting' => ['costing']
+		];
+
+		private $to_edit = [
+			'Chef' => ['ingredients'],
+			'Marketing Encoder' => ['packagings', 'costing'],
+		];
 
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
@@ -247,7 +258,8 @@
 						title: 'Which details do you want to see?',
 						showDenyButton: true,
 						focusConfirm: false,
-						showCancelButton: true,
+						showCloseButton: true,
+						focusConfirm: true,
 						confirmButtonText: `🍕 Ingredients`,
 						denyButtonText: `💲 Costing`,
 					}).then((result) => {
@@ -266,13 +278,19 @@
 						showDenyButton: true,
 						focusConfirm: false,
 						showCancelButton: true,
+						showCloseButton: true,
+						focusConfirm: true,
 						confirmButtonText: `🍕 Ingredients`,
 						denyButtonText: `🛍️ Packagings`,
+						cancelButtonText: `💲 Costing`,
 					}).then((result) => {
+						console.log(result);
 						if (result.isConfirmed) {
 							location.href=`$main_path/edit/` + dbId + `/ingredients`;
 						} else if (result.isDenied) {
 							location.href=`$main_path/edit/` + dbId + `/packagings`;
+						} else if (result.dismiss == 'cancel') {
+							alert('heeey');
 						}
 					})
 				});
@@ -1002,57 +1020,6 @@
 						'new_ingredients_id' => $ingredient['new_ingredients_id'],
 						'batching_ingredients_id' => $ingredient['batching_ingredients_id']
 					], $ingredient);
-				}
-			}
-
-			DB::table('menu_packagings_details')
-				->where('menu_items_id', $menu_items_id)
-				->where('status', 'ACTIVE')
-				->update([
-					'status' => 'INACTIVE',
-					'row_id' => null,
-					'deleted_at' => $time_stamp
-				]);
-
-			foreach ($packagings as $group) {
-				foreach ($group as $packaging) {
-					$packaging = (array) $packaging;
-
-					//checking if the packaging already exists
-					$is_existing = DB::table('menu_packagings_details')
-						->where([
-							'menu_items_id' => $menu_items_id,
-							'item_masters_id' => $packaging['item_masters_id'],
-							'packaging_name' => $packaging['packaging_name'],
-							'new_packagings_id' => $packaging['new_packagings_id'],
-						])->exists();
-
-					if ($is_existing) {
-						$packaging['updated_at'] = $time_stamp;
-						$packaging['updated_by'] = $action_by;
-					} else {
-						$packaging['created_at'] = $time_stamp;
-						$packaging['created_by'] = $action_by;
-					}
-
-					$packaging['status'] = 'ACTIVE';
-					$packaging['deleted_at'] = null;
-
-					//unsetting packagings details that may be outdated in the future
-					unset(
-						$packaging['qty'], 
-						$packaging['cost'], 
-						$packaging['total_cost'],
-						$packaging['ttp']
-					);
-
-					//finally, inserting packaging to the table
-					DB::table('menu_packagings_details')->updateOrInsert([
-						'menu_items_id' => $menu_items_id,
-						'item_masters_id' => $packaging['item_masters_id'],
-						'new_packagings_id' => $packaging['new_packagings_id']
-					], $packaging);
-						
 				}
 			}
 
