@@ -817,7 +817,7 @@
 		public function getEdit($id, $to_edit) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
+					CRUDBooster::mainPath(),
 					trans('crudbooster.denied_access')
 				);
 
@@ -938,7 +938,7 @@
 			if ($to_edit == 'ingredients') {
 				if (!in_array($to_edit, self::$to_edit[$my_privilege] ?? []) && !$is_superadmin)
 					CRUDBooster::redirect(
-						CRUDBooster::adminPath(),
+						CRUDBooster::mainPath(),
 						trans('crudbooster.denied_access')
 					);
 
@@ -946,7 +946,7 @@
 			} else if ($to_edit == 'packagings') {
 				if (!in_array($to_edit, self::$to_edit[$my_privilege] ?? []) && !$is_superadmin)
 					CRUDBooster::redirect(
-						CRUDBooster::adminPath(),
+						CRUDBooster::mainPath(),
 						trans('crudbooster.denied_access')
 					);
 
@@ -954,7 +954,7 @@
 			} else if ($to_edit == 'costing') {
 				if (!in_array($to_edit, self::$to_edit[$my_privilege] ?? []) && !$is_superadmin)
 					CRUDBooster::redirect(
-						CRUDBooster::adminPath(),
+						CRUDBooster::mainPath(),
 						trans('crudbooster.denied_access')
 					);
 
@@ -1181,14 +1181,14 @@
 		public function getDetail($id) {
 			if (!CRUDBooster::isRead())
 				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
+					CRUDBooster::mainPath(),
 					trans('crudbooster.denied_access')
 				);
 
 			$my_privilege = CRUDBooster::myPrivilegeName();
 			if (!in_array('ingredients', self::$to_view[$my_privilege] ?? []) && !CRUDBooster::isSuperAdmin())
 					CRUDBooster::redirect(
-						CRUDBooster::adminPath(),
+						CRUDBooster::mainPath(),
 						trans('crudbooster.denied_access')
 					);
 
@@ -1218,14 +1218,14 @@
 		public function getCostingDetails($id) {
 			if (!CRUDBooster::isRead())
 				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
+					CRUDBooster::mainPath(),
 					trans('crudbooster.denied_access')
 				);
 
 			$my_privilege = CRUDBooster::myPrivilegeName();
 			if (!in_array('costing', self::$to_view[$my_privilege] ?? []) && !CRUDBooster::isSuperAdmin())
 				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
+					CRUDBooster::mainPath(),
 					trans('crudbooster.denied_access')
 				);
 			$data = [];
@@ -1247,14 +1247,14 @@
 		public function getPackagingDetail($id) {
 			if (!CRUDBooster::isRead())
 				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
+					CRUDBooster::mainPath(),
 					trans('crudbooster.denied_access')
 				);
 
 			$my_privilege = CRUDBooster::myPrivilegeName();
 			if (!in_array('packagings', self::$to_view[$my_privilege] ?? []) && !CRUDBooster::isSuperAdmin())
 				CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
+					CRUDBooster::mainPath(),
 					trans('crudbooster.denied_access')
 				);
 			$data = [];
