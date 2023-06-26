@@ -137,6 +137,12 @@
             pageLength: 100,
         });
 
+        $('.percentage-input').on('keypress', function(event) {
+            if (event.keyCode == 13) {
+                $('.set-percentage-btn').click();
+            }
+        })
+
     });
 
 </script>
