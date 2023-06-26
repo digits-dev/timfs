@@ -76,11 +76,12 @@
                 </tr>
             </tbody>
         </table>
-        @if (!$ingredients)
-        <h4 class="no-ingredient-warning" style="color: gray; text-align: center; font-style: italic;"> <i class="fa fa-spoon"></i> No ingredients to show...</h4>
+        <hr>
+        @if (!$packagings)
+        <h4 class="no-packaging-warning" style="color: gray; text-align: center; font-style: italic;"> <i class="fa fa-shopping-bag"></i> No packagings to show...</h4>
         @else
-        <div class="with-ingredient">
-            <h4 style="font-weight: 600; text-align: center;">Ingredients List</h4>
+        <div class="with-packaging">
+            <h4 style="font-weight: 600; text-align: center;">Packagings List</h4>
             <div class="box-body table-responsive no-padding">
                 <table class="table table-striped table-bordered">
                     <thead>
@@ -89,27 +90,27 @@
                             <th scope="col">Status</th>
                             <th scope="col">From</th>
                             <th scope="col">Tasteless Code</th>
-                            <th scope="col">Ingredient</th>
+                            <th scope="col">Packaging</th>
                             <th scope="col">Packaging Size</th>
                             <th scope="col">Preparation Qty</th>
                             <th scope="col">UOM</th>
                             <th scope="col">Preparation</th>
                             <th scope="col">Yield</th>
                             <th scope="col">TTP</th>
-                            <th scope="col">Ingredient Qty</th>
+                            <th scope="col">Packaging Qty</th>
                             <th scope="col">Cost</th>
                         </tr>
                     </thead>
                     <tbody class="ingredient-tbody">
                         @php
-                            $grouped_ingredients = [];
-                            foreach ($ingredients as $ingredient) {
-                                $key = $ingredient->ingredient_group;
-                                $grouped_ingredients[$key][] = $ingredient;
+                            $grouped_packagings = [];
+                            foreach ($packagings as $packaging) {
+                                $key = $packaging->packaging_group;
+                                $grouped_packagings[$key][] = $packaging;
                             }
 
                         @endphp
-                        @foreach ($grouped_ingredients as $group)
+                        @foreach ($grouped_packagings as $group)
                             @php
                                 $primary = array_filter($group, fn($obj) => $obj->is_selected == 'TRUE');
                                 $column_name = !!$primary ? 'is_selected' : 'is_primary';
@@ -121,21 +122,21 @@
                                 }, $group);
 
                             @endphp
-                            @foreach ($group as $ingredient)
+                            @foreach ($group as $packaging)
                                 @php
-                                    $status = $ingredient->menu_item_status ??
-                                            $ingredient->item_status ??
-                                            $ingredient->new_ingredient_status ??
-                                            $ingredient->batching_ingredient_status;
+                                    $status = $packaging->menu_item_status ??
+                                            $packaging->item_status ??
+                                            $packaging->new_packaging_status ??
+                                            $packaging->batching_packaging_status;
 
-                                    $description = $ingredient->full_item_description ??
-                                            $ingredient->menu_item_description ??
-                                            $ingredient->ingredient_description ??
-                                            $ingredient->item_description;
+                                    $description = $packaging->full_item_description ??
+                                            $packaging->menu_item_description ??
+                                            $packaging->packaging_description ??
+                                            $packaging->item_description;
 
                                 @endphp
                                 <tr>
-                                    <td>{{ $ingredient->is_checked ? '✓' : '' }}</td>
+                                    <td>{{ $packaging->is_checked ? '✓' : '' }}</td>
                                     <td>
                                         @if ($status == 'INACTIVE')
                                         <span class="label label-danger">INACTIVE</span>
@@ -146,48 +147,48 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if ($ingredient->item_masters_id)
+                                        @if ($packaging->item_masters_id)
                                         <span class="label label-info">IMFS</span>
-                                        @elseif ($ingredient->menu_item_description)
+                                        @elseif ($packaging->menu_item_description)
                                         <span class="label label-warning">MIMF</span>
-                                        @elseif ($ingredient->ingredient_description)
+                                        @elseif ($packaging->packaging_description)
                                         <span class="label label-secondary">BATCH</span>
                                         @else
                                         <span class="label label-success">NEW</span>
                                         @endif
                                     </td>
-                                    <td>{{ $ingredient->tasteless_code ?? $ingredient->tasteless_menu_code ?? '' }}</td>
+                                    <td>{{ $packaging->tasteless_code ?? $packaging->tasteless_menu_code ?? '' }}</td>
                                     <td>
-                                        <span class="{{ $ingredient->is_checked ? 'primary_ingredient_description' : '' }}">
+                                        <span class="{{ $packaging->is_checked ? 'primary_packaging_description' : '' }}">
                                             {{ $description }}
                                         </span>
                                     </td>
-                                    <td>{{ (float) $ingredient->packaging_size }}</td>
-                                    <td>{{ (float) $ingredient->prep_qty }}</td>
-                                    <td>{{ $ingredient->packaging_description ?? $ingredient->uom_description }}</td>
-                                    <td>{{ $ingredient->preparation_desc }}</td>
-                                    <td>{{ (float) $ingredient->yield }}%</td>
+                                    <td>{{ (float) $packaging->packaging_size }}</td>
+                                    <td>{{ (float) $packaging->prep_qty }}</td>
+                                    <td>{{ $packaging->packaging_description ?? $packaging->uom_description }}</td>
+                                    <td>{{ $packaging->preparation_desc }}</td>
+                                    <td>{{ (float) $packaging->yield }}%</td>
                                     <td>
-                                        ₱ {{ (float) $ingredient->ttp }}
-                                        @if ($ingredient->item_masters_id)
+                                        ₱ {{ (float) $packaging->ttp }}
+                                        @if ($packaging->item_masters_id)
                                             <br>
-                                            <span class="timeago date-updated" datetime={{ $ingredient->updated_at ?? $ingredient->created_at }}></span>
+                                            <span class="timeago date-updated" datetime={{ $packaging->updated_at ?? $packaging->created_at }}></span>
                                         @endif
                                     </td>
-                                    <td>{{ (float) $ingredient->ingredient_qty }}</td>
-                                    <td>{{ (float) $ingredient->cost }}</td>
+                                    <td>{{ (float) $packaging->packaging_qty }}</td>
+                                    <td>{{ (float) $packaging->cost }}</td>
                                 </tr>
                             @endforeach
                         @endforeach
                         <tr class="text-bold">
-                            <td colspan="12" class="total-cost-label">Total Ingredient Cost</td>
-                            <td>₱ {{ (float) $item->computed_ingredient_total_cost }}</td>
+                            <td colspan="12" class="total-cost-label">Total Packaging Cost</td>
+                            <td>₱ {{ (float) $item->computed_packaging_total_cost }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-        <p class="note-ingredients">** Highlighted ingredient names are primary ingredients.</p>
+        <p class="note-packagings">** Highlighted packaging names are primary packagings.</p>
         @endif
     </div>
     <div class="panel-footer">

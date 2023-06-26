@@ -117,31 +117,41 @@
             const path = "{{ CRUDBooster::adminPath('menu_items') }}";
             if (clickedAction == 'edit') {
                 Swal.fire({
-                    title: 'Which one do you want to edit?',
+                    title: 'Which details do you want to see?',
                     showDenyButton: true,
                     focusConfirm: false,
                     showCancelButton: true,
+                    showCloseButton: true,
+                    focusConfirm: true,
                     confirmButtonText: `🍕 Ingredients`,
                     denyButtonText: `🛍️ Packagings`,
+                    cancelButtonText: `💲 Costing`,
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.open(`${path}/edit/${id}/ingredients`);
                     } else if (result.isDenied) {
                         window.open(`${path}/edit/${id}/packagings`);
+                    } else if (result.dismiss == 'cancel') {
+                        window.open(`${path}/edit/${id}/costing`);
                     }
                 });
             } else if (clickedAction == 'detail') {
                 Swal.fire({
-                    title: 'Which details do you want to see?',
+                    title: 'Which one do you want to edit?',
                     showDenyButton: true,
                     focusConfirm: false,
                     showCancelButton: true,
+                    showCloseButton: true,
+                    focusConfirm: true,
                     confirmButtonText: `🍕 Ingredients`,
-                    denyButtonText: `💲 Costing`,
+                    denyButtonText: `🛍️ Packagings`,
+                    cancelButtonText: `💲 Costing`,
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.open(`${path}/detail/${id}`);
                     } else if (result.isDenied) {
+                        window.open(`${path}/packaging-detail/${id}`);
+                    } else if (result.dismiss == 'cancel') {
                         window.open(`${path}/costing-detail/${id}`);
                     }
                 })

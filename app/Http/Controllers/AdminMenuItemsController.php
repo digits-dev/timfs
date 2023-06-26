@@ -23,6 +23,17 @@
 
 
 	class AdminMenuItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
+		static $to_view = [
+			'Chef' => ['ingredients', 'packagings', 'costing'],
+			'Marketing Encoder' => ['packagings', 'costing'],
+			'Marketing Manager' => ['ingredients', 'packagings', 'costing'],
+			'Sales Accounting' => ['costing']
+		];
+
+		static $to_edit = [
+			'Chef' => ['ingredients'],
+			'Marketing Encoder' => ['packagings', 'costing'],
+		];
 
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
@@ -248,15 +259,20 @@
 						showDenyButton: true,
 						focusConfirm: false,
 						showCancelButton: true,
+						showCloseButton: true,
+						focusConfirm: true,
 						confirmButtonText: `🍕 Ingredients`,
-						denyButtonText: `💲 Costing`,
+						denyButtonText: `🛍️ Packagings`,
+						cancelButtonText: `💲 Costing`,
 					}).then((result) => {
 						if (result.isConfirmed) {
 							location.href=`$main_path/detail/` + dbId;
 						} else if (result.isDenied) {
+							location.href=`$main_path/packaging-detail/` + dbId;
+						} else if (result.dismiss == 'cancel') {
 							location.href=`$main_path/costing-detail/` + dbId;
 						}
-					})
+					});
 				});
 
 				$('.edit-menu-item').on('click', function() {
@@ -266,15 +282,21 @@
 						showDenyButton: true,
 						focusConfirm: false,
 						showCancelButton: true,
+						showCloseButton: true,
+						focusConfirm: true,
 						confirmButtonText: `🍕 Ingredients`,
 						denyButtonText: `🛍️ Packagings`,
+						cancelButtonText: `💲 Costing`,
 					}).then((result) => {
+						console.log(result);
 						if (result.isConfirmed) {
 							location.href=`$main_path/edit/` + dbId + `/ingredients`;
 						} else if (result.isDenied) {
 							location.href=`$main_path/edit/` + dbId + `/packagings`;
+						} else if (result.dismiss == 'cancel') {
+							location.href=`$main_path/edit/` + dbId + `/costing`;
 						}
-					})
+					});
 				});
 			";
 
@@ -909,23 +931,38 @@
 				->first();
 
 			$data['menu_items_data'] = self::getMenuItemDetails($id);
-			
+
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			$is_superadmin = CRUDBooster::isSuperAdmin();
+
 			if ($to_edit == 'ingredients') {
-				if (CRUDBooster::myPrivilegeName() != 'Chef' && !CRUDBooster::isSuperAdmin()) {
+				if (!in_array($to_edit, self::$to_edit[$my_privilege] ?? []) && !$is_superadmin)
 					CRUDBooster::redirect(
 						CRUDBooster::adminPath(),
 						trans('crudbooster.denied_access')
 					);
-				}
+
 				return $this->view('menu-items/edit-item', $data);
 			} else if ($to_edit == 'packagings') {
-				if (CRUDBooster::myPrivilegeName() == 'Chef') {
+				if (!in_array($to_edit, self::$to_edit[$my_privilege] ?? []) && !$is_superadmin)
 					CRUDBooster::redirect(
 						CRUDBooster::adminPath(),
 						trans('crudbooster.denied_access')
 					);
-				}
+
 				return $this->view('menu-items/add-packaging', $data);
+			} else if ($to_edit == 'costing') {
+				if (!in_array($to_edit, self::$to_edit[$my_privilege] ?? []) && !$is_superadmin)
+					CRUDBooster::redirect(
+						CRUDBooster::adminPath(),
+						trans('crudbooster.denied_access')
+					);
+
+				$data['item'] = DB::table('menu_costing')
+					->where('menu_items_id', $id)
+					->first();
+
+				return $this->view('menu-items/edit-costing', $data);
 			}
 		}
 
@@ -1002,57 +1039,6 @@
 						'new_ingredients_id' => $ingredient['new_ingredients_id'],
 						'batching_ingredients_id' => $ingredient['batching_ingredients_id']
 					], $ingredient);
-				}
-			}
-
-			DB::table('menu_packagings_details')
-				->where('menu_items_id', $menu_items_id)
-				->where('status', 'ACTIVE')
-				->update([
-					'status' => 'INACTIVE',
-					'row_id' => null,
-					'deleted_at' => $time_stamp
-				]);
-
-			foreach ($packagings as $group) {
-				foreach ($group as $packaging) {
-					$packaging = (array) $packaging;
-
-					//checking if the packaging already exists
-					$is_existing = DB::table('menu_packagings_details')
-						->where([
-							'menu_items_id' => $menu_items_id,
-							'item_masters_id' => $packaging['item_masters_id'],
-							'packaging_name' => $packaging['packaging_name'],
-							'new_packagings_id' => $packaging['new_packagings_id'],
-						])->exists();
-
-					if ($is_existing) {
-						$packaging['updated_at'] = $time_stamp;
-						$packaging['updated_by'] = $action_by;
-					} else {
-						$packaging['created_at'] = $time_stamp;
-						$packaging['created_by'] = $action_by;
-					}
-
-					$packaging['status'] = 'ACTIVE';
-					$packaging['deleted_at'] = null;
-
-					//unsetting packagings details that may be outdated in the future
-					unset(
-						$packaging['qty'], 
-						$packaging['cost'], 
-						$packaging['total_cost'],
-						$packaging['ttp']
-					);
-
-					//finally, inserting packaging to the table
-					DB::table('menu_packagings_details')->updateOrInsert([
-						'menu_items_id' => $menu_items_id,
-						'item_masters_id' => $packaging['item_masters_id'],
-						'new_packagings_id' => $packaging['new_packagings_id']
-					], $packaging);
-						
 				}
 			}
 
@@ -1163,12 +1149,47 @@
 
 		}
 
+		public function submitCosting(Request $request) {
+			$action_by = CRUDBooster::myId();
+			$time_stamp = date('Y-m-d H:i:s');
+			$menu_items_id = $request->input('menu_items_id');
+			$buffer = $request->input('buffer');
+			$ideal_food_cost = $request->input('ideal_food_cost');
+			$menu_price_dine = $request->input('menu_price_dine');
+			$menu_price_take = $request->input('menu_price_take');
+			$menu_price_dlv = $request->input('menu_price_dlv');
+
+			DB::table('menu_items')
+				->where('id', $menu_items_id)
+				->update([
+					'buffer' => $buffer,
+					'ideal_food_cost' => $ideal_food_cost,
+					'menu_price_dine' => $menu_price_dine,
+					'menu_price_take' => $menu_price_take,
+					'menu_price_dlv' => $menu_price_dlv,
+				]);
+
+			return redirect('admin/menu_items')
+				->with([
+					'message_type' => 'success',
+					'message' => 'Costing Updated!'
+				]);
+		}
+
 		public function getDetail($id) {
 			if (!CRUDBooster::isRead())
 				CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
 				);
+
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			if (!in_array('ingredients', self::$to_view[$my_privilege] ?? []) && !CRUDBooster::isSuperAdmin())
+					CRUDBooster::redirect(
+						CRUDBooster::adminPath(),
+						trans('crudbooster.denied_access')
+					);
+
 			$data = [];
 			$data['item'] = DB::table('menu_items')
 				->where('menu_items.id', $id)
@@ -1193,6 +1214,18 @@
 		}
 
 		public function getCostingDetails($id) {
+			if (!CRUDBooster::isRead())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			if (!in_array('costing', self::$to_view[$my_privilege] ?? []) && !CRUDBooster::isSuperAdmin())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
 			$data = [];
 
 			$item = DB::table('menu_costing')
@@ -1207,6 +1240,42 @@
 			$data['menu_items_data'] = self::getMenuItemDetails($id);
 
 			return $this->view('menu-items/costing-details', $data);
+		}
+
+		public function getPackagingDetail($id) {
+			if (!CRUDBooster::isRead())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			if (!in_array('packagings', self::$to_view[$my_privilege] ?? []) && !CRUDBooster::isSuperAdmin())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+			$data = [];
+			
+			$data['item'] = DB::table('menu_items')
+				->where('menu_items.id', $id)
+				->select(
+					'menu_items.tasteless_menu_code',
+					'menu_items.menu_price_dine',
+					'menu_items.menu_item_description',
+					'menu_items.portion_size',
+					'computed_ingredient_total_cost',
+					'computed_food_cost',
+					'computed_food_cost_percentage',
+					'computed_packaging_total_cost'
+				)
+				->leftJoin('menu_computed_food_cost', 'menu_computed_food_cost.id', '=', 'menu_items.id')
+				->leftJoin('menu_computed_packaging_cost', 'menu_computed_packaging_cost.id', '=', 'menu_items.id')
+				->first();
+
+			$data['packagings'] = self::getPackagings($id);
+			return $this->view('menu-items/packaging-detail', $data);
+			
 		}
 
 		function getMenuItemDetails($id) {
