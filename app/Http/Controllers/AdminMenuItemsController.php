@@ -1167,6 +1167,8 @@
 					'menu_price_dine' => $menu_price_dine,
 					'menu_price_take' => $menu_price_take,
 					'menu_price_dlv' => $menu_price_dlv,
+					'updated_by' => $action_by,
+					'updated_at' => $time_stamp,
 				]);
 
 			return redirect('admin/menu_items')
