@@ -50,7 +50,7 @@ class UpdateMenuIngredientsAutoComputeSqlView extends Migration
                     WHEN menu_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
                     WHEN menu_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
                     WHEN menu_ingredients_details.batching_ingredients_id IS NOT NULL THEN ROUND(
-                        batching_ingredients_computed_food_cost.food_cost,
+                        batching_ingredients_computed_food_cost.ttp,
                         4
                     )
                     WHEN menu_ingredients_details.new_ingredients_id IS NOT NULL THEN new_ingredients.ttp
@@ -113,7 +113,7 @@ class UpdateMenuIngredientsAutoComputeSqlView extends Migration
                         WHEN menu_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
                         WHEN menu_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
                         WHEN menu_ingredients_details.batching_ingredients_id IS NOT NULL THEN ROUND(
-                            batching_ingredients_computed_food_cost.food_cost,
+                            batching_ingredients_computed_food_cost.ttp,
                             4
                         )
                         WHEN menu_ingredients_details.new_ingredients_id IS NOT NULL THEN new_ingredients.ttp

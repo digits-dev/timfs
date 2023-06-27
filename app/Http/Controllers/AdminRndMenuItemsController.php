@@ -982,7 +982,7 @@
 				})
 				->select('batching_ingredients.id as batching_ingredients_id',
 					'batching_ingredients.ingredient_description',
-					'food_cost',
+					'batching_ingredients.ttp',
 					'batching_ingredients.uoms_id',
 					'uom_description')
 				->leftJoin('uoms', 'uoms.id', '=', 'batching_ingredients.uoms_id')

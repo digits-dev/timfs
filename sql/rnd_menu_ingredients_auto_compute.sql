@@ -33,7 +33,7 @@ CREATE VIEW RND_MENU_INGREDIENTS_AUTO_COMPUTE AS
 	        WHEN rnd_menu_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
 	        WHEN rnd_menu_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
 	        WHEN rnd_menu_ingredients_details.batching_ingredients_id IS NOT NULL THEN ROUND(
-	            batching_ingredients_computed_food_cost.food_cost,
+	            batching_ingredients_computed_food_cost.ttp,
 	            4
 	        )
 	        WHEN rnd_menu_ingredients_details.new_ingredients_id IS NOT NULL THEN new_ingredients.ttp
@@ -96,7 +96,7 @@ CREATE VIEW RND_MENU_INGREDIENTS_AUTO_COMPUTE AS
 	            WHEN rnd_menu_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
 	            WHEN rnd_menu_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
 	            WHEN rnd_menu_ingredients_details.batching_ingredients_id IS NOT NULL THEN ROUND(
-	                batching_ingredients_computed_food_cost.food_cost,
+	                batching_ingredients_computed_food_cost.ttp,
 	                4
 	            )
 	            WHEN rnd_menu_ingredients_details.new_ingredients_id IS NOT NULL THEN new_ingredients.ttp
@@ -120,5 +120,7 @@ CREATE VIEW RND_MENU_INGREDIENTS_AUTO_COMPUTE AS
 	        rnd_menu_ingredients_details.uom_id
 	    );
 ; 
+
+;
 
 ;
