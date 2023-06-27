@@ -279,7 +279,7 @@
 				$('.edit-menu-item').on('click', function() {
 					const dbId = $(this).attr('href')?.replace('#', '');
 					Swal.fire({
-						title: 'Which one do you want to edit?',
+						title: 'Which details do you want to edit?',
 						showDenyButton: true,
 						focusConfirm: false,
 						showCancelButton: true,
