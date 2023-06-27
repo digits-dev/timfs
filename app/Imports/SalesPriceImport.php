@@ -28,6 +28,7 @@ class SalesPriceImport implements ToModel, WithHeadingRow, WithChunkReading
 
         $data = [
             'old_ttp' => $currentItemCode->ttp,
+            'action_type' => 'UPDATE',
             'old_ttp_percentage' => $currentItemCode->ttp_percentage,
             'ttp_price_change' => $row['sales_price'],
             'ttp_percentage_price_change' => $commi_margin,

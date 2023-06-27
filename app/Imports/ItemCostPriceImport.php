@@ -23,6 +23,7 @@ class ItemCostPriceImport implements ToModel, WithHeadingRow, WithChunkReading
         
         $data = [
             'purchase_price' => $row['cost_price'],
+            'action_type' => 'UPDATE',
             'updated_at' => date('Y-m-d H:i:s'),
             'updated_by' => CRUDBooster::myId(),
             'approval_status' => '202',

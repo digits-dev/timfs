@@ -32,6 +32,7 @@ class FulfillmentTypeImport implements ToModel, WithHeadingRow, WithChunkReading
         $data = [
             'fulfillment_type_id' => $fulfillment_types[$row['fulfillment_type']],
             'updated_at' => date('Y-m-d H:i:s'),
+            'action_type' => 'UPDATE',
             'updated_by' => CRUDBooster::myId(),
             'approval_status' => '202',
         ];

@@ -37,6 +37,7 @@ class ItemSegmentationImport implements ToModel, WithHeadingRow, WithChunkReadin
         }
 
         $data_segments['approval_status'] = '202';
+        $data_segments['action_type'] = 'UPDATE';
 
 
         ItemMasterApproval::where('tasteless_code', '=', (string)$row['tasteless_code'])->update($data_segments);
