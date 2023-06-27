@@ -269,22 +269,22 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input value="{{$item ? $item->ingredient_description : ''}}" type="text" class="form-control ingredient-description" placeholder="Batching Ingredient Description">
+                            <input value="{{$item->ingredient_description ?? ''}}" type="text" class="form-control ingredient-description" placeholder="Batching Ingredient Description">
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="" class="control-label">Batching Ingredient Item Code</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input value="{{$item ? $item->bi_code : ''}}" type="text" class="form-control bi_code" placeholder="BI-XXXXX" readonly>
+                            <input value="{{$item->bi_code ?? ''}}" type="text" class="form-control bi_code" placeholder="BI-XXXXX" readonly>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="" class="control-label"><span class="required-star">*</span> Batching Ingredient Prepared By</label>
                         <div class="input-group">
@@ -297,6 +297,17 @@
                                 <option value="{{ $prepared_by->id }}" {{$item->batching_ingredients_prepared_by_id == $prepared_by->id ? 'selected' : ''}}>{{ $prepared_by->prepared_by }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label"><span class="required-star">*</span> Batching Ingredient TTP</label>
+                        <div class="input-group">
+                            <div class="input-group-addon text-bold">
+                                ₱
+                            </div>
+                            <input type="number" value="{{$item->ttp ?? ''}}" step="any" class="batching-ingredient-ttp form-control ttp" placeholder="0.00" required>
                         </div>
                     </div>
                 </div>
@@ -869,7 +880,8 @@
 
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
-                $('.portion').val() > 0 && $('.ingredient-description').val() && $('.prepared-by').val();
+                $('.portion').val() > 0 && $('.ingredient-description').val() && $('.prepared-by').val()
+                && $('.batching-ingredient-ttp').val();
 
             const hasIngredient = $('#form-ingredient .ingredient-wrapper, #form-ingredient .new-ingredient-wrapper').length > 0;
             
@@ -895,6 +907,7 @@
                     if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
 					if (!$('.ingredient-description').val()) $('.ingredient-description').css('outline', '2px solid red');
                     if (!$('.prepared-by').val()) $('.prepared-by').css('outline', '2px solid red');
+                    if (!$('.batching-ingredient-ttp').val()) $('.batching-ingredient-ttp').css('outline', '2px solid red');
                 });
         }
 
