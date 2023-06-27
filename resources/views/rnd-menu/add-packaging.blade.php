@@ -951,6 +951,19 @@
                         $.fn.submitForm('save');
                     }
                 });
+            } else if (!hasPackaging) {
+                Swal.fire({
+                    title: 'Are you sure this item has no packaging?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.fn.submitForm('save');
+                    }
+                });
             } else {
                 $.fn.formatInvalidInputs(isValid);
             }
