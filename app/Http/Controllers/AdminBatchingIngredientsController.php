@@ -38,6 +38,7 @@
 			$this->col[] = ["label"=>"Ingredient Descrition","name"=>"ingredient_description"];
 			$this->col[] = ["label"=>"Portion Size","name"=>"portion_size"];
 			$this->col[] = ["label"=>"Food Cost","name"=>"id","join"=>"batching_ingredients_computed_food_cost,food_cost","join_id"=>"id"];
+			$this->col[] = ["label"=>"TTP","name"=>"ttp"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
@@ -509,6 +510,7 @@
 			$batching_ingredients_id = $request->get('batching_ingredients_id');
 			$ingredient_description = strtoupper($request->get('ingredient_description'));
 			$portion_size = $request->get('portion_size');
+			$batching_ingredients_ttp = $request->get('ttp');
 			$batching_ingredients_prepared_by_id = $request->get('batching_ingredients_prepared_by_id');
 			$ingredients = json_decode($request->get('ingredients'));
 			$time_stamp = date('Y-m-d H:i:s');
@@ -525,6 +527,7 @@
 						'batching_ingredients_prepared_by_id' => $batching_ingredients_prepared_by_id,
 						'bi_code' => $bi_code,
 						'portion_size' => $portion_size,
+						'ttp' => $batching_ingredients_ttp,
 						'created_by' => $action_by,
 						'created_at' => $time_stamp
 					]);
@@ -538,6 +541,7 @@
 						'ingredient_description' => $ingredient_description,
 						'batching_ingredients_prepared_by_id' => $batching_ingredients_prepared_by_id,
 						'portion_size' => $portion_size,
+						'ttp' => $batching_ingredients_ttp,
 						'updated_at' => $time_stamp,
 						'updated_by' => $action_by
 					]);

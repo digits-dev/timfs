@@ -854,6 +854,10 @@
                 .attr('name', 'portion_size')
                 .val($('.portion').val());
 
+            const ttpData = $(document.createElement('input'))
+                .attr('name', 'ttp')
+                .val($('.batching-ingredient-ttp').val());
+
             const batchingIngredientsPreparedById = $(document.createElement('input'))
                 .attr('name', 'batching_ingredients_prepared_by_id')
                 .val($('.prepared-by').val());
@@ -864,6 +868,7 @@
                 ingrediendDescription,
                 bachingIngredientId,
                 portionData,
+                ttpData,
                 batchingIngredientsPreparedById,
             );
             $('.panel-body').append(form);
