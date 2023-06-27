@@ -5,6 +5,7 @@ AS
 	    batching_ingredients.ingredient_description,
 	    batching_ingredients.status,
 	    batching_ingredients.portion_size,
+	    batching_ingredients.ttp,
 	    ROUND(SUM(subquery.cost), 4) as ingredient_total_cost,
 	    ROUND(
 	        ROUND(SUM(subquery.cost), 4) / batching_ingredients.portion_size,
