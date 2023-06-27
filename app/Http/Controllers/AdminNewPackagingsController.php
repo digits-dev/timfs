@@ -109,7 +109,7 @@
 				'color' => ' ',
 			];
 
-			if (in_array($my_privilege, $this->tagger)) {
+			if (in_array($my_privilege, $this->tagger) || CRUDBooster::isSuperAdmin()) {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
