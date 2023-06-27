@@ -723,6 +723,11 @@
 						'approved_by_1' => $action_by,
 						'approved_at_1' => $time_stamp,
 					]);
+
+					$item = DB::table('item_master_approvals')
+						->where('id', $id)
+						->first();
+
 					unset($item->id);
 
 					$inserted_item = ItemMaster::updateOrCreate(
