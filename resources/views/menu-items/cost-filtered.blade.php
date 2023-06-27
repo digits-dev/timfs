@@ -117,7 +117,7 @@
             const path = "{{ CRUDBooster::adminPath('menu_items') }}";
             if (clickedAction == 'edit') {
                 Swal.fire({
-                    title: 'Which details do you want to see?',
+                    title: 'Which details do you want to edit?',
                     showDenyButton: true,
                     focusConfirm: false,
                     showCancelButton: true,
@@ -137,7 +137,7 @@
                 });
             } else if (clickedAction == 'detail') {
                 Swal.fire({
-                    title: 'Which one do you want to edit?',
+                    title: 'Which details do you want to see?',
                     showDenyButton: true,
                     focusConfirm: false,
                     showCancelButton: true,
