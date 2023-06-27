@@ -591,6 +591,15 @@
 						'is_existing' => 'TRUE'
 					]);
 
+				DB::table('menu_packagings_details')
+					->where('new_packagings_id')
+					->update([
+						'updated_by' => $action_by,
+						'updated_at' => $time_stamp,
+						'item_masters_id' => $item_masters_id,
+						'is_existing' => 'TRUE'
+					]);
+
 				return redirect(CRUDBooster::mainpath())
 					->with([
 						'message_type' => 'success',
