@@ -506,11 +506,13 @@
 
 
 
-			$query->where(function($sub) {
-				$sub
-					->where('item_master_approvals.created_at', '>=', date('2023-06-07'))
-					->orWhere('item_master_approvals.updated_at', '>=', date('2023-06-07'));
-			});
+			$query
+				->whereIn('item_master_approvals.approval_status', ['200', '202', '400'])
+				->where(function($sub) {
+					$sub
+						->where('item_master_approvals.created_at', '>=', date('2023-06-07'))
+						->orWhere('item_master_approvals.updated_at', '>=', date('2023-06-07'));
+				});
 
 			if (in_array($my_privilege, $this->requestor)) {
 				$my_id = CRUDBooster::myId();
@@ -802,9 +804,7 @@
 
 				} else if ($action == 'reject') {
 					ItemMasterApproval::where('id', $id)->update([
-						'approval_status' => '400',
-						'approved_by_1' => $action_by,
-						'approved_at_1' => $time_stamp,
+						'approval_status' => '400'
 					]);
 				} 
 					
