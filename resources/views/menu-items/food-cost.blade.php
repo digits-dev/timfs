@@ -59,7 +59,7 @@
         <table id="main-table" class="table table-striped table-bordered" style="display: none;">
             <thead>
                 <tr class="active">
-                    <th scope="col">Concept Name</th>
+                    <th scope="col">Store</th>
                     <th scope="col">Low Cost</th>
                     <th scope="col">High Cost</th>
                     <th scope="col">No Cost</th>
