@@ -35,6 +35,10 @@
         font-style: italic;
         color: grey;
     }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
 </style>
 @endpush
 
@@ -57,38 +61,40 @@
         <h3 class="concept-name">{{$concept->menu_segment_column_description ? $concept->menu_segment_column_description : 'ALL'}}</h3>
         <p class="filter-name">{{$filter}} Cost</p>
         <p class="loading-label text-center">Loading...</p>
-        <table id="tableData" class="table table-striped table-bordered" style="display: none;">
-            <thead>
-                <tr class="active">
-                    <th scope="col">Menu Item Code</th>
-                    <th scope="col">Menu Item Description</th>
-                    <th scope="col">SRP</th>
-                    <th scope="col">Food Cost</th>
-                    <th scope="col">Percentage</th>
-                    <th scope="col">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($menu_items as $menu_item)
-                <tr>
-                    <td>{{$menu_item->tasteless_menu_code}}</td>
-                    <td>{{$menu_item->menu_item_description}}</td>
-                    <td>{{(float) $menu_item->menu_price_dine}}</td>
-                    <td>{{$menu_item->food_cost ? (float) $menu_item->food_cost : '0'}}</td>
-                    <td>{{$menu_item->food_cost_percentage ? (float) $menu_item->food_cost_percentage : '0.00'}}%</td>
-                    <td class="action">
-                        <a class="action-button" href="#" _menu-item-id="{{ $menu_item->id }}" _action="detail">
-                            <i class="fa fa-eye button"></i>
-                        </a>
-                        <a class="action-button" href="#" _menu-item-id="{{ $menu_item->id }}" _action="edit">
-                            <i class="fa fa-pencil button"></i>
-                        </a>
-                    </td>
-                </tr>
-
-                @endforeach
-            </tbody>
-        </table>
+        <div class="table-wrapper">
+            <table id="tableData" class="table table-striped table-bordered" style="display: none;">
+                <thead>
+                    <tr class="active">
+                        <th scope="col">Menu Item Code</th>
+                        <th scope="col">Menu Item Description</th>
+                        <th scope="col">SRP</th>
+                        <th scope="col">Food Cost</th>
+                        <th scope="col">Percentage</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($menu_items as $menu_item)
+                    <tr>
+                        <td>{{$menu_item->tasteless_menu_code}}</td>
+                        <td>{{$menu_item->menu_item_description}}</td>
+                        <td>{{(float) $menu_item->menu_price_dine}}</td>
+                        <td>{{$menu_item->food_cost ? (float) $menu_item->food_cost : '0'}}</td>
+                        <td>{{$menu_item->food_cost_percentage ? (float) $menu_item->food_cost_percentage : '0.00'}}%</td>
+                        <td class="action">
+                            <a class="action-button" href="#" _menu-item-id="{{ $menu_item->id }}" _action="detail">
+                                <i class="fa fa-eye button"></i>
+                            </a>
+                            <a class="action-button" href="#" _menu-item-id="{{ $menu_item->id }}" _action="edit">
+                                <i class="fa fa-pencil button"></i>
+                            </a>
+                        </td>
+                    </tr>
+    
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div class="panel-footer">
