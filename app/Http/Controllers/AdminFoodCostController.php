@@ -341,7 +341,7 @@ class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CB
 	public function getIndex($low_cost_value = 30) {
 		$low_cost_value = (float) $low_cost_value;
 
-		if (!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::mainPath(), trans('crudbooster.denied_access'));
+		if (!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
 		$data = [];
 
 		$data['concepts'] = DB::table('menu_segmentations')
