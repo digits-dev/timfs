@@ -55,7 +55,8 @@
            <input class="percentage-input form-control percentage-text" type="number" step="any"/>
            <button class="btn btn-primary set-percentage-btn">Set</button>
        </label>
-        <table class="table table-striped table-bordered">
+       <div class="loading-label text-center">Loading...</div>
+        <table id="main-table" class="table table-striped table-bordered" style="display: none;">
             <thead>
                 <tr class="active">
                     <th scope="col">Concept Name</th>
@@ -114,7 +115,6 @@
     document.title = 'Food Cost';
     $(document).ready(function() {
 
-        $('.loading-label').remove();
 
         $(document).on('click', '.clickable', function() {
             const td = $(this);
@@ -136,6 +136,8 @@
             pagingType: 'full_numbers',
             pageLength: 100,
         });
+        $('.loading-label').hide();
+        $('#main-table').show();
 
         $('.percentage-input').on('keypress', function(event) {
             if (event.keyCode == 13) {

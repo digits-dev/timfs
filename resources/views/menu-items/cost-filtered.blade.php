@@ -56,7 +56,8 @@
     <div class="panel-body">
         <h3 class="concept-name">{{$concept->menu_segment_column_description ? $concept->menu_segment_column_description : 'ALL'}}</h3>
         <p class="filter-name">{{$filter}} Cost</p>
-        <table id="tableData" class="table table-striped table-bordered">
+        <p class="loading-label text-center">Loading...</p>
+        <table id="tableData" class="table table-striped table-bordered" style="display: none;">
             <thead>
                 <tr class="active">
                     <th scope="col">Menu Item Code</th>
@@ -88,7 +89,6 @@
                 @endforeach
             </tbody>
         </table>
-        <p class="loading-label">Loading...</p>
     </div>
 
     <div class="panel-footer">
@@ -104,12 +104,13 @@
     const filter = {!! json_encode($filter) !!};
     document.title = `${concept ? concept.menu_segment_column_description.toUpperCase() : 'ALL'}: ${filter.toUpperCase()} COST`
     $(document).ready(function() {
-        $('.loading-label').remove();
         const tbody = $('tbody');
-        $('table').DataTable({
+        $('#tableData').DataTable({
             pagingType: 'full_numbers',
             pageLength: 50,
         });
+        $('.loading-label').hide();
+        $('#tableData').show();
 
         $(document).on('click', '.action-button', function() {
             const clickedAction = $(this).attr('_action');
