@@ -48,21 +48,29 @@
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			if(in_array(CRUDBooster::getCurrentMethod(),['getEdit','postEditSave','getDetail'])) {
-			    $this->form[] = ['label'=>'Menu Segment Column Code','name'=>'menu_segment_column_code','type'=>'text','validation'=>'required|unique:menu_segmentations|min:3|max:15','width'=>'col-sm-4'];
-			    $this->form[] = ['label'=>'Menu Segment Column Description','name'=>'menu_segment_column_description','type'=>'text','validation'=>'required|min:3|max:50','width'=>'col-sm-4'];
-				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'ACTIVE;INACTIVE'];
-			}else{
-			    $this->form[] = ['label'=>'Menu Segment Column Name','name'=>'menu_segment_column_name','type'=>'text','readonly'=>true,'validation'=>'required|unique:menu_segmentations|min:3|max:35','width'=>'col-sm-4'];
-			    $this->form[] = ['label'=>'Menu Segment Column Code','name'=>'menu_segment_column_code','type'=>'text','validation'=>'required|unique:menu_segmentations|min:3|max:3','width'=>'col-sm-4'];
-			    $this->form[] = ['label'=>'Menu Segment Column Description','name'=>'menu_segment_column_description','type'=>'text','validation'=>'required|min:3|max:50','width'=>'col-sm-4']; 
-			}
-			if(CRUDBooster::getCurrentMethod() == 'getDetail'){
-				$this->form[] = ["label"=>"Created By","name"=>"created_by",'type'=>'select',"datatable"=>"cms_users,name"];
-				$this->form[] = ['label'=>'Created Date','name'=>'created_at', 'type'=>'datetime'];
-				$this->form[] = ["label"=>"Updated By","name"=>"updated_by",'type'=>'select',"datatable"=>"cms_users,name"];
-				$this->form[] = ['label'=>'Updated Date','name'=>'updated_at', 'type'=>'datetime'];
-			}# END FORM DO NOT REMOVE THIS LINE
+			$this->form[] = ['label'=>'Menu Segment Column Name','name'=>'menu_segment_column_name','type'=>'text','validation'=>'required|unique:menu_segmentations|min:3|max:35','width'=>'col-sm-4','readonly'=>'1'];
+			$this->form[] = ['label'=>'Menu Segment Column Code','name'=>'menu_segment_column_code','type'=>'text','validation'=>'required|unique:menu_segmentations|min:3|max:3','width'=>'col-sm-4'];
+			$this->form[] = ['label'=>'Menu Segment Column Description','name'=>'menu_segment_column_description','type'=>'text','validation'=>'required|min:3|max:50','width'=>'col-sm-4'];
+			# END FORM DO NOT REMOVE THIS LINE
+
+			# OLD START FORM
+			//$this->form = [];
+			//if(in_array(CRUDBooster::getCurrentMethod(),['getEdit','postEditSave','getDetail'])) {
+			//$this->form[] = ['label'=>'Menu Segment Column Code','name'=>'menu_segment_column_code','type'=>'text','validation'=>'required|unique:menu_segmentations|min:3|max:15','width'=>'col-sm-4'];
+			//$this->form[] = ['label'=>'Menu Segment Column Description','name'=>'menu_segment_column_description','type'=>'text','validation'=>'required|min:3|max:50','width'=>'col-sm-4'];
+			//$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'ACTIVE;INACTIVE'];
+			//}else{
+			//$this->form[] = ['label'=>'Menu Segment Column Name','name'=>'menu_segment_column_name','type'=>'text','readonly'=>true,'validation'=>'required|unique:menu_segmentations|min:3|max:35','width'=>'col-sm-4'];
+			//$this->form[] = ['label'=>'Menu Segment Column Code','name'=>'menu_segment_column_code','type'=>'text','validation'=>'required|unique:menu_segmentations|min:3|max:3','width'=>'col-sm-4'];
+			//$this->form[] = ['label'=>'Menu Segment Column Description','name'=>'menu_segment_column_description','type'=>'text','validation'=>'required|min:3|max:50','width'=>'col-sm-4'];
+			//}
+			//if(CRUDBooster::getCurrentMethod() == 'getDetail'){
+			//$this->form[] = ["label"=>"Created By","name"=>"created_by",'type'=>'select',"datatable"=>"cms_users,name"];
+			//$this->form[] = ['label'=>'Created Date','name'=>'created_at', 'type'=>'datetime'];
+			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by",'type'=>'select',"datatable"=>"cms_users,name"];
+			//$this->form[] = ['label'=>'Updated Date','name'=>'updated_at', 'type'=>'datetime'];
+			//}
+			# OLD END FORM
 
 			/* 
 	        | ---------------------------------------------------------------------- 
