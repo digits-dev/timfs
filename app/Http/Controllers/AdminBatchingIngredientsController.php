@@ -37,8 +37,9 @@
 			$this->col[] = ["label"=>"Prepared by","name"=>"batching_ingredients_prepared_by_id","join"=>"batching_ingredients_prepared_by,prepared_by"];
 			$this->col[] = ["label"=>"Ingredient Descrition","name"=>"ingredient_description"];
 			$this->col[] = ["label"=>"Portion Size","name"=>"portion_size"];
-			$this->col[] = ["label"=>"Food Cost","name"=>"id","join"=>"batching_ingredients_computed_food_cost,food_cost","join_id"=>"id"];
+			$this->col[] = ["label"=>"Total Cost","name"=>"id","join"=>"batching_ingredients_computed_food_cost,ingredient_total_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"TTP","name"=>"ttp"];
+			$this->col[] = ["label"=>"Portion TTP","name"=>"id","join"=>"batching_ingredients_computed_food_cost,portion_ttp","join_id"=>"id"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
