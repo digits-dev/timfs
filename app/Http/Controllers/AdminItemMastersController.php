@@ -935,13 +935,11 @@
 		public function submitAddOrEdit(Request $request) {
 			$input = $request->all();
 			if ($input['item_photo']) {
-				$random_string = Str::random(10);
-				$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', $random_string);
-				$item_description = str_replace(['/', ':', ' ', ','], '_', $input['full_item_description']);
-				$item_description = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', $item_description);
+				$filename_filler = $input['tasteless_code'] ?? 'new_item';
+				$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
 	
 				$img_file = $input['item_photo'];
-				$filename = "$item_description(" . date('Y-m-d') . ")$random_string." . $img_file->getClientOriginalExtension();
+				$filename = date('Y-m-d') . "-$filename_filler-$random_string." . $img_file->getClientOriginalExtension();
 				$image = Image::make($img_file);
 				
 				$image->resize(1024, 768, function ($constraint) {
