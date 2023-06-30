@@ -80,9 +80,9 @@
                     @endphp
                 <tr>
                     <td>{{$concept->menu_segment_column_description}}</td>
-                    <td class="clickable" filter="low" id={{$concept->id}} items="{{implode(',', $low_cost_id)}}">{{count($low_cost)}}</td>
-                    <td class="clickable" filter="high" id={{$concept->id}} items="{{implode(',', $high_cost_id)}}">{{count($high_cost)}}</td>
-                    <td class="clickable" filter="no" id={{$concept->id}} items="{{implode(',', $no_cost_id)}}">{{count($no_cost)}}</td>
+                    <td class="clickable" filter="low" _id="{{$concept->id}}" items="{{implode(',', $low_cost_id)}}">{{count($low_cost)}}</td>
+                    <td class="clickable" filter="high" _id="{{$concept->id}}" items="{{implode(',', $high_cost_id)}}">{{count($high_cost)}}</td>
+                    <td class="clickable" filter="no" _id="{{$concept->id}}" items="{{implode(',', $no_cost_id)}}">{{count($no_cost)}}</td>
                 </tr>
                 @endforeach
                 @php
@@ -98,9 +98,9 @@
                 @if ($menu_items)
                 <tr>
                     <td>ALL</td>
-                    <td class="clickable" filter="low" id="all" items="{{implode(',', $low_cost_id)}}">{{count($low_cost)}}</td>
-                    <td class="clickable" filter="high" id="all" items="{{implode(',', $high_cost_id)}}">{{count($high_cost)}}</td>
-                    <td class="clickable" filter="no" id="all" items="{{implode(',', $no_cost_id)}}">{{count($no_cost)}}</td>
+                    <td class="clickable" filter="low" _id="all" items="{{implode(',', $low_cost_id)}}">{{count($low_cost)}}</td>
+                    <td class="clickable" filter="high" _id="all" items="{{implode(',', $high_cost_id)}}">{{count($high_cost)}}</td>
+                    <td class="clickable" filter="no" _id="all" items="{{implode(',', $no_cost_id)}}">{{count($no_cost)}}</td>
                 </tr>
                 @endif
             </tbody>
@@ -118,7 +118,7 @@
 
         $(document).on('click', '.clickable', function() {
             const td = $(this);
-            const concept = td.attr('id');
+            const concept = td.attr('_id');
             const filter = td.attr('filter');
             const low_cost = Number(localStorage.getItem('lowCost')) || 30;
             location.assign("{{CRUDBooster::mainpath()}}/" + `${concept}/${filter}/${low_cost}`);
