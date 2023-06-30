@@ -143,20 +143,24 @@
 	        $this->addaction = array();
 			$privilege = CRUDBooster::myPrivilegeName(); 
 
-			$this->addaction[] = [
-				'title'=>'Detail',
-				'url' => '#[id]',
-				'icon'=>'fa fa-eye',
-				'color' => ' view-menu-details'
-			];
+			if (CRUDBooster::isRead()) {
+				$this->addaction[] = [
+					'title'=>'Detail',
+					'url' => '#[id]',
+					'icon'=>'fa fa-eye',
+					'color' => ' view-menu-details'
+				];
+			}
 
-			$this->addaction[] = [
-				'title'=>'Edit',
-				'url' => '#[id]',
-				'icon'=>'fa fa-pencil',
-				'color' => ' edit-menu-item',
-				'showIf' => '[tasteless_menu_code] != null'
-			];
+			if (CRUDBooster::isUpdate()) {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url' => '#[id]',
+					'icon'=>'fa fa-pencil',
+					'color' => ' edit-menu-item',
+					'showIf' => '[tasteless_menu_code] != null'
+				];
+			}
 
 
 	        /* 
@@ -1238,13 +1242,7 @@
 					CRUDBooster::mainPath(),
 					trans('crudbooster.denied_access')
 				);
-
-			// $my_privilege = CRUDBooster::myPrivilegeName();
-			// if (!in_array('costing', self::$to_view[$my_privilege] ?? []) && !CRUDBooster::isSuperAdmin())
-			// 	CRUDBooster::redirect(
-			// 		CRUDBooster::mainPath(),
-			// 		trans('crudbooster.denied_access')
-			// 	);
+				
 			$data = [];
 
 			$item = DB::table('menu_costing')
