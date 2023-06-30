@@ -307,7 +307,7 @@
                             <div class="input-group-addon text-bold">
                                 ₱
                             </div>
-                            <input type="number" value="{{$item->ttp ?? ''}}" step="any" class="batching-ingredient-ttp form-control ttp" placeholder="0.00" required>
+                            <input type="number" value="{{$item->ttp ? (float) $item->ttp : ''}}" step="any" class="batching-ingredient-ttp form-control ttp" placeholder="0.00" required>
                         </div>
                     </div>
                 </div>
