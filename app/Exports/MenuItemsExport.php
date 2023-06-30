@@ -57,6 +57,10 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             array_push($header,$segment->menu_segment_column_description);
         }
 
+        array_push($header, 'RELEASE DATE');
+        array_push($header, 'END DATE');
+        array_push($header, 'POS UPDATE DATE');
+
         return $header;
     } 
 
@@ -107,6 +111,10 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             array_push($data_items, $data_menu_item->$seg);
         }
 
+        array_push($data_items, $data_menu_item->release_date);
+        array_push($data_items, $data_menu_item->end_date);
+        array_push($data_items, $data_menu_item->pos_update);
+
         return $data_items;
     }
 
@@ -123,8 +131,8 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         ->leftJoin('menu_types','menu_items.menu_types_id','=','menu_types.id')
         ->leftJoin('menu_categories','menu_items.menu_categories_id','=','menu_categories.id')
         ->leftJoin('menu_subcategories','menu_items.menu_subcategories_id','=','menu_subcategories.id')
+        ->leftJoin('rnd_menu_items','menu_items.id','=','rnd_menu_items.menu_items_id')
         ->select(
-            
             'menu_items.tasteless_menu_code',
             'menu_items.pos_old_item_description',
             'menu_items.menu_item_description',
@@ -137,7 +145,11 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             'menu_items.original_concept',
             'menu_items.status as menu_item_status',
             'menu_items.approved_at',
-            'menu_items.available_concepts');
+            'menu_items.available_concepts',
+            'rnd_menu_items.release_date',
+            'rnd_menu_items.end_date',
+            'rnd_menu_items.pos_update',
+        );
             
         foreach($old_item_codes as $old_codes){
             $menu_items->addSelect('menu_items.'.$old_codes->menu_old_code_column_name);
