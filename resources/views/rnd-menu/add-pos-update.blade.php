@@ -84,7 +84,7 @@
         <i class="fa fa-pencil"></i><strong> Edit RND Menu Item</strong>
     </div>
     <div class="panel-body">
-        <form method="POST" action="{{route('add_release_date')}}" id="form" class="form">
+        <form method="POST" action="{{route('add_pos_update')}}" id="form" class="form">
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
@@ -97,6 +97,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-2">
                     <div class="form-group">
                         <label for="" class="control-label">RND Menu Item Code</label>
@@ -126,7 +128,7 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input type="date" value="{{ $rnd_menu_item->release_date ?? '' }}" class="form-control release_date" name="release_date" required>
+                            <input type="date" value="{{ $rnd_menu_item->release_date ?? '' }}" class="form-control release_date" name="release_date" readonly>
                         </div>
                     </div>
                 </div>
@@ -137,7 +139,18 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input type="date" value="{{ $rnd_menu_item->end_date ?? '' }}" class="form-control end_date" name="end_date">
+                            <input type="date" value="{{ $rnd_menu_item->end_date ?? '' }}" class="form-control end_date" name="end_date" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">POS Update Date</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-sticky-note"></i>
+                            </div>
+                            <input type="date" value="{{ $rnd_menu_item->pos_update ?? '' }}" class="form-control pos_update" name="pos_update">
                         </div>
                     </div>
                 </div>

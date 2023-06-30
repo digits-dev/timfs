@@ -302,15 +302,13 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-			$not_valid_approval_statuses = [
-				'SAVED', 
-				'REJECTED', 
-				'APPROVED', 
-				'CLOSED', 
-				'FOR RELEASE DATE',
-				'ARCHIVED',
-				'RETURNED',
-				'FOR ADJUSTMENT',
+			$valid_approval_statuses = [
+				'FOR FOOD TASTING',
+				'FOR PACKAGING',
+				'FOR MENU CREATION',
+				'FOR COSTING',
+				'FOR APPROVAL (MARKETING)',
+				'FOR APPROVAL (ACCOOUNTING)',
 			];
 
 			$upperCasedPrivilege = strtoupper(CRUDBooster::myPrivilegeName());
@@ -327,7 +325,7 @@
 
 			$query
 				->addSelect('rnd_menu_approvals.approval_status as approval_status')
-				->whereNotIn('rnd_menu_approvals.approval_status', $not_valid_approval_statuses);
+				->whereIn('rnd_menu_approvals.approval_status', $valid_approval_statuses);
 			
 			if (!CRUDBooster::isSuperAdmin()) {
 				$query->whereIn('rnd_menu_approvals.approval_status', ($privileges[$upperCasedPrivilege] ?? []));

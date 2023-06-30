@@ -343,7 +343,7 @@
 			if (is_numeric($column_value)) $column_value = (float) $column_value;
 
 			$blue_status = ['SAVED', 'FOR COSTING'];
-			$dark_blue_status = ['FOR FOOD TASTING', 'RETURNED', 'FOR ADJUSTMENT'];
+			$dark_blue_status = ['FOR FOOD TASTING', 'RETURNED', 'FOR ADJUSTMENT', 'FOR POS UPDATE'];
 			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION', 'FOR RELEASE DATE'];
 			$green_status = ['APPROVED', 'CLOSED'];
 			$red_status = ['REJECTED'];
@@ -1439,6 +1439,10 @@
 				->where('rnd_menu_items_id', $id)
 				->first();
 
+			$data['rnd_menu_item'] = DB::table('rnd_menu_items')
+				->where('id', $id)
+				->first();
+
 			$data['workflow'] = self::getWorkFlowDetails($id);
 
 			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
@@ -1452,7 +1456,7 @@
 			$end_date = $request->get('end_date');
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
-			$approval_status = 'CLOSED';
+			$approval_status = 'FOR POS UPDATE';
 
 			DB::table('rnd_menu_items')
 				->where('id', $rnd_menu_items_id)
@@ -1648,6 +1652,55 @@
 				->with([
 					'message_type' => 'success',
 					'message' => $message,
+				]);
+		}
+
+		public function getAddPosUpdate($id) {
+			$data = [];
+
+			$data['item'] = DB::table('rnd_menu_costing')
+				->where('rnd_menu_items_id', $id)
+				->first();
+
+			$data['rnd_menu_item'] = DB::table('rnd_menu_items')
+				->where('id', $id)
+				->first();
+
+			$data['workflow'] = self::getWorkFlowDetails($id);
+
+			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
+
+			return $this->view('rnd-menu/add-pos-update', $data);
+		}
+
+		public function addPosUpdate(Request $request) {
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+			$pos_update = $request->get('pos_update');
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$approval_status = 'CLOSED';
+
+			DB::table('rnd_menu_items')
+				->where('id', $rnd_menu_items_id)
+				->update([
+					'pos_update' => $pos_update,
+					'updated_at' => $time_stamp,
+					'updated_by' => $action_by,
+				]);
+
+			DB::table('rnd_menu_approvals')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->update([
+					'set_pos_update_by' => $action_by,
+					'set_pos_update_at' => $time_stamp,
+					'updated_at' => $time_stamp,
+					'approval_status' => $approval_status,
+				]);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => '✔️ POS Update Date added.',
 				]);
 		}
 

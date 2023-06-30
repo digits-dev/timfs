@@ -38,9 +38,10 @@
 			$this->col = [];
 			$this->col[] = ["label"=>"Approval Status","name"=>"id","join"=>"rnd_menu_approvals,approval_status","join_id"=>"rnd_menu_items_id"];
 			$this->col[] = ["label"=>"Concept","name"=>"segmentations_id","join"=>"segmentations,segment_column_description"];
+			$this->col[] = ["label"=>"RND Code","name"=>"rnd_code"];
 			$this->col[] = ["label"=>"Release Date","name"=>"release_date"];
 			$this->col[] = ["label"=>"End Date","name"=>"end_date"];
-			$this->col[] = ["label"=>"RND Code","name"=>"rnd_code"];
+			$this->col[] = ["label"=>"POS Update Date","name"=>"pos_update"];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"menu_items_id","join"=>"menu_items,tasteless_menu_code"];
 			$this->col[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description"];
 			$this->col[] = ["label"=>"SRP","name"=>"rnd_menu_srp"];
@@ -110,7 +111,7 @@
 				'color' => ' ',
 			];
 
-			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Marketing Encoder') {
+			if (CRUDBooster::isUpdate()) {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
@@ -275,7 +276,7 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-			$approval_status = ['APPROVED', 'CLOSED', 'FOR RELEASE DATE'];
+			$approval_status = ['APPROVED', 'CLOSED', 'FOR RELEASE DATE', 'FOR POS UPDATE'];
 			
 	        $query->whereIn('rnd_menu_approvals.approval_status', $approval_status)
 				->addSelect('rnd_menu_approvals.approval_status')
@@ -293,7 +294,7 @@
 			if (is_numeric($column_value)) $column_value = (float) $column_value;
 
 			$blue_status = ['SAVED', 'FOR COSTING'];
-			$dark_blue_status = ['FOR FOOD TASTING'];
+			$dark_blue_status = ['FOR FOOD TASTING', 'FOR POS UPDATE'];
 			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION', 'FOR RELEASE DATE'];
 			$green_status = ['CLOSED'];
 			
@@ -405,10 +406,29 @@
 					trans('crudbooster.denied_access')
 				);
 
-			return $this->mainController->getAddReleaseDate($id);
+			$status = DB::table('rnd_menu_items')
+				->where('rnd_menu_items.id', $id)
+				->leftJoin('rnd_menu_approvals', 'rnd_menu_approvals.rnd_menu_items_id', '=', 'rnd_menu_items.id')
+				->first()
+				->approval_status;
+
+			$my_privilege = CRUDBooster::myPrivilegeName();
+
+			if ((CRUDBooster::isSuperAdmin() || $my_privilege == 'Marketing Encoder') && $status == 'FOR RELEASE DATE') {
+				return $this->mainController->getAddReleaseDate($id);
+			}
+
+			if ((CRUDBooster::isSuperAdmin() || $my_privilege == 'Sales Accounting') && $status == 'FOR POS UPDATE') {
+				return $this->mainController->getAddPosUpdate($id);;
+			}
+
 		}
 
 		public function addReleaseDate(Request $request) {
 			return $this->mainController->addReleaseDate($request);
+		}
+
+		public function addPosUpdate(Request $request) {
+			return $this->mainController->addPosUpdate($request);
 		}
 	}
