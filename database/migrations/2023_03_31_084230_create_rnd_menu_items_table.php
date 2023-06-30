@@ -24,6 +24,7 @@ class CreateRndMenuItemsTable extends Migration
             $table->decimal('rnd_menu_srp', 18, 4)->unsigned()->nullable();
             $table->date('release_date')->nullable();
             $table->date('end_date')->nullable();
+            $table->date('pos_update')->nullable();
             $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE')->nullable();
             $table->integer('created_by')->length(10)->unsigned()->nullable();
             $table->integer('updated_by')->length(10)->unsigned()->nullable();
