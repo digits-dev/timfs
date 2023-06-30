@@ -33,6 +33,8 @@ class CreateRndMenuApprovalsTable extends Migration
             $table->timestamp('accounting_approved_at')->nullable();
             $table->integer('set_release_date_by')->length(10)->unsigned()->nullable();
             $table->timestamp('set_release_date_at')->nullable();
+            $table->integer('set_pos_update_by')->length(10)->unsigned()->nullable();
+            $table->timestamp('set_pos_update_at')->nullable();
             $table->integer('rejected_by')->length(10)->unsigned()->nullable();
             $table->timestamp('rejected_at')->nullable();
             $table->integer('returned_by')->length(10)->unsigned()->nullable();
