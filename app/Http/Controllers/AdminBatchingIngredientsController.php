@@ -436,7 +436,13 @@
 			$data['action'] = $action;
 
 			$data['item'] = DB::table('batching_ingredients')
-				->where('id', $id)
+				->where('batching_ingredients.id', $id)
+				->leftJoin(
+					'batching_ingredients_computed_food_cost', 
+					'batching_ingredients_computed_food_cost.id', 
+					'=', 
+					'batching_ingredients.id'
+				)
 				->first();
 
 			$data['preparations'] = DB::table('menu_ingredients_preparations')

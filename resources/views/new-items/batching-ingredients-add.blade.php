@@ -275,7 +275,7 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label">Batching Ingredient Item Code</label>
+                        <label for="" class="control-label">Batching Ingredient Code</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
@@ -286,7 +286,7 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label"><span class="required-star">*</span> Batching Ingredient Prepared By</label>
+                        <label for="" class="control-label"><span class="required-star">*</span> Prepared By</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
@@ -302,12 +302,23 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label"><span class="required-star">*</span> Batching Ingredient TTP</label>
+                        <label for="" class="control-label"><span class="required-star">*</span> TTP</label>
                         <div class="input-group">
                             <div class="input-group-addon text-bold">
                                 ₱
                             </div>
-                            <input type="number" value="{{$item->ttp ? (float) $item->ttp : ''}}" step="any" class="batching-ingredient-ttp form-control ttp" placeholder="0.00" required>
+                            <input type="number" value="{{$item->ttp ? (float) $item->ttp : ''}}" step="any" class="batching-ingredient-ttp form-control" placeholder="0.00" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">Portion TTP</label>
+                        <div class="input-group">
+                            <div class="input-group-addon text-bold">
+                                ₱
+                            </div>
+                            <input type="number" value="{{$item->ttp ? (float) $item->portion_ttp : ''}}" class="batching-ingredient-portion-ttp form-control ttp" placeholder="0.00" readonly>
                         </div>
                     </div>
                 </div>
@@ -345,7 +356,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="" class="control-label">Food Cost <label>
+                            <label for="" class="control-label">Total Cost <label>
                             <div class="input-group">
                                 <div class="input-group-addon">
                                     <span class="custom-icon"><strong>₱</strong></span>
@@ -649,12 +660,13 @@
                 $(this).val(value.toUpperCase());
             });
 
-            $('.rnd_menu_description').keyup(function() {
-                const value = $(this).val();
-                $(this).val(value.toUpperCase());
-            });
-
-            $('.rnd_menu_srp').keyup(function() {
+            $('.batching-ingredient-ttp').keyup(function() {
+                const ttp = $(this);
+                const [int, dec] = ttp.val().split('.');
+                if (dec && dec.length > 4) {
+                    const value = `${int}.${dec.slice(0,4)}`;
+                    ttp.val(value);
+                }
                 $.fn.sumCost();
             });
         }
@@ -663,6 +675,8 @@
             const ingredientWrappers = jQuery.makeArray($('.ingredient-section .ingredient-wrapper, .ingredient-section .new-ingredient-wrapper'));
             const foodCostInput = $('.food-cost');
             const portionInput = $('.portion');
+            const ttp = $('.batching-ingredient-ttp').val();
+            const portionTtpInput = $('.batching-ingredient-portion-ttp');
             if (portionInput.val() <= 0) portionInput.val('1');
             const portionSize = portionInput.val();
             let ingredientSum = 0;
@@ -679,8 +693,9 @@
                 }
             });
             ingredientSum = math.round(ingredientSum, 4);
-            const foodCost = math.round(ingredientSum / portionSize, 4);
-            foodCostInput.val(foodCost);
+            foodCostInput.val(ingredientSum);
+            const portionTtp = math.round(ttp / portionSize, 4);
+            portionTtpInput.val(portionTtp);
         }
 
         $.fn.formatSelected = function() {
