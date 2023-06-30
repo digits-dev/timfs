@@ -1239,12 +1239,12 @@
 					trans('crudbooster.denied_access')
 				);
 
-			$my_privilege = CRUDBooster::myPrivilegeName();
-			if (!in_array('costing', self::$to_view[$my_privilege] ?? []) && !CRUDBooster::isSuperAdmin())
-				CRUDBooster::redirect(
-					CRUDBooster::mainPath(),
-					trans('crudbooster.denied_access')
-				);
+			// $my_privilege = CRUDBooster::myPrivilegeName();
+			// if (!in_array('costing', self::$to_view[$my_privilege] ?? []) && !CRUDBooster::isSuperAdmin())
+			// 	CRUDBooster::redirect(
+			// 		CRUDBooster::mainPath(),
+			// 		trans('crudbooster.denied_access')
+			// 	);
 			$data = [];
 
 			$item = DB::table('menu_costing')
