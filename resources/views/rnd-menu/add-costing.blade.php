@@ -414,6 +414,7 @@
 
         function formatTotalCost() {
             const totalCost = $('.total-cost').val();
+            const foodCostFromFinalSrp = $('.food-cost-from-final-srp').val();
             const idealFoodCost = $('.ideal-food-cost').val();
             if (parseFloat(totalCost) > parseFloat(idealFoodCost)) {
                 $('.total-cost').css({
@@ -422,6 +423,18 @@
                 });
             } else {
                 $('.total-cost').css({
+                    color: 'unset',
+                    border: 'unset',
+                });
+            }
+
+            if (parseFloat(foodCostFromFinalSrp) > parseFloat(idealFoodCost)) {
+                $('.food-cost-from-final-srp').css({
+                    color: 'red',
+                    border: '2px solid red',
+                });
+            } else {
+                $('.food-cost-from-final-srp').css({
                     color: 'unset',
                     border: 'unset',
                 });
