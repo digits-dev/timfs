@@ -25,6 +25,7 @@
 	class AdminMenuItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
 		static $to_view = [
 			'Chef' => ['ingredients', 'packagings', 'costing'],
+			'Chef Assistant' => ['ingredients', 'packagings', 'costing'],
 			'Marketing Encoder' => ['packagings', 'costing'],
 			'Marketing Manager' => ['ingredients', 'packagings', 'costing'],
 			'Sales Accounting' => ['costing']
@@ -32,6 +33,7 @@
 
 		static $to_edit = [
 			'Chef' => ['ingredients'],
+			'Chef Assistant' => ['ingredients'],
 			'Marketing Encoder' => ['packagings', 'costing'],
 		];
 
@@ -435,7 +437,7 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-			if (CRUDBooster::myPrivilegeName() == 'Chef') {
+			if (CRUDBooster::myPrivilegeName() == 'Chef' || CRUDBooster::myPrivilegeName() == 'Chef Assistant') {
 
 				$concept_access_id = DB::table('user_concept_acess')
 					->where('cms_users_id', CRUDBooster::myID())

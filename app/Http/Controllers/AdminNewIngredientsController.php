@@ -115,7 +115,7 @@
 				];
 			}
 
-			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Chef') {
+			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Chef' || $my_privilege == 'Chef Assistant') {
 				$this->addaction[] = [
 					'title'=>'Delete',
 					'url' => '#[id]',
