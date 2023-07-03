@@ -150,7 +150,7 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input type="date" value="{{ $rnd_menu_item->pos_update ?? '' }}" class="form-control pos_update" name="pos_update">
+                            <input type="date" value="{{ $rnd_menu_item->pos_update ?? '' }}" class="form-control pos_update" name="pos_update" required>
                         </div>
                     </div>
                 </div>
