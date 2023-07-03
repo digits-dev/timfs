@@ -111,13 +111,21 @@
 				'color' => ' ',
 			];
 
-			if (CRUDBooster::isUpdate()) {
+			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Marketing Encoder') {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
 					'icon'=>'fa fa-pencil',
 					'color' => ' ',
-					"showIf"=>"[approval_status] != 'CLOSED'"
+					"showIf"=>"[approval_status] == 'FOR RELEASE DATE'"
+				];
+			} else if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Sales Accounting') {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url'=>CRUDBooster::mainpath('edit/[id]'),
+					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"[approval_status] == 'FOR POS UPDATE'"
 				];
 			}
 
