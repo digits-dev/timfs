@@ -308,7 +308,7 @@
 				'FOR MENU CREATION',
 				'FOR COSTING',
 				'FOR APPROVAL (MARKETING)',
-				'FOR APPROVAL (ACCOOUNTING)',
+				'FOR APPROVAL (ACCOUNTING)',
 			];
 
 			$upperCasedPrivilege = strtoupper(CRUDBooster::myPrivilegeName());
