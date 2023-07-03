@@ -119,7 +119,8 @@
 					'color' => ' ',
 					"showIf"=>"[approval_status] == 'FOR RELEASE DATE'"
 				];
-			} else if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Sales Accounting') {
+			} 
+			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Sales Accounting') {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
