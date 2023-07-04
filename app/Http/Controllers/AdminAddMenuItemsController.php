@@ -388,12 +388,13 @@
 			$postdata['menu_price_dine'] = $returnInputs['price_dine_in'];
 			$postdata['menu_price_dlv'] = $price_delivery;
 			$postdata['menu_price_take'] = $price_take_out;
-			$postdata['original_concept'] = $returnInputs['original_concept'];
+			// $postdata['original_concept'] = $returnInputs['original_concept'];
 			$postdata['pos_old_item_description'] = $returnInputs['pos_item_description'];
 			$postdata['menu_product_types_name'] = $returnInputs['product_type'];
 			$postdata['menu_categories_id'] = $returnInputs['menu_categories'];
 			$postdata['menu_subcategories_id'] = $returnInputs['sub_category'];
 			$postdata['status'] = $returnInputs['status'];
+			$postdata['segmentations_id'] = implode(',', $returnInputs['original_concept']);
 			$postdata['created_by'] = CRUDBooster::myid();
 			$postdata['created_at'] = date('Y-m-d H:i:s');
 			// Get store list column name
@@ -599,6 +600,11 @@
 				->where('status', 'ACTIVE')
 				->orderBy('menu_choice_group_column_description')
 				->get()->unique('menu_choice_group_column_description');
+			// Segmentations
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()->unique('segment_column_description');
 
 			if ($item) {
 				$data['item'] = $item;

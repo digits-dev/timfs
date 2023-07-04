@@ -247,7 +247,10 @@
                     @endif
                     <fieldset>
                         <legend><span id="required">*</span> Original Concept</legend>
-                        <input type="text" name="original_concept" placeholder="Enter original concept" required oninput="this.value = this.value.toUpperCase()">
+                        <select class="js-example-basic-multiple" name="original_concept[]" multiple="multiple" id="menu_type_select6" required>
+                            @foreach ($segmentations as $segmentation)
+                                <option {{$item->segmentations_id == $segmentation->id ? 'selected' : ''}} value="{{ $segmentation->id }}">{{ $segmentation->segment_column_description }}</option>
+                            @endforeach
                         </select>
                     </fieldset> 
                     <fieldset>
@@ -291,7 +294,7 @@
     const item = {!! json_encode($item) !!} || {};
 
     $('#menu_type_select1').select2({
-        placeholder: "Select a menu segmentation",
+        placeholder: "Select stores",
         allowClear: true,
         dropdownAutoWidth: true,
         width: '100%'
@@ -319,7 +322,12 @@
         allowClear: true,
         dropdownAutoWidth: true,
         width: '100%'
-
+    });
+    $('#menu_type_select6').select2({
+        placeholder: "Select concepts",
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%'
     });
     // Choices Group SKU 1
     $('.sku').select2({
@@ -409,6 +417,7 @@
             dataType: "json",
             encode: true,
             success: function(response) {
+                console.log(response);return;
                 Swal.fire({
                     title: `✔️ New Menu Item Created!`,
                     html: '📄 Do you want to continue to Costing?',
