@@ -784,11 +784,12 @@
             const ttp = ttpInput.val() || 0;
             const costInput = entry.find('.cost');
             const yieldPercent = math.round(yieldInput.val() / 100, 4) || 0;
+            if (!yieldPercent) return;
             const uomQty = 1;
             const packagingSize = packagingSizeInput.val() || ttpInput.attr('packaging_size');
-            const ingredientModifier = math.round(uomQty / packagingSize * preperationQuantity * (1 + (1 - yieldPercent)), 4);
+            const ingredientModifier = math.round(uomQty / packagingSize * preperationQuantity / yieldPercent, 4);
             const ingredientCost = math.round(ingredientModifier * ttp, 4);
-            const ingredientQty = math.round(preperationQuantity * (1 + (1 - yieldPercent)), 4);
+            const ingredientQty = math.round(preperationQuantity / yieldPercent, 4);
 
             ingredientQuantityInput.val(ingredientQty);
             costInput.val(ingredientCost);
