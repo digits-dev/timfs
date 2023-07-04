@@ -271,7 +271,10 @@
                     @endif 
                     <label><span id="required">*</span> Original Concept</label>
                     <fieldset>
-                        <input type="text" name="original_concept" placeholder="Enter original concept" value="{{ $row->original_concept }}" required oninput="this.value = this.value.toUpperCase()">
+                        <select class="js-example-basic-multiple" name="original_concept[]" multiple="multiple" id="menu_type_select6" required>
+                            @foreach ($segmentations as $segmentation)
+                                <option {{in_array($segmentation_id, explode(',', $row->segmentations_id)) ? 'selected' : ''}} value="{{ $segmentation->id }}">{{ $segmentation->segment_column_description }}</option>
+                            @endforeach
                         </select>
                     </fieldset> 
                     <label><span id="required">*</span> Store List</label>
@@ -322,7 +325,7 @@
 const table = {!! json_encode($table) !!};
 
 $('#menu_type_select1').select2({
-        placeholder: "Select a menu segmentation",
+        placeholder: "Select stores",
         allowClear: true,
         dropdownAutoWidth: true,
         width: '100%'
@@ -347,6 +350,13 @@ $('#menu_type_select1').select2({
     });
     $('#menu_type_select5').select2({
         placeholder: "Select a sub category",
+        allowClear: true,
+        dropdownAutoWidth: true,
+        width: '100%'
+
+    });
+    $('#menu_type_select6').select2({
+        placeholder: "Select concepts",
         allowClear: true,
         dropdownAutoWidth: true,
         width: '100%'

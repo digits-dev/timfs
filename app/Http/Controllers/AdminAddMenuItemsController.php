@@ -485,12 +485,13 @@
 			$postdata['menu_price_dine'] = $returnInputs['price_dine_in'];
 			$postdata['menu_price_dlv'] = $price_delivery;
 			$postdata['menu_price_take'] = $price_take_out;
-			$postdata['original_concept'] = $returnInputs['original_concept'];
+			// $postdata['original_concept'] = $returnInputs['original_concept'];
 			$postdata['pos_old_item_description'] = $returnInputs['pos_item_description'];
 			$postdata['menu_product_types_name'] = $returnInputs['product_type'];
 			$postdata['menu_categories_id'] = $returnInputs['menu_categories'];
 			$postdata['menu_subcategories_id'] = $returnInputs['sub_category'];
 			$postdata['status'] = $returnInputs['status'];
+			$postdata['segmentations_id'] = implode(',', $returnInputs['original_concept']);
 			$postdata['updated_by'] = CRUDBooster::myid();
 			// Update Store List
 			if($returnInputs['menu_segment_column_description'] != null){
@@ -676,7 +677,12 @@
 			$user_menu_segmentations = DB::table('menu_segmentations')
 				->where('status','ACTIVE')
 				->select('menu_segment_column_name')
-				->get()->toArray();		
+				->get()->toArray();	
+			// Segmentations
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()->unique('segment_column_description');	
 			$menu_segment = Arr::pluck($user_menu_segmentations, 'menu_segment_column_name');
 			$data['user_menu_segment'] = [];
 			foreach($data['row'] as $key=>$value){
