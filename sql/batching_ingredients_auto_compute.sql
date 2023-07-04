@@ -1,5 +1,3 @@
--- Active: 1678237171731@@127.0.0.1@3306@timfs
-
 SELECT
     batching_ingredients_details.id,
     batching_ingredients_details.batching_ingredients_id,
@@ -41,12 +39,10 @@ SELECT
         ELSE 1
     END as packaging_size,
     ROUND(
-        prep_qty * (
-            1 + (
-                1 - ROUND(
-                    batching_ingredients_details.yield / 100,
-                    4
-                )
+        prep_qty / (
+            ROUND(
+                batching_ingredients_details.yield / 100,
+                4
             )
         ),
         4
@@ -59,12 +55,10 @@ SELECT
                 WHEN batching_ingredients_details.packaging_size IS NOT NULL THEN batching_ingredients_details.packaging_size
                 ELSE 1
             END
-        ) * prep_qty * (
-            1 + (
-                1 - ROUND(
-                    batching_ingredients_details.yield / 100,
-                    4
-                )
+        ) * prep_qty / (
+            ROUND(
+                batching_ingredients_details.yield / 100,
+                4
             )
         ),
         4
@@ -78,12 +72,10 @@ SELECT
                     WHEN batching_ingredients_details.packaging_size IS NOT NULL THEN batching_ingredients_details.packaging_size
                     ELSE 1
                 END
-            ) * prep_qty * (
-                1 + (
-                    1 - ROUND(
-                        batching_ingredients_details.yield / 100,
-                        4
-                    )
+            ) * prep_qty / (
+                ROUND(
+                    batching_ingredients_details.yield / 100,
+                    4
                 )
             ),
             4

@@ -35,12 +35,10 @@ SELECT
         ELSE 1
     END as packaging_size,
     ROUND(
-        prep_qty * (
-            1 + (
-                1 - ROUND(
-                    menu_packagings_details.yield / 100,
-                    4
-                )
+        prep_qty / (
+            ROUND(
+                menu_packagings_details.yield / 100,
+                4
             )
         ),
         4
@@ -53,12 +51,10 @@ SELECT
                 WHEN menu_packagings_details.packaging_size IS NOT NULL THEN menu_packagings_details.packaging_size
                 ELSE 1
             END
-        ) * prep_qty * (
-            1 + (
-                1 - ROUND(
-                    menu_packagings_details.yield / 100,
-                    4
-                )
+        ) * prep_qty / (
+            ROUND(
+                menu_packagings_details.yield / 100,
+                4
             )
         ),
         4
@@ -72,12 +68,10 @@ SELECT
                     WHEN menu_packagings_details.packaging_size IS NOT NULL THEN menu_packagings_details.packaging_size
                     ELSE 1
                 END
-            ) * prep_qty * (
-                1 + (
-                    1 - ROUND(
-                        menu_packagings_details.yield / 100,
-                        4
-                    )
+            ) * prep_qty / (
+                ROUND(
+                    menu_packagings_details.yield / 100,
+                    4
                 )
             ),
             4
