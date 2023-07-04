@@ -16,6 +16,7 @@ class AddBufferSizeAndIdealFoodCostInMenuItemsTable extends Migration
         Schema::table('menu_items', function (Blueprint $table) {
             $table->decimal('ideal_food_cost', 18, 4)->default(30)->unsigned()->nullable()->after('status');
             $table->decimal('buffer', 18, 4)->default(6.5)->unsigned()->nullable()->after('status');
+            $table->string('segmentations_id')->nullable()->after('status');
         });
     }
 
@@ -29,6 +30,7 @@ class AddBufferSizeAndIdealFoodCostInMenuItemsTable extends Migration
         Schema::table('menu_items', function (Blueprint $table) {
             $table->dropColumn('ideal_food_cost');
             $table->dropColumn('buffer');
+            $table->dropColumn('segmentations_id');
         });
     }
 }
