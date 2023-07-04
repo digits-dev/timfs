@@ -168,7 +168,7 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             $menu_items->addSelect('menu_items.'.$price->menu_price_column_name);
         }
 
-        if (CRUDBooster::myPrivilegeName() == 'Chef') {
+        if (in_array(CRUDBooster::myPrivilegeName(), ['Chef', 'Chef Assistant'])) {
 
             $concept_access_id = DB::table('user_concept_acess')
                 ->where('cms_users_id', CRUDBooster::myID())
@@ -186,6 +186,8 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
                     $subQuery->orWhere('menu_items.' . $concept->menu_segment_column_name, '1');
                 }
             });
+
+            if (!$concept_access_id) $menu_items->where('menu_items.id', null);
         }
 
         if (request()->has('filter_column')) {

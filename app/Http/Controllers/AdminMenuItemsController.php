@@ -9,6 +9,7 @@
 	use App\ApprovalWorkflowSetting;
 	use App\Exports\ExcelTemplate;
 	use App\Exports\MenuItemsExport;
+	use App\Exports\MenuIngredientsExport;
 	use App\Imports\MenuItemsImport;
 	use App\MenuChoiceGroup;
 	use App\MenuOldCodeMaster;
@@ -35,6 +36,15 @@
 			'Chef' => ['ingredients'],
 			'Chef Assistant' => ['ingredients'],
 			'Marketing Encoder' => ['packagings', 'costing'],
+		];
+
+		static $to_update_menu = [
+			'Purchasing',
+			'Encoder (Menu Item)',
+			'Purchasing Encoder',
+			'Purchasing Manager',
+			'Marketing Encoder',
+			'Marketing Manager',
 		];
 
 		public function __construct() {
@@ -200,15 +210,15 @@
 	        */
 	        $this->index_button = array();
             if(CRUDBooster::getCurrentMethod() == 'getIndex') {
-                if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(),["Purchasing","Encoder (Menu Item)"])){
+                if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), self::$to_update_menu)){
                     $this->index_button[] = [
                         "title"=>"Upload New Menu Items",
                         "label"=>"Upload New Menu Items",
                         "icon"=>"fa fa-upload",
                         "color"=>"success",
                         "url"=>route('menu-items.view')];
-                }
-				if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(),["Purchasing","Encoder (Menu Item)"])){
+				}
+				if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), self::$to_update_menu)){
                     $this->index_button[] = [
                         "title"=>"Update Menu Items",
                         "label"=>"Update Menu Items",
@@ -216,7 +226,19 @@
                         "color"=>"success",
                         "url"=>route('menu-items.update-view')];
                 }
-				$this->index_button[] = ['label'=>'Export Menu Items','url'=>"javascript:showMenuItemExport()",'icon'=>'fa fa-download'];
+				$this->index_button[] = [
+					'label'=>'Export Menu Items',
+					'url'=>"javascript:showMenuItemExport()",
+					'icon'=>'fa fa-download'
+				];
+
+				if (CRUDBooster::isSuperAdmin() || in_array('ingredients', self::$to_view[CRUDBooster::myPrivilegeName()] ?? [])) {
+					$this->index_button[] = [
+						'label'=>'Export Menu Ingredients',
+						'url'=>"javascript:menuIngredientsExport()",
+						'icon'=>'fa fa-download'
+					];
+				}
             }
 
 
@@ -258,6 +280,9 @@
 					$('#modal-menu-item-export').modal('show');
 				}
 
+				function menuIngredientsExport() {
+					$('#modal-menu-ingredients-export').modal('show');
+				}
 
 				$('.view-menu-details').on('click', function() {
 					const dbId = $(this).attr('href')?.replace('#', '');
@@ -355,6 +380,34 @@
 						</div>
 
 						<form method='post' target='_blank' action=".CRUDBooster::mainpath("export").">
+                        <input type='hidden' name='_token' value=".csrf_token().">
+                        ".CRUDBooster::getUrlParameters()."
+                        <div class='modal-body'>
+                            <div class='form-group'>
+                                <label>File Name</label>
+                                <input type='text' name='filename' class='form-control' required value='Export ".CRUDBooster::getCurrentModule()->name ." - ".date('Y-m-d H:i:s')."'/>
+                            </div>
+						</div>
+						<div class='modal-footer' align='right'>
+                            <button class='btn btn-default' type='button' data-dismiss='modal'>Close</button>
+                            <button class='btn btn-primary btn-submit' type='submit'>Submit</button>
+                        </div>
+                    </form>
+					</div>
+				</div>
+			</div>
+			" . 
+			"
+			<div class='modal fade' tabindex='-1' role='dialog' id='modal-menu-ingredients-export'>
+				<div class='modal-dialog'>
+					<div class='modal-content'>
+						<div class='modal-header'>
+							<button class='close' aria-label='Close' type='button' data-dismiss='modal'>
+								<span aria-hidden='true'>×</span></button>
+							<h4 class='modal-title'><i class='fa fa-download'></i> Export Menu Ingredients</h4>
+						</div>
+
+						<form method='post' target='_blank' action=".CRUDBooster::mainpath("export-menu-ingredients").">
                         <input type='hidden' name='_token' value=".csrf_token().">
                         ".CRUDBooster::getUrlParameters()."
                         <div class='modal-body'>
@@ -836,6 +889,11 @@
 		   $filename = $request->input('filename');
 		   return Excel::download(new MenuItemsExport, $filename.'.xlsx');
 	    }
+
+		public function exportMenuIngredients(Request $request) {
+			$filename = $request->input('filename');
+			return Excel::download(new MenuIngredientsExport, $filename.'.xlsx');
+		}
 
 		public function getEdit($id, $to_edit) {
 			if (!CRUDBooster::isUpdate())
