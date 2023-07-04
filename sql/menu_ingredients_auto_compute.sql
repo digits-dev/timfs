@@ -1,5 +1,3 @@
-ALTER VIEW
-    menu_ingredients_auto_compute AS
 SELECT
     menu_ingredients_details.id,
     menu_ingredients_details.menu_items_id,
