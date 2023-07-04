@@ -417,7 +417,6 @@
             dataType: "json",
             encode: true,
             success: function(response) {
-                console.log(response);return;
                 Swal.fire({
                     title: `✔️ New Menu Item Created!`,
                     html: '📄 Do you want to continue to Costing?',
