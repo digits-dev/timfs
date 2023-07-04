@@ -255,20 +255,29 @@
 
   - `batching_ingredients_auto_compute`
   - `batching_ingredients_computed_food_cost`
+  - `batching_primary_ingredients`
   - `menu_computed_food_cost`
+  - `menu_computed_packaging_cost`
+  - `menu_costing`
   - `menu_ingredients_auto_compute`
+  - `menu_packagings_auto_compute`
+  - `menu_primary_ingredients`
   - `rnd_menu_computed_food_cost`
   - `rnd_menu_computed_packaging_cost`
   - `rnd_menu_costing`
   - `rnd_menu_ingredients_auto_compute`
   - `rnd_menu_packagings_auto_compute`
+  - `rnd_menu_primary_ingredients`
 
 - ### 🔏 User Privileges to be Added
   - Chef
+  - Chef Assistant
   - Marketing Encoder
-  - Marketing Approver
-  - Accounting Approver
-  - Purchasing Staff
+  - Marketing Manager
+  - Accounting Manager
+  - Sales Accounting
+  - Purchasing Encoder
+  - Purchasing Manager
 - ### 🔄️ RND Workflow
 
   - #### 🧑‍🍳 Chef
