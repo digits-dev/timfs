@@ -69,6 +69,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
             $this->col[] = ["label" => "Item ID", "name" => "id", "visible" => false];
+			$this->col[] = ["label" => "Item Photo", "name" => "image_filename","visible" =>  true];
     		$this->col[] = ["label" => "Tasteless Code", "name" => "tasteless_code","visible" =>  false];
     		$this->col[] = ["label" => "Preferred Vendor", "name" => "suppliers_id", "join" => "suppliers,last_name", "visible" => CRUDBooster::myColumnView()->supplier ? true : false];
     		$this->col[] = ["label" => "Item", "name" => "tasteless_code", "visible" =>  true];
@@ -603,7 +604,12 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = NULL;
+	        $this->style_css = "
+			.item-master-image {
+				max-width: 100px;
+			}
+			
+			";
 	        
 	        /*
 	        | ---------------------------------------------------------------------- 
@@ -656,6 +662,9 @@
             // if($column_index == 12){
 			// 	$column_value = floatval(number_format($column_value, 5, '.', ''));
 			// }
+			if ($column_index == 2 && $column_value) {
+				$column_value = '<image class="item-master-image" src="'. asset("img/item-master/$column_value") . '"/>';
+			}
 	    }
 
 	    /*
