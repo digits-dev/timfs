@@ -647,6 +647,11 @@
 				->pluck('last_name')
 				->first();
 
+			$data['subcategory'] = DB::table('subcategories')
+				->where('id', $item_for_approval->subcategories_id)
+				->pluck('subcategory_description')
+				->first();
+
 			$data['segmentation_differences'] = $differences['segmentation_differences'] ?? [];
 
 			$data = array_merge($data, $submaster_details);
@@ -724,7 +729,12 @@
 			$data['supplier'] = DB::table('suppliers')
 				->where('id', $item_for_approval->suppliers_id)
 				->pluck('last_name')
-				->first();			
+				->first();
+				
+			$data['subcategory'] = DB::table('subcategories')
+				->where('id', $item_for_approval->subcategories_id)
+				->pluck('subcategory_description')
+				->first();
 
 			$data = array_merge($data, $submaster_details);
 

@@ -769,6 +769,11 @@
 				->pluck('last_name')
 				->first();
 
+			$data['subcategory'] = DB::table('subcategories')
+				->where('id', $item->subcategories_id)
+				->pluck('subcategory_description')
+				->first();
+
 			$data['segmentation_differences'] = $differences['segmentation_differences'] ?? [];
 
 			$data = array_merge($data, $submaster_details);

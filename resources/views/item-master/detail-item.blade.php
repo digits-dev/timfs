@@ -321,9 +321,7 @@
                                 <td>
                                     <select name="subcategories_id" id="subcategories_id" class="form-control" required disabled>
                                         <option value="" disabled selected>None selected...</option>
-                                        @foreach ($subcategories as $subcategory)
-                                        <option value="{{ $subcategory->id }}" {{ $subcategory->id == $item->subcategories_id ? 'selected' : '' }}>{{ $subcategory->subcategory_description }}</option>
-                                        @endforeach
+                                        <option value="" selected>{{ $subcategory }}</option>
                                     </select>
                                 </td>
                             </tr>
