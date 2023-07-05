@@ -742,6 +742,29 @@
 
 	    }
 
+		public function getDetail($id) {
+			if (!CRUDBooster::isRead())
+					CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+			
+			$submaster_details = self::getSubmasters();
+			$data = [];
+
+			$item = DB::table('item_masters')
+				->where('id', $id)
+				->get()
+				->first();
+
+			$data['item'] = $item;
+			$data['segmentation_differences'] = $differences['segmentation_differences'] ?? [];
+
+			$data = array_merge($data, $submaster_details);
+
+			return $this->view('item-master/detail-item', $data);
+		}
+
 		public function getAdd() {
 			if (!CRUDBooster::isCreate())
 				CRUDBooster::redirect(

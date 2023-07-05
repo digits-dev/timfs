@@ -618,6 +618,31 @@
 
 	    }
 
+		public function getDetail($id) {
+			if (!CRUDBooster::isRead())
+					CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+			
+			$submaster_details = $this->main_controller->getSubmasters();
+			$data = [];
+
+			$item_for_approval = DB::table('item_master_approvals')
+				->where('id', $id)
+				->get()
+				->first();
+
+			$differences = self::getUpdatedDetails($id);
+
+			$data['item'] = $item_for_approval;
+			$data['segmentation_differences'] = $differences['segmentation_differences'] ?? [];
+
+			$data = array_merge($data, $submaster_details);
+
+			return $this->view('item-master/detail-item', $data);
+		}
+
 		public function getEdit($id) {
 			$my_privilege = CRUDBooster::myPrivilegeName();
 			$to_edit = in_array($my_privilege, $this->requestor) || CRUDBooster::isSuperAdmin();
