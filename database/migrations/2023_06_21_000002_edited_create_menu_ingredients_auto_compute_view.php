@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMenuIngredientsAutoComputeView extends Migration
+class EditedCreateMenuIngredientsAutoComputeView extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,11 @@ class CreateMenuIngredientsAutoComputeView extends Migration
     public function up()
     {
         DB::statement("
-            CREATE VIEW MENU_INGREDIENTS_AUTO_COMPUTE AS 
+            DROP VIEW IF EXISTS menu_ingredients_auto_compute;
+        ");
+
+        DB::statement("
+            CREATE VIEW menu_ingredients_auto_compute AS 
                 SELECT
                     menu_ingredients_details.id,
                     menu_ingredients_details.menu_items_id,
