@@ -1023,6 +1023,8 @@
 						trans('crudbooster.denied_access')
 					);
 
+				$data['page_title'] = 'Edit Ingredients';
+
 				return $this->view('menu-items/edit-item', $data);
 			} else if ($to_edit == 'packagings') {
 				if (!in_array($to_edit, self::$to_edit[$my_privilege] ?? []) && !$is_superadmin)
@@ -1030,6 +1032,8 @@
 						CRUDBooster::mainPath(),
 						trans('crudbooster.denied_access')
 					);
+				
+					$data['page_title'] = 'Edit Packaging';
 
 				return $this->view('menu-items/add-packaging', $data);
 			} else if ($to_edit == 'costing') {
@@ -1042,6 +1046,8 @@
 				$data['item'] = DB::table('menu_costing')
 					->where('menu_items_id', $id)
 					->first();
+
+				$data['page_title'] = 'Edit Costing';
 
 				return $this->view('menu-items/edit-costing', $data);
 			}
@@ -1292,6 +1298,7 @@
 
 			$data['ingredients'] = self::getIngredients($id);
 			$data['packagings'] = self::getPackagings($id);
+			$data['page_title'] = 'Detail Ingredient';
 
 			return $this->view('menu-items/detail-item', $data);
 		}
@@ -1315,6 +1322,7 @@
 
 			$data['item'] = $item;
 			$data['menu_items_data'] = self::getMenuItemDetails($id);
+			$data['page_title'] = 'Detail Costing';
 
 			return $this->view('menu-items/costing-details', $data);
 		}
@@ -1351,6 +1359,7 @@
 				->first();
 
 			$data['packagings'] = self::getPackagings($id);
+			$data['page_title'] = 'Detail Packaging';
 			return $this->view('menu-items/packaging-detail', $data);
 			
 		}
