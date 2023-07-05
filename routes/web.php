@@ -151,6 +151,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     
     // batching ingredients
     Route::post('/admin/batching_ingredients/edit-batching-ingredient', [AdminBatchingIngredientsController::class, 'editBatchingIngredient'])->name('edit_batching_ingredient');
+    Route::post('/admin/batching_ingredients/export-batching-ingredients', [AdminBatchingIngredientsController::class, 'exportBatchingIngredients'])->name('export_batching_ingredients');
 
     //item master
     Route::post('/admin/item_masters/submit-add-or-edit', [AdminItemMastersController::class, 'submitAddOrEdit'])->name('item_maters_submit_add_or_edit');

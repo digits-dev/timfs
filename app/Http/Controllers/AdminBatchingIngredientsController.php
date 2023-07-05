@@ -4,6 +4,8 @@
 	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
+	use Maatwebsite\Excel\Facades\Excel;
+	use App\Exports\BatchingIngredientsExport;
 
 	class AdminBatchingIngredientsController extends \crocodicstudio\crudbooster\controllers\CBController {
 		public function __construct() {
@@ -140,6 +142,13 @@
 	        | 
 	        */
 	        $this->index_button = array();
+			if (CRUDBooster::getCurrentMethod() == 'getIndex') {
+				$this->index_button[] = [
+					'label'=>'Export Batching Ingredients',
+					'url'=>"javascript:batchingIngredientsExport()",
+					'icon'=>'fa fa-download'
+				];
+			}
 
 
 
@@ -173,7 +182,11 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
-	        $this->script_js = NULL;
+	        $this->script_js = "
+				function batchingIngredientsExport() {
+					$('#modal-batching-ingredients-export').modal('show');
+				}
+			";
 
 
             /*
@@ -196,7 +209,34 @@
 	        | $this->post_index_html = "<p>test</p>";
 	        |
 	        */
-	        $this->post_index_html = null;
+	        $this->post_index_html = "
+			<div class='modal fade' tabindex='-1' role='dialog' id='modal-batching-ingredients-export'>
+				<div class='modal-dialog'>
+					<div class='modal-content'>
+						<div class='modal-header'>
+							<button class='close' aria-label='Close' type='button' data-dismiss='modal'>
+								<span aria-hidden='true'>×</span></button>
+							<h4 class='modal-title'><i class='fa fa-download'></i> Export Menu Ingredients</h4>
+						</div>
+
+						<form method='post' target='_blank' action=".CRUDBooster::mainpath("export-batching-ingredients").">
+                        <input type='hidden' name='_token' value=".csrf_token().">
+                        ".CRUDBooster::getUrlParameters()."
+                        <div class='modal-body'>
+                            <div class='form-group'>
+                                <label>File Name</label>
+                                <input type='text' name='filename' class='form-control' required value='Export ".CRUDBooster::getCurrentModule()->name ." - ".date('Y-m-d H:i:s')."'/>
+                            </div>
+						</div>
+						<div class='modal-footer' align='right'>
+                            <button class='btn btn-default' type='button' data-dismiss='modal'>Close</button>
+                            <button class='btn btn-primary btn-submit' type='submit'>Submit</button>
+                        </div>
+                    </form>
+					</div>
+				</div>
+			</div>
+			";
 	        
 	        
 	        
@@ -615,6 +655,11 @@
 					'message_type' => 'success',
 					'message' => $message,
 				]);
+		}
+
+		public function exportBatchingIngredients(Request $request) {
+			$filename = $request->input('filename');
+			return Excel::download(new BatchingIngredientsExport, $filename.'.xlsx');
 		}
 
 
