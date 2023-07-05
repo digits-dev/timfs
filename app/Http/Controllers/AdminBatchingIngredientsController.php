@@ -37,7 +37,7 @@
 			$this->col = [];
 			$this->col[] = ["label"=>"BI Code","name"=>"bi_code"];
 			$this->col[] = ["label"=>"Prepared by","name"=>"batching_ingredients_prepared_by_id","join"=>"batching_ingredients_prepared_by,prepared_by"];
-			$this->col[] = ["label"=>"Ingredient Descrition","name"=>"ingredient_description"];
+			$this->col[] = ["label"=>"Batching Description","name"=>"ingredient_description"];
 			$this->col[] = ["label"=>"Portion Size","name"=>"portion_size"];
 			$this->col[] = ["label"=>"Total Cost","name"=>"id","join"=>"batching_ingredients_computed_food_cost,ingredient_total_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"TTP","name"=>"ttp"];
