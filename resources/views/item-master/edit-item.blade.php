@@ -111,9 +111,6 @@
                                 <td>
                                     <select value="{{ $item->brands_id }}" name="brands_id" id="brands_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
-                                        @foreach ($brands as $brand)
-                                        <option value="{{ $brand->id }}" {{ $brand->id == $item->brands_id ? 'selected' : '' }}>{{ $brand->brand_description }}</option>
-                                        @endforeach
                                     </select>
                                 </td>
                             </tr>
@@ -273,9 +270,6 @@
                                     <td>
                                         <select name="suppliers_id" id="suppliers_id" class="form-control" required>
                                             <option value="" disabled selected>None selected...</option>
-                                            @foreach ($suppliers as $supplier)
-                                            <option value="{{ $supplier->id }}" {{ $supplier->id == $item->suppliers_id ? 'selected' : '' }}>{{ $supplier->last_name }}</option>
-                                            @endforeach
                                         </select>
                                     </td>
                                 </tr>
@@ -441,6 +435,83 @@
 
 <script type="application/javascript">
     const allSubcategories = {!! json_encode($subcategories) !!};
+    getAllBrands();
+    getAllSuppliers();
+    function setBrand(brands) {
+        brands.forEach(brand => {
+            const option = $(document.createElement('option'))
+                .val(brand.id)
+                .text(brand.brand_description);
+
+            if ("{{ $item->brands_id }}" == brand.id) {
+                option.attr('selected', true);
+            }
+            
+            $('#brands_id').append(option);
+        });
+
+        $('#brands_id').trigger('change');
+    }
+
+    function setSupplier(suppliers) {
+        suppliers.forEach(supplier => {
+            const option = $(document.createElement('option'))
+                .val(supplier.id)
+                .text(supplier.last_name);
+
+            if ("{{ $item->suppliers_id }}" == supplier.id) {
+                option.attr('selected', true);
+            }
+            
+            $('#suppliers_id').append(option);
+        });
+
+        $('#suppliers_id').trigger('change');
+    }
+    function getAllBrands() {
+        let brands = JSON.parse(localStorage.getItem('brands'));
+        if (!brands) {
+            $.ajax({
+                url: "{{ route('getAjaxSubmaster', ['table' => 'brands']) }}",
+                _token: "{{ csrf_token() }}",
+                type: 'GET',
+                success: function(response) {
+                    localStorage.setItem('brands', response);
+                    brands = JSON.parse(localStorage.getItem('brands'));
+                    setBrand(brands)
+                },
+                error: function(response) {
+                    console.log(response);
+                }
+            });
+        } else {
+            setBrand(brands);
+        }
+    }
+
+    function getAllSuppliers() {
+        let suppliers = JSON.parse(localStorage.getItem('suppliers'));
+        if (!suppliers) {
+            $.ajax({
+                url: "{{ route('getAjaxSubmaster', ['table' => 'suppliers']) }}",
+                _token: "{{ csrf_token() }}",
+                type: 'GET',
+                success: function(response) {
+                    localStorage.setItem('suppliers', response);
+                    suppliers = JSON.parse(localStorage.getItem('suppliers'));
+                    setSupplier(suppliers);
+                },
+                error: function(response) {
+                    console.log(response);
+                }
+            });
+        } else {
+            setSupplier(suppliers);
+        }
+        
+    }
+
+    
     function restrictDecimals(jqueryElement, number) {
         const [int, dec] = jqueryElement.val().split('.');
         number = parseInt(number);

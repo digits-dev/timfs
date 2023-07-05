@@ -158,4 +158,5 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/item_masters/approve-or-reject', [AdminItemApprovalController::class, 'approveOrReject'])->name('item_maters_approve_or_reject');
     Route::post('/admin/item_master_approvals/submit-edit', [AdminItemApprovalController::class, 'submitEdit'])->name('item_mater_approvals_submit_edit');
     Route::get('/admin/item_approval/approve_or_reject/{id}', [AdminItemApprovalController::class, 'getApproveOrReject']);
+    Route::get('/admin/item_masters/get/{table}', [AdminItemMastersController::class, 'getAjaxSubmaster'])->name('getAjaxSubmaster');
 });

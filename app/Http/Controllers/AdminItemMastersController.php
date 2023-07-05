@@ -955,6 +955,23 @@
 			return $data;
 		}
 
+		public function getAjaxSubmaster($table) {
+			if ($table == 'brands') {
+				$items = DB::table($table)
+					->where('status', 'ACTIVE')
+					->select('id', 'brand_description')
+					->get()
+					->toArray();
+			} else if ($table == 'suppliers') {
+				$items = DB::table($table)
+					->select('id', 'last_name')
+					->get()
+					->toArray();
+			}
+
+			return json_encode($items);
+		}
+
 		public function submitAddOrEdit(Request $request) {
 			$input = $request->all();
 			if ($input['item_photo']) {
