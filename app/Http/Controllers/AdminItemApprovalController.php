@@ -636,6 +636,17 @@
 			$differences = self::getUpdatedDetails($id);
 
 			$data['item'] = $item_for_approval;
+
+			$data['brand'] = DB::table('brands')
+				->where('id', $item_for_approval->brands_id)
+				->pluck('brand_description')
+				->first();
+
+			$data['supplier'] = DB::table('suppliers')
+				->where('id', $item_for_approval->suppliers_id)
+				->pluck('last_name')
+				->first();
+
 			$data['segmentation_differences'] = $differences['segmentation_differences'] ?? [];
 
 			$data = array_merge($data, $submaster_details);
@@ -704,6 +715,16 @@
 			$data['item'] = $item_for_approval;
 			$data['differences'] = $differences['differences'] ?? [];
 			$data['segmentation_differences'] = $differences['segmentation_differences'] ?? [];
+
+			$data['brand'] = DB::table('brands')
+				->where('id', $item_for_approval->brands_id)
+				->pluck('brand_description')
+				->first();
+
+			$data['supplier'] = DB::table('suppliers')
+				->where('id', $item_for_approval->suppliers_id)
+				->pluck('last_name')
+				->first();			
 
 			$data = array_merge($data, $submaster_details);
 

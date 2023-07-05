@@ -110,10 +110,7 @@
                                 <th><span class="required-star">*</span>  Brand Description</th>
                                 <td>
                                     <select value="{{ $item->brands_id }}" name="brands_id" id="brands_id" class="form-control" required disabled>
-                                        <option value="" disabled selected>None selected...</option>
-                                        @foreach ($brands as $brand)
-                                        <option value="{{ $brand->id }}" {{ $brand->id == $item->brands_id ? 'selected' : '' }}>{{ $brand->brand_description }}</option>
-                                        @endforeach
+                                        <option value="" selected>{{ $brand }}</option>
                                     </select>
                                 </td>
                             </tr>
@@ -272,10 +269,7 @@
                                     <th><span class="required-star">*</span> Preferred Vendor</th>
                                     <td>
                                         <select name="suppliers_id" id="suppliers_id" class="form-control" required disabled>
-                                            <option value="" disabled selected>None selected...</option>
-                                            @foreach ($suppliers as $supplier)
-                                            <option value="{{ $supplier->id }}" {{ $supplier->id == $item->suppliers_id ? 'selected' : '' }}>{{ $supplier->last_name }}</option>
-                                            @endforeach
+                                            <option value="" selected>{{ $supplier }}</option>
                                         </select>
                                     </td>
                                 </tr>

@@ -758,6 +758,17 @@
 				->first();
 
 			$data['item'] = $item;
+
+			$data['brand'] = DB::table('brands')
+				->where('id', $item->brands_id)
+				->pluck('brand_description')
+				->first();
+
+			$data['supplier'] = DB::table('suppliers')
+				->where('id', $item->suppliers_id)
+				->pluck('last_name')
+				->first();
+
 			$data['segmentation_differences'] = $differences['segmentation_differences'] ?? [];
 
 			$data = array_merge($data, $submaster_details);
