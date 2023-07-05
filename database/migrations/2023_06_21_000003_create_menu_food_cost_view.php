@@ -14,7 +14,7 @@ class CreateMenuFoodCostView extends Migration
     public function up()
     {
         DB::statement("
-            CREATE VIEW MENU_COMPUTED_FOOD_COST AS 
+            CREATE VIEW menu_computed_food_cost AS 
                 SELECT
                     menu_items.id,
                     menu_items.tasteless_menu_code,
