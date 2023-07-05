@@ -844,11 +844,11 @@
 
 			$data = [];
 
-			$data['brands'] = DB::table('brands')
-				->where('status', 'ACTIVE')
-				->orderBy('brand_description')
-				->get()
-				->toArray();
+			// $data['brands'] = DB::table('brands')
+			// 	->where('status', 'ACTIVE')
+			// 	->orderBy('brand_description')
+			// 	->get()
+			// 	->toArray();
 
 			$data['tax_codes'] = DB::table('tax_codes')
 				->where('status', 'ACTIVE')
@@ -898,10 +898,10 @@
 				->get()
 				->toArray();
 
-			$data['suppliers'] = DB::table('suppliers')
-				->orderBy('last_name')
-				->get()
-				->toArray();
+			// $data['suppliers'] = DB::table('suppliers')
+			// 	->orderBy('last_name')
+			// 	->get()
+			// 	->toArray();
 
 			$data['groups'] = DB::table('groups')
 				->where('status', 'ACTIVE')
