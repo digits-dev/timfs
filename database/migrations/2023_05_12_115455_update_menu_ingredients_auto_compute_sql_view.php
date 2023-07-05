@@ -63,12 +63,10 @@ class UpdateMenuIngredientsAutoComputeSqlView extends Migration
                     ELSE 1
                 END as packaging_size,
                 ROUND(
-                    prep_qty * (
-                        1 + (
-                            1 - ROUND(
-                                menu_ingredients_details.yield / 100,
-                                4
-                            )
+                    prep_qty / (
+                        ROUND(
+                            menu_ingredients_details.yield / 100,
+                            4
                         )
                     ),
                     4
@@ -81,12 +79,10 @@ class UpdateMenuIngredientsAutoComputeSqlView extends Migration
                             WHEN menu_ingredients_details.packaging_size IS NOT NULL THEN menu_ingredients_details.packaging_size
                             ELSE 1
                         END
-                    ) * prep_qty * (
-                        1 + (
-                            1 - ROUND(
-                                menu_ingredients_details.yield / 100,
-                                4
-                            )
+                    ) * prep_qty / (
+                        ROUND(
+                            menu_ingredients_details.yield / 100,
+                            4
                         )
                     ),
                     4
@@ -100,12 +96,10 @@ class UpdateMenuIngredientsAutoComputeSqlView extends Migration
                                 WHEN menu_ingredients_details.packaging_size IS NOT NULL THEN menu_ingredients_details.packaging_size
                                 ELSE 1
                             END
-                        ) * prep_qty * (
-                            1 + (
-                                1 - ROUND(
-                                    menu_ingredients_details.yield / 100,
-                                    4
-                                )
+                        ) * prep_qty / (
+                            ROUND(
+                                menu_ingredients_details.yield / 100,
+                                4
                             )
                         ),
                         4
