@@ -26,17 +26,19 @@ class MenuIngredientsExport  implements FromArray, WithHeadings
 
     public function array() : array
     {
-        return DB::table('menu_primary_ingredient')
+        return DB::table('menu_primary_ingredients')
             ->where('menu_items.status', 'ACTIVE')
             ->select(
-                'menu_primary_ingredient.tasteless_menu_code',
-                'menu_primary_ingredient.menu_item_description',
-                'menu_primary_ingredient.tasteless_code',
-                'menu_primary_ingredient.ingredient',
-                'menu_primary_ingredient.quantity',
-                'menu_primary_ingredient.uom',
-                'menu_primary_ingredient.cost',
+                'menu_primary_ingredients.tasteless_menu_code',
+                'menu_primary_ingredients.menu_item_description',
+                'menu_primary_ingredients.tasteless_code',
+                'menu_primary_ingredients.ingredient',
+                'menu_primary_ingredients.quantity',
+                'menu_primary_ingredients.uom',
+                'menu_primary_ingredients.cost',
             )
+            ->leftJoin('menu_items', 'menu_items.id', 'menu_primary_ingredients.menu_items_id')
+            ->orderBy('menu_items.menu_item_description')
             ->get()
             ->toArray();
     }
