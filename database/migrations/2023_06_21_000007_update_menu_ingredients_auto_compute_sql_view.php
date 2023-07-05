@@ -14,7 +14,11 @@ class UpdateMenuIngredientsAutoComputeSqlView extends Migration
     public function up()
     {
         DB::statement("
-            ALTER VIEW
+            DROP VIEW IF EXISTS menu_ingredients_auto_compute;
+        ");
+
+        DB::statement("
+            CREATE VIEW
                 menu_ingredients_auto_compute AS
             SELECT
                 menu_ingredients_details.id,
