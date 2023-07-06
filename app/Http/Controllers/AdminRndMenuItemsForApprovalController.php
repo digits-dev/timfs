@@ -39,7 +39,6 @@
 			$this->col = [];
 			$this->col[] = ["label"=>"Approval Status","name"=>"id","join"=>"rnd_menu_approvals,approval_status","join_id"=>"rnd_menu_items_id"];
 			$this->col[] = ["label"=>"RND Code","name"=>"rnd_code"];
-			$this->col[] = ["label"=>"Tasteless Code","name"=>"menu_items_id","join"=>"menu_items,tasteless_menu_code"];
 			$this->col[] = ["label"=>"Concept","name"=>"segmentations_id","join"=>"segmentations,segment_column_description"];
 			$this->col[] = ["label"=>"Rnd Menu Description","name"=>"rnd_menu_description"];
 			$this->col[] = ["label"=>"SRP","name"=>"rnd_menu_srp"];

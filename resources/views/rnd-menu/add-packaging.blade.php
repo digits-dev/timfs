@@ -258,7 +258,7 @@
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <i class="fa fa-pencil"></i><strong> Add Packaging Cost</strong>
+        <i class="fa fa-pencil"></i><strong> Add Packaging</strong>
     </div>
     <div class="panel-body">
         <form action="" id="form-ingredient" class="form">
@@ -397,7 +397,6 @@
 @push('bottom')
 
 <script>
-    document.title = 'Add New RND Menu Item Description';
     $('body').addClass('sidebar-collapse');
     const savedPackagings = {!! json_encode($packagings) !!} || [];
     const rndMenuItem = {!! json_encode($item) !!};

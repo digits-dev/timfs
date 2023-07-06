@@ -116,7 +116,11 @@
 @extends('crudbooster::admin_template')
 @section('content')
   <!-- Your html goes here -->
-  <p><a title='Return' href='{{ CRUDBooster::mainpath() }}'><i class='fa fa-chevron-circle-left '></i>&nbsp; Back To Add Menu Item</a></p>
+  <p class="noprint">
+    <a title='Return' href="{{ CRUDBooster::mainPath() }}">
+        <i class='fa fa-chevron-circle-left '></i> &nbsp; {{trans("crudbooster.form_back_to_list",['module'=>CRUDBooster::getCurrentModule()->name])}}
+    </a>
+  </p>
   <div class='panel panel-default'>
     <div class='panel-heading'>Edit Menu Items</div>
     <div class='panel-body'>
@@ -273,7 +277,7 @@
                     <fieldset>
                         <select class="js-example-basic-multiple" name="original_concept[]" multiple="multiple" id="menu_type_select6" required>
                             @foreach ($segmentations as $segmentation)
-                                <option {{in_array($segmentation_id, explode(',', $row->segmentations_id)) ? 'selected' : ''}} value="{{ $segmentation->id }}">{{ $segmentation->segment_column_description }}</option>
+                                <option {{in_array($segmentation->id, explode(',', $row->segmentations_id)) ? 'selected' : ''}} value="{{ $segmentation->id }}">{{ $segmentation->segment_column_description }}</option>
                             @endforeach
                         </select>
                     </fieldset> 
@@ -293,7 +297,7 @@
                     <fieldset>
                         <select class="js-example-basic-single" name="status" id="status_select2" required>
                             <option value="ACTIVE" {{ $row->status == 'ACTIVE' ? 'selected':'' }}>ACTIVE</option>
-                            <option value="INACTIVE" {{ $row->status == 'INACTIVE' ? 'selected':'' }}>INACTIVE</option>
+                            <option value="INACTIVE" {{ $row->status == 'INACTIVE' ? 'selected':'' }} {{ $rnd_menu_items_id ? 'disabled' : '' }}>INACTIVE</option>
                         </select>
                     </fieldset>
                 </div>

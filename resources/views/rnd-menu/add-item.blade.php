@@ -676,7 +676,6 @@
 @push('bottom')
 
 <script>
-    document.title = 'Add New RND Menu Item Description';
     $('body').addClass('sidebar-collapse');
     const savedIngredients = {!! json_encode($ingredients) !!} || [];
     const savedPackagings = {!! json_encode($packagings) !!} || [];

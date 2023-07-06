@@ -628,6 +628,8 @@
 				$data['workflow_data'] = self::getWorkFlowDetails($id);
 			}
 
+			$data['page_title'] = ucwords("$action RND Menu", '-');
+
 			
 			if ($action == 'add-packaging') {
 				return $this->view('rnd-menu/add-packaging', $data);
@@ -1341,7 +1343,7 @@
 
 			$data['comments_data'] = self::getRNDComments($id);
 
-
+			$data['page_title'] = 'Add Costing RND Menu';
 			return $this->view('rnd-menu/add-costing', $data);
 		}
 
@@ -1395,6 +1397,7 @@
 
 			$data['comments_data'] = self::getRNDComments($id);
 
+			$data['page_title'] = 'Approve RND Menu';
 
 			return $this->view('rnd-menu/approve-item-marketing', $data);
 		}
@@ -1449,6 +1452,8 @@
 			$data['workflow'] = self::getWorkFlowDetails($id);
 
 			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
+
+			$data['page_title'] = 'Add Release Date';
 
 			return $this->view('rnd-menu/add-release-date', $data);
 		}
@@ -1513,6 +1518,8 @@
 			$data['workflow'] = self::getWorkFlowDetails($id);
 
 			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
+
+			$data['page_title'] = 'Approve RND Menu';
 
 			return $this->view('rnd-menu/approve-item-accounting', $data);
 		}
@@ -1672,6 +1679,8 @@
 			$data['workflow'] = self::getWorkFlowDetails($id);
 
 			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
+
+			$data['page_title'] = 'Add POS Update Date';
 
 			return $this->view('rnd-menu/add-pos-update', $data);
 		}

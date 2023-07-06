@@ -145,7 +145,7 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label">POS Update Date</label>
+                        <label for="" class="control-label">* POS Update Date</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
