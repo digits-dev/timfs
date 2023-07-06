@@ -50,6 +50,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			//----added by cris 20200630
 			$this->col[] = ["label" => "Action Type", "name" => "action_type"];
+			$this->col[] = ["label" => "Item Photo", "name" => "image_filename","visible" =>  true];
 			$this->col[] = ["label" => "Approval Status", "name" => "approval_status"];
 			$this->col[] = ["label" => "Tasteless Code", "name" => "tasteless_code"];
 			$this->col[] = ["label" => "Type", "name" => "types_id", "join" => "types,type_description", "visible" => CRUDBooster::myColumnView()->type ? true : false];
@@ -462,7 +463,12 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = NULL;
+	        $this->style_css = "
+			.item-master-image {
+				max-width: 100px;
+			}
+			
+			";
 	        
 	        
 	        
@@ -536,7 +542,11 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 			//Your code here
-			if($column_index == 3) {
+			if ($column_index == 3 && $column_value) {
+				$column_value = '<image class="item-master-image" src="'. asset("img/item-master/$column_value") . '"/>';
+			}
+
+			else if ($column_index == 4) {
 				if ($column_value == '200') {
 					$column_value = '<span class="label label-success">APPROVED</span>';
 				} else if ($column_value == '202') {
