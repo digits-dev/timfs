@@ -102,10 +102,13 @@
                                 <td><input value="{{ $item->tasteless_code}}" type="text" name="tasteless_code" id="tasteless_code" class="form-control" readonly></td>
                             </tr>
                             @endif
+                            @if (CRUDBooster::myColumnView()->full_item_description)
                             <tr>
                                 <th><span class="required-star">*</span> Item Description</th>
                                 <td><input value="{{ $item->full_item_description ?: '' }}" title="{{ $item->full_item_description }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
                             </tr>
+                            @endif
+                            @if (CRUDBooster::myColumnView()->brand_description)
                             <tr>
                                 <th><span class="required-star">*</span>  Brand Description</th>
                                 <td>
@@ -114,6 +117,7 @@
                                     </select>
                                 </td>
                             </tr>
+                            @endif
                             <tr>
                                 <th><span class="required-star">*</span>  Tax Code</th>
                                 <td>
@@ -158,12 +162,14 @@
                                     </select>
                                 </td>
                             </tr>
+                            @if (CRUDBooster::myColumnView()->full_item_description)
                             <tr>
                                 <th><span class="required-star">*</span>  Purchase Description</th>
                                 <td>
                                     <input type="text" value="{{ $item->purchase_description }}" class="form-control" name="purchase_description" id="purchase_description" readonly>
                                 </td>
                             </tr>
+                            @endif
                             @if ($item->tasteless_code)
                             <tr>
                                 <th>Accumulated Depreciation</th>
@@ -211,6 +217,7 @@
                                     </select>
                                 </td>
                             </tr>
+                            @if (CRUDBooster::myColumnView()->currency)
                             <tr>
                                 <th><span class="required-star">*</span> Currency</th>
                                 <td>
@@ -222,24 +229,30 @@
                                     </select>
                                 </td>
                             </tr>
+                            @endif
+                            @if (CRUDBooster::myColumnView()->purchase_price)
                             <tr>
                                 <th><span class="required-star">*</span> Supplier Cost</th>
                                 <td>
                                     <input value="{{ $item->purchase_price }}" type="number" step="any" class="form-control" name="purchase_price" id="purchase_price" required readonly>
                                 </td>
                             </tr>
+                            @endif
+                            @if (CRUDBooster::myColumnView()->ttp)
                             <tr>
                                 <th><span class="required-star">*</span> Sales Price</th>
                                 <td>
                                     <input value="{{ $item->ttp }}"  type="number" step="any" class="form-control" name="ttp" id="ttp" required readonly>
                                 </td>
                             </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
                 <div class="col-md-6">
                     <table class="table-responsive table">
                         <tbody>
+                            @if (CRUDBooster::myColumnView()->ttp)
                             @if ($item->tasteless_code)
                             <tr>
                                 <th>Sales Price Change</th>
@@ -254,6 +267,8 @@
                                 </td>
                             </tr>
                             @endif
+                            @endif
+                            @if (CRUDBooster::myColumnView()->landed_cost)
                             <tr>
                                 <th><span class="required-star">*</span> Commi Margin</th>
                                 <td>
@@ -273,6 +288,7 @@
                                         </select>
                                     </td>
                                 </tr>
+                                @endif
                                 @if ($item->tasteless_code)
                                 <tr>
                                     <th>Tax Agency</th>
