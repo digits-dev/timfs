@@ -5,7 +5,7 @@ img[data-action="zoom"] {
   }
   .zoom-img,
   .zoom-img-wrap {
-    position: relative;
+    position: absolute;
     z-index: 666;
     -webkit-transition: all 300ms;
          -o-transition: all 300ms;
@@ -39,8 +39,3 @@ img[data-action="zoom"] {
   .zoom-overlay-transitioning {
     cursor: default;
   }
-
-  /* .box-body {
-    overflow: visible;
-  } */
-  
