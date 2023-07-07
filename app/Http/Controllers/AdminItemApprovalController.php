@@ -825,6 +825,7 @@
 							'details' => $details_of_item,
 							'created_by' => $inserted_item->created_by,
 							'updated_by' => $inserted_item->updated_by,
+							'updated_at' => $inserted_item->updated_at
 						]);
 					}
 
