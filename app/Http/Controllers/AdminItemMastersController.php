@@ -594,7 +594,8 @@
 	        |
 	        */
 	        $this->load_js = array();
-	        // $this->load_js[] = asset("js/item_master.js");
+	        // $this->load_js[] = asset("js/item-masters-img.js");
+	        $this->load_js[] = asset("js/zoom.js");
 	        
 	        /*
 	        | ---------------------------------------------------------------------- 
@@ -620,6 +621,7 @@
 	        |
 	        */
 	        $this->load_css = array();
+			$this->load_css[] = asset("css/zoom.css");
 	        
 	    }
 
@@ -663,7 +665,7 @@
 			// 	$column_value = floatval(number_format($column_value, 5, '.', ''));
 			// }
 			if ($column_index == 2 && $column_value) {
-				$column_value = '<image class="item-master-image" src="'. asset("img/item-master/$column_value") . '"/>';
+				$column_value = '<image class="item-master-image" src="'. asset("img/item-master/$column_value") . '" data-action="zoom"/>';
 			}
 	    }
 

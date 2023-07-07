@@ -53,16 +53,12 @@
 			$this->col[] = ["label" => "Item Photo", "name" => "image_filename","visible" =>  true];
 			$this->col[] = ["label" => "Approval Status", "name" => "approval_status"];
 			$this->col[] = ["label" => "Tasteless Code", "name" => "tasteless_code"];
-			$this->col[] = ["label" => "Type", "name" => "types_id", "join" => "types,type_description", "visible" => CRUDBooster::myColumnView()->type ? true : false];
-			$this->col[] = ["label" => "Item", "name" => "item", "visible" =>  true];
 			$this->col[] = ["label" => "Description", "name" => "full_item_description", "visible" => CRUDBooster::myColumnView()->full_item_description ? true : false];
 			$this->col[] = ["label" => "Tax Code", "name" => "tax_codes_id", "join" => "tax_codes,tax_code", "visible" => CRUDBooster::myColumnView()->tax_code ? true : false];
 			$this->col[] = ["label" => "Account", "name" => "accounts_id", "join" => "accounts,group_description", "visible" =>  true];
 			$this->col[] = ["label" => "COGS Account", "name" => "cogs_accounts_id", "join" => "cogs_accounts,group_description", "visible" =>  true];
 			$this->col[] = ["label" => "Asset Account", "name" => "asset_accounts_id", "join" => "asset_accounts,group_description", "visible" =>  true];
-			$this->col[] = ["label" => "Accumulated Depreciation", "name" => "accumulated_depreciation", "visible" =>  true];
 			$this->col[] = ["label" => "Purchase Description", "name" => "purchase_description", "visible" =>  true];
-			$this->col[] = ["label" => "Quantity On Hand", "name" => "quantity_on_hand", "visible" =>  true];
 			$this->col[] = ["label" => "Fulfillment Type", "name" => "fulfillment_type_id", "join" => "fulfillment_methods,fulfillment_method"];
 			$this->col[] = ["label" => "UOM", "name" => "uoms_id", "join" => "uoms,uom_description", "visible" => CRUDBooster::myColumnView()->uom ? true : false];
 			$this->col[] = ["label" => "UOM Set", "name" => "uoms_set_id", "join" => "uoms_set,uom_description", "visible" =>  true];
@@ -71,9 +67,7 @@
 			$this->col[] = ["label" => "Commi Margin", "name" => "ttp_percentage", "visible" => CRUDBooster::myColumnView()->ttp_percentage ? true : false];
 			$this->col[] = ["label" => "Landed Cost", "name" => "landed_cost", "visible" => CRUDBooster::myColumnView()->landed_cost ? true : false];
 			$this->col[] = ["label" => "Preffered Vendor", "name" => "suppliers_id", "join" => "suppliers,last_name", "visible" => CRUDBooster::myColumnView()->supplier ? true : false];
-			$this->col[] = ["label" => "Tax Agency", "name" => "tax_agency", "visible" =>  true];
 			$this->col[] = ["label" => "Reorder Pt (Min)", "name" => "reorder_pt", "visible" =>  true];
-			$this->col[] = ["label" => "MPN", "name" => "mpn", "visible" =>  true];
 			$this->col[] = ["label" => "Group", "name" => "groups_id", "join" => "groups,group_description", "visible" => CRUDBooster::myColumnView()->group ? true : false];
 			$this->col[] = ["label" => "Category Description", "name" => "categories_id", "join" => "categories,category_description", "visible" => CRUDBooster::myColumnView()->category_description ? true : false];
 			$this->col[] = ["label" => "Subcategory Description", "name" => "subcategories_id", "join" => "subcategories,subcategory_description", "visible" => CRUDBooster::myColumnView()->subcategory ? true : false];
@@ -84,7 +78,6 @@
 			// $this->col[] = ["label" => "Price", "name" => "price", "visible" =>  true];
 			$this->col[] = ["label" => "Supplier Item Code", "name" => "supplier_item_code", "visible" => CRUDBooster::myColumnView()->supplier_item_code ? true : false];
 			$this->col[] = ["label" => "MOQ Store", "name" => "moq_store", "visible" => CRUDBooster::myColumnView()->moq_store ? true : false];
-			$this->col[] = ["label" => "Account Number", "name" => "chart_accounts_id", "join" => "chart_accounts,account_number", "visible" => CRUDBooster::myColumnView()->chart_accounts ? true : false];
 			$this->col[] = ["label" => "Created Date", "name" => "created_at", "visible" => CRUDBooster::myColumnView()->create_date ? true : false];
 			$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->create_by ? true : false];
 			$this->col[] = ["label" => "Updated Date", "name" => "updated_at", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
@@ -451,6 +444,7 @@
 	        |
 	        */
 	        $this->load_js = array();
+	        $this->load_js[] = asset("js/zoom.js");
 			// $module_id = DB::table('cms_moduls')->where('controller','AdminItemMastersController')->value('id');
 			// $approver_checker = ApprovalWorkflowSetting::where('cms_moduls_id', 'LIKE', '%' . $module_id . '%')->where('approver_privilege_id',CRUDBooster::myPrivilegeId())->where('status','ACTIVE')->first();
 	        
@@ -481,6 +475,7 @@
 	        |
 	        */
 	        $this->load_css = array();
+			$this->load_css[] = asset("css/zoom.css");
 	        
 	        
 	    }
@@ -543,7 +538,7 @@
 	    public function hook_row_index($column_index,&$column_value) {	        
 			//Your code here
 			if ($column_index == 3 && $column_value) {
-				$column_value = '<image class="item-master-image" src="'. asset("img/item-master/$column_value") . '"/>';
+				$column_value = '<image class="item-master-image" src="'. asset("img/item-master/$column_value") . '" data-action="zoom"/>';
 			}
 
 			else if ($column_index == 4) {
