@@ -820,7 +820,7 @@
 							'brand_id' => $inserted_item->brands_id,
 							'ttp' => $inserted_item->ttp,
 							'ttp_percentage' => $inserted_item->ttp_percentage,
-							'old_ttp' => $inserted_item->ttp,
+							'old_ttp' => $old_values->ttp,
 							'old_ttp_percentage' => $old_values->ttp_percentage,
 							'purchase_price' => $inserted_item->purchase_price,
 							'old_purchase_price' => $old_values->purchase_price,
