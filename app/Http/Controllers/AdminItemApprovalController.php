@@ -818,7 +818,7 @@
 							'group_id' => $inserted_item->groups_id,
 							'action' => $inserted_item->action_type,
 							'brand_id' => $inserted_item->brands_id,
-							'ttp' => $inserted_item->sales_price,
+							'ttp' => $inserted_item->ttp,
 							'ttp_percentage' => $inserted_item->ttp_percentage,
 							'old_ttp' => $inserted_item->ttp,
 							'old_ttp_percentage' => $old_values->ttp_percentage,
