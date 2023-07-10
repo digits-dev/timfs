@@ -469,30 +469,41 @@
         $('#suppliers_id').trigger('change');
     }
     function getAllBrands() {
-        let brands = JSON.parse(localStorage.getItem('brands'));
-        if (!brands) {
-            $.ajax({
-                url: "{{ route('getAjaxSubmaster', ['table' => 'brands']) }}",
-                _token: "{{ csrf_token() }}",
-                type: 'GET',
-                success: function(response) {
-                    localStorage.setItem('brands', response);
-                    brands = JSON.parse(localStorage.getItem('brands'));
-                    setBrand(brands)
-                },
-                error: function(response) {
-                    console.log(response);
-                }
-            });
-        } else {
-            setBrand(brands);
-        }
+        $.ajax({
+            url: "{{ route('getAjaxSubmaster', ['table' => 'brands']) }}",
+            _token: "{{ csrf_token() }}",
+            type: 'GET',
+            success: function(response) {
+                localStorage.setItem('brands', response);
+                brands = JSON.parse(localStorage.getItem('brands'));
+                setBrand(brands)
+            },
+            error: function(response) {
+                console.log(response);
+            }
+        });
+        // let brands = JSON.parse(localStorage.getItem('brands'));
+        // if (!brands) {
+        //     $.ajax({
+        //         url: "{{ route('getAjaxSubmaster', ['table' => 'brands']) }}",
+        //         _token: "{{ csrf_token() }}",
+        //         type: 'GET',
+        //         success: function(response) {
+        //             localStorage.setItem('brands', response);
+        //             brands = JSON.parse(localStorage.getItem('brands'));
+        //             setBrand(brands)
+        //         },
+        //         error: function(response) {
+        //             console.log(response);
+        //         }
+        //     });
+        // } else {
+        //     setBrand(brands);
+        // }
     }
 
     function getAllSuppliers() {
-        let suppliers = JSON.parse(localStorage.getItem('suppliers'));
-        if (!suppliers) {
-            $.ajax({
+        $.ajax({
                 url: "{{ route('getAjaxSubmaster', ['table' => 'suppliers']) }}",
                 _token: "{{ csrf_token() }}",
                 type: 'GET',
@@ -505,9 +516,24 @@
                     console.log(response);
                 }
             });
-        } else {
-            setSupplier(suppliers);
-        }
+        // let suppliers = JSON.parse(localStorage.getItem('suppliers'));
+        // if (!suppliers) {
+        //     $.ajax({
+        //         url: "{{ route('getAjaxSubmaster', ['table' => 'suppliers']) }}",
+        //         _token: "{{ csrf_token() }}",
+        //         type: 'GET',
+        //         success: function(response) {
+        //             localStorage.setItem('suppliers', response);
+        //             suppliers = JSON.parse(localStorage.getItem('suppliers'));
+        //             setSupplier(suppliers);
+        //         },
+        //         error: function(response) {
+        //             console.log(response);
+        //         }
+        //     });
+        // } else {
+        //     setSupplier(suppliers);
+        // }
         
     }
 
