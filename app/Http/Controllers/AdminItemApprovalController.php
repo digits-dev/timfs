@@ -397,6 +397,35 @@
 	        |
 	        */
 	        $this->index_statistic = array();
+			if (in_array(CRUDBooster::myPrivilegeName(), $this->approver) || CRUDBooster::isSuperAdmin()) {
+				$pending_count = DB::table('item_master_approvals')
+					->where('approval_status', '202')
+					->count();
+				$approved_count = DB::table('item_master_approvals')
+					->where('approval_status', '200')
+					->count();
+				$rejected_count = DB::table('item_master_approvals')
+					->where('approval_status', '400')
+					->count();
+				$this->index_statistic[] = [
+					'label' => 'Pending Items',
+					'count' => $pending_count,
+					'icon' => 'fa fa-hourglass-half',
+					'color' => 'orange',
+				];
+				$this->index_statistic[] = [
+					'label' => 'Approved Items',
+					'count' => $approved_count,
+					'icon' => 'fa fa-thumbs-up',
+					'color' => 'green',
+				];
+				$this->index_statistic[] = [
+					'label' => 'Rejected Items',
+					'count' => $rejected_count,
+					'icon' => 'fa fa-thumbs-down',
+					'color' => 'red',
+				];
+			}
 
 
 
@@ -526,7 +555,14 @@
 				$query->where('item_master_approvals.approval_status', '202');
 			}
 
-			$query->orderBy(DB::raw('COALESCE(item_master_approvals.updated_at, item_master_approvals.created_at)'), 'desc');
+			$query
+				->orderBy(DB::raw('
+					CASE 
+						WHEN item_master_approvals.approval_status = "202" THEN 1
+						ELSE 2 
+					END
+				'))
+				->orderBy(DB::raw('COALESCE(item_master_approvals.updated_at, item_master_approvals.created_at)'), 'desc');
 	    }
 
 	    /*
