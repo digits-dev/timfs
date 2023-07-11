@@ -30,7 +30,8 @@ class SalesPrice implements FromArray, WithHeadings
         ->join('item_masters','history_item_masterfile.item_id','=','item_masters.id')
         ->leftJoin('groups','history_item_masterfile.group_id','=','groups.id')
         ->leftJoin('cms_users','history_item_masterfile.updated_by','=','cms_users.id')
-        ->whereNotNull('history_item_masterfile.ttp');
+        ->whereNotNull('history_item_masterfile.ttp')
+        ->orderBy('history_item_masterfile.id', 'DESC');
 
         if (Request::get('filter_column')) {
 	
@@ -101,10 +102,10 @@ class SalesPrice implements FromArray, WithHeadings
             'Tasteless Code', 
             'Item Description', 
             'Group',
-            'Old TTP',
-            'Old TTP Percentage',
             'TTP',
             'TTP Percentage',
+            'Old TTP',
+            'Old TTP Percentage',
             'Updated By',
             'Updated Date'
         );

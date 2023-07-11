@@ -29,8 +29,8 @@ class PurchasePrice implements FromArray, WithHeadings
         ->join('item_masters','history_item_masterfile.item_id','=','item_masters.id')
         ->leftJoin('groups','history_item_masterfile.group_id','=','groups.id')
         ->leftJoin('cms_users','history_item_masterfile.updated_by','=','cms_users.id')
-        ->whereNotNull('history_item_masterfile.purchase_price');
-
+        ->whereNotNull('history_item_masterfile.purchase_price')
+        ->orderBy('history_item_masterfile.id', 'DESC');
 
         if (Request::get('filter_column')) {
 
@@ -101,8 +101,8 @@ class PurchasePrice implements FromArray, WithHeadings
             'Tasteless Code', 
             'Item Description', 
             'Group',
-            'Old Purchase Price',
             'Purchase Price',
+            'Old Purchase Price',
             'Updated By',
             'Updated Date'
         ];
