@@ -985,10 +985,11 @@
 				})
 				->select('batching_ingredients.id as batching_ingredients_id',
 					'batching_ingredients.ingredient_description',
-					'batching_ingredients_computed_food_cost.portion_ttp as ttp',
+					'batching_ingredients.ttp',
 					'batching_ingredients.uoms_id',
-					'uom_description')
-				->leftJoin('uoms', 'uoms.id', '=', 'batching_ingredients.uoms_id')
+					'batching_ingredients.quantity as packaging_size',
+					'packagings.packaging_description')
+				->leftJoin('packagings', 'packagings.id', '=', 'batching_ingredients.uoms_id')
 				->leftJoin('batching_ingredients_computed_food_cost', 'batching_ingredients_computed_food_cost.id', '=', 'batching_ingredients.id')
 				->get()
 				->toArray();

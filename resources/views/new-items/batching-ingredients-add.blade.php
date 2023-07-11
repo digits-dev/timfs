@@ -302,23 +302,28 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label"><span class="required-star">*</span> TTP</label>
+                        <label for="" class="control-label"><span class="required-star">*</span> Batching Quantity</label>
                         <div class="input-group">
-                            <div class="input-group-addon text-bold">
-                                ₱
+                            <div class="input-group-addon">
+                                <span class="custom-icon"><strong>÷</strong></span>
                             </div>
-                            <input type="number" value="{{$item->ttp ? (float) $item->ttp : ''}}" step="any" class="batching-ingredient-ttp form-control" placeholder="0.00" required>
+                            <input value="{{$item ? (float) $item->quantity : '1'}}" type="number" class="form-control batching_quantity" placeholder="Batching Quantity">
                         </div>
                     </div>
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label">Portion TTP</label>
+                        <label for="" class="control-label"><span class="required-star">*</span> UOM</label>
                         <div class="input-group">
-                            <div class="input-group-addon text-bold">
-                                ₱
+                            <div class="input-group-addon">
+                                <i class="fa fa-sticky-note"></i>
                             </div>
-                            <input type="number" value="{{$item->ttp ? (float) $item->portion_ttp : ''}}" class="batching-ingredient-portion-ttp form-control ttp" placeholder="0.00" readonly>
+                            <select class="form-control batching_uom" required>
+                                <option value="" {{!$item->batching_ingredients_prepared_by_id ? 'selected' : ''}} disabled>None selected</option>
+                                @foreach ($uoms as $uom)
+                                <option value="{{ $uom->id }}" {{$item->uoms_id == $uom->id || !$item->uoms_id && $uom->id == 2 ? 'selected' : ''}}>{{ $uom->packaging_description }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -345,12 +350,12 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="" class="control-label"><span class="required-star">*</span> Portion Size</label>
+                            <label for="" class="control-label"><span class="required-star">*</span> TTP</label>
                             <div class="input-group">
-                                <div class="input-group-addon">
-                                    <span class="custom-icon"><strong>÷</strong></span>
+                                <div class="input-group-addon text-bold">
+                                    ₱
                                 </div>
-                                <input value="{{$item ? (float) $item->portion_size : '1'}}" type="number" class="form-control portion" placeholder="Portion Size">
+                                <input type="number" value="{{$item->ttp ? (float) $item->ttp : ''}}" step="any" class="batching-ingredient-ttp form-control" placeholder="0.00" required>
                             </div>
                         </div>
                     </div>
@@ -369,17 +374,6 @@
             </section>
         </form>
         <hr>
-        @if ($approval_status == 'FOR FOOD TASTING')
-        <div class="row">
-            <div class="col-md-6">
-                <hr>
-                <h3 class="text-center">COMMENTS</h3>
-                <div class="chat">
-                    @include('rnd-menu/chat-app', $comments_data)
-                </div>
-            </div>
-        </div>
-        @endif
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
@@ -420,8 +414,8 @@
         }
 
         $.fn.firstLoad = function() {
-            if (savedIngredients) $('.no-ingredient-warning').remove();
-            if (savedPackagings) $('.no-packaging-warning').remove();
+            if (savedIngredients.length) $('.no-ingredient-warning').hide();
+            if (savedPackagings.length) $('.no-packaging-warning').hide();
 
             const ingredientGroupCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
             const ingredientSection = $('.ingredient-section');
@@ -649,12 +643,6 @@
                 }
             });
 
-            $('.portion').keyup(function() {
-                const value = $(this).val();
-                if (value && value > 0) $.fn.sumCost();
-                else return;
-            });
-
             $('.ingredient-name, .packaging-name').keyup(function() {
                 const value = $(this).val();
                 $(this).val(value.toUpperCase());
@@ -865,10 +853,14 @@
             const bachingIngredientId = $(document.createElement('input'))
                 .attr('name', 'batching_ingredients_id')
                 .val(batchigIngredient?.id);
-            
-            const portionData = $(document.createElement('input'))
-                .attr('name', 'portion_size')
-                .val($('.portion').val());
+
+            const uomData = $(document.createElement('input'))
+                .attr('name', 'uoms_id')
+                .val($('.batching_uom').val());
+
+            const batchingQuantityData = $(document.createElement('input'))
+                .attr('name', 'quantity')
+                .val($('.batching_quantity').val());
 
             const ttpData = $(document.createElement('input'))
                 .attr('name', 'ttp')
@@ -883,7 +875,8 @@
                 ingredientsData,
                 ingrediendDescription,
                 bachingIngredientId,
-                portionData,
+                uomData,
+                batchingQuantityData,
                 ttpData,
                 batchingIngredientsPreparedById,
             );
@@ -901,7 +894,7 @@
 
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
-                $('.portion').val() > 0 && $('.ingredient-description').val() && $('.prepared-by').val()
+                $('.batching_quantity').val() > 0 && $('.ingredient-description').val() && $('.prepared-by').val()
                 && $('.batching-ingredient-ttp').val();
 
             const hasIngredient = $('#form-ingredient .ingredient-wrapper, #form-ingredient .new-ingredient-wrapper').length > 0;
@@ -925,7 +918,7 @@
                         .parents('.ingredient-entry, .packaging-entry')
                         .find('.display-ingredient, .display-packaging')
                         .css('outline', '2px solid red');
-                    if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
+                    if ($('.batching_quantity').val() == 0) $('.batching_quantity').css('outline', '2px solid red');
 					if (!$('.ingredient-description').val()) $('.ingredient-description').css('outline', '2px solid red');
                     if (!$('.prepared-by').val()) $('.prepared-by').css('outline', '2px solid red');
                     if (!$('.batching-ingredient-ttp').val()) $('.batching-ingredient-ttp').css('outline', '2px solid red');
