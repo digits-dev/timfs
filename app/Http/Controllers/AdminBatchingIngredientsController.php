@@ -38,10 +38,10 @@
 			$this->col[] = ["label"=>"BI Code","name"=>"bi_code"];
 			$this->col[] = ["label"=>"Prepared by","name"=>"batching_ingredients_prepared_by_id","join"=>"batching_ingredients_prepared_by,prepared_by"];
 			$this->col[] = ["label"=>"Batching Description","name"=>"ingredient_description"];
-			$this->col[] = ["label"=>"Portion Size","name"=>"portion_size"];
-			$this->col[] = ["label"=>"Total Cost","name"=>"id","join"=>"batching_ingredients_computed_food_cost,ingredient_total_cost","join_id"=>"id"];
+			$this->col[] = ["label"=>"Quantity","name"=>"quantity"];
+			$this->col[] = ["label"=>"UOM","name"=>"uoms_id","join"=>"packagings,packaging_description"];
 			$this->col[] = ["label"=>"TTP","name"=>"ttp"];
-			$this->col[] = ["label"=>"Portion TTP","name"=>"id","join"=>"batching_ingredients_computed_food_cost,portion_ttp","join_id"=>"id"];
+			$this->col[] = ["label"=>"Total Cost","name"=>"id","join"=>"batching_ingredients_computed_food_cost,ingredient_total_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
@@ -556,7 +556,7 @@
 		public function editBatchingIngredient(Request $request) {
 			$batching_ingredients_id = $request->get('batching_ingredients_id');
 			$ingredient_description = strtoupper($request->get('ingredient_description'));
-			$portion_size = $request->get('portion_size');
+			$quantity = $request->get('quantity');
 			$batching_ingredients_ttp = $request->get('ttp');
 			$batching_ingredients_prepared_by_id = $request->get('batching_ingredients_prepared_by_id');
 			$ingredients = json_decode($request->get('ingredients'));
@@ -573,7 +573,7 @@
 						'ingredient_description' => $ingredient_description,
 						'batching_ingredients_prepared_by_id' => $batching_ingredients_prepared_by_id,
 						'bi_code' => $bi_code,
-						'portion_size' => $portion_size,
+						'quantity' => $quantity,
 						'ttp' => $batching_ingredients_ttp,
 						'created_by' => $action_by,
 						'created_at' => $time_stamp
@@ -587,7 +587,7 @@
 					->update([
 						'ingredient_description' => $ingredient_description,
 						'batching_ingredients_prepared_by_id' => $batching_ingredients_prepared_by_id,
-						'portion_size' => $portion_size,
+						'quantity' => $quantity,
 						'ttp' => $batching_ingredients_ttp,
 						'updated_at' => $time_stamp,
 						'updated_by' => $action_by
