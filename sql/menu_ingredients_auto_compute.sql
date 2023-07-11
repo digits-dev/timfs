@@ -31,15 +31,13 @@ SELECT
     CASE
         WHEN menu_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
         WHEN menu_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
-        WHEN menu_ingredients_details.batching_ingredients_id IS NOT NULL THEN ROUND(
-            batching_ingredients_computed_food_cost.ttp,
-            4
-        )
+        WHEN menu_ingredients_details.batching_ingredients_id IS NOT NULL THEN batching_ingredients_computed_food_cost.ttp
         WHEN menu_ingredients_details.new_ingredients_id IS NOT NULL THEN new_ingredients.ttp
         ELSE menu_ingredients_details.ttp
     END as ttp,
     CASE
         WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
+        WHEN batching_ingredients_computed_food_cost.quantity IS NOT NULL THEN batching_ingredients_computed_food_cost.quantity
         WHEN new_ingredients.packaging_size IS NOT NULL THEN new_ingredients.packaging_size
         WHEN menu_ingredients_details.packaging_size IS NOT NULL THEN menu_ingredients_details.packaging_size
         ELSE 1
@@ -57,6 +55,7 @@ SELECT
         1 / (
             CASE
                 WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
+                WHEN batching_ingredients_computed_food_cost.quantity IS NOT NULL THEN batching_ingredients_computed_food_cost.quantity
                 WHEN new_ingredients.packaging_size IS NOT NULL THEN new_ingredients.packaging_size
                 WHEN menu_ingredients_details.packaging_size IS NOT NULL THEN menu_ingredients_details.packaging_size
                 ELSE 1
@@ -74,6 +73,7 @@ SELECT
             1 / (
                 CASE
                     WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
+                    WHEN batching_ingredients_computed_food_cost.quantity IS NOT NULL THEN batching_ingredients_computed_food_cost.quantity
                     WHEN new_ingredients.packaging_size IS NOT NULL THEN new_ingredients.packaging_size
                     WHEN menu_ingredients_details.packaging_size IS NOT NULL THEN menu_ingredients_details.packaging_size
                     ELSE 1
@@ -88,10 +88,7 @@ SELECT
         ) * CASE
             WHEN menu_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
             WHEN menu_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
-            WHEN menu_ingredients_details.batching_ingredients_id IS NOT NULL THEN ROUND(
-                batching_ingredients_computed_food_cost.ttp,
-                4
-            )
+            WHEN menu_ingredients_details.batching_ingredients_id IS NOT NULL THEN batching_ingredients_computed_food_cost.ttp
             WHEN menu_ingredients_details.new_ingredients_id IS NOT NULL THEN new_ingredients.ttp
             ELSE menu_ingredients_details.ttp
         END,
