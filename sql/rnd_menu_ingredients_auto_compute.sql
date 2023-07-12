@@ -103,10 +103,13 @@ FROM
     LEFT JOIN uoms ON uoms.id = COALESCE(
         item_masters.uoms_id,
         menu_items.uoms_id,
+        batching_ingredients_computed_food_cost.uoms_id,
         rnd_menu_ingredients_details.uom_id
     )
     LEFT JOIN packagings ON packagings.id = COALESCE(
         item_masters.packagings_id,
+        menu_items.uoms_id,
+        batching_ingredients_computed_food_cost.uoms_id,
         rnd_menu_ingredients_details.uom_id
     );
 

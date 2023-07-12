@@ -3,6 +3,7 @@ SELECT
     batching_ingredients.ingredient_description,
     batching_ingredients.status,
     batching_ingredients.quantity,
+    batching_ingredients.uoms_id,
     batching_ingredients.ttp,
     ROUND(SUM(subquery.cost), 4) as ingredient_total_cost
 FROM batching_ingredients

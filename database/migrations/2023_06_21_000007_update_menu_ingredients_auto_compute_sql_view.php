@@ -122,10 +122,10 @@ class UpdateMenuIngredientsAutoComputeSqlView extends Migration
                 LEFT JOIN new_ingredients ON new_ingredients.id = menu_ingredients_details.new_ingredients_id
                 LEFT JOIN batching_ingredients_computed_food_cost ON batching_ingredients_computed_food_cost.id = menu_ingredients_details.batching_ingredients_id
                 LEFT JOIN uoms ON uoms.id = COALESCE(
-                    item_masters.uoms_id, menu_items.uoms_id, menu_ingredients_details.uom_id
+                    item_masters.uoms_id, menu_items.uoms_id, batching_ingredients_computed_food_cost.uoms_id, menu_ingredients_details.uom_id
                 )
                 LEFT JOIN packagings ON packagings.id = COALESCE(
-                    item_masters.packagings_id, menu_ingredients_details.uom_id
+                    item_masters.packagings_id, menu_items.uoms_id, batching_ingredients_computed_food_cost.uoms_id, menu_ingredients_details.uom_id
                 );
         ");
     }

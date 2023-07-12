@@ -55,8 +55,8 @@
                         <th>Ingredient Description</th>
                         <th>Batching Ingredient Code</th>
                         <th>Prepared By</th>
-                        <th>Portion Size</th>
-                        <th>Food Cost</th>
+                        <th>Quantity</th>
+                        <th>UOM</th>
                         <th>Created Date</th>
                         <th>Created By</th>
                     </tr>
@@ -66,8 +66,8 @@
                         <td>{{$item->ingredient_description}}</td>
                         <td>{{$item->bi_code}}</td>
                         <td>{{$item->prepared_by}}</td>
-                        <td>{{(float) $item->portion_size}}</td>
-                        <td>{{(float) $item->food_cost}}</td>
+                        <td>{{(float) $item->quantity}}</td>
+                        <td>{{$item->packaging_description}}</td>
                         <td>{{$item->created_at}}</td>
                         <td>{{$item->name}}</td>
                     </tr>
