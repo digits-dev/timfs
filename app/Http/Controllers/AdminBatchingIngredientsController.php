@@ -409,6 +409,7 @@
 				->leftJoin('cms_users', 'cms_users.id', 'batching_ingredients.created_by')
 				->leftJoin('batching_ingredients_computed_food_cost', 'batching_ingredients_computed_food_cost.id', '=', 'batching_ingredients.id')
 				->leftJoin('batching_ingredients_prepared_by', 'batching_ingredients_prepared_by.id', '=', 'batching_ingredients.batching_ingredients_prepared_by_id')
+				->leftJoin('packagings', 'packagings.id', '=', 'batching_ingredients.uoms_id')
 				->get()
 				->first();
 
@@ -557,6 +558,7 @@
 			$batching_ingredients_id = $request->get('batching_ingredients_id');
 			$ingredient_description = strtoupper($request->get('ingredient_description'));
 			$quantity = $request->get('quantity');
+			$uoms_id = $request->get('uoms_id');
 			$batching_ingredients_ttp = $request->get('ttp');
 			$batching_ingredients_prepared_by_id = $request->get('batching_ingredients_prepared_by_id');
 			$ingredients = json_decode($request->get('ingredients'));
@@ -574,6 +576,7 @@
 						'batching_ingredients_prepared_by_id' => $batching_ingredients_prepared_by_id,
 						'bi_code' => $bi_code,
 						'quantity' => $quantity,
+						'uoms_id' => $uoms_id,
 						'ttp' => $batching_ingredients_ttp,
 						'created_by' => $action_by,
 						'created_at' => $time_stamp
@@ -588,6 +591,7 @@
 						'ingredient_description' => $ingredient_description,
 						'batching_ingredients_prepared_by_id' => $batching_ingredients_prepared_by_id,
 						'quantity' => $quantity,
+						'uoms_id' => $uoms_id,
 						'ttp' => $batching_ingredients_ttp,
 						'updated_at' => $time_stamp,
 						'updated_by' => $action_by
