@@ -305,7 +305,7 @@
                         <label for="" class="control-label"><span class="required-star">*</span> Batching Quantity</label>
                         <div class="input-group">
                             <div class="input-group-addon">
-                                <span class="custom-icon"><strong>÷</strong></span>
+                                <i class="fa fa-sticky-note"></i>
                             </div>
                             <input value="{{$item ? (float) $item->quantity : '1'}}" type="number" class="form-control batching_quantity" placeholder="Batching Quantity">
                         </div>
