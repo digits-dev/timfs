@@ -413,7 +413,7 @@
                         <div class='modal-body'>
                             <div class='form-group'>
                                 <label>File Name</label>
-                                <input type='text' name='filename' class='form-control' required value='Export ".CRUDBooster::getCurrentModule()->name ." - ".date('Y-m-d H:i:s')."'/>
+                                <input type='text' name='filename' class='form-control' required value='Export Menu Ingredients " ." - ".date('Y-m-d H:i:s')."'/>
                             </div>
 						</div>
 						<div class='modal-footer' align='right'>

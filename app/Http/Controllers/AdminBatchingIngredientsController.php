@@ -216,7 +216,7 @@
 						<div class='modal-header'>
 							<button class='close' aria-label='Close' type='button' data-dismiss='modal'>
 								<span aria-hidden='true'>×</span></button>
-							<h4 class='modal-title'><i class='fa fa-download'></i> Export Menu Ingredients</h4>
+							<h4 class='modal-title'><i class='fa fa-download'></i> Export Batching Ingredients</h4>
 						</div>
 
 						<form method='post' target='_blank' action=".CRUDBooster::mainpath("export-batching-ingredients").">
@@ -225,7 +225,7 @@
                         <div class='modal-body'>
                             <div class='form-group'>
                                 <label>File Name</label>
-                                <input type='text' name='filename' class='form-control' required value='Export ".CRUDBooster::getCurrentModule()->name ." - ".date('Y-m-d H:i:s')."'/>
+                                <input type='text' name='filename' class='form-control' required value='Export Batching Ingredients "." - ".date('Y-m-d H:i:s')."'/>
                             </div>
 						</div>
 						<div class='modal-footer' align='right'>
