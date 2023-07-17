@@ -754,6 +754,7 @@
 	    }
 
 		public function getDetail($id) {
+			dd(date('Y-m-d',strtotime("-1 days")));
 			if (!CRUDBooster::isRead())
 					CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
@@ -1111,5 +1112,49 @@
 			$this->cbLoader();
 			$data['page_title'] = 'Upload Module';
 			return view("upload.upload", $data);
+		}
+
+		public function getUpdatedItems($secret_key) {
+			if ($secret_key != config('api.secret_key')) {
+				return response([
+					'message' => 'Error: Bad Request',
+				], 404);
+			}
+
+			$segmentations = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->pluck('segment_column_name')
+				->toArray();
+
+			$created_items = DB::table('item_masters')
+				->where('action_type', 'CREATE')
+				->whereBetween(DB::raw('DATE(approved_at_1)'), [date('Y-m-d',strtotime("-1 days")), date('Y-m-d')])
+				->select(
+					'item_masters.action_type',
+					'item_masters.tasteless_code',
+					'item_masters.full_item_description',
+					'item_masters.approved_at_1',
+					...$segmentations
+				)
+				->get()
+				->toArray();
+
+			$updated_items = DB::table('item_masters')
+					->where('action_type', 'UPDATE')
+					->whereBetween(DB::raw('DATE(approved_at_1)'), [date('Y-m-d',strtotime("-1 days")), date('Y-m-d')])
+					->select(
+						'item_masters.action_type',
+						'item_masters.tasteless_code',
+						'item_masters.full_item_description',
+						'item_masters.approved_at_1',
+						...$segmentations
+					)
+					->get()
+					->toArray();
+
+			return response()->json([
+				'created_items' => $created_items,
+				'updated_items' => $updated_items,
+			]);
 		}
 	}
