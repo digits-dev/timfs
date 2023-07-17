@@ -754,7 +754,6 @@
 	    }
 
 		public function getDetail($id) {
-			dd(date('Y-m-d',strtotime("-1 days")));
 			if (!CRUDBooster::isRead())
 					CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
