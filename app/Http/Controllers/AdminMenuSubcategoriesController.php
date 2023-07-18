@@ -34,7 +34,6 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Category","name"=>"categories_id","join"=>"menu_categories,category_description"];
 			$this->col[] = ["label"=>"Subcategory Code","name"=>"subcategory_code"];
 			$this->col[] = ["label"=>"Subcategory Description","name"=>"subcategory_description"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
@@ -46,7 +45,6 @@
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Category','name'=>'categories_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'menu_categories,category_description'];
 			$this->form[] = ['label'=>'Subcategory Code','name'=>'subcategory_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-4'];
 			$this->form[] = ['label'=>'Subcategory Description','name'=>'subcategory_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-4'];
 			if(in_array(CRUDBooster::getCurrentMethod(),['getEdit','postEditSave','getDetail'])) {
