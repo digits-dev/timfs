@@ -420,8 +420,10 @@
 					'menu_items.status as menu_item_status',
 					'sku_statuses.sku_status_description as item_status',
 					'new_ingredients.status as new_ingredient_status',
+					'batching_as_ingredient.status as batching_ingredient_status',
 					'batching_ingredients_auto_compute.item_masters_id',
 					'batching_ingredients_auto_compute.menu_item_description',
+					'batching_as_ingredient.ingredient_description',
 					'tasteless_menu_code',
 					'ingredient_name',
 					'prep_qty',
@@ -446,6 +448,7 @@
 				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
 				->leftJoin('menu_ingredients_preparations', 'batching_ingredients_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
 				->leftJoin('new_ingredients', 'new_ingredients.id', '=', 'batching_ingredients_auto_compute.new_ingredients_id')
+				->leftJoin('batching_ingredients as batching_as_ingredient', 'batching_as_ingredient.id', '=', 'batching_ingredients_auto_compute.batching_as_ingredient_id')
 				->orderby('ingredient_group', 'asc')
 				->orderby('row_id', 'asc')
 				->get()
@@ -514,6 +517,8 @@
 					->where('batching_ingredients_auto_compute.status', 'ACTIVE')
 					->select(\DB::raw('item_masters.id as item_masters_id'),
 						'ingredient_name',
+						'batching_ingredients_computed_food_cost.ingredient_description',
+						'batching_ingredients_computed_food_cost.id as batching_ingredients_id',
 						'menu_as_ingredient_id',
 						'batching_ingredients_auto_compute.menu_item_description',
 						'is_selected',
@@ -544,6 +549,7 @@
 					->leftJoin('menu_items', 'batching_ingredients_auto_compute.menu_as_ingredient_id', '=', 'menu_items.id')
 					->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
 					->leftJoin('new_ingredients', 'new_ingredients.id', 'batching_ingredients_auto_compute.new_ingredients_id')
+					->leftJoin('batching_ingredients_computed_food_cost', 'batching_ingredients_computed_food_cost.id', 'batching_ingredients_auto_compute.batching_as_ingredient_id')
 					->orderBy('ingredient_group', 'ASC')
 					->orderBy('row_id', 'ASC')
 					->get()
@@ -622,6 +628,7 @@
 							'item_masters_id' => $ingredient['item_masters_id'],
 							'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
 							'new_ingredients_id' => $ingredient['new_ingredients_id'],
+							'batching_as_ingredient_id' => $ingredient['batching_as_ingredient_id'],
 						])->exists();
 					
 					if ($is_existing) {
@@ -650,6 +657,7 @@
 						'ingredient_name' => $ingredient['ingredient_name'],
 						'menu_as_ingredient_id' => $ingredient['menu_as_ingredient_id'],
 						'new_ingredients_id' => $ingredient['new_ingredients_id'],
+						'batching_as_ingredient_id' => $ingredient['batching_as_ingredient_id'],
 					], $ingredient);
 				}
 			}
