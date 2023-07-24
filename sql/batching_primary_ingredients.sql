@@ -11,7 +11,8 @@ SELECT
         ingredient_view.full_item_description,
         ingredient_view.menu_item_description,
         ingredient_view.item_description,
-        ingredient_view.ingredient_name
+        ingredient_view.ingredient_name,
+        ingredient_view.ingredient_description
     ) AS ingredient,
     ingredient_view.prep_qty AS quantity,
     COALESCE(
@@ -67,3 +68,4 @@ FROM batching_ingredients
     LEFT JOIN batching_ingredients_auto_compute ingredient_view ON ingredient_view.id = subquery.id
     LEFT JOIN item_masters item_as_ingredient ON item_as_ingredient.id = ingredient_view.item_masters_id
     LEFT JOIN menu_items menu_as_ingredient ON menu_as_ingredient.id = ingredient_view.menu_as_ingredient_id
+    LEFT JOIN batching_ingredients batching_as_ingredient ON batching_as_ingredient.id = ingredient_view.batching_as_ingredient_id

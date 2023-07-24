@@ -4,9 +4,11 @@ SELECT
     batching_ingredients_details.item_masters_id,
     batching_ingredients_details.menu_as_ingredient_id,
     batching_ingredients_details.new_ingredients_id,
+    batching_ingredients_details.batching_as_ingredient_id,
     item_masters.full_item_description,
     menu_items.menu_item_description,
     new_ingredients.item_description,
+    batching_as_ingredient.ingredient_description,
     batching_ingredients_details.ingredient_name,
     batching_ingredients_details.ingredient_group,
     batching_ingredients_details.row_id,
@@ -30,12 +32,14 @@ SELECT
         WHEN batching_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
         WHEN batching_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
         WHEN batching_ingredients_details.new_ingredients_id IS NOT NULL THEN new_ingredients.ttp
+        WHEN batching_ingredients_details.batching_as_ingredient_id IS NOT NULL THEN batching_as_ingredient.ttp
         ELSE batching_ingredients_details.ttp
     END as ttp,
     CASE
         WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
         WHEN new_ingredients.packaging_size IS NOT NULL THEN new_ingredients.packaging_size
         WHEN batching_ingredients_details.packaging_size IS NOT NULL THEN batching_ingredients_details.packaging_size
+        WHEN batching_as_ingredient.quantity IS NOT NULL THEN batching_as_ingredient.quantity
         ELSE 1
     END as packaging_size,
     ROUND(
@@ -53,6 +57,7 @@ SELECT
                 WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
                 WHEN new_ingredients.packaging_size IS NOT NULL THEN new_ingredients.packaging_size
                 WHEN batching_ingredients_details.packaging_size IS NOT NULL THEN batching_ingredients_details.packaging_size
+                WHEN batching_as_ingredient.quantity IS NOT NULL THEN batching_as_ingredient.quantity
                 ELSE 1
             END
         ) * prep_qty / (
@@ -70,6 +75,7 @@ SELECT
                     WHEN item_masters.packaging_size IS NOT NULL THEN item_masters.packaging_size
                     WHEN new_ingredients.packaging_size IS NOT NULL THEN new_ingredients.packaging_size
                     WHEN batching_ingredients_details.packaging_size IS NOT NULL THEN batching_ingredients_details.packaging_size
+                    WHEN batching_as_ingredient.quantity IS NOT NULL THEN batching_as_ingredient.quantity
                     ELSE 1
                 END
             ) * prep_qty / (
@@ -83,6 +89,7 @@ SELECT
             WHEN batching_ingredients_details.item_masters_id IS NOT NULL THEN item_masters.ttp
             WHEN batching_ingredients_details.menu_as_ingredient_id IS NOT NULL THEN ROUND(menu_items.food_cost, 4)
             WHEN batching_ingredients_details.new_ingredients_id IS NOT NULL THEN new_ingredients.ttp
+            WHEN batching_ingredients_details.batching_as_ingredient_id IS NOT NULL THEN batching_as_ingredient.ttp
             ELSE batching_ingredients_details.ttp
         END,
         4
@@ -92,14 +99,17 @@ FROM
     LEFT JOIN item_masters ON item_masters.id = batching_ingredients_details.item_masters_id
     LEFT JOIN menu_items ON menu_items.id = batching_ingredients_details.menu_as_ingredient_id
     LEFT JOIN new_ingredients ON new_ingredients.id = batching_ingredients_details.new_ingredients_id
+    LEFT JOIN batching_ingredients AS batching_as_ingredient ON batching_as_ingredient.id = batching_ingredients_details.batching_as_ingredient_id
     LEFT JOIN uoms ON uoms.id = COALESCE(
         item_masters.uoms_id,
         menu_items.uoms_id,
-        new_ingredients.uoms_id
+        new_ingredients.uoms_id,
+        batching_as_ingredient.uoms_id
     )
     LEFT JOIN packagings ON packagings.id = COALESCE(
         item_masters.packagings_id,
-        new_ingredients.uoms_id
+        new_ingredients.uoms_id,
+        batching_as_ingredient.uoms_id
     );
 
 ;
