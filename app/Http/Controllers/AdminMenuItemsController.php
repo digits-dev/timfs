@@ -908,8 +908,12 @@
 					'menu_items.tasteless_menu_code',
 					'menu_items.menu_price_dine',
 					'menu_items.portion_size',
-					'menu_items.menu_item_description')
+					'menu_items.menu_item_description',
+					'menu_items.buffer',
+					'menu_items.ideal_food_cost',
+					'menu_costing.packaging_cost')
 				->where('menu_items.id', $id)
+				->leftJoin('menu_costing', 'menu_costing.menu_items_id', 'menu_items.id')
 				->first();
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
@@ -1129,44 +1133,8 @@
 				}
 			}
 
-			$to_update = DB::table('menu_items')
-					->leftJoin('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
-					->whereRaw("
-						CAST(
-							menu_items.food_cost AS DECIMAL(18, 4)
-						) != CAST(
-							COALESCE(
-								menu_computed_food_cost.computed_food_cost,
-								0
-							) AS DECIMAL(18, 4)
-						)
-					")
-					->orWhereRaw("
-						CAST(
-							menu_items.food_cost_percentage AS DECIMAL(18, 4)
-						) != CAST(
-							COALESCE(
-								menu_computed_food_cost.computed_food_cost_percentage,
-								0
-							) AS DECIMAL(18, 4)
-						)
-					")
-					->orWhereRaw("
-						CAST(
-							menu_items.ingredient_total_cost AS DECIMAL(18, 4)
-						) != CAST(
-							COALESCE(
-								menu_computed_food_cost.computed_ingredient_total_cost,
-								0
-							) AS DECIMAL(18, 4)
-						)
-					")
-					->pluck('menu_items.id')
-					->toArray();
-
 			//calling the function... should start the recursion
-			self::updateCostOfOtherMenu($to_update);
-
+			self::updateCostOfOtherMenu();
 
 			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
 		}
@@ -1228,6 +1196,9 @@
 				}
 			}
 
+			//calling the function... should start the recursion
+			self::updateCostOfOtherMenu();
+
 			return redirect('admin/menu_items')
 				->with([
 					'message_type' => 'success',
@@ -1257,6 +1228,9 @@
 					'updated_by' => $action_by,
 					'updated_at' => $time_stamp,
 				]);
+
+			//calling the function... should start the recursion
+			self::updateCostOfOtherMenu();
 
 			return redirect('admin/menu_items')
 				->with([
@@ -1571,24 +1545,15 @@
 			return json_encode($response);
 		}
 
-		function updateCostOfOtherMenu($menu_ids) {
-			//stopping the recursion if array is empty
-			if (!$menu_ids) return;
-
-			DB::table('menu_items')
-				->whereIn('menu_items.id', $menu_ids)
-				->leftJoin('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
-				->update([
-					'menu_items.ingredient_total_cost' => DB::raw("menu_computed_food_cost.computed_ingredient_total_cost"),
-					'menu_items.food_cost' => DB::raw("menu_computed_food_cost.computed_food_cost"),
-					'menu_items.food_cost_percentage' => DB::raw("menu_computed_food_cost.computed_food_cost_percentage"),
-				]);
-
+		function updateCostOfOtherMenu() {
 			$to_update = DB::table('menu_items')
-				->leftJoin('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
+				->join('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
 				->whereRaw("
 					CAST(
-						menu_items.food_cost AS DECIMAL(18, 4)
+						COALESCE(
+							menu_items.food_cost,
+							0
+						) AS DECIMAL(18, 4)
 					) != CAST(
 						COALESCE(
 							menu_computed_food_cost.computed_food_cost,
@@ -1598,17 +1563,23 @@
 				")
 				->orWhereRaw("
 					CAST(
-						menu_items.food_cost_percentage AS DECIMAL(18, 4)
+						COALESCE(
+							menu_items.food_cost_percentage,
+							0
+						) AS DECIMAL(18, 2)
 					) != CAST(
 						COALESCE(
 							menu_computed_food_cost.computed_food_cost_percentage,
 							0
-						) AS DECIMAL(18, 4)
+						) AS DECIMAL(18, 2)
 					)
 				")
 				->orWhereRaw("
 					CAST(
-						menu_items.ingredient_total_cost AS DECIMAL(18, 4)
+						COALESCE(
+							menu_items.ingredient_total_cost,
+							0
+						) AS DECIMAL(18, 4)
 					) != CAST(
 						COALESCE(
 							menu_computed_food_cost.computed_ingredient_total_cost,
@@ -1619,10 +1590,22 @@
 				->pluck('menu_items.id')
 				->toArray();
 
+			//stopping the recursion if array is empty
+			if (!$to_update) return;
+
+			DB::table('menu_items')
+				->whereIn('menu_items.id', $to_update)
+				->leftJoin('menu_costing', 'menu_items.id', '=', 'menu_costing.menu_items_id')
+				->leftJoin('menu_computed_food_cost', 'menu_computed_food_cost.id', '=', 'menu_items.id')
+				->update([
+					'menu_items.ingredient_total_cost' => DB::raw("menu_computed_food_cost.computed_ingredient_total_cost"),
+					'menu_items.food_cost' => DB::raw("menu_costing.final_recipe_cost"),
+					'menu_items.food_cost_percentage' => DB::raw("menu_costing.food_cost_percentage"),
+				]);
+
 			//finally, calling the function itself
 			//the process keeps going on until there are no more ingredients to be updated
-			self::updateCostOfOtherMenu($to_update);
-
+			self::updateCostOfOtherMenu();
 		}
 
 		function getIngredients($id) {

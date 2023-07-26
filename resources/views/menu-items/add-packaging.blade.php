@@ -891,8 +891,8 @@
         }
 
         $(document).on('click', '#save-btn', function(event) {
-            const [isValid, hasPackaging] = $.fn.checkFormValidity();
-            if (isValid && hasPackaging) {
+            const [isValid] = $.fn.checkFormValidity();
+            if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
                     icon: 'warning',
