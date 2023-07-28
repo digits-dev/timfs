@@ -285,7 +285,7 @@
 
             const finalRecipeCost = math.round((recipeCostWithoutBuffer * (1 + (buffer / 100))) / portionSize, 4);
             const suggestedFinalSrpWithVAT = math.round(finalRecipeCost / (idealFoodCost / 100) * 1.12, 4);
-            const suggestedFinalSrpWithVATPlusPackaginCost = suggestedFinalSrpWithVAT + Number(packagingCost);
+            const suggestedFinalSrpWithVATPlusPackaginCost = math.round(suggestedFinalSrpWithVAT + Number(packagingCost), 4);
             const finalSrpWithoutVAT = math.round(finalSrpWithVat / 1.12, 4);
             const costPackagingFromFinalSrp = math.round(packagingCost / finalSrpWithoutVAT * 100, 2) || 0;
             const foodCostFromFinalSrp = math.round(finalRecipeCost / finalSrpWithoutVAT * 100, 2) || 0;
