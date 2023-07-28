@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use CRUDBooster;
 use DB;
+use App\Http\Controllers\AdminMenuItemsController;
 
 class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
 {
@@ -170,24 +171,13 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
 
         if (in_array(CRUDBooster::myPrivilegeName(), ['Chef', 'Chef Assistant'])) {
 
-            $concept_access_id = DB::table('user_concept_acess')
-                ->where('cms_users_id', CRUDBooster::myID())
-                ->get('menu_segmentations_id')
-                ->first()
-                ->menu_segmentations_id;
-            
-            $concepts = DB::table('menu_segmentations')
-                ->whereIn('id', explode(',', $concept_access_id))
-                ->get('menu_segment_column_name')
-                ->toArray();
+            $menu_ids = (new AdminMenuItemsController)->getMyMenuIds();
 
-            $menu_items->where(function($subQuery) use ($concepts) {
-                foreach($concepts as $concept) {
-                    $subQuery->orWhere('menu_items.' . $concept->menu_segment_column_name, '1');
-                }
-            });
+            $menu_items->whereIn('menu_items.id', $menu_ids);
 
-            if (!$concept_access_id) $menu_items->where('menu_items.id', null);
+            if (!$menu_ids) {
+                $menu_items->where('menu_items.id', null);
+            }
         }
 
         if (request()->has('filter_column')) {
