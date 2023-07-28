@@ -180,10 +180,16 @@
                                     <input type="number" class="form-control ideal-food-cost" placeholder="Ideal Food Cost" step="any" required>
                                 </td>
                             </tr>
-                            <tr class="divider">
+                            <tr class="divider hide">
                                 <td class="text-center text-bold">Suggested Final SRP With VAT</td>
                                 <td class="text-center">
                                     <input type="number" class="form-control suggested-final-srp-w-vat" placeholder="Suggested Final SRP With VAT" step="any" readonly>
+                                </td>
+                            </tr>
+                            <tr class="divider">
+                                <td class="text-center text-bold">Suggested Final SRP With VAT + Packaging Cost</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control suggested-final-srp-w-vat-plus-packaging-cost" placeholder="Suggested Final SRP With VAT + Packaging Cost" step="any" readonly>
                                 </td>
                             </tr>
                         </tbody>
@@ -204,7 +210,7 @@
                                     <input type="number" class="form-control final-srp-wo-vat" placeholder="Final SRP without VAT" step="any" readonly>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr class="hide">
                                 <td class="text-center text-bold">% Cost Packaging From Final SRP</td>
                                 <td class="text-center">
                                     <input type="number" class="form-control cost-packaging-from-final-srp" placeholder="% Cost Packaging From Final SRP" step="any" readonly>
@@ -216,7 +222,7 @@
                                     <input type="number" class="form-control food-cost-from-final-srp" placeholder="% Food Cost from Final SRP" step="any" readonly>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr class="hide">
                                 <td class="text-center text-bold">% Total Cost</td>
                                 <td class="text-center">
                                     <input type="number" class="form-control total-cost" placeholder="% Total Cost" step="any" readonly>
@@ -396,17 +402,20 @@
 
             const finalRecipeCost = math.round((recipeCostWithoutBuffer * (1 + (buffer / 100))) / portionSize, 4);
             const suggestedFinalSrpWithVAT = math.round(finalRecipeCost / (idealFoodCost / 100) * 1.12, 4);
+            const suggestedFinalSrpWithVATPlusPackaginCost = suggestedFinalSrpWithVAT + Number(packagingCost);
             const finalSrpWithoutVAT = math.round(finalSrpWithVat / 1.12, 4);
             const costPackagingFromFinalSrp = math.round(packagingCost / finalSrpWithoutVAT * 100, 2);
             const foodCostFromFinalSrp = math.round(finalRecipeCost / finalSrpWithoutVAT * 100, 2);
+            const foodCostPercentage = math.round(math.round(finalRecipeCost / math.round((finalSrpWithVat - packagingCost) / 1.12, 4), 4) * 100, 2) || 0;
             const totalCost = math.round(costPackagingFromFinalSrp + foodCostFromFinalSrp, 2);
 
             $('.rnd_menu_srp').val(finalSrpWithVat);
             $('.final-recipe-cost').val(finalRecipeCost);
             $('.suggested-final-srp-w-vat').val(suggestedFinalSrpWithVAT);
+            $('.suggested-final-srp-w-vat-plus-packaging-cost').val(suggestedFinalSrpWithVATPlusPackaginCost);
             $('.final-srp-wo-vat').val(finalSrpWithoutVAT);
             $('.cost-packaging-from-final-srp').val(costPackagingFromFinalSrp);
-            $('.food-cost-from-final-srp').val(foodCostFromFinalSrp);
+            $('.food-cost-from-final-srp').val(foodCostPercentage);
             $('.total-cost').val(totalCost);
 
             formatTotalCost();

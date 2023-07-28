@@ -545,12 +545,12 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label">Total Cost</label>
+                        <label for="" class="control-label"><span class="required-star">*</span> Portion Size</label>
                         <div class="input-group">
                             <div class="input-group-addon">
-                                <span class="custom-icon"><strong>₱</strong></span>
+                                <span class="custom-icon"><strong>÷</strong></span>
                             </div>
-                            <input type="text" class="form-control total-cost" placeholder="0.00" readonly>
+                            <input value="{{$item ? (float) $item->portion_size : '1'}}" type="number" class="form-control portion" placeholder="Portion Size">
                         </div>
                     </div>
                 </div>
@@ -568,49 +568,70 @@
                     No ingredients currently saved...
                 </div>
             </section>
-            <section class="section-footer">
-                <div class="add-buttons">
+            <hr>
+            <div class="row">
+                <div class="col-md-4" style="margin-bottom: 15px;">
                     <button class="btn btn-primary" id="add-existing-ingredient" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add existing ingredient</button>
                     <button class="btn btn-success" id="add-new-ingredient" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add new ingredient</button>
                 </div>
-                <hr>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="" class="control-label"><span class="required-star">*</span> Portion Size</label>
-                            <div class="input-group">
-                                <div class="input-group-addon">
-                                    <span class="custom-icon"><strong>÷</strong></span>
-                                </div>
-                                <input value="{{$item ? (float) $item->portion_size : '1'}}" type="number" class="form-control portion" placeholder="Portion Size">
+                <div class="hide">
+                    <div class="form-group">
+                        <label for="" class="control-label">Total Ingredient Cost</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-plus"></i>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4" style="display: none;">
-                        <div class="form-group">
-                            <label for="" class="control-label">Total Ingredient Cost</label>
-                            <div class="input-group">
-                                <div class="input-group-addon">
-                                    <i class="fa fa-plus"></i>
-                                </div>
-                                <input type="text" class="form-control ingredient-total-cost" placeholder="Total Cost" readonly>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="" class="control-label">Food Cost (<span class="percentage"></span>)</label>
-                            <div class="input-group">
-                                <div class="input-group-addon">
-                                    <span class="custom-icon"><strong>₱</strong></span>
-                                </div>
-                                <input type="text" class="form-control food-cost" placeholder="Food Cost" readonly>
-                            </div>
+                            <input type="text" class="form-control ingredient-total-cost" placeholder="Total Cost" readonly>
                         </div>
                     </div>
                 </div>
-            </section>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">Cost Without Buffer</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <span class="custom-icon"><strong>₱</strong></span>
+                            </div>
+                            <input type="text" class="form-control recipe-cost-without-buffer" placeholder="Cost Without Buffer" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">% Buffer</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <span class="custom-icon"><strong>%</strong></span>
+                            </div>
+                            <input type="text" class="form-control buffer" placeholder="0.00" value="{{ $item->buffer ? (float) $item->buffer : 6.5 }}" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">% Ideal Food Cost</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <span class="custom-icon"><strong>%</strong></span>
+                            </div>
+                            <input type="text" class="form-control ideal_food_cost" placeholder="0.00%" value="{{ $item->ideal_food_cost ? (float) $item->ideal_food_cost : 30 }}" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">Food Cost (<span class="percentage"></span>)</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <span class="custom-icon"><strong>₱</strong></span>
+                            </div>
+                            <input type="text" class="form-control food-cost" placeholder="Food Cost" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
+        <hr>
         <hr>
         <form action="" id="form-packaging">
             <div class="row">
@@ -625,26 +646,24 @@
                     No packaging currently saved...
                 </div>
             </section>
-            <section class="section-footer">
-                <div class="add-buttons">
+            <hr>
+            <div class="row">
+                <div class="col-md-10" style="margin-bottom: 15px;">
                     <button class="btn btn-primary" id="add-existing-packaging" name="button" type="button"> <i class="fa fa-plus" ></i> Add existing packaging</button>
                     <button class="btn btn-success" id="add-new-packaging" name="button" type="button"> <i class="fa fa-plus" ></i> Add new packaging</button>
                 </div>
-                <hr>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="" class="control-label">Packaging Cost</label>
-                            <div class="input-group">
-                                <div class="input-group-addon">
-                                    <span class="custom-icon"><strong>₱</strong></span>
-                                </div>
-                                <input type="text" class="form-control packaging-cost" placeholder="Packaging Cost" readonly>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">Packaging Cost</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <span class="custom-icon"><strong>₱</strong></span>
                             </div>
+                            <input type="text" class="form-control packaging-cost" placeholder="Packaging Cost" readonly>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
         </form>
         @if ($approval_status == 'FOR FOOD TASTING' || $approval_status == 'FOR ADJUSTMENT')
         <div class="row">
@@ -1047,8 +1066,11 @@
             const ingredientWrappers = jQuery.makeArray($('.ingredient-section .ingredient-wrapper, .ingredient-section .new-ingredient-wrapper'));
             const packagingWrappers = jQuery.makeArray($('.packaging-section .packaging-wrapper, .packaging-section .new-packaging-wrapper'));
             const lowCost = Number(localStorage.getItem('lowCost')) || 30;
+            const buffer = Number($('.buffer').val());
+            const idealFoodCost = Number($('.ideal_food_cost').val()) || 30;
             const totalIngredientCostInput = $('.ingredient-total-cost');
             const totalCostInput = $('.total-cost');
+            const recipeCostWithoutBufferInput = $('.recipe-cost-without-buffer');
             const foodCostInput = $('.food-cost');
             const portionInput = $('.portion');
             const srpInput = $('.rnd_menu_srp');
@@ -1071,20 +1093,12 @@
                 }
             });
             ingredientSum = math.round(ingredientSum, 4);
-            const foodCost = math.round(ingredientSum / portionSize, 4);
+            const recipeCostWithoutBuffer = ingredientSum;
+            recipeCostWithoutBufferInput.val(recipeCostWithoutBuffer);
             totalIngredientCostInput.val(ingredientSum);
+            const foodCost = math.round((recipeCostWithoutBuffer * (1 + (buffer / 100))) / portionSize, 4);
             foodCostInput.val(foodCost);
             const percentage = srp > 0 ? math.round(foodCost / srp * 100, 2) : 0;
-            
-            //formatting the percentage text depending on the low cost
-            $(percentageText).text(`${percentage}%`);
-            if (percentage > lowCost) {
-                $(percentageText).css('color', 'red');
-                foodCostInput.css({'color': 'red', 'outline': '2px solid red', 'font-weight': 'bold',});
-            } else {
-                $(percentageText).css('color', '');
-                foodCostInput.css({'color': '', 'outline': '', 'font-weight': 'normal'});    
-            }
 
             //looping through packaging wrappers 
             packagingWrappers.forEach(wrapper => {
@@ -1098,9 +1112,19 @@
                 }
             });
             packagingSum = math.round(packagingSum, 4);
+            const packagingCost = packagingSum;
             $('.packaging-cost').val(packagingSum);
-            const totalCost = math.round(packagingSum + foodCost, 4);
-            totalCostInput.val(totalCost);
+            const foodCostPercentage = srp ? math.round(math.round(foodCost / math.round((srp - packagingCost) / 1.12, 4), 4) * 100, 2) : 0;
+
+            //formatting the percentage text depending on the low cost
+            $(percentageText).text(`${foodCostPercentage}%`);
+            if (foodCostPercentage > idealFoodCost) {
+                $(percentageText).css('color', 'red');
+                foodCostInput.css({'color': 'red', 'outline': '2px solid red', 'font-weight': 'bold',});
+            } else {
+                $(percentageText).css('color', '');
+                foodCostInput.css({'color': '', 'outline': '', 'font-weight': 'normal'});    
+            }
 
         }
 
