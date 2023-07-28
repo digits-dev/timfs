@@ -363,10 +363,6 @@
                         <td>{{(float) $food_cost_data->computed_food_cost}}</td>
                     </tr>
                     <tr>
-                        <td class="text-bold">Food Cost Percentage:</td>
-                        <td>{{(float) $food_cost_data->computed_food_cost_percentage}} %</td>
-                    </tr>
-                    <tr>
                         <td class="text-bold">Published By:</td>
                         <td>{{$workflow_data->published_by_name}}</td>
                     </tr>
