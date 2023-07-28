@@ -170,14 +170,8 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         }
 
         if (in_array(CRUDBooster::myPrivilegeName(), ['Chef', 'Chef Assistant'])) {
-
             $menu_ids = (new AdminMenuItemsController)->getMyMenuIds();
-
             $menu_items->whereIn('menu_items.id', $menu_ids);
-
-            if (!$menu_ids) {
-                $menu_items->where('menu_items.id', null);
-            }
         }
 
         if (request()->has('filter_column')) {

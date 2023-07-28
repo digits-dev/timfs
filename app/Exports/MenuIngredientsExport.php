@@ -43,14 +43,8 @@ class MenuIngredientsExport  implements FromArray, WithHeadings
             ->orderBy('menu_items.menu_item_description');
 
         if (in_array(CRUDBooster::myPrivilegeName(), ['Chef', 'Chef Assistant'])) {
-
             $menu_ids = (new AdminMenuItemsController)->getMyMenuIds();
-
             $menu_query->whereIn('menu_items.id', $menu_ids);
-
-            if (!$menu_ids) {
-                $menu_query->where('menu_items.id', null);
-            }
         }
 
         $menu_items = $menu_query->get()->toArray();

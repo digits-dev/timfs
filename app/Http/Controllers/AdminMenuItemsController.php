@@ -492,12 +492,7 @@
 	        //Your code here
 			if (CRUDBooster::myPrivilegeName() == 'Chef' || CRUDBooster::myPrivilegeName() == 'Chef Assistant') {
 				$menu_ids = self::getMyMenuIds();
-
 				$query->whereIn('menu_items.id', $menu_ids);
-				
-				if (!$menu_ids) {
-					$query->where('menu_items.id', null);
-				}
 			}
 	    }
 
