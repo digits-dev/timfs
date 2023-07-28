@@ -34,7 +34,8 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"Privileges","name"=>"id_cms_privileges","join"=>"cms_privileges,name"];
-			$this->col[] = ["label"=>"Users Id","name"=>"cms_users_id","join"=>"cms_users,email"];
+			$this->col[] = ["label"=>"User Email","name"=>"cms_users_id","join"=>"cms_users,email"];
+			$this->col[] = ["label"=>"User Name","name"=>"cms_users_id","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Concept Access","name"=>"menu_segmentations_id"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
@@ -45,8 +46,17 @@
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Privilege','name'=>'id_cms_privileges','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-6','datatable'=>'cms_privileges,name','datatable_where'=>'name NOT LIKE \'%Admin%\''];
-			$this->form[] = ['label'=>'User Name','name'=>'cms_users_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-6','datatable'=>'cms_users,email','datatable_where'=>'status=%27ACTIVE%27','parent_select'=>'id_cms_privileges'];
+			$this->form[] = ['label'=>'Privilege','name'=>'id_cms_privileges','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-6','datatable'=>'cms_privileges,name','datatable_where'=>'name NOT LIKE \'%Admin%\''];
+			$used_ids = DB::table('user_concept_acess')->pluck('cms_users_id')->toArray();
+			if (CRUDBooster::getCurrentMethod() == 'getEdit') {
+				$current_url = url()->current();
+				$params = explode('/', $current_url);
+				$user_concept_access_id = $params[count($params) - 1];
+				$user_id = DB::table('user_concept_acess')->where('id', $user_concept_access_id)->first()->cms_users_id;
+				$used_ids = array_filter($used_ids, fn($val) => $val != $user_id);
+			}
+			$used_ids = implode(',', $used_ids);
+			$this->form[] = ['label'=>'User Name','name'=>'cms_users_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-6','datatable'=>'cms_users,email','datatable_where'=>"status=%27ACTIVE%27 and cms_users.id NOT IN ($used_ids)",'parent_select'=>'id_cms_privileges'];
 			$this->form[] = ['label'=>'Concept Access','name'=>'menu_segmentations_id','type'=>'select2-multi','validation'=>'required','width'=>'col-sm-6','datatable'=>'menu_segmentations,menu_segment_column_description'];
 			# END FORM DO NOT REMOVE THIS LINE
 
@@ -256,7 +266,7 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
-			if ($column_index == 4) {
+			if ($column_index == 5) {
 				$column_array = explode(',', $column_value);
 				$concepts = DB::table('menu_segmentations')
 					->whereIn('id', $column_array)
