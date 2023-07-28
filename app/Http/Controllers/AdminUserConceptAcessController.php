@@ -34,7 +34,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"Privileges","name"=>"id_cms_privileges","join"=>"cms_privileges,name"];
-			$this->col[] = ["label"=>"Users Id","name"=>"cms_users_id","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Users Id","name"=>"cms_users_id","join"=>"cms_users,email"];
 			$this->col[] = ["label"=>"Concept Access","name"=>"menu_segmentations_id"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
