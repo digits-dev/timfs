@@ -478,7 +478,7 @@ class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CB
 				foreach ($concepts_columns ?? [] as $concept) {
 					$sub_query->orWhere($concept, '1');
 				}
-			});
+			})->where('menu_items.tasteless_menu_code', '!=', null);
 
 			$concepts = $concept_query->get()->toArray();
 

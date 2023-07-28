@@ -491,30 +491,13 @@
 	    public function hook_query_index(&$query) {
 	        //Your code here
 			if (CRUDBooster::myPrivilegeName() == 'Chef' || CRUDBooster::myPrivilegeName() == 'Chef Assistant') {
+				$menu_ids = self::getMyMenuIds();
 
-				$concept_access_id = DB::table('user_concept_acess')
-					->where('cms_users_id', CRUDBooster::myID())
-					->get('menu_segmentations_id')
-					->first()
-					->menu_segmentations_id;
+				$query->whereIn('menu_items.id', $menu_ids);
 				
-				$concepts = DB::table('menu_segmentations')
-					->whereIn('id', explode(',', $concept_access_id))
-					->get('menu_segment_column_name')
-					->toArray();
-
-				if ($concepts) {
-					$query->where(function($subQuery) use ($concepts) {
-						foreach($concepts as $concept) {
-							$subQuery->orWhere('menu_items.' . $concept->menu_segment_column_name, '1');
-						}
-					});
-				} else {
+				if (!$menu_ids) {
 					$query->where('menu_items.id', null);
 				}
-
-				$query->where('menu_items.tasteless_menu_code', '!=', null);
-
 			}
 	    }
 
@@ -1690,6 +1673,15 @@
 			->toArray();
 
 			return $packagings;
+		}
+
+		public function getMyMenuIds() {
+			$ids = (new AdminFoodCostController)
+				->getMyMenuAndConcepts()['menu_query']
+				->pluck('menu_items.id')
+				->toArray();
+
+			return $ids;
 		}
 
 	}	
