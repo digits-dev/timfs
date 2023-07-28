@@ -512,7 +512,7 @@
                             <div class="input-group-addon">
                                 <span class="custom-icon"><strong>₱</strong></span>
                             </div>
-                            <input value="{{$item ? (float) $item->rnd_menu_srp : ''}}" type="number" class="form-control rnd_menu_srp" placeholder="0.00">
+                            <input value="{{$item ? (float) $item->rnd_menu_srp : ''}}" {{$item->menu_items_id ? 'readonly' : ''}} type="number" class="form-control rnd_menu_srp" placeholder="0.00">
                         </div>
                     </div>
                 </div>

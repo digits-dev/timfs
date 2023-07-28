@@ -674,14 +674,20 @@
 			} else {
 				//update details for rnd menu item
 				DB::table('rnd_menu_items')
-					->where('id', $rnd_menu_items_id)
+					->where('rnd_menu_items.id', $rnd_menu_items_id)
+					->leftJoin('menu_items', 'menu_items.id', 'rnd_menu_items.menu_items_id')
 					->update([
-						'rnd_menu_description' => $rnd_menu_description,
-						'segmentations_id' => $segmentations_id,
-						'rnd_menu_srp' => $rnd_menu_srp,
-						'portion_size' => $portion_size,
-						'updated_at' => $time_stamp,
-						'updated_by' => $action_by
+						'rnd_menu_items.rnd_menu_description' => $rnd_menu_description,
+						'rnd_menu_items.segmentations_id' => $segmentations_id,
+						'rnd_menu_items.rnd_menu_srp' => DB::raw("COALESCE(menu_items.menu_price_dine, $rnd_menu_srp)"),
+						'rnd_menu_items.portion_size' => $portion_size,
+						'rnd_menu_items.updated_at' => $time_stamp,
+						'rnd_menu_items.updated_by' => $action_by,
+						'menu_items.menu_price_dine' => DB::raw("COALESCE(menu_items.menu_price_dine, $rnd_menu_srp)"),
+						'menu_items.menu_price_take' => DB::raw("COALESCE(menu_items.menu_price_take, $rnd_menu_srp)"),
+						'menu_items.menu_price_dlv' => DB::raw("COALESCE(menu_items.menu_price_dlv, $rnd_menu_srp)"),
+						'menu_items.updated_at' => $time_stamp,
+						'menu_items.updated_by' => $action_by,
 					]);
 
 				$message = "✔️ RND Menu Item Details of $rnd_menu_description Updated!";
