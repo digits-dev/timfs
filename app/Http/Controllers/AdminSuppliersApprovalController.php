@@ -147,7 +147,7 @@
 	        | 
 	        */
 	        $this->button_selected = array();
-			if(CRUDBooster::isUpdate() && (in_array(CRUDBooster::myPrivilegeName(),['Administrator','Supervisor (Purchaser)','Supervisor (Accounting)','Manager (Accounting)']) || CRUDBooster::isSuperadmin() )) {
+			if(CRUDBooster::isUpdate() && (in_array(CRUDBooster::myPrivilegeName(),['Administrator','Supervisor (Purchaser)','Supervisor (Accounting)','Manager (Accounting)','Accounting Manager']) || CRUDBooster::isSuperadmin() )) {
 	        	$this->button_selected[] = ['label'=>'APPROVED','icon'=>'fa fa-check','name'=>'APPROVED'];
 				$this->button_selected[] = ['label'=>'REJECT','icon'=>'fa fa-times','name'=>'REJECT'];
 			}
@@ -470,7 +470,7 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-	        if(CRUDBooster::isSuperadmin() || CRUDBooster::myPrivilegeName() == "Administrator"){
+	        if(CRUDBooster::isSuperadmin() || CRUDBooster::myPrivilegeName() == "Accounting Manager"){
 				$query->where(function($sub_query){
 					$module_id = DB::table('cms_moduls')->where('controller','AdminSuppliersController')->value('id');
 
