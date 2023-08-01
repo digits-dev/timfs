@@ -392,7 +392,7 @@
             }
         }
 
-        function modalAfterSubmission(menuItemid) {
+        function modalAfterSubmission(menuItemId) {
             Swal.fire({
                 title: 'Packaging successfully updated!',
                 html: '📄 Do you want to review the costing?',
@@ -404,7 +404,7 @@
                 cancelButtonText: 'Not now',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    location.assign("{{ CRUDBooster::mainPath() }}" + `/edit/${menuItemid}/costing`);
+                    location.assign("{{ CRUDBooster::mainPath() }}" + `/edit/${menuItemId}/costing`);
                 } else {
                     location.assign("{{ CRUDBooster::mainPath() }}");
                 }
@@ -889,7 +889,6 @@
                 }
             });
 
-            // form.submit();
         }
 
         $.fn.checkFormValidity = function() {
