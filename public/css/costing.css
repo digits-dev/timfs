@@ -1,0 +1,64 @@
+.flex {
+    display: flex;
+}
+
+.parent {
+    flex-wrap: wrap;
+}
+
+.child {
+    min-width: 500px;
+    margin-top: 10px;
+}
+
+.child > * {
+    width: 50%;
+}
+thead {
+    background: rgb(213, 211, 211);
+}
+
+.swal2-html-container {
+    line-height: 3rem;
+}
+
+td {
+    vertical-align: middle !important;
+}
+
+table.costing-table td + td {
+    border-left: 2px solid #b9b8b8 !important; 
+}
+
+table.costing-table, table.costing-table th {
+    border: 2px solid #b9b8b8 !important; 
+}
+
+.divider {
+    border-top: 2px solid #b9b8b8;
+}
+
+.srp-td {
+    width: 30%;
+    margin: auto 3px;
+}
+
+.row-srp {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    appearance: textfield;
+    -moz-appearance: textfield; /* Firefox */
+}

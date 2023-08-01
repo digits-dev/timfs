@@ -973,7 +973,6 @@
 				->get()
 				->toArray();
 
-
 			$data['preparations'] = DB::table('menu_ingredients_preparations')
 				->where('status', 'ACTIVE')
 				->select('id', 'preparation_desc')
@@ -991,6 +990,10 @@
 			$data['food_cost_data'] = DB::table('menu_computed_food_cost')
 				->where('id', $id)
 				->get()
+				->first();
+
+			$data['costing'] = DB::table('menu_costing')
+				->where('menu_items_id', $id)
 				->first();
 
 			$data['menu_items_data'] = self::getMenuItemDetails($id);
