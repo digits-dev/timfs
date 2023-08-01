@@ -1180,12 +1180,7 @@
 			//calling the function... should start the recursion
 			self::updateCostOfOtherMenu();
 
-			return redirect('admin/menu_items')
-				->with([
-					'message_type' => 'success',
-					'message' => 'Packagings Updated!'
-				]);
-
+			return true;
 		}
 
 		public function submitCosting(Request $request) {

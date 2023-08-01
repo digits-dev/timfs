@@ -369,7 +369,7 @@
 <script>
     $('body').addClass('sidebar-collapse');
     const savedPackagings = {!! json_encode($packagings) !!} || [];
-    const menuIitem = {!! json_encode($item) !!};
+    const menuItem = {!! json_encode($item) !!};
     const action = "{{$action}}";
     const privilege = "{{$privilege}}";
     const addButtonsId = '#add-existing-ingredient, #add-new-ingredient, #add-existing-packaging, #add-new-packaging';
@@ -390,6 +390,25 @@
                 timeout = setTimeout(later, wait);
                 if (callNow) func.apply(context, args);
             }
+        }
+
+        function modalAfterSubmission(menuItemid) {
+            Swal.fire({
+                title: 'Packaging successfully updated!',
+                html: '📄 Do you want to review the costing?',
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'Not now',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    location.assign("{{ CRUDBooster::mainPath() }}" + `/edit/${menuItemid}/costing`);
+                } else {
+                    location.assign("{{ CRUDBooster::mainPath() }}");
+                }
+            });
         }
 
         $.fn.firstLoad = function() {
@@ -842,7 +861,7 @@
 
             const menuItemsId = $(document.createElement('input'))
                 .attr('name', 'menu_items_id')
-                .val(menuIitem.id);
+                .val(menuItem.id);
 
             const packagings = $(document.createElement('input'))
                 .attr('name', 'packagings')
@@ -852,7 +871,25 @@
 
             $('.panel-default').append(form);
 
-            form.submit();
+            const formData = form.serialize();
+
+            $.ajax({
+                method: 'POST',
+                url: "{{ route('menu_item_submit_packaging') }}",
+                data: {
+                    packagings: packagingsJSON,
+                    menu_items_id: menuItem.id,
+                    _token: "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    modalAfterSubmission(menuItem.id);
+                },
+                error: function(response) {
+                    console.log(response);
+                }
+            });
+
+            // form.submit();
         }
 
         $.fn.checkFormValidity = function() {
