@@ -371,19 +371,7 @@ class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CB
 		} 
 
 		if ($filter == 'low') {
-			// $menu_items = array_filter(
-			// 	$menu_items,
-			// 	fn ($obj) => ((float) $obj->food_cost_percentage <= (float) $low_cost ||
-			// 		$obj->menu_price_dine == 0 ||
-			// 		$obj->menu_price_dine == null
-			// 	) && $obj->food_cost
-			// );
-
 			$menu_query = $menu_query
-				// ->whereRaw("
-				// 	food_cost is not null AND
-				// 	(menu_price_dine = 0 or menu_price_dine is null or food_cost_percentage <= $low_cost)				
-				// ");
 				->where('food_cost', '!=', null)
 				->where(function($sub_query) use ($low_cost){
 					$sub_query
@@ -394,22 +382,12 @@ class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CB
 		}
 
 		if ($filter == 'high') {
-			// $menu_items = array_filter(
-			// 	$menu_items,
-			// 	fn ($obj) => (float) $obj->food_cost_percentage > (float) $low_cost && $obj->food_cost
-			// );
-
 			$menu_query = $menu_query
 				->where('food_cost', '!=', null)
 				->where('food_cost_percentage', '>', (float) $low_cost);
 		}
 
 		if ($filter == 'no') {
-			// $menu_items = array_filter(
-			// 	$menu_items,
-			// 	fn ($obj) => $obj->food_cost == 0 || $obj->food_cost == null
-			// );
-
 			$menu_query = $menu_query
 				->where(function($sub_query) {
 					$sub_query
@@ -417,7 +395,6 @@ class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CB
 						->orWhere('food_cost', null);
 				});
 		}
-		// dd($menu_query);
 
 		$data['filter'] = $filter;
 		$data['concept'] = $concept;
