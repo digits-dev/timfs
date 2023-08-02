@@ -430,7 +430,10 @@
             </div>
             <hr>
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-2">
+                    <button type="button" id="show-menu-history" history-type="ingredient" menu-items-id="{{ $item->id }}" class="btn btn-info"><i class="fa fa-clock-o"></i> Ingredient History</button>
+                </div>
+                <div class="col-md-8">
                     <div class="box-header text-center">
                         <h3 class="box-title"><b>Ingredients</b></h3>
                     </div>
@@ -492,6 +495,7 @@
 
 @endsection
 @push('bottom')
+@include('menu-items/menu_details_history_script')
 
 <script>
     $('body').addClass('sidebar-collapse');

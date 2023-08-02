@@ -1114,6 +1114,9 @@
 				}
 			}
 
+			//creating a new entry for menu detail history
+			self::createMenuDetailHistory($menu_items_id, 'ingredient');
+
 			//calling the function... should start the recursion
 			self::updateCostOfOtherMenu();
 
@@ -1675,6 +1678,59 @@
 				->toArray();
 
 			return $ids;
+		}
+
+		public function createMenuDetailHistory($menu_items_id, $history_type) {
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			if ($history_type == 'ingredient') {
+				$ingredients = DB::table('menu_primary_ingredients')
+					->where('menu_items_id', $menu_items_id)
+					->get()
+					->toArray();
+
+				DB::table('menu_details_history')
+					->insert([
+						'menu_items_id' => $menu_items_id,
+						'history_type' => $history_type,
+						'history_json' => json_encode($ingredients),
+						'created_at' => $time_stamp,
+						'created_by' => $action_by
+					]);
+			} else if ($history_type == 'costing') {
+				$costing = DB::table('menu_costing')
+					->where('menu_items_id', $menu_items_id)
+					->first();
+
+				DB::table('menu_details_history')
+					->insert([
+						'menu_items_id' => $menu_items_id,
+						'history_type' => $history_type,
+						'history_json' => json_encode($costing),
+						'created_at' => $time_stamp,
+						'created_by' => $action_by
+					]);
+			}
+		}
+
+		public function getMenuDetailHistory(Request $request) {
+			$menu_items_id = $request->get('menu_items_id');
+			$history_type = $request->get('history_type');
+
+			$data = DB::table('menu_details_history')
+				->where('menu_details_history.menu_items_id', $menu_items_id)
+				->where('menu_details_history.history_type', $history_type)
+				->where('menu_details_history.status', 'ACTIVE')
+				->select(
+					'menu_details_history.*',
+					'cms_users.name'
+				)
+				->leftJoin('cms_users', 'cms_users.id', 'menu_details_history.created_by')
+				->orderBy('menu_details_history.created_at', 'desc')
+				->get()
+				->toArray();
+
+			return json_encode($data);
 		}
 
 	}	
