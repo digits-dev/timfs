@@ -1236,6 +1236,7 @@
 			$data['item'] = DB::table('menu_items')
 				->where('menu_items.id', $id)
 				->select(
+					'menu_items.id',
 					'menu_items.tasteless_menu_code',
 					'menu_items.menu_price_dine',
 					'menu_items.menu_item_description',
