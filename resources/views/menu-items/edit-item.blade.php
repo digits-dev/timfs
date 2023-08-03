@@ -1229,6 +1229,7 @@
             if (isValid) {
                 Swal.fire({
                     title: action == 'add' ? 'Do you want to save this item?' : 'Do you want to save the changes?',
+                    html: '📄 This will generate a new ingredient history.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
