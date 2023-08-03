@@ -17,7 +17,10 @@ SELECT
             menu_items.ideal_food_cost / 100
         ) * 1.12,
         4
-    ) + rnd_menu_computed_packaging_cost.computed_packaging_total_cost AS suggested_final_srp_w_vat_plus_packaging_cost,
+    ) + COALESCE(
+        rnd_menu_computed_packaging_cost.computed_packaging_total_cost,
+        0
+    ) AS suggested_final_srp_w_vat_plus_packaging_cost,
     ROUND(
         COALESCE(
             menu_items.menu_price_dine,
