@@ -1189,12 +1189,16 @@
 			$data['menu_price_dine'] = $returnInputs['price_dine_in'];
 			$data['menu_price_dlv'] = $price_delivery;
 			$data['menu_price_take'] = $price_take_out;
-			// $data['original_concept'] = $returnInputs['original_concept'];
 			$data['pos_old_item_description'] = $returnInputs['pos_item_description'];
 			$data['menu_product_types_name'] = $returnInputs['product_type'];
 			$data['menu_categories_id'] = $returnInputs['menu_categories'];
 			$data['menu_subcategories_id'] = $returnInputs['sub_category'];
 			$data['status'] = $returnInputs['status'];
+			$original_concept = DB::table('segmentations')
+				->whereIn('segmentations.id', $returnInputs['original_concept'])
+				->pluck('segmentations.segment_column_description')
+				->toArray();
+			$data['original_concept'] = implode(',', $original_concept);
 			$data['segmentations_id'] = implode(',', $returnInputs['original_concept']);
 			$data['created_by'] = CRUDBooster::myid();
 			$data['created_at'] = date('Y-m-d H:i:s');
@@ -1283,12 +1287,16 @@
 				}
 			}
 			$data['menu_types_id'] = $returnInputs['menu_type'];
-			// $data['original_concept'] = $returnInputs['original_concept'];
 			$data['pos_old_item_description'] = $returnInputs['pos_item_description'];
 			$data['menu_product_types_name'] = $returnInputs['product_type'];
 			$data['menu_categories_id'] = $returnInputs['menu_categories'];
 			$data['menu_subcategories_id'] = $returnInputs['sub_category'];
 			$data['status'] = $returnInputs['status'];
+			$original_concept = DB::table('segmentations')
+				->whereIn('segmentations.id', $returnInputs['original_concept'])
+				->pluck('segmentations.segment_column_description')
+				->toArray();
+			$data['original_concept'] = implode(',', $original_concept);
 			$data['segmentations_id'] = implode(',', $returnInputs['original_concept']);
 			$data['updated_by'] = CRUDBooster::myid();
 			// Update Store List
