@@ -4,19 +4,23 @@
 @endpush
 
 <script>
-    async function showHistoryChoices(dataArray, historyType) {
+    async function showHistoryChoices(dataObj) {
         const inputOptions = {};
-        inputOptions[historyType.toUpperCase()] = {};
-        dataArray.forEach(row => {
-            const key = row.created_at;
-            inputOptions[key] = key;
+        const historyTypes = Object.keys(dataObj);
+        historyTypes.forEach(historyType => {
+            inputOptions[historyType.toUpperCase()] = {}
+            dataObj[historyType].forEach(row => {
+                const key = row.created_at;
+                inputOptions[historyType.toUpperCase()][`${historyType}_${key}`] = key;
+            });
         });
 
-        const { value: history } = await Swal.fire({
+
+        const { value: chosen } = await Swal.fire({
             title: 'Menu Details History',
             input: 'select',
             inputOptions,
-            inputPlaceholder: `Select ${historyType} history.`,
+            inputPlaceholder: 'Select Menu Detail History',
             showCancelButton: true,
             inputValidator: (value) => {
                 return new Promise((resolve) => {
@@ -29,9 +33,10 @@
             }
         });
 
-        if (history) {
-            const chosen = dataArray.find(e => e.created_at === history);
-            showHistory(chosen);
+        if (chosen) {
+            const [historyType, history] = chosen.split('_');
+            const chosenValue = dataObj[historyType].find(e => e.created_at === history);
+            showHistory(chosenValue);
         }
     }
 
@@ -50,7 +55,7 @@
         const headers = Object.keys(rows[0]).filter(key => !notIncludedKeys.includes(key));
         const headerRow = $('<tr>');
         headers.forEach(header => {
-            const headerName = header.replace(/_/g, ' ').toUpperCase()
+            const headerName = header.replace(/_/g, ' ').toUpperCase();
             $('<th>').addClass('text-center').text(headerName).appendTo(headerRow);
         });
         table.append(headerRow);
@@ -73,26 +78,27 @@
         });
     } 
 
-    $(document).on('click', '#show-menu-history', function() {
+    $(document).on('click', '.show-menu-history', function() {
         const menuItemId = $(this).attr('menu-items-id');
-        const historyType = $(this).attr('history-type');
+        let historyType = $(this).attr('history-type');
+        historyType = historyType.split(' ');
         Swal.fire({
             title: 'Fetching...',
             html: 'Please wait...',
             allowEscapeKey: false,
             allowOutsideClick: false,
             didOpen: () => {
-                Swal.showLoading()
+                Swal.showLoading();
             },
         });
         $.ajax({
             type: 'POST',
             url: '{{ route('get_menu_detail_history') }}',
-            data: { menu_items_id: menuItemId, history_type: historyType, _token: '{{ csrf_token() }}',},
+            data: { menu_items_id: menuItemId, history_type: JSON.stringify(historyType), _token: '{{ csrf_token() }}',},
             success: function(response) {
                 Swal.close();
-                const data = JSON.parse(response) || [];
-                showHistoryChoices(data, historyType);
+                const data = JSON.parse(response);
+                showHistoryChoices(data);
             },
             error: function(response) { 
                 console.log(response);

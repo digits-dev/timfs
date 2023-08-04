@@ -1116,6 +1116,7 @@
 
 			//creating a new entry for menu detail history
 			self::createMenuDetailHistory($menu_items_id, 'ingredient');
+			self::createMenuDetailHistory($menu_items_id, 'costing');
 
 			//calling the function... should start the recursion
 			self::updateCostOfOtherMenu();
@@ -1701,7 +1702,8 @@
 			} else if ($history_type == 'costing') {
 				$costing = DB::table('menu_costing')
 					->where('menu_items_id', $menu_items_id)
-					->first();
+					->get()
+					->toArray();
 
 				DB::table('menu_details_history')
 					->insert([
@@ -1716,22 +1718,29 @@
 
 		public function getMenuDetailHistory(Request $request) {
 			$menu_items_id = $request->get('menu_items_id');
-			$history_type = $request->get('history_type');
+			$history_types = $request->get('history_type');
+			$history_types = json_decode($history_types);
+			$valid_history_types = ['ingredient', 'costing'];
 
-			$data = DB::table('menu_details_history')
-				->where('menu_details_history.menu_items_id', $menu_items_id)
-				->where('menu_details_history.history_type', $history_type)
-				->where('menu_details_history.status', 'ACTIVE')
-				->select(
-					'menu_details_history.*',
-					'cms_users.name'
-				)
-				->leftJoin('cms_users', 'cms_users.id', 'menu_details_history.created_by')
-				->orderBy('menu_details_history.created_at', 'desc')
-				->get()
-				->toArray();
+			$response = [];
 
-			return json_encode($data);
+			foreach ($history_types as $history_type) {
+				if (!in_array($history_type, $valid_history_types)) continue;
+				$response[$history_type] = DB::table('menu_details_history')
+					->where('menu_details_history.menu_items_id', $menu_items_id)
+					->where('menu_details_history.history_type', $history_type)
+					->where('menu_details_history.status', 'ACTIVE')
+					->select(
+						'menu_details_history.*',
+						'cms_users.name'
+					)
+					->leftJoin('cms_users', 'cms_users.id', 'menu_details_history.created_by')
+					->orderBy('menu_details_history.created_at', 'desc')
+					->get()
+					->toArray();
+			}
+
+			return json_encode($response);
 		}
 
 	}	

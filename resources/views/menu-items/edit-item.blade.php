@@ -431,7 +431,7 @@
             <hr>
             <div class="row">
                 <div class="col-md-2">
-                    <button type="button" id="show-menu-history" history-type="ingredient" menu-items-id="{{ $item->id }}" class="btn btn-info"><i class="fa fa-clock-o"></i> Ingredient History</button>
+                    <button type="button" class="show-menu-history btn btn-info" history-type="ingredient costing" menu-items-id="{{ $item->id }}"><i class="fa fa-clock-o"></i> Menu History</button>
                 </div>
                 <div class="col-md-8">
                     <div class="box-header text-center">
