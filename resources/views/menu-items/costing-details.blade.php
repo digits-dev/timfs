@@ -109,7 +109,14 @@
                 </div>
             </div>
             <hr>
-            <h3 class="text-center">MENU COSTING</h3>
+            <div class="row">
+                <div class="col-md-2">
+                    <button type="button" class="show-menu-history btn btn-info" history-type="costing" menu-items-id="{{ $item->menu_items_id }}"><i class="fa fa-clock-o"></i> Menu History</button>
+                </div>
+                <div class="col-md-8">
+                    <h3 class="text-center">MENU COSTING</h3>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-4">
                     <table class="table table-striped table-bordered costing-table">
@@ -311,6 +318,7 @@
 @endsection
 
 @push('bottom')
+@include('menu-items/menu_details_history_script')
 <script>
     const item = {!! json_encode($item) !!};
     $(document).ready(function() {
