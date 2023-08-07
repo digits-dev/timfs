@@ -54,28 +54,30 @@
     </div>
     <div class="panel-body">
         <h4 style="font-weight: 600; text-align: center;">Menu Information</h4>
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th scope="col">Menu Item Code</th>
-                    <th scope="col">Menu Item Description</th>
-                    <th scope="col">Menu SRP</th>
-                    <th scope="col">Portion Size</th>
-                    <th scope="col">Food Cost</th>
-                    <th scope="col">Food Cost Percentage</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{$item->tasteless_menu_code}}</td>
-                    <td>{{$item->menu_item_description}}</td>
-                    <td class="peso">{{'₱ ' . (float) $item->menu_price_dine}}</td>
-                    <td>{{(float) $item->portion_size}}</td>
-                    <td class="food-cost">{{$item->computed_food_cost ? '₱ ' . (float) $item->computed_food_cost : '0'}}</td>
-                    <td class="food-cost-percentage">{{$item->computed_food_cost_percentage ? (float) $item->computed_food_cost_percentage . '%' : '0%'}}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="box-body table-responsive no-padding">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Menu Item Code</th>
+                        <th scope="col">Menu Item Description</th>
+                        <th scope="col">Menu SRP</th>
+                        <th scope="col">Portion Size</th>
+                        <th scope="col">Food Cost</th>
+                        <th scope="col">Food Cost Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{$item->tasteless_menu_code}}</td>
+                        <td>{{$item->menu_item_description}}</td>
+                        <td class="peso">{{'₱ ' . (float) $item->menu_price_dine}}</td>
+                        <td>{{(float) $item->portion_size}}</td>
+                        <td class="food-cost">{{$item->computed_food_cost ? '₱ ' . (float) $item->computed_food_cost : '0'}}</td>
+                        <td class="food-cost-percentage">{{$item->computed_food_cost_percentage ? (float) $item->computed_food_cost_percentage . '%' : '0%'}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         @if (!$ingredients)
         <h4 class="no-ingredient-warning" style="color: gray; text-align: center; font-style: italic;"> <i class="fa fa-spoon"></i> No ingredients to show...</h4>
         @else

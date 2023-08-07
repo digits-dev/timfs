@@ -52,30 +52,32 @@
 
     <div class="panel-body">
         <h4 class="text-center text-bold">Batching Ingredient Details</h4>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Ingredient Description</th>
-                    <th>Batching Ingredient Code</th>
-                    <th>Prepared By</th>
-                    <th>Quantity</th>
-                    <th>UOM</th>
-                    <th>Created Date</th>
-                    <th>Created By</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{$item->ingredient_description}}</td>
-                    <td>{{$item->bi_code}}</td>
-                    <td>{{$item->prepared_by}}</td>
-                    <td>{{(float) $item->quantity}}</td>
-                    <td>{{$item->packaging_description}}</td>
-                    <td>{{$item->created_at}}</td>
-                    <td>{{$item->name}}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="box-body table-responsive no-padding">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Ingredient Description</th>
+                        <th>Batching Ingredient Code</th>
+                        <th>Prepared By</th>
+                        <th>Quantity</th>
+                        <th>UOM</th>
+                        <th>Created Date</th>
+                        <th>Created By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{$item->ingredient_description}}</td>
+                        <td>{{$item->bi_code}}</td>
+                        <td>{{$item->prepared_by}}</td>
+                        <td>{{(float) $item->quantity}}</td>
+                        <td>{{$item->packaging_description}}</td>
+                        <td>{{$item->created_at}}</td>
+                        <td>{{$item->name}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         @if (!$ingredients)
         <h4 class="no-ingredient-warning" style="color: gray; text-align: center; font-style: italic;"> <i class="fa fa-spoon"></i> No ingredients to show...</h4>
         @else
