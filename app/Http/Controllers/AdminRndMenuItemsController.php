@@ -108,11 +108,12 @@
 				'url'=>CRUDBooster::mainpath('edit/[id]'),
 				'icon'=>'fa fa-pencil',
 				'color' => ' ',
-				"showIf"=>"[approval_status] == 'SAVED' || 
+				"showIf"=>"([approval_status] == 'SAVED' || 
 					[approval_status] == 'FOR FOOD TASTING' ||
 					[approval_status] == 'ARCHIVED' ||
 					[approval_status] == 'REJECTED' ||
-					[approval_status] == 'FOR ADJUSTMENT'",
+					[approval_status] == 'FOR ADJUSTMENT') &&
+					(CRUDBooster::isSuperAdmin() || [created_by] == CRUDBooster::myId())",
 			];
 
 			$this->addaction[] = [
@@ -120,11 +121,13 @@
 				'url' => '#[id]',
 				'icon'=>'fa fa-trash',
 				'color' => ' delete-rnd-menu',
-				"showIf"=>"[approval_status] == 'SAVED' || 
+				"showIf"=>"(
+					[approval_status] == 'SAVED' || 
 					[approval_status] == 'FOR FOOD TASTING' ||
 					[approval_status] == 'ARCHIVED' ||
 					[approval_status] == 'REJECTED' ||
-					[approval_status] == 'FOR ADJUSTMENT'",
+					[approval_status] == 'FOR ADJUSTMENT') &&
+					(CRUDBooster::isSuperAdmin() || [created_by] == CRUDBooster::myId())",
 			];
 
 	        /* 
@@ -303,30 +306,20 @@
 	    public function hook_query_index(&$query) {
 	        
 			$query
-				->addSelect('rnd_menu_approvals.approval_status')
+				->addSelect('rnd_menu_approvals.approval_status', 'rnd_menu_items.created_by')
 				->orderBy(DB::raw("rnd_menu_approvals.approval_status = 'ARCHIVED'"));
 
-			if (!CRUDBooster::isSuperAdmin()) {
-				$my_concepts = DB::table('user_concept_acess')
-					->where('cms_users_id', CRUDBooster::myId())
-					->get()
-					->first()
-					->menu_segmentations_id;
+			if (in_array(CRUDBooster::myPrivilegeName(), ['Chef', 'Chef Assistant'])) {
+				$my_concepts = implode(',', self::getMyConcepts());
 
-				$query->where('rnd_menu_items.created_by', CRUDBooster::myId());
-				
-				// if ($my_concepts) {
-				// 	$my_concepts = explode(',', $my_concepts);
-				// 	$query
-				// 		->leftJoin('user_concept_acess', 'user_concept_acess.cms_users_id', 'rnd_menu_items.created_by')
-				// 		->where(function($sub_query) use ($my_concepts) {
-				// 			foreach ($my_concepts as $my_concept) {
-				// 				$sub_query->orWhereRaw("find_in_set('$my_concept', user_concept_acess.menu_segmentations_id)");
-				// 			}
-				// 		});
-				// } else {
-				// 	$query->where('rnd_menu_items.created_by', CRUDBooster::myId());
-				// }
+				$my_id = CRUDBooster::myId();
+
+				if ($my_concepts) {
+					$query
+						->whereRaw("find_in_set(rnd_menu_items.segmentations_id, '$my_concepts') or rnd_menu_items.created_by = $my_id");
+				} else {
+					$query->where('rnd_menu_items.created_by', CRUDBooster::myId());
+				}
 
 			}
 	    }
@@ -1189,12 +1182,16 @@
 			$data['menu_price_dine'] = $returnInputs['price_dine_in'];
 			$data['menu_price_dlv'] = $price_delivery;
 			$data['menu_price_take'] = $price_take_out;
-			// $data['original_concept'] = $returnInputs['original_concept'];
 			$data['pos_old_item_description'] = $returnInputs['pos_item_description'];
 			$data['menu_product_types_name'] = $returnInputs['product_type'];
 			$data['menu_categories_id'] = $returnInputs['menu_categories'];
 			$data['menu_subcategories_id'] = $returnInputs['sub_category'];
 			$data['status'] = $returnInputs['status'];
+			$original_concept = DB::table('segmentations')
+				->whereIn('segmentations.id', $returnInputs['original_concept'])
+				->pluck('segmentations.segment_column_description')
+				->toArray();
+			$data['original_concept'] = implode(',', $original_concept);
 			$data['segmentations_id'] = implode(',', $returnInputs['original_concept']);
 			$data['created_by'] = CRUDBooster::myid();
 			$data['created_at'] = date('Y-m-d H:i:s');
@@ -1227,7 +1224,6 @@
 				->update([
 					'menu_items_id' => $inserted_id,
 					'rnd_menu_description' => $rnd_menu_description,
-					'rnd_menu_srp' => $rnd_menu_srp,
 					'updated_by' => $action_by,
 					'updated_at' => $time_stamp,
 				]);
@@ -1283,12 +1279,16 @@
 				}
 			}
 			$data['menu_types_id'] = $returnInputs['menu_type'];
-			// $data['original_concept'] = $returnInputs['original_concept'];
 			$data['pos_old_item_description'] = $returnInputs['pos_item_description'];
 			$data['menu_product_types_name'] = $returnInputs['product_type'];
 			$data['menu_categories_id'] = $returnInputs['menu_categories'];
 			$data['menu_subcategories_id'] = $returnInputs['sub_category'];
 			$data['status'] = $returnInputs['status'];
+			$original_concept = DB::table('segmentations')
+				->whereIn('segmentations.id', $returnInputs['original_concept'])
+				->pluck('segmentations.segment_column_description')
+				->toArray();
+			$data['original_concept'] = implode(',', $original_concept);
 			$data['segmentations_id'] = implode(',', $returnInputs['original_concept']);
 			$data['updated_by'] = CRUDBooster::myid();
 			// Update Store List
@@ -2095,6 +2095,22 @@
 			->toArray();
 
 			return $packagings;
+		}
+
+		function getMyConcepts() {
+			$my_id = CRUDBooster::myId();
+			$my_menu_segmentations = DB::table('user_concept_acess')
+				->where('cms_users_id', $my_id)
+				->first()
+				->menu_segmentations_id;
+			$menu_segmentations_id = explode(',', $my_menu_segmentations);
+			$segmentations_id = DB::table('menu_segmentations')
+				->whereIn('id', $menu_segmentations_id)
+				->pluck('segmentations_id')
+				->toArray();
+
+			return $segmentations_id;
+
 		}
 
 	}

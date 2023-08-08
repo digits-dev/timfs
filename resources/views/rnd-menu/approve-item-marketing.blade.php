@@ -181,9 +181,9 @@
                                 </td>
                             </tr>
                             <tr class="divider">
-                                <td class="text-center text-bold">Suggested Final SRP With VAT</td>
+                                <td class="text-center text-bold">Suggested Final SRP With VAT + Packaging Cost</td>
                                 <td class="text-center">
-                                    <input type="number" value="{{(float) $item->suggested_final_srp_w_vat}}" class="form-control suggested-final-srp-w-vat" placeholder="Suggested Final SRP With VAT" step="any" readonly>
+                                    <input type="number" value="{{(float) $item->suggested_final_srp_w_vat_plus_packaging_cost}}" class="form-control suggested-final-srp-w-vat" placeholder="Suggested Final SRP With VAT" step="any" readonly>
                                 </td>
                             </tr>
                         </tbody>
@@ -205,21 +205,9 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="text-center text-bold">% Cost Packaging From Final SRP</td>
-                                <td class="text-center">
-                                    <input type="number" value="{{(float) $item->cost_packaging_from_final_srp}}" class="form-control cost-packaging-from-final-srp" placeholder="% Cost Packaging From Final SRP" step="any" readonly>
-                                </td>
-                            </tr>
-                            <tr>
                                 <td class="text-center text-bold">% Food Cost from Final SRP</td>
                                 <td class="text-center">
                                     <input type="number" value="{{(float) $item->food_cost_from_final_srp}}" class="form-control food-cost-from-final-srp" placeholder="% Food Cost from Final SRP" step="any" readonly>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center text-bold">% Total Cost</td>
-                                <td class="text-center">
-                                    <input type="number" value="{{(float) $item->total_cost}}" class="form-control total-cost" placeholder="% Total Cost" step="any" readonly>
                                 </td>
                             </tr>
                             <tr class="divider">

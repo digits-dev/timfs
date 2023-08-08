@@ -39,6 +39,7 @@
 			$this->col[] = ["label"=>"Menu Segment Column Name","name"=>"menu_segment_column_name"];
 			$this->col[] = ["label"=>"Menu Segment Column Code","name"=>"menu_segment_column_code"];
 			$this->col[] = ["label"=>"Menu Segment Column Description","name"=>"menu_segment_column_description"];
+			$this->col[] = ["label"=>"Concept","name"=>"segmentations_id","join"=>"segmentations,segment_column_description"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
@@ -51,6 +52,7 @@
 			$this->form[] = ['label'=>'Menu Segment Column Name','name'=>'menu_segment_column_name','type'=>'text','validation'=>'required|unique:menu_segmentations|min:3|max:35','width'=>'col-sm-4','readonly'=>'1'];
 			$this->form[] = ['label'=>'Menu Segment Column Code','name'=>'menu_segment_column_code','type'=>'text','validation'=>'required|unique:menu_segmentations|min:3|max:3','width'=>'col-sm-4'];
 			$this->form[] = ['label'=>'Menu Segment Column Description','name'=>'menu_segment_column_description','type'=>'text','validation'=>'required|min:3|max:50','width'=>'col-sm-4'];
+			$this->form[] = ['label'=>'Concept','name'=>'segmentations_id','type'=>'select2','validation'=>'required','width'=>'col-sm-4','datatable'=>'segmentations,segment_column_description'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM

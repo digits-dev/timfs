@@ -386,7 +386,7 @@
 
             $('.packaging-cost').val(parseFloat(item.packaging_cost || 0));
             $('.ideal-food-cost').val(parseFloat(item.ideal_food_cost || 30));
-            $('.final-srp-w-vat-dine-in').val(parseFloat(item.final_srp_w_vat_dine_in || 0));
+            $('.final-srp-w-vat-dine-in').val(parseFloat(item.final_srp_w_vat_dine_in || item.rnd_menu_srp || 0));
             $('.final-srp-w-vat-take-out').val(parseFloat(item.final_srp_w_vat_take_out || item.final_srp_w_vat_dine_in || 0));
             $('.final-srp-w-vat-delivery').val(parseFloat(item.final_srp_w_vat_delivery || item.final_srp_w_vat_dine_in || 0));
         }
@@ -510,11 +510,12 @@
         });
 
         $('#save-btn').on('click', function() {
-            const isValid = jQuery.makeArray($('#form input:not(.rnd_tasteless_code)')).every(e => !!$(e).val());
+            const isValid = jQuery.makeArray($(inputTriggerClasses)).every(e => !!$(e).val());
+            const dineInPrice = $('.final-srp-w-vat-dine-in').val();
             const validPrice = priceIsValid();
             if (isValid && validPrice) {
                 Swal.fire({
-                    title: 'Do you want to save the changes?',
+                    title: 'Do you want to save the changes?' + (!Number(dineInPrice) ? '\n Are you sure this menu is free?' : ''),
                     html: '🔵 Doing so will forward this item to <label class="label label-info">MARKETING APPROVER</label>.' + 
                         '<br/> 📄 You won\'t be able to revert this.',
                     icon: 'warning',
