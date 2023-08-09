@@ -180,7 +180,7 @@
                                 </td>
                             </tr>
                             <tr class="divider">
-                                <td class="text-center text-bold">Suggested Final SRP With VAT + Packagin Cost</td>
+                                <td class="text-center text-bold">Suggested Final SRP With VAT + Packaging Cost</td>
                                 <td class="text-center">
                                     <input type="number" value="{{(float) $item->suggested_final_srp_w_vat_plus_packaging_cost}}" class="form-control suggested-final-srp-w-vat" placeholder="Suggested Final SRP With VAT" step="any" readonly>
                                 </td>
