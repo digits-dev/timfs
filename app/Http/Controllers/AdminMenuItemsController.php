@@ -1116,7 +1116,6 @@
 
 			//creating a new entry for menu detail history
 			self::createMenuDetailHistory($menu_items_id, 'ingredient');
-			self::createMenuDetailHistory($menu_items_id, 'costing');
 
 			//calling the function... should start the recursion
 			self::updateCostOfOtherMenu();
@@ -1211,6 +1210,9 @@
 
 			//calling the function... should start the recursion
 			self::updateCostOfOtherMenu();
+
+			//create new costing history
+			self::createMenuDetailHistory($menu_items_id, 'costing');
 
 			return redirect('admin/menu_items')
 				->with([

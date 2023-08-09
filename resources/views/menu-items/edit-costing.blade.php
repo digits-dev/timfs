@@ -345,6 +345,7 @@
             if (validPrice) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
+                    html: '📄 This will generate a new menu costing history.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
