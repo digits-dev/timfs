@@ -245,8 +245,6 @@
                                             $packaging->batching_packaging_status;
 
                                     $description = $packaging->full_item_description ??
-                                            $packaging->menu_item_description ??
-                                            $packaging->packaging_description ??
                                             $packaging->item_description;
 
                                 @endphp
@@ -264,10 +262,6 @@
                                     <td>
                                         @if ($packaging->item_masters_id)
                                         <span class="label label-info">IMFS</span>
-                                        @elseif ($packaging->menu_item_description)
-                                        <span class="label label-warning">MIMF</span>
-                                        @elseif ($packaging->packaging_description)
-                                        <span class="label label-secondary">BATCH</span>
                                         @else
                                         <span class="label label-success">NEW</span>
                                         @endif
