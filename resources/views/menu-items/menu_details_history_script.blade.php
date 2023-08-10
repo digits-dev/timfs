@@ -49,7 +49,8 @@
             'menu_items_id', 
             'tasteless_menu_code', 
             'menu_item_description',
-            'id'
+            'id',
+            'menu_packagings_details_id',
         ];
 
         const headers = Object.keys(rows[0]).filter(key => !notIncludedKeys.includes(key));

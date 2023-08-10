@@ -1182,6 +1182,7 @@
 
 			//calling the function... should start the recursion
 			self::updateCostOfOtherMenu();
+			self::createMenuDetailHistory($menu_items_id, 'packaging');
 
 			return true;
 		}
@@ -1302,6 +1303,7 @@
 			$data['item'] = DB::table('menu_items')
 				->where('menu_items.id', $id)
 				->select(
+					'menu_items.id',
 					'menu_items.tasteless_menu_code',
 					'menu_items.menu_price_dine',
 					'menu_items.menu_item_description',
@@ -1688,41 +1690,33 @@
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 			if ($history_type == 'ingredient') {
-				$ingredients = DB::table('menu_primary_ingredients')
-					->where('menu_items_id', $menu_items_id)
-					->get()
-					->toArray();
-
-				DB::table('menu_details_history')
-					->insert([
-						'menu_items_id' => $menu_items_id,
-						'history_type' => $history_type,
-						'history_json' => json_encode($ingredients),
-						'created_at' => $time_stamp,
-						'created_by' => $action_by
-					]);
+				$table_name = 'menu_primary_ingredients';
+			} else if ($history_type == 'packaging') {
+				$table_name = 'menu_primary_packagings';
 			} else if ($history_type == 'costing') {
-				$costing = DB::table('menu_costing')
-					->where('menu_items_id', $menu_items_id)
-					->get()
-					->toArray();
-
-				DB::table('menu_details_history')
-					->insert([
-						'menu_items_id' => $menu_items_id,
-						'history_type' => $history_type,
-						'history_json' => json_encode($costing),
-						'created_at' => $time_stamp,
-						'created_by' => $action_by
-					]);
+				$table_name = 'menu_costing';
 			}
+
+			$data = DB::table($table_name)
+				->where('menu_items_id', $menu_items_id)
+				->get()
+				->toArray();
+
+			DB::table('menu_details_history')
+				->insert([
+					'menu_items_id' => $menu_items_id,
+					'history_type' => $history_type,
+					'history_json' => json_encode($data),
+					'created_at' => $time_stamp,
+					'created_by' => $action_by,
+				]);
 		}
 
 		public function getMenuDetailHistory(Request $request) {
 			$menu_items_id = $request->get('menu_items_id');
 			$history_types = $request->get('history_type');
 			$history_types = json_decode($history_types);
-			$valid_history_types = ['ingredient', 'costing'];
+			$valid_history_types = ['ingredient', 'costing', 'packaging'];
 
 			$response = [];
 

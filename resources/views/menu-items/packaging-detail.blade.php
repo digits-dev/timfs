@@ -83,7 +83,14 @@
         <h4 class="no-packaging-warning" style="color: gray; text-align: center; font-style: italic;"> <i class="fa fa-shopping-bag"></i> No packagings to show...</h4>
         @else
         <div class="with-packaging">
-            <h4 style="font-weight: 600; text-align: center;">Packagings List</h4>
+            <div class="row">
+                <div class="col-md-2">
+                    <button type="button" class="show-menu-history btn btn-info" history-type="packaging" menu-items-id="{{ $item->id }}"><i class="fa fa-clock-o"></i> Menu History</button>
+                </div>
+                <div class="col-md-8">
+                    <h4 style="font-weight: 600; text-align: center;">Packagings List</h4>
+                </div>
+            </div>
             <div class="box-body table-responsive no-padding">
                 <table class="table table-striped table-bordered">
                     <thead>
@@ -194,6 +201,7 @@
 @endsection
 
 @push('bottom')
+@include('menu-items/menu_details_history_script')
 <script>
     $(document).ready(function() {
         $('body').addClass('sidebar-collapse');

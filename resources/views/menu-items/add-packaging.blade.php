@@ -323,7 +323,10 @@
         <hr>
         <form action="" id="form-packaging">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-2">
+                    <button type="button" class="show-menu-history btn btn-info" history-type="packaging" menu-items-id="{{ $item->id }}"><i class="fa fa-clock-o"></i> Menu History</button>
+                </div>
+                <div class="col-md-8">
                     <div class="box-header text-center">
                         <h3 class="box-title"><b>Packaging</b></h3>
                     </div>
@@ -365,6 +368,7 @@
 @endsection
 
 @push('bottom')
+@include('menu-items/menu_details_history_script')
 
 <script>
     $('body').addClass('sidebar-collapse');
@@ -931,6 +935,7 @@
             if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
+                    html: '📄 This will generate a new packaging history for this item.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
