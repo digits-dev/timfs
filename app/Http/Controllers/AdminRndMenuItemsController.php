@@ -850,7 +850,7 @@
 			$rnd_menu_description = $request->get('rnd_menu_description');
 			$rnd_menu_items_id = self::editRNDMenu($request, 'publish');
 
-			self::createHistory($rnd_menu_items_id, true);
+			self::createHistory($rnd_menu_items_id);
 			
 			DB::table('rnd_menu_approvals')
 				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
