@@ -557,7 +557,10 @@
             </div>
             <hr>
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-2">
+                    <button type="button" class="show-rnd-version btn btn-info" version-type="detail ingredient packaging costing" rnd-menu-items-id="{{ $item->id }}"><i class="fa fa-eye"></i> See Versions</button>
+                </div>
+                <div class="col-md-8">
                     <div class="box-header text-center">
                         <h3 class="box-title"><b>Ingredients</b></h3>
                     </div>
@@ -693,7 +696,7 @@
 @endsection
 
 @push('bottom')
-
+@include('rnd-menu/rnd-version-script')
 <script>
     $('body').addClass('sidebar-collapse');
     const savedIngredients = {!! json_encode($ingredients) !!} || [];
