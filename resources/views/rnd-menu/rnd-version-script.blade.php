@@ -48,7 +48,8 @@
         const notIncludedKeys = [
             'menu_ingredients_details_id', 
             'rnd_menu_ingredients_details_id', 
-            'menu_items_id', 
+            'menu_items_id',
+            'rnd_code', 
             'rnd_menu_items_id', 
             'tasteless_menu_code', 
             'menu_item_description',
@@ -66,6 +67,10 @@
             'created_at',
             'status',
         ];
+
+        if (['packaging', 'ingredient', 'costing'].includes(versionDetail)) {
+            notIncludedKeys.push('rnd_menu_description');
+        }
 
         const headers = Object.keys(rows[0]).filter(key => !notIncludedKeys.includes(key));
         const headerRow = $('<tr>');
