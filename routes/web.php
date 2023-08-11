@@ -136,6 +136,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/approved_rnd_menu/edit/add-release-date', [AdminRndMenuItemsApprovedController::class, 'addReleaseDate'])->name('add_release_date');
     Route::post('/admin/for_approval_rnd_menu/edit/return-item', [AdminRndMenuItemsForApprovalController::class, 'returnRNDMenu'])->name('return_rnd_menu');
     Route::post('/admin/approved_rnd_menu/edit/add-pos-update', [AdminRndMenuItemsApprovedController::class, 'addPosUpdate'])->name('add_pos_update');
+    Route::get('/admin/rnd-menu-items/get-rnd-versions', [AdminRndMenuItemsController::class, 'getRNDVersions'])->name('get_rnd_versions');
 
     //new items (new ingredients and packagings)
     Route::get('/admin/delete-new-items/{table}/{id}', [AdminNewIngredientsController::class, 'deleteNewItem']);

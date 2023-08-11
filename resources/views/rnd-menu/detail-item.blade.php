@@ -78,11 +78,19 @@
                 </tbody>
             </table>
         </div>
+        <hr>
         @if (!$ingredients)
         <h4 class="no-ingredient-warning" style="color: gray; text-align: center; font-style: italic;"> <i class="fa fa-spoon"></i> No ingredients to show...</h4>
         @else
         <div class="with-ingredient">
-            <h4 style="font-weight: 600; text-align: center;">Ingredients List</h4>
+            <div class="row">
+                <div class="col-md-2">
+                    <button type="button" class="show-rnd-version btn btn-info" version-type="detail ingredient packaging costing" rnd-menu-items-id="{{ $item->id }}"><i class="fa fa-eye"></i> See Versions</button>
+                </div>
+                <div class="col-md-8">
+                    <h4 style="font-weight: 600; text-align: center;">Ingredients List</h4>
+                </div>
+            </div>
             <div class="box-body table-responsive no-padding">
                 <table class="table table-striped table-bordered">
                     <thead>
@@ -316,6 +324,7 @@
 @endsection
 
 @push('bottom')
+@include('rnd-menu/rnd-version-script');
 <script>
     $(document).ready(function() {
         $('body').addClass('sidebar-collapse');
