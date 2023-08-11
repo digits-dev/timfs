@@ -453,6 +453,7 @@
 			$data['item'] = DB::table('rnd_menu_items')
 				->where('rnd_menu_items.id', $id)
 				->select(
+					'rnd_menu_items.id',
 					'rnd_code',
 					'rnd_menu_items.rnd_menu_srp',
 					'rnd_menu_items.rnd_menu_description',
@@ -848,6 +849,8 @@
 			$action_by = CRUDBooster::myId();
 			$rnd_menu_description = $request->get('rnd_menu_description');
 			$rnd_menu_items_id = self::editRNDMenu($request, 'publish');
+
+			self::createHistory($rnd_menu_items_id, true);
 			
 			DB::table('rnd_menu_approvals')
 				->updateOrInsert(['rnd_menu_items_id' => $rnd_menu_items_id],[
@@ -2110,6 +2113,92 @@
 				->toArray();
 
 			return $segmentations_id;
+
+		}
+
+		function createHistory($rnd_menu_items_id, $to_update = false) {
+			$action_by = CRUDBooster::myId();
+			$time_stamp = date('Y-m-d H:i:s');
+			$current_version = DB::table('rnd_menu_details_history')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->max('version_id');
+			$version_int = (int) explode('-', $current_version)[1];
+
+			if (!$to_update) {
+				$version_id = 'V-' . str_pad($version_int + 1, 3, '0', STR_PAD_LEFT);
+			} else {
+				$version_id = $current_version;
+			}
+
+			$detail = DB::table('rnd_menu_items')
+				->where('id', $rnd_menu_items_id)
+				->first();
+
+			$ingredient = DB::table('rnd_menu_primary_ingredients')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->get()
+				->toArray();
+
+			$packaging = DB::table('rnd_menu_primary_packagings')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->get()
+				->toArray();
+
+			$costing = DB::table('rnd_menu_costing')
+				->where('rnd_menu_items_id', $rnd_menu_items_id)
+				->first();
+
+			$data = [
+				'detail' => $detail,
+				'ingredient' => $ingredient,
+				'packaging' => $packaging,
+				'costing' => $costing
+			];
+
+			$data = array_filter($data, fn($arr) => $arr);
+
+			if (!$to_update) {
+				DB::table('rnd_menu_details_history')
+					->insert([
+						'rnd_menu_items_id' => $rnd_menu_items_id,
+						'version_id' => $version_id,
+						'history_json' => json_encode($data),
+						'created_by' => $action_by,
+						'created_at' => $time_stamp,
+					]);
+			} else {
+				DB::table('rnd_menu_details_history')
+					->updateOrInsert([
+						'rnd_menu_items_id' => $rnd_menu_items_id,
+						'version_id' => $version_id,
+					], [
+						'rnd_menu_items_id' => $rnd_menu_items_id,
+						'version_id' => $version_id,
+						'history_json' => json_encode($data),
+						'updated_by' => $action_by,
+						'updated_at' => $time_stamp,
+					]);
+			}
+		}
+
+		function getRNDVersions(Request $request) {
+			$rnd_menu_items_id = $request->get('rnd_menu_items_id');
+
+			$response = DB::table('rnd_menu_details_history')
+				->select(
+					'rnd_menu_details_history.*',
+					'rnd_menu_items.rnd_code',
+					'creator.name as creator',
+					'updater.name as updater'
+				)
+				->where('rnd_menu_details_history.rnd_menu_items_id', $rnd_menu_items_id)
+				->leftJoin('rnd_menu_items', 'rnd_menu_items.id', '=', 'rnd_menu_details_history.rnd_menu_items_id')
+				->leftJoin('cms_users as creator', 'creator.id', '=', 'rnd_menu_details_history.created_by')
+				->leftJoin('cms_users as updater', 'updater.id', '=', 'rnd_menu_details_history.updated_by')
+				->get()
+				->toArray();
+
+			return json_encode($response);
 
 		}
 
