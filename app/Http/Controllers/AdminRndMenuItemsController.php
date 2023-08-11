@@ -1082,6 +1082,8 @@
 					'packaging_updated_by' => $action_by,
 					'packaging_updated_at' => $time_stamp
 				]);
+
+			self::createHistory($rnd_menu_items_id, true);
 			return true;
 		}
 
