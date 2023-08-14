@@ -222,7 +222,7 @@
                                     <div class="row-srp">
                                         <div class="srp-td">
                                             <p class="text-center text-bold">Dine In</p>
-                                            <input type="number" value="{{(float) $item->final_srp_w_vat_dine_in}}" class="form-control final-srp-w-vat-dine-in" placeholder="0.00" readonly>
+                                            <input type="number" value="{{$item->final_srp_w_vat_dine_in ? (float) $item->final_srp_w_vat_dine_in : (float) $item->rnd_menu_srp}}" class="form-control final-srp-w-vat-dine-in" placeholder="0.00" readonly>
                                         </div>
                                         <div class="srp-td">
                                             <p class="text-center text-bold">Take Out</p>
