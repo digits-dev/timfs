@@ -120,7 +120,14 @@
                 </div>
             </div>
             <hr>
-            <h3 class="text-center">RND MENU COSTING</h3>
+            <div class="row">
+                <div class="col-md-2">
+                    <button type="button" class="show-rnd-version btn btn-info" version-type="detail costing" rnd-menu-items-id="{{ $item->id }}"><i class="fa fa-eye"></i> See Versions</button>
+                </div>
+                <div class="col-md-8">
+                    <h3 class="text-center">RND MENU COSTING</h3>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-4">
                     <table class="table table-striped table-bordered costing-table">
@@ -387,6 +394,7 @@
 @endsection
 
 @push('bottom')
+@include('rnd-menu/rnd-version-script')
 <script>
     const item = {!! json_encode($item) !!};
     $(document).ready(function() {
