@@ -317,10 +317,11 @@
         <hr>
         <form action="" id="form-packaging">
             <div class="row">
-                <div class="col-md-12">
-                    <div class="box-header text-center">
-                        <h3 class="box-title"><b>Packaging</b></h3>
-                    </div>
+                <div class="col-md-2">
+                    <button type="button" class="show-rnd-version btn btn-info" version-type="detail packaging costing" rnd-menu-items-id="{{ $item->id }}"><i class="fa fa-eye"></i> See Versions</button>
+                </div>
+                <div class="col-md-8">
+                    <h4 class="text-center"><b>Packaging</b></h4>
                 </div>
             </div>
             <section class="packaging-section">
@@ -391,6 +392,7 @@
 @endsection
 
 @push('bottom')
+@include('rnd-menu/rnd-version-script')
 
 <script>
     $('body').addClass('sidebar-collapse');
