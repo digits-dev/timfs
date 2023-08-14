@@ -558,7 +558,9 @@
             <hr>
             <div class="row">
                 <div class="col-md-2">
+                    @if ($item)
                     <button type="button" class="show-rnd-version btn btn-info" version-type="detail ingredient packaging costing" rnd-menu-items-id="{{ $item->id }}"><i class="fa fa-eye"></i> See Versions</button>
+                    @endif
                 </div>
                 <div class="col-md-8">
                     <div class="box-header text-center">
