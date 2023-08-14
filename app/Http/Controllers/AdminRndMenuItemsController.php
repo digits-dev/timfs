@@ -1242,6 +1242,8 @@
 					'menu_created_at' => $time_stamp
 				]);
 
+			self::createHistory($rnd_menu_items_id, true);
+
 			return true;
 		}
 
@@ -1340,6 +1342,8 @@
 					'menu_created_at' => $time_stamp
 				]);
 
+			self::createHistory($rnd_menu_items_id, true);
+
 			return true;
 		}
 
@@ -1388,6 +1392,8 @@
 					'costing_updated_by' => $action_by,
 					'updated_at' => $time_stamp,
 				]);
+
+			self::createHistory($rnd_menu_items_id, true);
 			
 
 			return redirect(CRUDBooster::mainpath())
