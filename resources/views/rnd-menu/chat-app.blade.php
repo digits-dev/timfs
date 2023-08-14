@@ -37,7 +37,7 @@
 
     function reloadInfo() {
         const messageCount = $('.message').length;
-        $('.message-counter').text(`${messageCount} Comment(s)`);
+        $('.message-counter').text(`${messageCount || 'No'} ${messageCount == 1 ? 'comment' : 'comments'}`);
         if (messageCount) {
             $('.no-message-note').hide();
         } else {
@@ -127,7 +127,7 @@
         })
     }
 
-    $('.type-message').on('keyup', function() {
+    $('.type-message').on('input', function() {
         const value = $(this).val().trim()
         if (value) $('.send-btn').attr('disabled', false);
         else $('.send-btn').attr('disabled', true);
