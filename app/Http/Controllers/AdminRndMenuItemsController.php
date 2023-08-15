@@ -1925,6 +1925,10 @@
 					'marketing_approved_at',
 					'accounting_approved_by.name as accounting_approved_by_name',
 					'accounting_approved_at',
+					'release_date_by.name as release_date_by_name',
+					'set_release_date_at',
+					'pos_update_by.name as pos_update_by_name',
+					'set_pos_update_at',
 					'rejected_by.name as reject_by_name',
 					'rejected_at'
 				)
@@ -1934,6 +1938,8 @@
 				->leftJoin('cms_users as costing_updated_by', 'costing_updated_by.id', '=', 'rnd_menu_approvals.costing_updated_by')
 				->leftJoin('cms_users as marketing_approved_by', 'marketing_approved_by.id', '=', 'rnd_menu_approvals.marketing_approved_by')
 				->leftJoin('cms_users as accounting_approved_by', 'accounting_approved_by.id', '=', 'rnd_menu_approvals.accounting_approved_by')
+				->leftJoin('cms_users as release_date_by', 'release_date_by.id', '=', 'rnd_menu_approvals.set_release_date_by')
+				->leftJoin('cms_users as pos_update_by', 'pos_update_by.id', '=', 'rnd_menu_approvals.set_pos_update_by')
 				->leftJoin('cms_users as rejected_by', 'rejected_by.id', '=', 'rnd_menu_approvals.rejected_by')
 				->first();
 

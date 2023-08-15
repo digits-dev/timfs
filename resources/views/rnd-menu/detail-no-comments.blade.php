@@ -397,6 +397,28 @@
                                 <div>{{$workflow->accounting_approved_at}}</div>
                             </div>
                         </div>
+                        <br>
+                        <div class="flex parent">
+                            <div class="flex child">
+                                <div class="text-bold">Release Date Added By:</div>
+                                <div>{{$workflow->release_date_by_name}}</div>
+                            </div>
+                            <div class="flex child">
+                                <div class="text-bold">Release Date Added At:</div>
+                                <div>{{$workflow->set_release_date_at}}</div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="flex parent">
+                            <div class="flex child">
+                                <div class="text-bold">POS Update Date Added By:</div>
+                                <div>{{$workflow->pos_update_by_name}}</div>
+                            </div>
+                            <div class="flex child">
+                                <div class="text-bold">POS Update Date Added At:</div>
+                                <div>{{$workflow->set_pos_update_at}}</div>
+                            </div>
+                        </div>
                     </section>
                 </div>
                 
