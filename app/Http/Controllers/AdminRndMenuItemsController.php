@@ -6,11 +6,13 @@
 	use CRUDBooster;
 	use Illuminate\Support\Facades\Request as Input;
 	use Illuminate\Support\Arr;
+	use App\Http\Controllers\AdminMenuItemsController;
 
 	class AdminRndMenuItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+			$this->menu_controller = new AdminMenuItemsController;
 		}
 
 	    public function cbInit() {
@@ -1674,6 +1676,11 @@
 						'menu_items.food_cost_percentage' => DB::raw('menu_computed_food_cost.computed_food_cost_percentage'),
 						'menu_items.tasteless_menu_code' => $tasteless_menu_code + 1,
 					]);
+
+				$this->menu_controller->createMenuDetailHistory($menu_items_id, 'ingredient');
+				$this->menu_controller->createMenuDetailHistory($menu_items_id, 'packaging');
+				$this->menu_controller->createMenuDetailHistory($menu_items_id, 'costing');
+				$this->menu_controller->updateCostOfOtherMenu();
 			}
 			
 
