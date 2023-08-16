@@ -12,6 +12,12 @@
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
 			$this->mainController = new AdminNewIngredientsController;
 			$this->tagger = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
+			$to_notify = DB::table('cms_users')
+				->where('cms_users.id_cms_privileges', '1')
+				->orWhereIn('cms_privileges.name', ['Purchasing Encoder', 'Purchasing Manager', 'Purchasing Staff'])
+				->leftJoin('cms_privileges', 'cms_privileges.id', '=', 'cms_users.id_cms_privileges')
+				->pluck('cms_users.id')
+				->toArray();
 		}
 
 	    public function cbInit() {
@@ -347,20 +353,25 @@
 	    | 
 	    */
 	    public function hook_after_add($id) {        
-	        $comment_content = DB::table('new_packagings')
+	        $inserted_item = DB::table('new_packagings')
 				->where('id', $id)
-				->get('comment')
-				->first()
-				->comment;
+				->first();
 
 			DB::table('new_items_comments')
 				->insert([
 					'new_packagings_id' => $id,
-					'comment_content' => $comment_content,
+					'comment_content' => $inserted_item->comment,
 					'created_by' => CRUDBooster::myId(),
 					'created_at' => date('Y-m-d H:i:s'),
 				]);
 
+			$notif_config = [
+				'content' => CRUDBooster::myName() . ' added an item in Packaging Sourcing: ' . $inserted_item->item_description,
+				'id_cms_users' => $this->to_notify,
+				'to' => CRUDBooster::mainPath("detail/$inserted_item->id"),
+			];
+
+			CRUDBooster::sendNotification($notif_config);
 	    }
 
 	    /* 
