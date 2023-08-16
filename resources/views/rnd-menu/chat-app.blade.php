@@ -24,7 +24,7 @@
     @if ($to_comment)
     <section class="type-message-section">
         <form action="" id="message-comment-form" class="message-form flex">
-            <input form="message-comment-form" type="text" class="type-message form-control" placeholder="✏️ Type your comment here...">
+            <input form="message-comment-form" type="text" class="type-message form-control" placeholder="✏️ Type your comment here..." autofocus="false">
             <button form="message-comment-form" class="btn btn-success send-btn" disabled>➡️Send</button>
         </form>
     </section>
