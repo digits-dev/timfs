@@ -12,9 +12,13 @@
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
 			$this->mainController = new AdminNewIngredientsController;
 			$this->tagger = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
-			$to_notify = DB::table('cms_users')
-				->where('cms_users.id_cms_privileges', '1')
-				->orWhereIn('cms_privileges.name', ['Purchasing Encoder', 'Purchasing Manager', 'Purchasing Staff'])
+			$this->to_notify = DB::table('cms_users')
+				->where(function($sub_query) {
+					$sub_query
+						->where('cms_users.id_cms_privileges', '1')
+						->orWhereIn('cms_privileges.name', ['Purchasing Encoder', 'Purchasing Manager', 'Purchasing Staff']);
+				})
+				->where('cms_users.status', 'ACTIVE')
 				->leftJoin('cms_privileges', 'cms_privileges.id', '=', 'cms_users.id_cms_privileges')
 				->pluck('cms_users.id')
 				->toArray();

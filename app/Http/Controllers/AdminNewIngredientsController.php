@@ -10,9 +10,13 @@
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
 			$this->tagger = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
-			$to_notify = DB::table('cms_users')
-				->where('cms_users.id_cms_privileges', '1')
-				->orWhereIn('cms_privileges.name', ['Purchasing Encoder', 'Purchasing Manager', 'Purchasing Staff'])
+			$this->to_notify = DB::table('cms_users')
+				->where(function($sub_query) {
+					$sub_query
+						->where('cms_users.id_cms_privileges', '1')
+						->orWhereIn('cms_privileges.name', ['Purchasing Encoder', 'Purchasing Manager', 'Purchasing Staff']);
+				})
+				->where('cms_users.status', 'ACTIVE')
 				->leftJoin('cms_privileges', 'cms_privileges.id', '=', 'cms_users.id_cms_privileges')
 				->pluck('cms_users.id')
 				->toArray();
@@ -743,6 +747,25 @@
 				)
 				->get()
 				->first();
+
+			$new_item_details = DB::table($table)
+				->where('id', $new_items_id)
+				->get()
+				->first();
+
+			if (in_array(CRUDBooster::myId(), $this->to_notify) || CRUDBooster::isSuperAdmin()) {
+				$to_notify = [$new_item_details->created_by];
+			} else {
+				$to_notify = $this->to_notify;
+			}
+
+			$notif_config = [
+				'content' => CRUDBooster::myName() . ' sent a message for item: ' . $new_item_details->item_description,
+				'to' => CRUDBooster::adminPath("$table/detail/$new_items_id"),
+				'id_cms_users' => $to_notify,
+			];
+
+			CRUDBooster::sendNotification($notif_config);
 
 			return json_encode([$response]);
 		}
