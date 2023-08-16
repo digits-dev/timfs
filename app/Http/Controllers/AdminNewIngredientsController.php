@@ -121,15 +121,15 @@
 				];
 			}
 
-			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Chef' || $my_privilege == 'Chef Assistant') {
-				$this->addaction[] = [
-					'title'=>'Delete',
-					'url' => '#[id]',
-					'icon'=>'fa fa-trash',
-					'color' => ' delete-rnd-menu',
-					"showIf"=>"[item_masters_id] == null"
-				];
-			}
+			// if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Chef' || $my_privilege == 'Chef Assistant') {
+			// 	$this->addaction[] = [
+			// 		'title'=>'Delete',
+			// 		'url' => '#[id]',
+			// 		'icon'=>'fa fa-trash',
+			// 		'color' => ' delete-rnd-menu',
+			// 		"showIf"=>"[item_masters_id] == null"
+			// 	];
+			// }
 
 
 	        /* 

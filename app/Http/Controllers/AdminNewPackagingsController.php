@@ -125,15 +125,15 @@
 				];
 			}
 
-			if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Marketing Encoder') {
-				$this->addaction[] = [
-					'title'=>'Delete',
-					'url' => '#[id]',
-					'icon'=>'fa fa-trash',
-					'color' => ' delete-rnd-menu',
-					"showIf"=>"[item_masters_id] == null"
-				];
-			}
+			// if (CRUDBooster::isSuperAdmin() || $my_privilege == 'Marketing Encoder') {
+			// 	$this->addaction[] = [
+			// 		'title'=>'Delete',
+			// 		'url' => '#[id]',
+			// 		'icon'=>'fa fa-trash',
+			// 		'color' => ' delete-rnd-menu',
+			// 		"showIf"=>"[item_masters_id] == null"
+			// 	];
+			// }
 
 
 	        /* 
