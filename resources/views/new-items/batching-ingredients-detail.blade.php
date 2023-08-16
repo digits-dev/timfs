@@ -61,8 +61,9 @@
                         <th>Prepared By</th>
                         <th>Quantity</th>
                         <th>UOM</th>
-                        <th>Created Date</th>
+                        <th>TTP</th>
                         <th>Created By</th>
+                        <th>Created Date</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -72,12 +73,14 @@
                         <td>{{$item->prepared_by}}</td>
                         <td>{{(float) $item->quantity}}</td>
                         <td>{{$item->packaging_description}}</td>
-                        <td>{{$item->created_at}}</td>
+                        <td>{{$item->ttp}}</td>
                         <td>{{$item->name}}</td>
+                        <td>{{$item->created_at}}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
+        <hr>
         @if (!$ingredients)
         <h4 class="no-ingredient-warning" style="color: gray; text-align: center; font-style: italic;"> <i class="fa fa-spoon"></i> No ingredients to show...</h4>
         @else
