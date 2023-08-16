@@ -43,6 +43,16 @@
 			$this->segments = Segmentation::where('status','ACTIVE')->orderBy('segment_column_description','ASC')->get();
 			$this->requestor = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
 			$this->approver = ['Purchasing Manager', 'Manager (Purchaser)'];
+			$this->to_notify = DB::table('cms_users')
+				->where(function($sub_query) {
+					$sub_query
+						->where('cms_users.id_cms_privileges', '1')
+						->orWhere('cms_privileges.name', 'Purchasing Manager');
+				})
+				->where('cms_users.status', 'ACTIVE')
+				->leftJoin('cms_privileges', 'cms_privileges.id', '=', 'cms_users.id_cms_privileges')
+				->pluck('cms_users.id')
+				->toArray();
 		}
 	    
 	    public function cbInit() {
@@ -1070,14 +1080,24 @@
 
 			if (!$tasteless_code && !$input['item_masters_approvals_id']) {
 				$data['action_type'] = 'CREATE';
-				ItemMasterApproval::insert($data);
+				$inserted_id = ItemMasterApproval::insertGetId($data);
 			} else if ($tasteless_code) {
 				$data['action_type'] = 'UPDATE';
-				ItemMasterApproval::where('tasteless_code', $tasteless_code)->update($data);
+				$item_to_be_updated = ItemMasterApproval::where('tasteless_code', $tasteless_code);
+				$inserted_id = $item_to_be_updated->first()->id;
+				$item_to_be_updated->update($data);
 			} else {
 				$data['action_type'] = 'CREATE';
 				ItemMasterApproval::where('id', $input['item_masters_approvals_id'])->update($data);
 			}
+
+			$notif_config = [
+				'content' => 'An item has been added to pending for approval.',
+				'id_cms_users' => $this->to_notify,
+				'to' => CRUDBooster::adminPath("item_approval/approve_or_reject/" . ($input['item_masters_approvals_id'] ?? $inserted_id)),
+			];
+
+			CRUDBooster::sendNotification($notif_config);
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
