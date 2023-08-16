@@ -800,6 +800,8 @@
 					->where('id', $id)
 					->first();
 
+				$item_id = $item->id;
+
 				if ($item->approval_status != '202') {
 					continue;
 				}
@@ -907,6 +909,14 @@
 						'approval_status' => '400'
 					]);
 				} 
+
+				$notif_config = [
+					'content' => $item->full_item_description . ' has been ' . ($action == 'approve' ? 'approved' : 'rejected') . ' by ' . CRUDBooster::myName(),
+					'id_cms_users' => [($item->updated_by ?? $item->created_by)],
+					'to' => CRUDBooster::mainPath("detail/$item_id"),
+				];
+	
+				CRUDBooster::sendNotification($notif_config);
 					
 			}
 
