@@ -82,7 +82,7 @@
     <div class="packaging-entry" isExisting="false">
         <div class="packaging-inputs">
             <label class="packaging-label">
-                <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span>
+                <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span> <span class="label label-danger"></span>
                 <div>
                     <input value="" type="text" class="packaging-name form-control" placeholder="Search by Item Description" required/>
                     <div class="item-list">
@@ -195,7 +195,7 @@
 <div class="new-substitute-packaging" style="display: none;" isExisting="false">
     <div class="packaging-inputs">
         <label class="packaging-label">
-            <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span>
+            <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span> <span class="label label-danger"></span>
             <div>
                 <input value="" type="text" class="packaging-name form-control" placeholder="Search by Item Description" required/>
                 <div class="item-list">
