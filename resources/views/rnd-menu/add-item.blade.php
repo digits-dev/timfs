@@ -83,7 +83,7 @@
     <div class="ingredient-entry" isExisting="false">
         <div class="ingredient-inputs">
             <label class="ingredient-label">
-                <span class="required-star">*</span> Ingredient <span class="item-from label label-success">NEW</span>
+                <span class="required-star">*</span> Ingredient <span class="item-from label label-success">NEW</span> <span class="label label-danger"></span>
                 <div>
                     <input value="" type="text" class="ingredient-name form-control" placeholder="Search by Item Description" required/>
                     <div class="item-list">
@@ -196,7 +196,7 @@
 <div class="new-substitute-ingredient" style="display: none;" isExisting="false">
     <div class="ingredient-inputs">
         <label class="ingredient-label">
-            <span class="required-star">*</span> Ingredient <span class="item-from label label-success">NEW</span>
+            <span class="required-star">*</span> Ingredient <span class="item-from label label-success">NEW</span> <span class="label label-danger"></span>
             <div>
                 <input value="" type="text" class="ingredient-name form-control" placeholder="Search by Item Description" required/>
                 <div class="item-list">
@@ -313,7 +313,7 @@
     <div class="packaging-entry" isExisting="false">
         <div class="packaging-inputs">
             <label class="packaging-label">
-                <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span>
+                <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span> <span class="label label-danger"></span>
                 <div>
                     <input value="" type="text" class="packaging-name form-control" placeholder="Search by Item Description" required/>
                     <div class="item-list">
@@ -426,7 +426,7 @@
 <div class="new-substitute-packaging" style="display: none;" isExisting="false">
     <div class="packaging-inputs">
         <label class="packaging-label">
-            <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span>
+            <span class="required-star">*</span> Packaging <span class="item-from label label-success">NEW</span> <span class="label label-danger"></span>
             <div>
                 <input value="" type="text" class="packaging-name form-control" placeholder="Search by Item Description" required/>
                 <div class="item-list">
@@ -760,7 +760,7 @@
                             if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
                         }
                     }
-                    if (savedIngredient.menu_status == 'INACTIVE' || savedIngredient.item_status == 'INACTIVE') 
+                    if (savedIngredient.menu_status == 'INACTIVE' || savedIngredient.item_status == 'INACTIVE' || savedIngredient.new_ingredient_status == 'INACTIVE' || savedIngredient.batching_ingredient_status == 'INACTIVE') 
                         element.find('.label-danger').text('⚠️INACTIVE');
 
                     if (savedIngredient.item_masters_id && !savedIngredient.menu_as_ingredient_id)

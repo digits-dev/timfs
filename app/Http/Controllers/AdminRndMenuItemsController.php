@@ -557,6 +557,8 @@
 						'item_masters.full_item_description',
 						'sku_status_description as item_status',
 						'menu_items.status as menu_status',
+						'new_ingredients.status as new_ingredient_status',
+						'batching_ingredients_computed_food_cost.status as batching_ingredient_status',
 						'item_masters.updated_at',
 						'item_masters.created_at',
 						'rnd_menu_ingredients_auto_compute.new_ingredients_id',
@@ -593,13 +595,14 @@
 						'rnd_menu_packagings_auto_compute.ttp',
 						'rnd_menu_packagings_auto_compute.ttp as packaging_cost',
 						'item_masters.full_item_description',
-						'sku_status_description as item_status',
+						DB::raw('COALESCE(sku_status_description, new_packagings.status) as item_status'),
 						'item_masters.updated_at',
 						'item_masters.created_at',
 						'rnd_menu_packagings_auto_compute.new_packagings_id',
 						'rnd_menu_packagings_auto_compute.item_description')
 					->leftJoin('item_masters', 'item_masters.id', '=', 'rnd_menu_packagings_auto_compute.item_masters_id')
 					->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+					->leftJoin('new_packagings', 'rnd_menu_packagings_auto_compute.new_packagings_id', '=', 'new_packagings.id')
 					->orderBy('packaging_group', 'ASC')
 					->orderBy('row_id', 'ASC')
 					->get()
