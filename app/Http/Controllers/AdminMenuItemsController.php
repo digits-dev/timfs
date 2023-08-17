@@ -925,6 +925,8 @@
 					'item_masters.full_item_description',
 					'sku_status_description as item_status',
 					'menu_items.status as menu_status',
+					'new_ingredients.status as new_ingredient_status',
+					'batching_ingredients_computed_food_cost.status as batching_ingredient_status',
 					'item_masters.updated_at',
 					'item_masters.created_at',
 					'menu_ingredients_auto_compute.new_ingredients_id',
