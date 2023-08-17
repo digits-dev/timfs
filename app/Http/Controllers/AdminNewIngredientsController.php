@@ -753,11 +753,9 @@
 				->get()
 				->first();
 
-			if (in_array(CRUDBooster::myId(), $this->to_notify) || CRUDBooster::isSuperAdmin()) {
-				$to_notify = [$new_item_details->created_by];
-			} else {
-				$to_notify = $this->to_notify;
-			}
+			$to_notify = [...$this->to_notify, $new_item_details->created_by];
+
+			$to_notify = array_filter($to_notify, fn ($e) => $e != CRUDBooster::myId());
 
 			$notif_config = [
 				'content' => 'New comment: ' . CRUDBooster::myName() . ' added a new comment for item: ' . $new_item_details->item_description,
