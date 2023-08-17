@@ -911,7 +911,7 @@
 				} 
 
 				$notif_config = [
-					'content' => $item->full_item_description . ' has been ' . ($action == 'approve' ? 'approved' : 'rejected') . ' by ' . CRUDBooster::myName(),
+					'content' => ($action == 'approve' ? 'Approved: ' : 'Rejected: ') . $item->full_item_description . ' has been ' . ($action == 'approve' ? 'approved' : 'rejected') . ' by ' . CRUDBooster::myName(),
 					'id_cms_users' => [($item->updated_by ?? $item->created_by)],
 					'to' => CRUDBooster::mainPath("detail/$item_id"),
 				];

@@ -760,7 +760,7 @@
 			}
 
 			$notif_config = [
-				'content' => CRUDBooster::myName() . ' added a new comment for item: ' . $new_item_details->item_description,
+				'content' => 'New comment: ' . CRUDBooster::myName() . ' added a new comment for item: ' . $new_item_details->item_description,
 				'to' => CRUDBooster::adminPath("$table/detail/$new_items_id"),
 				'id_cms_users' => $to_notify,
 			];
