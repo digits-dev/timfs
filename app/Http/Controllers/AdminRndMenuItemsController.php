@@ -1731,6 +1731,11 @@
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
 
+			$commented_item = DB::table('rnd_menu_items')
+				->where('id', $rnd_menu_items_id)
+				->get()
+				->first();
+
 			$inserted_id = DB::table('rnd_menu_comments')
 				->insertGetId([
 					'rnd_menu_items_id' => $rnd_menu_items_id,
@@ -1750,6 +1755,17 @@
 				)
 				->get()
 				->first();
+
+			if (CRUDBooster::myId() != $commented_item->created_by) {
+				$notif_config = [
+					'content' => 'New comment: ' . CRUDBooster::myName() . " added a new comment for item: $commented_item->rnd_menu_description.",
+					'id_cms_users' => [($commented_item->created_by)],
+					'to' => CRUDBooster::adminPath("rnd_menu_items/detail/$rnd_menu_items_id"),
+				];
+			}
+
+
+			CRUDBooster::sendNotification($notif_config);
 
 			return json_encode([$response]);
 
