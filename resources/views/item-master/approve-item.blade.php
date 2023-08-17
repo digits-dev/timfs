@@ -325,7 +325,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th>Dimension</th>
+                                <th>Specifications</th>
                                 <td>
                                     <input value="{{ $item->packaging_dimension }}" type="text" class="form-control" name="packaging_dimension" id="packaging_dimension" readonly>
                                 </td>
