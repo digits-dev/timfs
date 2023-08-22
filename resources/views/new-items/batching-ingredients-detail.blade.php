@@ -194,7 +194,6 @@
         </div>
         <p class="note-ingredients">** Highlighted ingredient names are primary ingredients.</p>
         @endif
-        </div>
     </div>
     <div class="panel-footer">
         <a class="btn btn-primary" href="{{ CRUDBooster::mainpath() }}" type="button"> <i class="fa fa-arrow-left" ></i> Back </a>
