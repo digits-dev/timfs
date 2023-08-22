@@ -275,78 +275,6 @@
 			$main_path = CRUDBooster::mainPath();
 			$admin_path = CRUDBooster::adminPath();
 	        $this->script_js = NULL;
-            $this->script_js = "
-				function showMenuItemExport() {
-					$('#modal-menu-item-export').modal('show');
-				}
-
-				function menuIngredientsExport() {
-					$('#modal-menu-ingredients-export').modal('show');
-				}
-
-				$('.view-menu-details').on('click', function() {
-					const dbId = $(this).attr('href')?.replace('#', '');
-					Swal.fire({
-						title: 'Which details do you want to see?',
-						showDenyButton: true,
-						focusConfirm: false,
-						showCancelButton: true,
-						showCloseButton: true,
-						focusConfirm: true,
-						confirmButtonText: `🍕 Ingredients`,
-						denyButtonText: `🛍️ Packagings`,
-						cancelButtonText: `💲 Costing`,
-					}).then((result) => {
-						if (result.isConfirmed) {
-							location.href=`$main_path/detail/` + dbId;
-						} else if (result.isDenied) {
-							location.href=`$main_path/packaging-detail/` + dbId;
-						} else if (result.dismiss == 'cancel') {
-							location.href=`$main_path/costing-detail/` + dbId;
-						}
-					});
-				});
-
-				$('.edit-menu-item').on('click', function() {
-					const dbId = $(this).attr('href')?.replace('#', '');
-					Swal.fire({
-						title: 'Which details do you want to edit?',
-						showDenyButton: true,
-						focusConfirm: false,
-						showCancelButton: true,
-						showCloseButton: true,
-						focusConfirm: true,
-						confirmButtonText: `🍕 Ingredients`,
-						denyButtonText: `🛍️ Packagings`,
-						cancelButtonText: `💲 Costing`,
-					}).then((result) => {
-						console.log(result);
-						if (result.isConfirmed) {
-							location.href=`$main_path/edit/` + dbId + `/ingredients`;
-						} else if (result.isDenied) {
-							location.href=`$main_path/edit/` + dbId + `/packagings`;
-						} else if (result.dismiss == 'cancel') {
-							location.href=`$main_path/edit/` + dbId + `/costing`;
-						}
-					});
-				});
-
-				$(`.user-footer .pull-right a`).on(`click`, function() {
-					Swal.fire({
-						title: `Do you want to logout?`,
-						icon: `warning`,
-						showCancelButton: true,
-						confirmButtonColor: `#d33`,
-						cancelButtonColor: `#b9b9b9`,
-						confirmButtonText: `Logout`,
-						reverseButtons: true,
-					  }).then((result) => {
-						if (result.isConfirmed) {
-						  location.href = `$admin_path` + `/logout`;
-						}
-					  })
-				});
-			";
 
             /*
 	        | ---------------------------------------------------------------------- 
@@ -437,6 +365,7 @@
 	        */
 	        $this->load_js = array();
 			$this->load_js[] = '//cdn.jsdelivr.net/npm/sweetalert2@11';
+			$this->load_js[] = asset('js/menu-items-action-buttons.js');
 	        
 	        
 	        
