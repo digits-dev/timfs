@@ -15,7 +15,7 @@
 	use App\MenuOldCodeMaster;
 	use App\MenuPriceMaster;
 	use App\MenuSegmentation;
-	use Illuminate\Support\Facades\Input;
+	use Illuminate\Support\Facades\Request as Input;
     use Maatwebsite\Excel\HeadingRowImport;
     use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 	use Maatwebsite\Excel\Facades\Excel;
@@ -25,17 +25,17 @@
 
 	class AdminMenuItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
 		static $to_view = [
-			'Chef' => ['ingredients', 'packagings', 'costing'],
-			'Chef Assistant' => ['ingredients', 'packagings', 'costing'],
-			'Marketing Encoder' => ['packagings', 'costing'],
-			'Marketing Manager' => ['ingredients', 'packagings', 'costing'],
-			'Sales Accounting' => ['costing']
+			'Chef' => ['ingredients', 'packagings', 'costing', 'menu-data'],
+			'Chef Assistant' => ['ingredients', 'packagings', 'costing', 'menu-data'],
+			'Marketing Encoder' => ['packagings', 'costing', 'menu-data'],
+			'Marketing Manager' => ['ingredients', 'packagings', 'costing', 'menu-data'],
+			'Sales Accounting' => ['costing', 'menu-data']
 		];
 
 		static $to_edit = [
 			'Chef' => ['ingredients'],
 			'Chef Assistant' => ['ingredients'],
-			'Marketing Encoder' => ['packagings', 'costing'],
+			'Marketing Encoder' => ['packagings', 'costing', 'menu-data'],
 		];
 
 		static $to_update_menu = [
@@ -967,6 +967,13 @@
 				$data['page_title'] = 'Edit Costing';
 
 				return $this->view('menu-items/edit-costing', $data);
+			} else if ($to_edit == 'menu-data') {
+				if (!in_array($to_edit, self::$to_edit[$my_privilege] ?? []) && !$is_superadmin)
+					CRUDBooster::redirect(
+						CRUDBooster::mainPath(),
+						trans('crudbooster.denied_access')
+					);
+				return (new AdminAddMenuItemsController)->getEdit($id);
 			}
 		}
 
@@ -1113,6 +1120,81 @@
 			self::updateCostOfOtherMenu();
 
 			return true;
+		}
+
+		public function submitMenuData(Request $request) {
+			$returnInputs = Input::all();
+			$menu_segment_names = [];
+			$user_menu_segmentations = DB::table('menu_segmentations')
+				->where('status','ACTIVE')
+				->select('menu_segment_column_name')
+				->get();
+			$menu_segments = Arr::pluck($user_menu_segmentations, 'menu_segment_column_name');
+
+			// Choices Group
+			$choices_group = DB::table('menu_choice_groups')
+				->select('id')
+				->where('status', 'ACTIVE')
+				->get();
+
+			// Old Codes
+			$old_codes = DB::table('menu_old_code_masters')
+				->where('status', 'ACTIVE')
+				->pluck('menu_old_code_column_name')
+				->toArray();
+
+			// Add data to database
+			foreach ($old_codes as $old_code) {
+				$data[$old_code] = $returnInputs[$old_code];
+			}
+			$data['menu_item_description'] = $returnInputs['menu_item_description'];
+			for ($i=0; $i<count($choices_group); $i++) {
+				$choices_group_str = 'choices_group_'.(string)($i+1);
+				$choices_skugroup_str = 'choices_skugroup_'.(string)($i+1);
+				$data[$choices_group_str] = $returnInputs[$choices_group_str];
+				if ($returnInputs[$choices_skugroup_str] != null){
+					$data[$choices_skugroup_str] = implode(', ',$returnInputs[$choices_skugroup_str]);
+				} else {
+					$data[$choices_skugroup_str] = null;
+				}
+			}
+			$data['menu_types_id'] = $returnInputs['menu_type'];
+			$data['pos_old_item_description'] = $returnInputs['pos_item_description'];
+			$data['menu_product_types_name'] = $returnInputs['product_type'];
+			$data['menu_categories_id'] = $returnInputs['menu_categories'];
+			$data['menu_subcategories_id'] = $returnInputs['sub_category'];
+			$data['status'] = $returnInputs['status'];
+			$original_concept = DB::table('segmentations')
+				->whereIn('segmentations.id', $returnInputs['original_concept'])
+				->pluck('segmentations.segment_column_description')
+				->toArray();
+			$data['original_concept'] = implode(',', $original_concept);
+			$data['segmentations_id'] = implode(',', $returnInputs['original_concept']);
+			$data['updated_by'] = CRUDBooster::myid();
+			$data['updated_at'] = date('Y-m-d H:i:s');
+			// Update Store List
+			if ($returnInputs['menu_segment_column_description'] != null) {
+				// Reset Store List
+				foreach($menu_segments as $segments) {
+					$data[$segments] = null;
+				}
+				foreach($returnInputs['menu_segment_column_description'] as $menu_segments_id) {
+					$menu_segmentations_column_name = DB::table('menu_segmentations')
+						->where('id', $menu_segments_id)
+						->select('menu_segment_column_name')
+						->value('menu_segment_column_name');
+					$data[$menu_segmentations_column_name] = 1;
+					array_push($menu_segment_names, $menu_segmentations_column_name);
+				}
+			} else {
+				foreach ($menu_segments as $segments) {
+					$data[$segments] = null;
+				}				
+			}
+
+			DB::table('menu_items')
+				->where('tasteless_menu_code', $returnInputs['tasteless_menu_code'])
+				->update($data);
 		}
 
 		public function submitCosting(Request $request) {

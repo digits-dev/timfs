@@ -124,7 +124,7 @@
   <div class='panel panel-default'>
     <div class='panel-heading'>Edit Menu Items</div>
     <div class='panel-body'>
-        <form method="POST" action="{{$table == 'menu_items' ? CRUDBooster::mainpath('edit-save/'.$row->id) : route('edit_new_menu', ['id' => $row->id])}}" id="form-edit" autocomplete="off">
+        <form method="POST" action="{{$table == 'menu_items' ? route('menu_item_submit_menu_data') : route('edit_new_menu', ['id' => $row->id])}}" id="form-edit" autocomplete="off">
             @csrf
             @if ($rnd_menu_items_id)
             <input type="text" class="hidden" name="rnd_menu_items_id" value="{{$rnd_menu_items_id}}">
@@ -136,18 +136,12 @@
                     <fieldset>
                         <input type="text" name="tasteless_menu_code" value="{{ $row->tasteless_menu_code }}" readonly>
                     </fieldset>
-                    <label> POS Old Item Code 1</label>
-                    <fieldset>
-                        <input type="text" name="pos_item_code_1" placeholder="Enter pos old item code 1" value="{{ $row->old_code_1 }}" oninput="this.value = this.value.toUpperCase()">
-                    </fieldset>
-                    <label> POS Old Item Code 2</label>
-                    <fieldset>
-                        <input type="text" name="pos_item_code_2" placeholder="Enter pos old item code 2" value="{{ $row->old_code_2 }}" oninput="this.value = this.value.toUpperCase()">
-                    </fieldset>
-                    <label> POS Old Item Code 3</label>
-                    <fieldset>
-                        <input type="text" name="pos_item_code_3" placeholder="Enter pos old item code 3 " value="{{ $row->old_code_3 }}" oninput="this.value = this.value.toUpperCase()">
-                    </fieldset>
+                    @foreach ($old_codes as $old_code)
+                        <label>{{ $old_code->menu_old_code_column_description }}</label>
+                        <fieldset>
+                            <input type="text" name="{{ $old_code->menu_old_code_column_name }}" placeholder="Enter {{ $old_code->menu_old_code_column_description }}" value="{{ $row->{$old_code->menu_old_code_column_name} }}" oninput="this.value = this.value.toUpperCase()">
+                        </fieldset>
+                    @endforeach
                     <label> POS Old Description</label>
                     <fieldset>
                         <input type="text" name="pos_item_description" placeholder="Enter pos old item description" value="{{ $row->pos_old_item_description }}" oninput="this.value = this.value.toUpperCase()">
@@ -258,21 +252,7 @@
                                 @endif
                             @endforeach
                         </select> 
-                    </fieldset>
-                    @if (!$rnd_menu_items_id)
-                    <label><span id="required">*</span> Price - Dine In</label>
-                    <fieldset>
-                        <input type="number" name="price_dine_in" placeholder="Enter price - dine in" value="{{ $row->menu_price_dine }}" required oninput="this.value = this.value.toUpperCase()">
-                    </fieldset>
-                    <label> Price - Delivery</label>
-                    <fieldset>
-                        <input type="number" name="price_delivery" placeholder="Leave blank if same as dine in" value="{{ $row->menu_price_dlv }}">
-                    </fieldset>
-                    <label> Price - Take Out</label>
-                    <fieldset>
-                        <input type="number" name="price_take_out" placeholder="Leave blank if same as dine in" value="{{ $row->menu_price_take }}">
                     </fieldset> 
-                    @endif 
                     <label><span id="required">*</span> Original Concept</label>
                     <fieldset>
                         <select class="js-example-basic-multiple" name="original_concept[]" multiple="multiple" id="menu_type_select6" required>
@@ -320,13 +300,32 @@
         <button type="button" class="btn btn-primary pull-right save-btn" id="save-edit-rnd"><i class="fa fa-save"></i> Save</button>
         <button class="btn btn-warning pull-right return-btn" type="button" _return_to="chef" style="margin-right: 10px;"><i class="fa fa-mail-reply" ></i> Return to Chef</button>
         @else
-        <input type="button" id="save-edit-btn" class='btn btn-primary pull-right' value='Edit Menu' onclick=""/>
+        <button type="submit" class="actual-submit-btn hide">submit</button>
+        <button type="button" id="save-edit-menu" class="btn btn-primary pull-right"><i class="fa fa-save"></i> Save</button>
         @endif
     </div>
 </div>
 
 <script>
 const table = {!! json_encode($table) !!};
+
+$(document).on('click', '#save-edit-menu', function() {
+    Swal.fire({
+        title: 'Do you want to save the changes?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes',
+        returnFocus: false,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $('#submit-button').click();
+        }
+    });
+
+    $('.actual-submit-btn').click();
+});
 
 $('#menu_type_select1').select2({
         placeholder: "Select stores",
