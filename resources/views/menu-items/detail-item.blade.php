@@ -173,7 +173,7 @@
                                         ₱ {{ (float) $ingredient->ttp }}
                                         @if ($ingredient->item_masters_id)
                                             <br>
-                                            <span class="timeago date-updated" datetime={{ $ingredient->updated_at ?? $ingredient->created_at }}></span>
+                                            <span class="timeago date-updated" datetime="{{ $ingredient->updated_at ?? $ingredient->created_at }}"></span>
                                         @endif
                                     </td>
                                     <td>{{ (float) $ingredient->ingredient_qty }}</td>
