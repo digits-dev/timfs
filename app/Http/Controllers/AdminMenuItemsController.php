@@ -15,6 +15,7 @@
 	use App\MenuOldCodeMaster;
 	use App\MenuPriceMaster;
 	use App\MenuSegmentation;
+	use App\MenuProductType;
 	use Illuminate\Support\Facades\Request as Input;
     use Maatwebsite\Excel\HeadingRowImport;
     use Maatwebsite\Excel\Imports\HeadingRowFormatter;
@@ -1160,6 +1161,8 @@
 			}
 			$data['menu_types_id'] = $returnInputs['menu_type'];
 			$data['pos_old_item_description'] = $returnInputs['pos_item_description'];
+			$product_type = MenuProductType::firstOrCreate(['menu_product_type_description' => strtoupper($returnInputs["product_type"])]);
+			$data['menu_product_types_id'] = $product_type->id;
 			$data['menu_product_types_name'] = $returnInputs['product_type'];
 			$data['menu_categories_id'] = $returnInputs['menu_categories'];
 			$data['menu_subcategories_id'] = $returnInputs['sub_category'];
@@ -1195,6 +1198,11 @@
 			DB::table('menu_items')
 				->where('tasteless_menu_code', $returnInputs['tasteless_menu_code'])
 				->update($data);
+
+			return redirect(CRUDBooster::mainPath())->with([
+				'message_type' => 'success',
+				'message' => 'Menu Item Data successfully updated!',
+			]);
 		}
 
 		public function submitCosting(Request $request) {

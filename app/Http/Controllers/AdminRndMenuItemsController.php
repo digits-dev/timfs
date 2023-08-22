@@ -3,6 +3,7 @@
 	use Session;
 	use Illuminate\Http\Request;
 	use DB;
+	use App\MenuProductType;
 	use CRUDBooster;
 	use Illuminate\Support\Facades\Request as Input;
 	use Illuminate\Support\Arr;
@@ -1186,6 +1187,8 @@
 			$data['menu_price_dlv'] = $price_delivery;
 			$data['menu_price_take'] = $price_take_out;
 			$data['pos_old_item_description'] = $returnInputs['pos_item_description'];
+			$product_type = MenuProductType::firstOrCreate(['menu_product_type_description' => strtoupper($returnInputs["product_type"])]);
+			$data['menu_product_types_id'] = $product_type->id;
 			$data['menu_product_types_name'] = $returnInputs['product_type'];
 			$data['menu_categories_id'] = $returnInputs['menu_categories'];
 			$data['menu_subcategories_id'] = $returnInputs['sub_category'];
@@ -1283,6 +1286,8 @@
 			}
 			$data['menu_types_id'] = $returnInputs['menu_type'];
 			$data['pos_old_item_description'] = $returnInputs['pos_item_description'];
+			$product_type = MenuProductType::firstOrCreate(['menu_product_type_description' => strtoupper($returnInputs["product_type"])]);
+			$data['menu_product_types_id'] = $product_type->id;
 			$data['menu_product_types_name'] = $returnInputs['product_type'];
 			$data['menu_categories_id'] = $returnInputs['menu_categories'];
 			$data['menu_subcategories_id'] = $returnInputs['sub_category'];
