@@ -1,11 +1,3 @@
-function showMenuItemExport() {
-  $('#modal-menu-item-export').modal('show');
-}
-
-function menuIngredientsExport() {
-  $('#modal-menu-ingredients-export').modal('show');
-}
-
 $('.view-menu-details').on('click', function () {
   const dbId = $(this).attr('href')?.replace('#', '');
   const currentMainPath = window.location.origin;
@@ -65,22 +57,5 @@ $('.edit-menu-item').on('click', function () {
         );
       });
     },
-  });
-});
-
-$('.user-footer .pull-right a').on('click', function () {
-  const currentMainPath = window.location.origin;
-  Swal.fire({
-    title: 'Do you want to logout?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#b9b9b9',
-    confirmButtonText: 'Logout',
-    reverseButtons: true,
-  }).then((result) => {
-    if (result.isConfirmed) {
-      location.assign(`${currentMainPath}/admin/logout`);
-    }
   });
 });

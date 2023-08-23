@@ -275,7 +275,32 @@
 	        */
 			$main_path = CRUDBooster::mainPath();
 			$admin_path = CRUDBooster::adminPath();
-	        $this->script_js = NULL;
+	        $this->script_js = "
+			function showMenuItemExport() {
+				$('#modal-menu-item-export').modal('show');
+			}
+			  
+			function menuIngredientsExport() {
+				$('#modal-menu-ingredients-export').modal('show');
+			}
+
+			$('.user-footer .pull-right a').on('click', function () {
+				const currentMainPath = window.location.origin;
+				Swal.fire({
+					title: 'Do you want to logout?',
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#d33',
+					cancelButtonColor: '#b9b9b9',
+					confirmButtonText: 'Logout',
+					reverseButtons: true,
+				}).then((result) => {
+					if (result.isConfirmed) {
+						location.assign(`$admin_path/logout`);
+					}
+				});
+			});			
+			";
 
             /*
 	        | ---------------------------------------------------------------------- 

@@ -82,10 +82,10 @@
                         <td>{{$menu_item->food_cost ? (float) $menu_item->food_cost : '0'}}</td>
                         <td>{{$menu_item->food_cost_percentage ? (float) $menu_item->food_cost_percentage : '0.00'}}%</td>
                         <td class="action">
-                            <a class="action-button" href="#" _menu-item-id="{{ $menu_item->id }}" _action="detail">
+                            <a class="action-button view-menu-details" href="#{{ $menu_item->id }}" _menu-item-id="{{ $menu_item->id }}" _action="detail">
                                 <i class="fa fa-eye button"></i>
                             </a>
-                            <a class="action-button" href="#" _menu-item-id="{{ $menu_item->id }}" _action="edit">
+                            <a class="action-button edit-menu-item" href="#{{ $menu_item->id }}" _menu-item-id="{{ $menu_item->id }}" _action="edit">
                                 <i class="fa fa-pencil button"></i>
                             </a>
                         </td>
@@ -118,52 +118,53 @@
         $('.loading-label').hide();
         $('#tableData').show();
 
-        $(document).on('click', '.action-button', function() {
-            const clickedAction = $(this).attr('_action');
-            const id = $(this).attr('_menu-item-id');
-            const path = "{{ CRUDBooster::adminPath('menu_items') }}";
-            if (clickedAction == 'edit') {
-                Swal.fire({
-                    title: 'Which details do you want to edit?',
-                    showDenyButton: true,
-                    focusConfirm: false,
-                    showCancelButton: true,
-                    showCloseButton: true,
-                    focusConfirm: true,
-                    confirmButtonText: `🍕 Ingredients`,
-                    denyButtonText: `🛍️ Packagings`,
-                    cancelButtonText: `💲 Costing`,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.open(`${path}/edit/${id}/ingredients`);
-                    } else if (result.isDenied) {
-                        window.open(`${path}/edit/${id}/packagings`);
-                    } else if (result.dismiss == 'cancel') {
-                        window.open(`${path}/edit/${id}/costing`);
-                    }
-                });
-            } else if (clickedAction == 'detail') {
-                Swal.fire({
-                    title: 'Which details do you want to see?',
-                    showDenyButton: true,
-                    focusConfirm: false,
-                    showCancelButton: true,
-                    showCloseButton: true,
-                    focusConfirm: true,
-                    confirmButtonText: `🍕 Ingredients`,
-                    denyButtonText: `🛍️ Packagings`,
-                    cancelButtonText: `💲 Costing`,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.open(`${path}/detail/${id}`);
-                    } else if (result.isDenied) {
-                        window.open(`${path}/packaging-detail/${id}`);
-                    } else if (result.dismiss == 'cancel') {
-                        window.open(`${path}/costing-detail/${id}`);
-                    }
-                })
-            }
-        });
+        // $(document).on('click', '.action-button', function() {
+        //     const clickedAction = $(this).attr('_action');
+        //     const id = $(this).attr('_menu-item-id');
+        //     const path = "{{ CRUDBooster::adminPath('menu_items') }}";
+        //     if (clickedAction == 'edit') {
+        //         Swal.fire({
+        //             title: 'Which details do you want to edit?',
+        //             showDenyButton: true,
+        //             focusConfirm: false,
+        //             showCancelButton: true,
+        //             showCloseButton: true,
+        //             focusConfirm: true,
+        //             confirmButtonText: `🍕 Ingredients`,
+        //             denyButtonText: `🛍️ Packagings`,
+        //             cancelButtonText: `💲 Costing`,
+        //         }).then((result) => {
+        //             if (result.isConfirmed) {
+        //                 window.open(`${path}/edit/${id}/ingredients`);
+        //             } else if (result.isDenied) {
+        //                 window.open(`${path}/edit/${id}/packagings`);
+        //             } else if (result.dismiss == 'cancel') {
+        //                 window.open(`${path}/edit/${id}/costing`);
+        //             }
+        //         });
+        //     } else if (clickedAction == 'detail') {
+        //         Swal.fire({
+        //             title: 'Which details do you want to see?',
+        //             showDenyButton: true,
+        //             focusConfirm: false,
+        //             showCancelButton: true,
+        //             showCloseButton: true,
+        //             focusConfirm: true,
+        //             confirmButtonText: `🍕 Ingredients`,
+        //             denyButtonText: `🛍️ Packagings`,
+        //             cancelButtonText: `💲 Costing`,
+        //         }).then((result) => {
+        //             if (result.isConfirmed) {
+        //                 window.open(`${path}/detail/${id}`);
+        //             } else if (result.isDenied) {
+        //                 window.open(`${path}/packaging-detail/${id}`);
+        //             } else if (result.dismiss == 'cancel') {
+        //                 window.open(`${path}/costing-detail/${id}`);
+        //             }
+        //         })
+        //     }
+        // });
     });
 </script>
+<script src="{{ asset('js/menu-items-action-buttons.js')}}"></script>
 @endpush
