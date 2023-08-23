@@ -449,6 +449,8 @@
 				$menu_ids = self::getMyMenuIds();
 				$query->whereIn('menu_items.id', $menu_ids);
 			}
+
+			$query->where('menu_items.status', 'ACTIVE');
 	    }
 
 	    /*
