@@ -149,7 +149,7 @@
                     @endif
                     <label><span id="required">*</span> Menu Description</label>
                     <fieldset>
-                        <input type="text" name="menu_item_description" placeholder="Enter menu description" required value="{{ $row->menu_item_description }}" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" name="menu_item_description" placeholder="Enter menu description" required value="{{ $row->menu_item_description }}" oninput="this.value = this.value.toUpperCase()" {{ $table == 'menu_items' ? 'readonly' : '' }}>
                     </fieldset>
                     <label><span id="required">*</span> Product Type</label>
                     <fieldset>
