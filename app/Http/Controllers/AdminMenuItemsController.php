@@ -1393,6 +1393,7 @@
 				->leftJoin('menu_categories', 'menu_categories.id', 'menu_items.menu_categories_id')
 				->leftJoin('menu_types', 'menu_types.id', '=', 'menu_items.menu_types_id')
 				->leftJoin('menu_subcategories', 'menu_subcategories.id', '=', 'menu_items.menu_subcategories_id')
+				->leftJoin('menu_product_types', 'menu_product_types.id', '=', 'menu_items.menu_product_types_id')
 				->get()
 				->first();
 

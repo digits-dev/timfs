@@ -34,7 +34,7 @@
                 </tr>
                 <tr>
                     <td class="text-bold">Product Type</td> 
-                    <td>{{ $menu_items_data->menu_product_types_name }}</td>
+                    <td>{{ $menu_items_data->menu_product_types_name ?? $menu_items_data->menu_product_type_description }}</td>
                 </tr>
                 @foreach ($menu_items_data->menu_choice_groups as $index => $choice_group)
                 <tr>
