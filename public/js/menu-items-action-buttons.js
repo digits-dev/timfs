@@ -25,9 +25,9 @@ $('.view-menu-details').on('click', function () {
       '📄 Menu Data' +
       '</button>',
     showConfirmButton: false,
-    showCloseButton: true,
     didOpen: () => {
       $('.swal-view-menu').on('click', function () {
+        Swal.close();
         const detail = $(this).attr('detail-to-view');
         location.assign(
           `${currentMainPath}/admin/menu_items/${detail}/${dbId}`
@@ -56,9 +56,9 @@ $('.edit-menu-item').on('click', function () {
       '📄 Menu Data' +
       '</button>',
     showConfirmButton: false,
-    showCloseButton: true,
     didOpen: () => {
       $('.swal-edit-menu').on('click', function () {
+        Swal.close();
         const detail = $(this).attr('detail-to-edit');
         location.assign(
           `${currentMainPath}/admin/menu_items/edit/${dbId}/${detail}`

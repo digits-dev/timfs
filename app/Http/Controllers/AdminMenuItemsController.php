@@ -1336,6 +1336,24 @@
 			
 		}
 
+		public function getMenuDataDetail($id) {
+			if (!CRUDBooster::isRead())
+				CRUDBooster::redirect(
+					CRUDBooster::mainPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$data = [];
+			$data['item'] = DB::table('menu_items')
+				->where('id', $id)
+				->get()
+				->first();
+			$data['menu_items_data'] = self::getMenuItemDetails($id);
+			$data['page_title'] = 'Detail Menu Data';
+
+			return $this->view('menu-items/menu-data-detail', $data);
+		}
+
 		function getMenuItemDetails($id) {
 			$data = [];
 
