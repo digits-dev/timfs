@@ -630,16 +630,15 @@
 		}
 
 		public function getEdit($id, $table = 'menu_items', $rnd_menu_items_id = null, $comments = null) {
-			//Create an Auth
-			if ($table == 'menu_items') {
-				if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE || $this->button_edit==FALSE) {    
-					CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
-				}
-			}
 			
 			$data = [];
-			$data['page_title'] = 'Edit Data';
+			$data['page_title'] = 'Edit Menu Data';
 			$data['row'] = DB::table('menu_items')->where('id',$id)->first();
+			// Menu Old Codes
+			$data['old_codes'] = DB::table('menu_old_code_masters')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
 			// Menu Product Types
 			$data['menu_product_types'] = DB::table('menu_product_types')
 				->where('status','ACTIVE')

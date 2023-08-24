@@ -127,6 +127,7 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         $group_choices = MenuChoiceGroup::where('status','ACTIVE')->orderBy('menu_choice_group_column_description','ASC')->get();
 
         $menu_items = MenuItem::query()
+        ->where('menu_items.status', 'ACTIVE')
         ->whereNotNull('tasteless_menu_code')
         ->leftJoin('menu_product_types','menu_items.menu_product_types_id','=','menu_product_types.id')
         ->leftJoin('menu_types','menu_items.menu_types_id','=','menu_types.id')

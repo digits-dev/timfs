@@ -102,9 +102,11 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/menu_items/costing-detail/{id}', [AdminMenuItemsController::class, 'getCostingDetails']);
     Route::get('/admin/menu_items/detail/{id}', [AdminMenuItemsController::class, 'getDetail']);
     Route::get('/admin/menu_items/packaging-detail/{id}', [AdminMenuItemsController::class, 'getPackagingDetail']);
+    Route::get('/admin/menu_items/menu-data/{id}', [AdminMenuItemsController::class, 'getMenuDataDetail']);
     Route::get('/admin/menu_items/edit/{id}/{to_edit}', [AdminMenuItemsController::class, 'getEdit']);
     Route::post('/admin/menu_items/submit-packaging', [AdminMenuItemsController::class, 'submitPackagings'])->name('menu_item_submit_packaging');
     Route::post('/admin/menu_items/submit-costing', [AdminMenuItemsController::class, 'submitCosting'])->name('menu_item_submit_costing');
+    Route::post('/admin/menu_items/submit-menu-data', [AdminMenuItemsController::class, 'submitMenuData'])->name('menu_item_submit_menu_data');
     Route::post('/admin/menu_items/export-menu-ingredients', [AdminMenuItemsController::class, 'exportMenuIngredients'])->name('export_menu_ingredients');
     Route::post('/admin/menu_items/get-menu-history', [AdminMenuItemsController::class, 'getMenuDetailHistory'])->name('get_menu_detail_history');
 

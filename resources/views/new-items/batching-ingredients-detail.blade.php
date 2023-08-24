@@ -176,7 +176,7 @@
                                         ₱ {{ (float) $ingredient->ttp }}
                                         @if ($ingredient->item_masters_id)
                                             <br>
-                                            <span class="timeago date-updated" datetime={{ $ingredient->updated_at ?? $ingredient->created_at }}></span>
+                                            <span class="timeago date-updated" datetime="{{ $ingredient->updated_at ?? $ingredient->created_at }}"></span>
                                         @endif
                                     </td>
                                     <td>{{ (float) $ingredient->ingredient_qty }}</td>
@@ -194,7 +194,6 @@
         </div>
         <p class="note-ingredients">** Highlighted ingredient names are primary ingredients.</p>
         @endif
-        </div>
     </div>
     <div class="panel-footer">
         <a class="btn btn-primary" href="{{ CRUDBooster::mainpath() }}" type="button"> <i class="fa fa-arrow-left" ></i> Back </a>
