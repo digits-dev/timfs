@@ -18,7 +18,10 @@ SELECT
             4
         ) / (
             ROUND( (
-                    rnd_menu_items.rnd_menu_srp - COALESCE(
+                    NULLIF(
+                        rnd_menu_items.rnd_menu_srp,
+                        0
+                    ) - COALESCE(
                         rnd_menu_computed_packaging_cost.computed_packaging_total_cost,
                         0
                     )

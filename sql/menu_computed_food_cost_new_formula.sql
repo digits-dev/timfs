@@ -18,9 +18,12 @@ SELECT
             4
         ) / (
             ROUND( (
-                    COALESCE(
-                        menu_items.menu_price_dine,
-                        menu_items.menu_price_take
+                    NULLIF(
+                        COALESCE(
+                            menu_items.menu_price_dine,
+                            menu_items.menu_price_take
+                        ),
+                        0
                     ) - COALESCE(
                         menu_computed_packaging_cost.computed_packaging_total_cost,
                         0
