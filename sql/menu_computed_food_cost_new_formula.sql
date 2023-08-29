@@ -16,21 +16,22 @@ SELECT
         ROUND(
             subquery.computed_ingredient_total_cost * (1 + (menu_items.buffer / 100)) / menu_items.portion_size,
             4
-        ) / NULLIF( (
-                ROUND( (
+        ) / (
+            ROUND( (
+                    NULLIF(
                         COALESCE(
                             menu_items.menu_price_dine,
                             menu_items.menu_price_take
-                        ) - COALESCE(
-                            menu_computed_packaging_cost.computed_packaging_total_cost,
-                            0
-                        )
-                    ) / 1.12,
-                    4
-                )
-            ) * 100,
-            0
-        ),
+                        ),
+                        0
+                    ) - COALESCE(
+                        menu_computed_packaging_cost.computed_packaging_total_cost,
+                        0
+                    )
+                ) / 1.12,
+                4
+            )
+        ) * 100,
         2
     ) AS computed_food_cost_percentage
 FROM menu_items
