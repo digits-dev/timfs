@@ -1114,7 +1114,7 @@
             packagingSum = math.round(packagingSum, 4);
             const packagingCost = packagingSum;
             $('.packaging-cost').val(packagingSum);
-            const foodCostPercentage = srp ? math.round(math.round(foodCost / math.round((srp - packagingCost) / 1.12, 4), 4) * 100, 2) : 0;
+            const foodCostPercentage = Number(srp) ? math.round(math.round(foodCost / math.round((srp - packagingCost) / 1.12, 4), 4) * 100, 2) : 0;
 
             //formatting the percentage text depending on the low cost
             $(percentageText).text(`${foodCostPercentage}%`);
@@ -1379,7 +1379,7 @@
 
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
-                $('.portion').val() > 0 && $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() > 0;
+                $('.portion').val() > 0 && $('.rnd_menu_description').val() && $('.rnd_menu_srp').val();
 
             const hasIngredient = $('#form-ingredient .ingredient-wrapper, #form-ingredient .new-ingredient-wrapper').length > 0;
             
