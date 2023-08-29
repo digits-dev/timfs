@@ -61,6 +61,8 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         array_push($header, 'RELEASE DATE');
         array_push($header, 'END DATE');
         array_push($header, 'POS UPDATE DATE');
+        array_push($header, 'CREATED DATE');
+        array_push($header, 'UPDATED DATE');
 
         return $header;
     } 
@@ -115,6 +117,8 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         array_push($data_items, $data_menu_item->release_date);
         array_push($data_items, $data_menu_item->end_date);
         array_push($data_items, $data_menu_item->pos_update);
+        array_push($data_items, $data_menu_item->created_at);
+        array_push($data_items, $data_menu_item->updated_at);
 
         return $data_items;
     }
@@ -151,6 +155,8 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             'rnd_menu_items.release_date',
             'rnd_menu_items.end_date',
             'rnd_menu_items.pos_update',
+            'menu_items.created_at',
+            'menu_items.updated_at',
         );
             
         foreach($old_item_codes as $old_codes){

@@ -15,7 +15,7 @@
         <table class="table table-striped">
             <tbody>
                 <tr>
-                    <td class="text-bold" style="width: 200px;">Tasteless Menu Code</td>
+                    <td class="text-bold" style="width: 250px;">Tasteless Menu Code</td>
                     <td>{{ $item->tasteless_menu_code }}</td>
                 </tr>
                 <tr>
@@ -61,6 +61,26 @@
                 <tr>
                     <td class="text-bold">Sub Category</td> 
                     <td>{{ $menu_items_data->subcategory_description }}</td>
+                </tr>
+                <tr>
+                    <td class="text-bold">Price - Dine in</td> 
+                    <td>{{ $menu_items_data->menu_price_dine }}</td>
+                </tr>
+                <tr>
+                    <td class="text-bold">Price - Delivery</td> 
+                    <td>{{ $menu_items_data->menu_price_dlv }}</td>
+                </tr>
+                <tr>
+                    <td class="text-bold">Price - Take Out</td> 
+                    <td>{{ $menu_items_data->menu_price_take }}</td>
+                </tr>
+                <tr>
+                    <td class="text-bold">Food Cost</td> 
+                    <td>{{ $menu_items_data->food_cost }}</td>
+                </tr>
+                <tr>
+                    <td class="text-bold">Food Cost Percentage</td> 
+                    <td>{{ (float) $menu_items_data->food_cost_percentage }}%</td>
                 </tr>
                 <tr>
                     <td class="text-bold">Original Concept</td> 
