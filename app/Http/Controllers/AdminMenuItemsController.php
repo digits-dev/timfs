@@ -1590,6 +1590,7 @@
 		}
 
 		function updateCostOfOtherMenu() {
+			return;
 			$to_update = DB::table('menu_items')
 				->join('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
 				->whereRaw("
