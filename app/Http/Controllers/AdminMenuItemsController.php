@@ -839,16 +839,20 @@
 
 			$data = [];
 			$data['item'] = DB::table('menu_items')
-				->select('menu_items.id as id',
+				->select(
+					'menu_items.id as id',
 					'menu_items.tasteless_menu_code',
 					'menu_items.menu_price_dine',
 					'menu_items.portion_size',
 					'menu_items.menu_item_description',
 					'menu_items.buffer',
 					'menu_items.ideal_food_cost',
-					'menu_costing.packaging_cost')
+					'menu_costing.packaging_cost',
+					'rnd_menu_items.id as rnd_menu_items_id'
+				)
 				->where('menu_items.id', $id)
 				->leftJoin('menu_costing', 'menu_costing.menu_items_id', 'menu_items.id')
+				->leftJoin('rnd_menu_items', 'rnd_menu_items.menu_items_id', '=', 'menu_items.id')
 				->first();
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
@@ -989,7 +993,9 @@
 					);
 
 				$data['item'] = DB::table('menu_costing')
-					->where('menu_items_id', $id)
+					->where('menu_costing.menu_items_id', $id)
+					->select('menu_costing.*', 'rnd_menu_items.id as rnd_menu_items_id')
+					->leftJoin('rnd_menu_items', 'rnd_menu_items.menu_items_id', 'menu_costing.menu_items_id')
 					->first();
 
 				$data['page_title'] = 'Edit Costing';

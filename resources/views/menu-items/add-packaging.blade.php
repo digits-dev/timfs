@@ -324,7 +324,7 @@
         <form action="" id="form-packaging">
             <div class="row">
                 <div class="col-md-2">
-                    <button type="button" class="show-menu-history btn btn-info" history-type="packaging" menu-items-id="{{ $item->id }}"><i class="fa fa-clock-o"></i> Menu History</button>
+                    <button type="button" class="show-menu-history btn btn-info" history-type="packaging" menu-items-id="{{ $item->id }}" version-type="detail packaging" rnd-menu-items-id="{{ $item->rnd_menu_items_id }}"><i class="fa fa-clock-o"></i> Menu History</button>
                 </div>
                 <div class="col-md-8">
                     <div class="box-header text-center">
