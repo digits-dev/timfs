@@ -16,16 +16,18 @@ SELECT
                 1 + (rnd_menu_items.buffer / 100)
             ) / rnd_menu_items.portion_size,
             4
-        ) / (
-            ROUND( (
-                    rnd_menu_items.rnd_menu_srp - COALESCE(
-                        rnd_menu_computed_packaging_cost.computed_packaging_total_cost,
-                        0
-                    )
-                ) / 1.12,
-                4
-            )
-        ) * 100,
+        ) / NULLIF( (
+                ROUND( (
+                        rnd_menu_items.rnd_menu_srp - COALESCE(
+                            rnd_menu_computed_packaging_cost.computed_packaging_total_cost,
+                            0
+                        )
+                    ) / 1.12,
+                    4
+                )
+            ) * 100,
+            0
+        ),
         2
     ) AS computed_food_cost_percentage
 FROM rnd_menu_items

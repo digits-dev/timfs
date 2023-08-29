@@ -1404,7 +1404,7 @@
                         .css('outline', '2px solid red');
                     if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
 					if (!$('.rnd_menu_description').val()) $('.rnd_menu_description').css('outline', '2px solid red');
-					if (!$('.rnd_menu_srp').val() || $('.rnd_menu_srp').val() <= 0) $('.rnd_menu_srp').css('outline', '2px solid red');
+					if (!$('.rnd_menu_srp').val()) $('.rnd_menu_srp').css('outline', '2px solid red');
 					if (!$('.segmentation').val()) $('.segmentation').css('outline', '2px solid red');
                 });
         }
