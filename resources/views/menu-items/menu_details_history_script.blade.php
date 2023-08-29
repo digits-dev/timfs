@@ -242,8 +242,8 @@
             showCloseButton: true,
             confirmButtonColor: '#3085d6',
             denyButtonColor: '#008d4c',
-            confirmButtonText: 'Menu History',
-            denyButtonText: 'RND Versions',
+            confirmButtonText: '🕒 Menu History',
+            denyButtonText: '📃 RND Versions',
             cancelButtonText: 'Cancel',
             returnFocus: false,
         }).then((result) => {
