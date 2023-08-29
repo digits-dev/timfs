@@ -85,7 +85,7 @@
         <div class="with-ingredient">
             <div class="row">
                 <div class="col-md-2">
-                    <button type="button" class="show-menu-history btn btn-info" history-type="ingredient costing" menu-items-id="{{ $item->id }}"><i class="fa fa-clock-o"></i> Menu History</button>
+                    <button type="button" class="show-menu-history btn btn-info" history-type="ingredient costing" menu-items-id="{{ $item->id }}" version-type="detail ingredient costing" rnd-menu-items-id="{{ $item->rnd_menu_items_id }}"><i class="fa fa-clock-o"></i> Menu History</button>
                 </div>
                 <div class="col-md-8">
                     <h4 style="font-weight: 600; text-align: center;">Ingredients List</h4>

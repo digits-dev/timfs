@@ -1290,6 +1290,7 @@
 				->where('menu_items.id', $id)
 				->select(
 					'menu_items.id',
+					'rnd_menu_items.id as rnd_menu_items_id',
 					'menu_items.tasteless_menu_code',
 					'menu_items.menu_price_dine',
 					'menu_items.menu_item_description',
@@ -1301,6 +1302,7 @@
 				)
 				->leftJoin('menu_computed_food_cost', 'menu_computed_food_cost.id', '=', 'menu_items.id')
 				->leftJoin('menu_computed_packaging_cost', 'menu_computed_packaging_cost.id', '=', 'menu_items.id')
+				->leftJoin('rnd_menu_items', 'rnd_menu_items.menu_items_id', '=', 'menu_items.id')
 				->first();
 
 			$data['ingredients'] = self::getIngredients($id);
@@ -1321,7 +1323,9 @@
 
 			$item = DB::table('menu_costing')
 				->where('menu_costing.menu_items_id', $id)
+				->select('menu_costing.*', 'menu_items.*', 'rnd_menu_items.id as rnd_menu_items_id')
 				->leftJoin('menu_items', 'menu_items.id', '=', 'menu_costing.menu_items_id')
+				->leftJoin('rnd_menu_items', 'rnd_menu_items.menu_items_id', 'menu_items.id')
 				->get()
 				->first();
 
@@ -1360,10 +1364,12 @@
 					'computed_ingredient_total_cost',
 					'computed_food_cost',
 					'computed_food_cost_percentage',
-					'computed_packaging_total_cost'
+					'computed_packaging_total_cost',
+					'rnd_menu_items.id as rnd_menu_items_id'
 				)
 				->leftJoin('menu_computed_food_cost', 'menu_computed_food_cost.id', '=', 'menu_items.id')
 				->leftJoin('menu_computed_packaging_cost', 'menu_computed_packaging_cost.id', '=', 'menu_items.id')
+				->leftJoin('rnd_menu_items', 'rnd_menu_items.menu_items_id', '=', 'menu_items.id')
 				->first();
 
 			$data['packagings'] = self::getPackagings($id);
