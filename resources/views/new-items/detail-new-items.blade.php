@@ -1,8 +1,3 @@
-@push('head')
-<style>
-</style>
-@endpush
-
 @extends('crudbooster::admin_template')
 @section('content')
 <p class="noprint">
@@ -71,12 +66,29 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="new-fields">
-                    <h5>Please copy, paste, and fill out these fields to your comment.</h5>
-                    @foreach ($comment_templates as $field)
-                    🔵 {{ $field }}:
-                    <br />
-                    @endforeach
+                <h3 class="text-center">ITEM USAGE</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Description</th>
+                                <th>User</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!$item_usages)
+                            <tr><td class="text-center" style="font-style: italic; color: grey" colspan="3">This item is currently not in use...</td></tr>
+                            @endif
+                            @foreach ($item_usages as $item_usage)
+                            <tr>
+                                <td>{{ $item_usage->item_code }}</td>
+                                <td>{{ $item_usage->item_description }}</td>
+                                <td>{{ $item_usage->name }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div class="col-md-6">
@@ -86,6 +98,12 @@
                     @include('new-items/chat-app', $comments_data)
                 </div>
             </div>
+        </div>
+        <hr>
+        <div class="row">
+            {{-- <div class="col-md-4"> --}}
+                
+            {{-- </div> --}}
         </div>
     </div>
     <div class="panel-footer">

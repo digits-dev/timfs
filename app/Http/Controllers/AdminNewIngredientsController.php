@@ -469,6 +469,8 @@
 
 			$data['comment_templates'] = self::getCommentTemplate('ingredient');
 
+			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
+
 			return $this->view('new-items/detail-new-items', $data);
 		}
 
@@ -520,6 +522,8 @@
 			$data['table'] = 'new_ingredients';
 
 			$data['comments_data'] = self::getNewItemsComments($id);
+
+			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
 
 			if ($data['item']->item_masters_id) {
 				return CRUDBooster::redirect(
@@ -630,42 +634,7 @@
 						'is_existing' => 'TRUE'
 					]);
 
-				$to_update = DB::table('menu_items')
-					->leftJoin('menu_computed_food_cost', 'menu_items.id', '=', 'menu_computed_food_cost.id')
-					->whereRaw("
-						CAST(
-							menu_items.food_cost AS DECIMAL(18, 4)
-						) != CAST(
-							COALESCE(
-								menu_computed_food_cost.computed_food_cost,
-								0
-							) AS DECIMAL(18, 4)
-						)
-					")
-					->orWhereRaw("
-						CAST(
-							menu_items.food_cost_percentage AS DECIMAL(18, 4)
-						) != CAST(
-							COALESCE(
-								menu_computed_food_cost.computed_food_cost_percentage,
-								0
-							) AS DECIMAL(18, 4)
-						)
-					")
-					->orWhereRaw("
-						CAST(
-							menu_items.ingredient_total_cost AS DECIMAL(18, 4)
-						) != CAST(
-							COALESCE(
-								menu_computed_food_cost.computed_ingredient_total_cost,
-								0
-							) AS DECIMAL(18, 4)
-						)
-					")
-					->pluck('menu_items.id')
-					->toArray();
-
-				(new AdminMenuItemsController)->updateCostOfOtherMenu($to_update);
+				(new AdminMenuItemsController)->updateCostOfOtherMenu();
 
 				return redirect(CRUDBooster::mainpath())
 					->with([
@@ -832,5 +801,95 @@
 				];
 			}
 			return $additional_fields;
+		}
+
+		function getNewItemUsage($new_item_id, $item_type) {
+			if ($item_type == 'ingredient') {
+				$menu_items = DB::table('menu_ingredients_details')
+					->where('menu_ingredients_details.status', 'ACTIVE')
+					->where('menu_ingredients_details.new_ingredients_id', $new_item_id)
+					->whereNull('menu_ingredients_details.item_masters_id')
+					->whereNotNull('menu_items.tasteless_menu_code')
+					->where('menu_items.status', 'ACTIVE')
+					->select(
+						'menu_items.tasteless_menu_code as item_code',
+						'menu_items.menu_item_description as item_description',
+						'cms_users.name'
+					)
+					->leftJoin('menu_items', 'menu_items.id', '=', 'menu_ingredients_details.menu_items_id')
+					->leftJoin('cms_users', 'cms_users.id', '=', DB::raw('COALESCE(menu_ingredients_details.updated_by, menu_ingredients_details.created_by)'))
+					->orderBy('item_description')
+					->get()
+					->toArray();
+
+				$rnd_menu_items = DB::table('rnd_menu_ingredients_details')
+					->where('rnd_menu_ingredients_details.status', 'ACTIVE')
+					->where('rnd_menu_ingredients_details.new_ingredients_id', $new_item_id)
+					->whereNull('rnd_menu_ingredients_details.item_masters_id')
+					->where('rnd_menu_items.status', 'ACTIVE')
+					->select(
+						'rnd_menu_items.rnd_code as item_code',
+						'rnd_menu_items.rnd_menu_description as item_description',
+						'cms_users.name'
+					)
+					->leftJoin('rnd_menu_items', 'rnd_menu_items.id', '=', 'rnd_menu_ingredients_details.rnd_menu_items_id')
+					->leftJoin('cms_users', 'cms_users.id', '=', DB::raw('COALESCE(rnd_menu_ingredients_details.updated_by, rnd_menu_ingredients_details.created_by)'))
+					->orderBy('item_description')
+					->get()
+					->toArray();
+
+				$batching_items = DB::table('batching_ingredients_details')
+					->where('batching_ingredients_details.status', 'ACTIVE')
+					->where('batching_ingredients_details.new_ingredients_id', $new_item_id)
+					->whereNull('batching_ingredients_details.item_masters_id')
+					->where('batching_ingredients.status', 'ACTIVE')
+					->select(
+						'batching_ingredients.bi_code as item_code',
+						'batching_ingredients.ingredient_description as item_description',
+						'cms_users.name'
+					)
+					->leftJoin('batching_ingredients', 'batching_ingredients.id', '=', 'batching_ingredients_details.batching_ingredients_id')
+					->leftJoin('cms_users', 'cms_users.id', '=', DB::raw('batching_ingredients_details.updated_by'))
+					->orderBy('item_description')
+					->get()
+					->toArray();
+
+				return array_merge($menu_items, $rnd_menu_items, $batching_items);
+			} else if ($item_type == 'packaging') {
+				$menu_items = DB::table('menu_packagings_details')
+					->where('menu_packagings_details.status', 'ACTIVE')
+					->where('menu_packagings_details.new_packagings_id', $new_item_id)
+					->whereNull('menu_packagings_details.item_masters_id')
+					->whereNotNull('menu_items.tasteless_menu_code')
+					->where('menu_items.status', 'ACTIVE')
+					->select(
+						'menu_items.tasteless_menu_code as item_code',
+						'menu_items.menu_item_description as item_description',
+						'cms_users.name'
+					)
+					->leftJoin('menu_items', 'menu_items.id', '=', 'menu_packagings_details.menu_items_id')
+					->leftJoin('cms_users', 'cms_users.id', '=', DB::raw('COALESCE(menu_packagings_details.updated_by, menu_packagings_details.created_by)'))
+					->orderBy('item_description')
+					->get()
+					->toArray();
+
+				$rnd_menu_items = DB::table('rnd_menu_packagings_details')
+					->where('rnd_menu_packagings_details.status', 'ACTIVE')
+					->where('rnd_menu_packagings_details.new_packagings_id', $new_item_id)
+					->whereNull('rnd_menu_packagings_details.item_masters_id')
+					->where('rnd_menu_items.status', 'ACTIVE')
+					->select(
+						'rnd_menu_items.rnd_code as item_code',
+						'rnd_menu_items.rnd_menu_description as item_description',
+						'cms_users.name'
+					)
+					->leftJoin('rnd_menu_items', 'rnd_menu_items.id', '=', 'rnd_menu_packagings_details.rnd_menu_items_id')
+					->leftJoin('cms_users', 'cms_users.id', '=', DB::raw('COALESCE(rnd_menu_packagings_details.updated_by, rnd_menu_packagings_details.created_by)'))
+					->orderBy('item_description')
+					->get()
+					->toArray();
+
+				return array_merge($menu_items, $rnd_menu_items);
+			}
 		}
 	}

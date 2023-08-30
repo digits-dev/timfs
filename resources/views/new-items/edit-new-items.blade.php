@@ -76,10 +76,6 @@
                                 <th>Created Date</th>
                                 <td>{{$item->created_at}}</td>
                             </tr>
-                            <tr>
-                                <th># of RND Menu with this item</th>
-                                <td>{{$rnd_count}}</td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -92,6 +88,33 @@
                 <h3 class="text-center">COMMENTS</h3>
                 <div class="chat-app">
                     @include('new-items/chat-app', $comments_data)
+                </div>
+            </div>
+            <div class="col-md-6">
+                <hr>
+                <h3 class="text-center">ITEM USAGE</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Description</th>
+                                <th>User</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!$item_usages)
+                            <tr><td class="text-center" style="font-style: italic; color: grey" colspan="3">This item is currently not in use...</td></tr>
+                            @endif
+                            @foreach ($item_usages as $item_usage)
+                            <tr>
+                                <td>{{ $item_usage->item_code }}</td>
+                                <td>{{ $item_usage->item_description }}</td>
+                                <td>{{ $item_usage->name }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
