@@ -423,6 +423,7 @@ class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CB
 
 		$menu_query = DB::table('menu_items')
 			->where('status', 'ACTIVE')
+			->whereNotNull('menu_items.tasteless_menu_code')
 			->select(
 				'id',
 				'tasteless_menu_code',
