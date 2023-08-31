@@ -947,7 +947,7 @@
                         $.fn.submitForm('save');
                     }
                 });
-            } else if (!hasPackaging) {
+            } else if (!hasPackaging && isValid) {
                 Swal.fire({
                     title: 'Are you sure this item has no packaging?',
                     icon: 'warning',
