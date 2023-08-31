@@ -17,7 +17,7 @@
 .chat-app-container {
   max-height: 700px;
   min-height: 500px;
-  padding: 15px;
+  padding: 15px 10px;
   justify-content: space-between;
   border: 2px solid grey;
   border-radius: 5px;
@@ -55,9 +55,10 @@
 
 .chat-body {
   justify-content: end;
-  padding: 15px;
+  padding: 15px 10px;
   min-height: 100%;
   width: 100%;
+  gap: 15px;
 }
 
 .no-message-note {
@@ -67,31 +68,44 @@
 
 .their-message-container {
   width: 100%;
-  gap: 15px;
+  gap: 12px;
 }
 
 .my-message-container {
   width: 100%;
-  gap: 15px;
+  gap: 12px;
   justify-content: flex-end;
 }
 
 .profile-photo {
-  height: 50px;
-  width: 50px;
+  height: 40px;
+  width: 40px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   color: whitesmoke;
   background-color: rgb(92, 92, 149);
-  font-size: 20px;
+  font-size: 13px;
   font-weight: bolder;
+}
+
+.message-wrapper {
+  min-width: 200px;
+}
+
+.my-message-wrapper {
+  align-items: flex-end;
+}
+
+.their-message-wrapper {
+  align-items: flex-start;
 }
 
 .sender-details {
   gap: 15px;
   margin-right: 10px;
 }
+
 
 .my-sender-details {
   justify-content: flex-end;
@@ -106,7 +120,7 @@
   background-color: rgb(204, 204, 204);
   padding: 15px;
   color: #f4f4f4;
-  position: relative;
+  position: relative;           
   margin-top: 5px;
   white-space: pre-line;
   word-break: break-word;
@@ -118,13 +132,13 @@
 
 .their-message {
   border-radius: 0 15px 15px 15px;
-  margin-right: 100px;
+  margin-right: 10%;
   background-color: #69ad4c;
 }
 
 .my-message {
   border-radius: 15px 0 15px 15px;
-  margin-left: 120px;
+  margin-left: 10%;
   background-color: #6ca2d5;
 }
 

@@ -69,12 +69,14 @@
             const isMyMessage = comment.cms_users_id == myId;
 
             if (isMyMessage) {
+                messageWrapper.addClass('my-message-wrapper');
                 messageContainer.addClass('my-message-container');
                 senderDetails.addClass('my-sender-details');
                 message.addClass('my-message').append(deleteComment);
                 senderName.text('Me');
 
             } else {
+                messageWrapper.addClass('their-message-wrapper');
                 messageContainer.addClass('their-message-container');
                 message.addClass('their-message');
                 profilePhotoSection.append(profilePhoto);
