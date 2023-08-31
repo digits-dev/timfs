@@ -357,6 +357,13 @@
             }
         });
 
+        $('input').on('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                $('#save-btn').click();
+            }
+        });
+
         firstLoad();
         computeFormula();
     });
