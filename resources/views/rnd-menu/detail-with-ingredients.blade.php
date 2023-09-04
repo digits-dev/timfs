@@ -91,7 +91,7 @@
                             <th scope="col"> </th>
                             <th scope="col">Status</th>
                             <th scope="col">From</th>
-                            <th scope="col">Tasteless Code</th>
+                            <th scope="col">Item Code</th>
                             <th scope="col">Ingredient</th>
                             <th scope="col">Packaging Size</th>
                             <th scope="col">Preparation Qty</th>
