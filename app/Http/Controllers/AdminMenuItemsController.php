@@ -1657,6 +1657,12 @@
 				->where('menu_items_id', $id)
 				->where('menu_ingredients_auto_compute.status', 'ACTIVE')
 				->select('tasteless_code',
+					DB::raw('COALESCE(
+						item_masters.tasteless_code,
+						menu_items.tasteless_menu_code,
+						batching_ingredients.bi_code,
+						new_ingredients.nwi_code
+					) AS item_code'),
 					'menu_items.status as menu_item_status',
 					'sku_statuses.sku_status_description as item_status',
 					'new_ingredients.status as new_ingredient_status',
@@ -1703,6 +1709,10 @@
 				->where('menu_items_id', $id)
 				->where('menu_packagings_auto_compute.status', 'ACTIVE')
 				->select('tasteless_code',
+				DB::raw('COALESCE(
+					item_masters.tasteless_code,
+					new_packagings.nwp_code
+				) AS item_code'),
 				'sku_statuses.sku_status_description as item_status',
 				'new_packagings.status as new_packaging_status',
 				'menu_packagings_auto_compute.item_masters_id',

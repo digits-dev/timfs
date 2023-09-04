@@ -91,7 +91,7 @@
                             <th scope="col"> </th>
                             <th scope="col">Status</th>
                             <th scope="col">From</th>
-                            <th scope="col">Tasteless Code</th>
+                            <th scope="col">Item Code</th>
                             <th scope="col">Packaging</th>
                             <th scope="col">Packaging Size</th>
                             <th scope="col">Preparation Qty</th>
@@ -153,7 +153,7 @@
                                         <span class="label label-success">NEW</span>
                                         @endif
                                     </td>
-                                    <td>{{ $packaging->tasteless_code ?? $packaging->tasteless_menu_code ?? '' }}</td>
+                                    <td>{{ $packaging->item_code }}</td>
                                     <td>
                                         <span class="{{ $packaging->is_checked ? 'primary_packaging_description' : '' }}">
                                             {{ $description }}
