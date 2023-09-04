@@ -417,6 +417,12 @@
 				->where('batching_ingredients_id', $id)
 				->where('batching_ingredients_auto_compute.status', 'ACTIVE')
 				->select('tasteless_code',
+					DB::raw('COALESCE(
+						item_masters.tasteless_code,
+						menu_items.tasteless_menu_code,
+						batching_as_ingredient.bi_code,
+						new_ingredients.nwi_code
+					) AS item_code'),
 					'menu_items.status as menu_item_status',
 					'sku_statuses.sku_status_description as item_status',
 					'new_ingredients.status as new_ingredient_status',
