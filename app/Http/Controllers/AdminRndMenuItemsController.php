@@ -1513,19 +1513,11 @@
 				->where('rnd_menu_items_id', $id)
 				->first();
 
-			$no_code_ingredients = DB::table('rnd_menu_ingredients_details')
-				->where('status', 'ACTIVE')
-				->where('rnd_menu_items_id', $id)
-				->where('is_existing', '!=', 'TRUE')
-				->count();
+			$no_codes_data = self::getItemWithoutCodes($id);
 
-			$no_code_packagings = DB::table('rnd_menu_packagings_details')
-				->where('status', 'ACTIVE')
-				->where('rnd_menu_items_id', $id)
-				->where('is_existing', '!=', 'TRUE')
-				->count();
-
-			$data['no_codes'] = $no_code_ingredients + $no_code_packagings;
+			$data['no_codes_data'] = $no_codes_data;
+			
+			$data['no_codes'] = count($no_codes_data['no_codes']);
 
 			$data['comments_data'] = self::getRNDComments($id);
 			
@@ -2143,6 +2135,36 @@
 
 			return $segmentations_id;
 
+		}
+
+		public function getItemWithoutCodes($rnd_menu_id) {
+			$no_code_ingredients = DB::table('rnd_menu_ingredients_details')
+				->where('rnd_menu_ingredients_details.status', 'ACTIVE')
+				->where('rnd_menu_ingredients_details.rnd_menu_items_id', $rnd_menu_id)
+				->where('rnd_menu_ingredients_details.is_existing', '!=', 'TRUE')
+				->select(
+					'new_ingredients.status',
+					'new_ingredients.nwi_code as item_code',
+					'new_ingredients.item_description',
+				)
+				->leftJoin('new_ingredients', 'new_ingredients.id', 'rnd_menu_ingredients_details.new_ingredients_id')
+				->get()
+				->toArray();
+
+			$no_code_packagings = DB::table('rnd_menu_packagings_details')
+				->where('rnd_menu_packagings_details.status', 'ACTIVE')
+				->where('rnd_menu_packagings_details.rnd_menu_items_id', $rnd_menu_id)
+				->where('rnd_menu_packagings_details.is_existing', '!=', 'TRUE')
+				->select(
+					'new_packagings.status',
+					'new_packagings.nwp_code as item_code',
+					'new_packagings.item_description',
+				)
+				->leftJoin('new_packagings', 'new_packagings.id', 'rnd_menu_packagings_details.new_packagings_id')
+				->get()
+				->toArray();
+			
+			return ['no_codes' => array_merge($no_code_ingredients, $no_code_packagings)];
 		}
 
 	}

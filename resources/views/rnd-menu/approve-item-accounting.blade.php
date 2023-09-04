@@ -125,7 +125,7 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label for="" class="control-label">Item(s) without Item Code</label>
+                        <label for="" class="control-label">Item(s) without Tasteless Code</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-sticky-note"></i>
@@ -134,6 +134,9 @@
                         </div>
                     </div>
                 </div>
+                @if ($no_codes)
+                    @include('rnd-menu/show-items-without-codes', $no_codes_data)
+                @endif
             </div>
             <hr>
             <h3 class="text-center">RND MENU COSTING</h3>
