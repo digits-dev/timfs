@@ -849,7 +849,7 @@
 						'cms_users.name'
 					)
 					->leftJoin('batching_ingredients', 'batching_ingredients.id', '=', 'batching_ingredients_details.batching_ingredients_id')
-					->leftJoin('cms_users', 'cms_users.id', '=', DB::raw('batching_ingredients_details.updated_by'))
+					->leftJoin('cms_users', 'cms_users.id', '=', DB::raw('COALESCE(batching_ingredients_details.updated_by, batching_ingredients_details.created_by)'))
 					->orderBy('item_description')
 					->get()
 					->toArray();
