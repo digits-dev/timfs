@@ -72,12 +72,7 @@ class MenuIngredientsExport  implements FromArray, WithHeadings
             }
         }
 
-        // dd($this->final_array);
-
-        return array_map(function($obj) {
-            unset($obj->batching_as_ingredient_id);
-            return $obj;
-        }, $this->final_array);
+        return $this->final_array;
     }
 
     public function batching_breakdown($menu_code, $menu_description, $batching_id, $ingredient_qty) {
