@@ -78,6 +78,7 @@
                 </tbody>
             </table>
         </div>
+        <hr>
         @if (!$ingredients)
         <h4 class="no-ingredient-warning" style="color: gray; text-align: center; font-style: italic;"> <i class="fa fa-spoon"></i> No ingredients to show...</h4>
         @else
