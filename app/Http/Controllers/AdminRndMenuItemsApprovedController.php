@@ -290,6 +290,20 @@
 	        $query->whereIn('rnd_menu_approvals.approval_status', $approval_status)
 				->addSelect('rnd_menu_approvals.approval_status')
 				->orderBy('rnd_menu_approvals.approval_status', 'desc');
+
+			if (in_array(CRUDBooster::myPrivilegeName(), ['Chef', 'Chef Assistant'])) {
+				$my_concepts = implode(',', $this->mainController->getMyConcepts());
+
+				$my_id = CRUDBooster::myId();
+
+				if ($my_concepts) {
+					$query
+						->whereRaw("find_in_set(rnd_menu_items.segmentations_id, '$my_concepts') or rnd_menu_items.created_by = $my_id");
+				} else {
+					$query->where('rnd_menu_items.created_by', CRUDBooster::myId());
+				}
+
+			}
 	    }
 
 	    /*
