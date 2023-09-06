@@ -119,6 +119,20 @@
                         </div>
                     </div>
                 </div>
+                @if ($no_codes)
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="control-label">Item(s) without Tasteless Code</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-sticky-note"></i>
+                                </div>
+                                <input value="{{$no_codes}}" class="form-control {{$no_codes ? 'no-code' : ''}}" style="outline: {{ $no_codes ? '2px solid red' : '' }}" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    @include('rnd-menu/show-items-without-codes', $no_codes_data)
+                @endif
             </div>
             <hr>
             <h3 class="text-center">RND MENU COSTING</h3>

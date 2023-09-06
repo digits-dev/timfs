@@ -1409,6 +1409,12 @@
 
 			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
 
+			$no_codes_data = self::getItemWithoutCodes($id);
+
+			$data['no_codes_data'] = $no_codes_data;
+			
+			$data['no_codes'] = count($no_codes_data['no_codes']);
+
 			$data['comments_data'] = self::getRNDComments($id);
 
 			$data['page_title'] = 'Approve RND Menu';
