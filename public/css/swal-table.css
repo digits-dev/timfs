@@ -1,0 +1,28 @@
+.swal-table-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+    max-width: 100%;
+}
+
+.swal-table-wrapper::-webkit-scrollbar {
+    height: 10px;
+}
+
+.swal-table {
+    border-collapse: collapse;
+    min-width: 100%;
+}
+
+.swal-table th {
+    white-space: nowrap;
+
+}
+
+.swal-table * {
+    font-size: 13px !important;
+}
+
+.swal-table th, .swal-table td {
+    border: 1px solid black;
+    padding: 5px;
+}
