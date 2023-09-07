@@ -904,7 +904,7 @@
             `);
 
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
-                $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() > 0;
+                $('.rnd_menu_description').val() && $('.rnd_menu_srp').val();
 
             const hasPackaging = $('.packaging-section .packaging-wrapper, .packaging-section .new-packaging-wrapper').length > 0;
 
@@ -929,7 +929,7 @@
                         .css('outline', '2px solid red');
                     if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
 					if (!$('.rnd_menu_description').val()) $('.rnd_menu_description').css('outline', '2px solid red');
-					if (!$('.rnd_menu_srp').val() || $('.rnd_menu_srp').val() <= 0) $('.rnd_menu_srp').css('outline', '2px solid red');
+					if (!$('.rnd_menu_srp').val()) $('.rnd_menu_srp').css('outline', '2px solid red');
                 });
         }
 
@@ -949,7 +949,7 @@
                         $.fn.submitForm('save');
                     }
                 });
-            } else if (!hasPackaging) {
+            } else if (!hasPackaging && isValid) {
                 Swal.fire({
                     title: 'Are you sure this item has no packaging?',
                     icon: 'warning',

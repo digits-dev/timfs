@@ -471,6 +471,8 @@
 
 			$data['comment_templates'] = (new AdminNewIngredientsController)->getCommentTemplate('packaging');
 
+			$data['item_usages'] = $this->mainController->getNewItemUsage($id, 'packaging');
+
 			return $this->view('new-items/detail-new-items', $data);
 		}
 
@@ -521,7 +523,9 @@
 			
 			$data['table'] = 'new_packagings';
 
-			$data['comments_data'] = (new AdminNewIngredientsController)->getNewItemsComments($id, true, 'new_packagings');
+			$data['comments_data'] = $this->mainController->getNewItemsComments($id, true, 'new_packagings');
+
+			$data['item_usages'] = $this->mainController->getNewItemUsage($id, 'packaging');
 
 			if ($data['item']->item_masters_id) {
 				return CRUDBooster::redirect(

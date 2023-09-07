@@ -470,9 +470,7 @@
 				->leftJoin('rnd_menu_computed_packaging_cost', 'rnd_menu_computed_packaging_cost.id', '=', 'rnd_menu_items.id')
 				->first();
 
-			$ingredients = self::getIngredients($id);
-
-			
+			$ingredients = self::getIngredients($id);			
 			$packagings = self::getPackagings($id);
 			
 			$rnd_menu_description = $data['item']->rnd_menu_description;
@@ -1424,6 +1422,12 @@
 
 			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
 
+			$no_codes_data = self::getItemWithoutCodes($id);
+
+			$data['no_codes_data'] = $no_codes_data;
+			
+			$data['no_codes'] = count($no_codes_data['no_codes']);
+
 			$data['comments_data'] = self::getRNDComments($id);
 
 			$data['page_title'] = 'Approve RND Menu';
@@ -1528,19 +1532,11 @@
 				->where('rnd_menu_items_id', $id)
 				->first();
 
-			$no_code_ingredients = DB::table('rnd_menu_ingredients_details')
-				->where('status', 'ACTIVE')
-				->where('rnd_menu_items_id', $id)
-				->where('is_existing', '!=', 'TRUE')
-				->count();
+			$no_codes_data = self::getItemWithoutCodes($id);
 
-			$no_code_packagings = DB::table('rnd_menu_packagings_details')
-				->where('status', 'ACTIVE')
-				->where('rnd_menu_items_id', $id)
-				->where('is_existing', '!=', 'TRUE')
-				->count();
-
-			$data['no_codes'] = $no_code_ingredients + $no_code_packagings;
+			$data['no_codes_data'] = $no_codes_data;
+			
+			$data['no_codes'] = count($no_codes_data['no_codes']);
 
 			$data['comments_data'] = self::getRNDComments($id);
 			
@@ -2066,6 +2062,12 @@
 				->where('rnd_menu_items_id', $id)
 				->where('rnd_menu_ingredients_auto_compute.status', 'ACTIVE')
 				->select('tasteless_code',
+					DB::raw('COALESCE(
+						item_masters.tasteless_code,
+						menu_items.tasteless_menu_code,
+						batching_ingredients.bi_code,
+						new_ingredients.nwi_code
+					) AS item_code'),
 					'menu_items.status as menu_item_status',
 					'sku_statuses.sku_status_description as item_status',
 					'new_ingredients.status as new_ingredient_status',
@@ -2112,35 +2114,39 @@
 				->where('rnd_menu_items_id', $id)
 				->where('rnd_menu_packagings_auto_compute.status', 'ACTIVE')
 				->select('tasteless_code',
-				'sku_statuses.sku_status_description as item_status',
-				'new_packagings.status as new_packaging_status',
-				'rnd_menu_packagings_auto_compute.item_masters_id',
-				'packaging_name',
-				'prep_qty',
-				'packaging_group',
-				'row_id',
-				'is_primary',
-				'is_selected',
-				'rnd_menu_packagings_auto_compute.packaging_size',
-				'rnd_menu_packagings_auto_compute.full_item_description',
-				'menu_ingredients_preparations.preparation_desc',
-				'packaging_qty',
-				'rnd_menu_packagings_auto_compute.uom_description',
-				'rnd_menu_packagings_auto_compute.packaging_description',
-				'yield',
-				'rnd_menu_packagings_auto_compute.ttp',
-				'cost',
-				'item_masters.updated_at',
-				'item_masters.created_at',
-				'rnd_menu_packagings_auto_compute.item_description')
-			->leftJoin('item_masters', 'rnd_menu_packagings_auto_compute.item_masters_id', '=', 'item_masters.id')
-			->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
-			->leftJoin('menu_ingredients_preparations', 'rnd_menu_packagings_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
-			->leftJoin('new_packagings', 'new_packagings.id', '=', 'rnd_menu_packagings_auto_compute.new_packagings_id')
-			->orderby('packaging_group', 'asc')
-			->orderby('row_id', 'asc')
-			->get()
-			->toArray();
+					DB::raw('COALESCE(
+						item_masters.tasteless_code,
+						new_packagings.nwp_code
+					) AS item_code'),
+					'sku_statuses.sku_status_description as item_status',
+					'new_packagings.status as new_packaging_status',
+					'rnd_menu_packagings_auto_compute.item_masters_id',
+					'packaging_name',
+					'prep_qty',
+					'packaging_group',
+					'row_id',
+					'is_primary',
+					'is_selected',
+					'rnd_menu_packagings_auto_compute.packaging_size',
+					'rnd_menu_packagings_auto_compute.full_item_description',
+					'menu_ingredients_preparations.preparation_desc',
+					'packaging_qty',
+					'rnd_menu_packagings_auto_compute.uom_description',
+					'rnd_menu_packagings_auto_compute.packaging_description',
+					'yield',
+					'rnd_menu_packagings_auto_compute.ttp',
+					'cost',
+					'item_masters.updated_at',
+					'item_masters.created_at',
+					'rnd_menu_packagings_auto_compute.item_description')
+				->leftJoin('item_masters', 'rnd_menu_packagings_auto_compute.item_masters_id', '=', 'item_masters.id')
+				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
+				->leftJoin('menu_ingredients_preparations', 'rnd_menu_packagings_auto_compute.menu_ingredients_preparations_id', '=', 'menu_ingredients_preparations.id')
+				->leftJoin('new_packagings', 'new_packagings.id', '=', 'rnd_menu_packagings_auto_compute.new_packagings_id')
+				->orderby('packaging_group', 'asc')
+				->orderby('row_id', 'asc')
+				->get()
+				->toArray();
 
 			return $packagings;
 		}
@@ -2159,6 +2165,36 @@
 
 			return $segmentations_id;
 
+		}
+
+		public function getItemWithoutCodes($rnd_menu_id) {
+			$no_code_ingredients = DB::table('rnd_menu_ingredients_details')
+				->where('rnd_menu_ingredients_details.status', 'ACTIVE')
+				->where('rnd_menu_ingredients_details.rnd_menu_items_id', $rnd_menu_id)
+				->where('rnd_menu_ingredients_details.is_existing', '!=', 'TRUE')
+				->select(
+					'new_ingredients.status',
+					'new_ingredients.nwi_code as item_code',
+					'new_ingredients.item_description',
+				)
+				->leftJoin('new_ingredients', 'new_ingredients.id', 'rnd_menu_ingredients_details.new_ingredients_id')
+				->get()
+				->toArray();
+
+			$no_code_packagings = DB::table('rnd_menu_packagings_details')
+				->where('rnd_menu_packagings_details.status', 'ACTIVE')
+				->where('rnd_menu_packagings_details.rnd_menu_items_id', $rnd_menu_id)
+				->where('rnd_menu_packagings_details.is_existing', '!=', 'TRUE')
+				->select(
+					'new_packagings.status',
+					'new_packagings.nwp_code as item_code',
+					'new_packagings.item_description',
+				)
+				->leftJoin('new_packagings', 'new_packagings.id', 'rnd_menu_packagings_details.new_packagings_id')
+				->get()
+				->toArray();
+			
+			return ['no_codes' => array_merge($no_code_ingredients, $no_code_packagings)];
 		}
 
 		function createHistory($rnd_menu_items_id, $to_update = false) {
