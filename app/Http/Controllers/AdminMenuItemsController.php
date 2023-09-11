@@ -1780,17 +1780,61 @@
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 			if ($history_type == 'ingredient') {
-				$table_name = 'menu_primary_ingredients';
+				$data = DB::table('menu_primary_ingredients as mpi')
+					->where('mpi.menu_items_id', $menu_items_id)
+					->select(
+						DB::raw('COALESCE(mpi.tasteless_code, bi.bi_code, ni.nwi_code) as item_code'),
+						'mpi.ingredient',
+						'miac.prep_qty as preparation_quantity',
+						'mpi.quantity as ingredient_quantity',
+						'mpi.uom',
+						'mip.preparation_desc as preparation',
+						'miac.yield',
+						'mpi.cost',
+					)
+					->leftJoin('menu_ingredients_details as mid', 'mid.id', 'mpi.menu_ingredients_details_id')
+					->leftJoin('batching_ingredients as bi', 'bi.id', 'mid.batching_ingredients_id')
+					->leftJoin('new_ingredients as ni', 'ni.id', 'mid.new_ingredients_id')
+					->leftJoin('menu_ingredients_preparations as mip', 'mip.id', 'mid.menu_ingredients_preparations_id')
+					->leftJoin('menu_ingredients_auto_compute as miac', 'miac.id', 'mid.id')
+					->get()
+					->toArray();
 			} else if ($history_type == 'packaging') {
-				$table_name = 'menu_primary_packagings';
+				$data = DB::table('menu_primary_packagings as mpp')
+					->select(
+						DB::raw('COALESCE(mpp.tasteless_code, np.nwp_code) as item_code'),
+						'mpp.packaging',
+						'mpp.quantity',
+						'mpp.uom',
+						'mpp.cost'
+					)
+					->where('mpp.menu_items_id', $menu_items_id)
+					->leftJoin('menu_packagings_details as mpd', 'mpd.id', 'mpp.menu_packagings_details_id')
+					->leftJoin('new_packagings as np', 'np.id', 'mpd.new_packagings_id')
+					->leftJoin('menu_packagings_auto_compute as mpac', 'mpac.id', 'mpd.id')
+					->get()
+					->toArray();
+				
 			} else if ($history_type == 'costing') {
-				$table_name = 'menu_costing';
+				$data = DB::table('menu_costing as mc')
+					->where('mc.menu_items_id', $menu_items_id)
+					->select(
+						'mc.portion_size',
+						'mc.recipe_cost_wo_buffer as recipe_cost_without_buffer',
+						'mc.buffer',
+						'mc.final_recipe_cost',
+						'mc.packaging_cost',
+						'mc.ideal_food_cost',
+						'mc.suggested_final_srp_w_vat_plus_packaging_cost as suggested_final_srp_with_vat_plus_packaging_cost',
+						'mc.final_srp_wo_vat as final_srp_without_vat',
+						'mc.food_cost_from_final_srp',
+						'mc.final_srp_w_vat_dine_in as dine_in_price',
+						'mc.final_srp_w_vat_take_out as take_out_price',
+						'mc.final_srp_w_vat_delivery as delivery_price',
+					)
+					->get()
+					->toArray();
 			}
-
-			$data = DB::table($table_name)
-				->where('menu_items_id', $menu_items_id)
-				->get()
-				->toArray();
 
 			DB::table('menu_details_history')
 				->insert([
