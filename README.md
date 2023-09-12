@@ -66,9 +66,9 @@
 - `ttp` = from the database || from the user if new
 - `prep_qty` = from the user
 - `yield` = from the user
-- `ingredient_modifier` = `uom_qty` / `packaging_size` \* `prep_qty` \* (1 + (1 - `yield`))
+- `ingredient_modifier` = `uom_qty` / `packaging_size` \* `prep_qty` / `yield`
 - `ingredient_cost` = `ingredient_modifier` \* `ttp`
-- `ingredient_qty` = `prep_qty` \* (1 + (1 - `yield`))
+- `ingredient_qty` = `prep_qty` / `yield`
 
 ---
 
@@ -223,22 +223,22 @@
 
 - ### 🟰 RND Menu Costing Formula
 
-  |       |           Particulars           | Value / Input by / Formula | Default Value |         Input Type         |
-  | :---: | :-----------------------------: | :------------------------: | :-----------: | :------------------------: |
-  | **a** |          portion size           |       input by chef        |       1       |         manual set         |
-  | **b** |   recipe cost without buffer    |       input by chef        |               | based on input ingredients |
-  | **c** |             buffer              |     input by marketing     |     6.5%      |         adjustable         |
-  | **d** |        final recipe cost        |    `(b * (1 + c)) / a`     |               |        auto compute        |
-  | **e** |         packaging cost          | input by chef / marketing  |               |  based on input packaging  |
-  | **f** |         ideal food cost         |     input by marketing     |      30%      |         adjustable         |
-  | **g** |  suggested final srp with vat   |       `d / f * 1.12`       |               |        auto compute        |
-  | **h** |      final srp without vat      |         `i / 1.12`         |               |        auto compute        |
-  | **i** |  final srp with vat (dine in)   |     input by marketing     |               |         manual set         |
-  | **j** |  final srp with vat (take out)  |     input by marketing     |               |         manual set         |
-  | **k** |  final srp with vat (delivery)  |     input by marketing     |               |         manual set         |
-  | **l** | % cost packaging from final srp |          `e / h`           |               |        auto compute        |
-  | **m** |   % food cost from final srp    |          `d / h`           |               |        auto compute        |
-  | **n** |          % total cost           |          `l + m`           |               |        auto compute        |
+  |       |                  Particulars                  | Value / Input by / Formula | Default Value |         Input Type         |
+  | :---: | :-------------------------------------------: | :------------------------: | :-----------: | :------------------------: |
+  | **a** |                 portion size                  |       input by chef        |       1       |         manual set         |
+  | **b** |          recipe cost without buffer           |       input by chef        |               | based on input ingredients |
+  | **c** |                    buffer                     |     input by marketing     |     6.5%      |         adjustable         |
+  | **d** |               final recipe cost               |    `(b * (1 + c)) / a`     |               |        auto compute        |
+  | **e** |                packaging cost                 | input by chef / marketing  |               |  based on input packaging  |
+  | **f** |                ideal food cost                |     input by marketing     |      30%      |         adjustable         |
+  | **g** | suggested final srp with vat + packaging_cost |     `d / f * 1.12 + e`     |               |        auto compute        |
+  | **h** |             final srp without vat             |         `i / 1.12`         |               |        auto compute        |
+  | **i** |         final srp with vat (dine in)          |     input by marketing     |               |         manual set         |
+  | **j** |         final srp with vat (take out)         |     input by marketing     |               |         manual set         |
+  | **k** |         final srp with vat (delivery)         |     input by marketing     |               |         manual set         |
+  | **l** |        % cost packaging from final srp        |          `e / h`           |               |        auto compute        |
+  | **m** |          % food cost from final srp           |          `d / h`           |               |        auto compute        |
+  | **n** |                 % total cost                  |          `l + m`           |               |        auto compute        |
 
 - ### 📅 Tables
   - `rnd_menu_items`
@@ -286,10 +286,13 @@
     - add / save ingredients
     - add / save packagings
     - add new ingredients to **New Ingredients** Module
-    - create batching ingredients in **Batching Ingredients** Module
+    - add new packagings to **New Packagings** Module
+    - create batching ingredients in **Batching List** Module
     - edit the rnd menu if they wish to
     - can add unpublished rnd menu items to archived items
-    - submit the rnd menu to next step (**publish**)
+    - click the food tasting button
+    - can add comment to comment section
+    - publish the item
 
   - #### 💹 Marketing
 
@@ -297,28 +300,70 @@
     - add new packagings to **New Packagings** Module
     - view the food cost value only
     - individual ingredients are hidden
+    - can add comment to comment section
     - create / udpate the menu
     - add the costing of the menu
+    - should add the release and end date after accounting approval
 
   - #### 👍 Marketing Approver
 
     - can talk to chef via comment section during food tasting
-    - can see ingredients
+    - can see ingredients during food tasting
     - can approve or reject the rnd menu item
-    - should add the release and end date after accounting approval
 
   - #### 💵 Purchasing (FOR ITEM CREATION) -> different module
 
     - should see all new items to be created
-    - should not be able to see which menu the items are used
     - should create items in IMFS for new ingredients / packagings
     - should tag all new ingredients / packagings
     - after tagging, new ingredients and packagings should be updated
 
-  - #### 🧾 Accounting
+  - #### 🧾 Accounting Approver
+
     - should not see the ingredients
     - approve or reject
+    - should see the items used in rnd without tasteless code
     - should not be able to approve until all ingredients and packagings are in IMFS
+
+  - ### 🧾 Sales Accounting
+    - should add the pos update date after adding of release date by marketing
+    - should upload items to pos
+
+### 📃 RND Menu Statuses
+
+- 🔵 `SAVED`
+  - chef save the rnd item
+  - can be edited
+- 🔵 `FOR FOOD TASTING`
+  - chef changed the status to food tasting
+  - marketing approver puts the comments about the food
+- 🟠 `FOR PACKAGING`
+  - chef published the item
+  - forwarded to marketing for packaging
+- 🟠 `FOR MENU CREATION`
+  - marketing saved the packagings
+  - ready for menu creation
+- 🔵 `FOR COSTING`
+  - marketing created the menu item
+  - menu item inserted to db without tasteless code, item is ready for costing
+- 🔵 `FOR APPROVAL (MARKETING)`
+  - costing has been saved
+  - ready for the approval of marketing approver
+- 🔵 `FOR APPROVAL (ACCOUNTING)`
+  - item has been approved by marketing approver
+  - ready for the approval of accouting approver
+  - if there are new ingredients / new packagings used for the item
+  - approver will not be able to approve it until those items are tagged by purchasing
+  - after approval, the tasteless code will be generated
+- 🟠 `FOR RELEASE DATE`
+  - item has been approved by 2 approvers
+  - marketing encoder inputs the release date (required) and end date (optional)
+- 🔵 `FOR POS UPDATE`
+  - done inputting the release date and / or end date
+  - sales accounting inputs the pos update date
+- 🟢 `CLOSED`
+  - done inputting the pos update date, the rnd process is done
+  - succeeding edits to the item should be done in menu masterfile module.
 
 ---
 
