@@ -83,7 +83,8 @@
         rows.forEach(dataObject => {
             const bodyRow = $('<tr>');
             headers.forEach(header => {
-                $('<td>').text(dataObject[header]).appendTo(bodyRow);
+                const value = dataObject[header];
+                $('<td>').text(isNaN(value) ? value : Number(value)).appendTo(bodyRow);
             });
             table.append(bodyRow);
         });
