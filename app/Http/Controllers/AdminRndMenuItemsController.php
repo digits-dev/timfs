@@ -2212,21 +2212,68 @@
 			}
 
 			$detail = DB::table('rnd_menu_items')
-				->where('id', $rnd_menu_items_id)
+				->where('rnd_menu_items.id', $rnd_menu_items_id)
+				->select(
+					'rnd_menu_items.rnd_code',
+					'rnd_menu_items.rnd_menu_description',
+					'segmentations.segment_column_description as concept',
+					'rnd_menu_items.portion_size',
+					'rnd_menu_items.buffer',
+					'rnd_menu_items.ideal_food_cost',
+					'rnd_menu_items.rnd_menu_srp',
+				)
+				->leftJoin('segmentations', 'segmentations.id', 'rnd_menu_items.segmentations_id')
 				->first();
 
-			$ingredient = DB::table('rnd_menu_primary_ingredients')
-				->where('rnd_menu_items_id', $rnd_menu_items_id)
+			$ingredient = DB::table('rnd_menu_primary_ingredients as rmpi')
+				->select(
+					DB::raw('COALESCE(rmpi.tasteless_code, bi.bi_code, ni.nwi_code) as item_code'),
+					'rmpi.ingredient',
+					'rmiac.prep_qty as preparation_quantity',
+					'rmiac.ingredient_qty as ingredient_quantity',
+					'rmpi.uom',
+					'mip.preparation_desc as preparation',
+					'rmiac.yield',
+					'rmpi.cost'
+				)
+				->where('rmpi.rnd_menu_items_id', $rnd_menu_items_id)
+				->leftJoin('rnd_menu_ingredients_auto_compute as rmiac', 'rmiac.id', 'rmpi.rnd_menu_ingredients_details_id')
+				->leftJoin('batching_ingredients as bi', 'bi.id', 'rmiac.batching_ingredients_id')
+				->leftJoin('new_ingredients as ni', 'ni.id', 'rmiac.new_ingredients_id')
+				->leftJoin('menu_ingredients_preparations as mip', 'mip.id', 'rmiac.menu_ingredients_preparations_id')
 				->get()
 				->toArray();
 
-			$packaging = DB::table('rnd_menu_primary_packagings')
-				->where('rnd_menu_items_id', $rnd_menu_items_id)
+			$packaging = DB::table('rnd_menu_primary_packagings as rmpp')
+				->select(
+					DB::raw('COALESCE(rmpp.tasteless_code, np.nwp_code) as item_code'),
+					'rmpp.packaging',
+					'rmpp.quantity',
+					'rmpp.uom',
+					'rmpp.cost',
+				)
+				->where('rmpp.rnd_menu_items_id', $rnd_menu_items_id)
+				->leftJoin('rnd_menu_packagings_auto_compute as rmpac', 'rmpac.id', 'rmpp.rnd_menu_packagings_details_id')
+				->leftJoin('new_packagings as np', 'np.id', 'rmpac.new_packagings_id')
 				->get()
 				->toArray();
 
-			$costing = DB::table('rnd_menu_costing')
-				->where('rnd_menu_items_id', $rnd_menu_items_id)
+			$costing = DB::table('rnd_menu_costing as rmc')
+				->where('rmc.rnd_menu_items_id', $rnd_menu_items_id)
+				->select(
+					'rmc.portion_size',
+					'rmc.recipe_cost_wo_buffer as recipe_cost_without_buffer',
+					'rmc.buffer',
+					'rmc.final_recipe_cost',
+					'rmc.packaging_cost',
+					'rmc.ideal_food_cost',
+					'rmc.suggested_final_srp_w_vat_plus_packaging_cost as suggested_final_srp_with_vat_plus_packaging_cost',
+					'rmc.final_srp_wo_vat as final_srp_without_vat',
+					'rmc.food_cost_from_final_srp',
+					'rmc.final_srp_w_vat_dine_in as dine_in_price',
+					'rmc.final_srp_w_vat_take_out as take_out_price',
+					'rmc.final_srp_w_vat_delivery as delivery_price',
+				)
 				->first();
 
 			$data = [
