@@ -81,6 +81,9 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <i class="fa fa-eye"></i><strong> Details RND Menu Item</strong>
+        @if ($workflow->approval_status)
+            <label class="pull-right label label-{{ $workflow->label_color }}">{{ $workflow->approval_status }}</label>
+        @endif
     </div>
     <div class="panel-body">
         <form action="" id="form" class="form">

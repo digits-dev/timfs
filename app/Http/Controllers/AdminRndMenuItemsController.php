@@ -475,6 +475,8 @@
 			$data['packagings'] = $packagings;
 			$data['page_title'] = "Detail RND Menu Item: $rnd_menu_description";
 			$data['comments_data'] = self::getRNDComments($id);
+			$data['workflow_data'] = self::getWorkFlowDetails($id);
+
 			return $this->view('rnd-menu/detail-item', $data);
 
 		}
@@ -1837,6 +1839,7 @@
 			$data['ingredients'] = array_map(fn ($object) => (object) array_filter((array) $object), $ingredients);
 			$data['packagings'] = array_map(fn ($object) => (object) array_filter((array) $object), $packagings);
 			$data['comments_data'] = self::getRNDComments($id);
+			$data['workflow'] = self::getWorkFlowDetails($id);
 			$data['page_title'] = "Detail RND Menu Item: $rnd_menu_description";
 
 			return $this->view('rnd-menu/detail-with-ingredients', $data);
@@ -1915,6 +1918,7 @@
 			$data = DB::table('rnd_menu_approvals')
 				->where('rnd_menu_items_id', $id)
 				->select(
+					'approval_status',
 					'published_by.name as published_by_name',
 					'published_at',
 					'packaging_updated_by.name as packaging_updated_by_name',
@@ -1938,6 +1942,33 @@
 				->leftJoin('cms_users as accounting_approved_by', 'accounting_approved_by.id', '=', 'rnd_menu_approvals.accounting_approved_by')
 				->leftJoin('cms_users as rejected_by', 'rejected_by.id', '=', 'rnd_menu_approvals.rejected_by')
 				->first();
+
+			$blue_status = ['SAVED', 'FOR COSTING'];
+			$dark_blue_status = ['FOR FOOD TASTING', 'RETURNED', 'FOR ADJUSTMENT', 'FOR POS UPDATE'];
+			$orange_status = ['FOR PACKAGING', 'FOR MENU CREATION', 'FOR ITEM CREATION', 'FOR RELEASE DATE'];
+			$green_status = ['APPROVED', 'CLOSED'];
+			$red_status = ['REJECTED'];
+			$purple_status = ['ARCHIVED'];
+
+			$approval_status = $data->approval_status;
+
+			if (in_array($approval_status, $blue_status)) {
+				$label_color = "info";
+			} else if (in_array($approval_status, $orange_status)) {
+				$label_color = "warning";
+			} else if (in_array($approval_status, $green_status)) {
+				$label_color = "success";
+			} else if (in_array($approval_status, $dark_blue_status)) {
+				$label_color = "primary";
+			} else if (in_array($approval_status, $red_status)) {
+				$label_color = "danger";
+			} else if (in_array($approval_status, $purple_status)) {
+				$label_color = "purple";
+			}
+			
+			if (str_contains($approval_status, 'APPROVAL')) $label_color = "info";
+
+			$data->label_color = $label_color;
 
 			return $data;
 		}
