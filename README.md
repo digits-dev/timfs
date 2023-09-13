@@ -338,7 +338,7 @@
   - chef changed the status to food tasting
   - marketing approver puts the comments about the food
 - 🟠 `FOR PACKAGING`
-  - chef published the item
+  - chef published the item or the item has been returned by approver to marketing
   - forwarded to marketing for packaging
 - 🟠 `FOR MENU CREATION`
   - marketing saved the packagings
@@ -364,6 +364,12 @@
 - 🟢 `CLOSED`
   - done inputting the pos update date, the rnd process is done
   - succeeding edits to the item should be done in menu masterfile module.
+- 🔵 `FOR ADJUSTMENT`
+  - the item has been returned to chef either by marketing or accounting
+  - after adjustment, the chef have to republish the item to continue proceeding to workflow
+- 🟣 `ARCHIVED`
+  - chef clicked the archive button and decided not to publish the item
+  - this will push the item to the bottom of the list
 
 ---
 
