@@ -259,6 +259,9 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <i class="fa fa-pencil"></i><strong> Add Packaging</strong>
+        @if ($workflow_data->approval_status)
+            <label class="pull-right label label-{{ $workflow_data->label_color }}">{{ $workflow_data->approval_status }}</label>
+        @endif
     </div>
     <div class="panel-body">
         <form action="" id="form-ingredient" class="form">

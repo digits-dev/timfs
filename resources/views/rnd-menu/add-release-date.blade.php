@@ -82,6 +82,9 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <i class="fa fa-pencil"></i><strong> Edit RND Menu Item</strong>
+        @if ($workflow->approval_status)
+            <label class="pull-right label label-{{ $workflow->label_color }}">{{ $workflow->approval_status }}</label>
+        @endif
     </div>
     <div class="panel-body">
         <form method="POST" action="{{route('add_release_date')}}" id="form" class="form">
