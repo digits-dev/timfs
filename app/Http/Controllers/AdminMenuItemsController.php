@@ -211,6 +211,15 @@
 	        */
 	        $this->index_button = array();
             if(CRUDBooster::getCurrentMethod() == 'getIndex') {
+				if (CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), self::$to_update_menu)) {
+					$this->index_button[] = [
+						"title"=>"Add Non-Trade Item",
+                        "label"=>"Add Non-Trade Item",
+                        "icon"=>"fa fa-plus",
+                        "color"=>"success",
+                        "url"=>route('add_non_trade_item')
+					];
+				}
                 // if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), self::$to_update_menu)){
                 //     $this->index_button[] = [
                 //         "title"=>"Upload New Menu Items",
@@ -233,7 +242,7 @@
 					'icon'=>'fa fa-download'
 				];
 
-				if (CRUDBooster::isSuperAdmin() || in_array('ingredients', self::$to_view[CRUDBooster::myPrivilegeName()] ?? [])) {
+				if (CRUDBooster::isSuperAdmin() || CRUDBooster::isCreate() || CRUDBooster::isUpdate() || in_array('ingredients', self::$to_view[CRUDBooster::myPrivilegeName()] ?? [])) {
 					$this->index_button[] = [
 						'label'=>'Export Menu Ingredients',
 						'url'=>"javascript:menuIngredientsExport()",
@@ -424,7 +433,7 @@
 
 	    /*
 	    | ---------------------------------------------------------------------- 
-	    | Hook for button selected
+	    | button selected
 	    | ---------------------------------------------------------------------- 
 	    | @id_selected = the id selected
 	    | @button_name = the name of button
@@ -828,6 +837,103 @@
 		public function exportMenuIngredients(Request $request) {
 			$filename = $request->input('filename');
 			return Excel::download(new MenuIngredientsExport, $filename.'.xlsx');
+		}
+
+		public function addNonTradeItem() {
+			if (!CRUDBooster::isCreate()) {
+				CRUDBooster::redirect(CRUDBooster::mainPath(), trans('crudbooster.denied_access'));
+			}
+
+			$data = [];
+			$data['page_title'] = 'Add Non Trade Items';
+			$data['menu_type'] = DB::table('menu_types')
+				->select('id', 'menu_type_description')
+				->where('status', 'ACTIVE')
+				->where('menu_type_description', 'OTHERS')
+				->first();
+
+			$data['menu_category'] = DB::table('menu_categories')
+				->select('id', 'category_description')
+				->where('status', 'ACTIVE')
+				->where('category_description', 'OTHERS')
+				->first();
+
+			$data['menu_subcategory'] = DB::table('menu_subcategories')
+				->select('id', 'subcategory_description')
+				->where('status', 'ACTIVE')
+				->where('subcategory_description', 'OTHERS')
+				->first();
+
+			$data['concepts'] = DB::table('segmentations')
+				->select('id', 'segment_column_description')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()
+				->toArray();
+
+			$data['menu_segmentations'] = DB::table('menu_segmentations')
+				->select('menu_segment_column_name', 'menu_segment_column_description')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
+			return $this->view('menu-items/add-non-trade-item', $data);
+
+		}
+
+		public function submitNonTradeItem(Request $request) {
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$menu_item_description = $request->get('menu_item_description');
+			$product_type = MenuProductType::firstOrCreate([
+				'menu_product_type_description' => strtoupper($request->get('menu_product_type'))
+			]);
+			$original_concept_ids = implode(',', $request->get('original_concept'));
+			$original_concept_name = DB::table('segmentations')
+				->whereIn('id', $request->get('original_concept'))
+				->pluck('segment_column_description')
+				->toArray();
+
+			$tasteless_menu_code = (int) DB::table('menu_items')
+				->where('tasteless_menu_code','like',"6%")
+				->select('tasteless_menu_code')
+				->max('tasteless_menu_code') + 1;
+
+			$data = [
+				'tasteless_menu_code' => $tasteless_menu_code,
+				'menu_item_description' => $menu_item_description,
+				'menu_product_types_name' => $request->get('menu_product_type'),
+				'menu_product_types_id' => $product_type->id,
+				'menu_types_id' => $request->get('menu_types_id'),
+				'menu_categories_id' => $request->get('menu_categories_id'),
+				'menu_subcategories_id' => $request->get('menu_subcategories_id'),
+				'menu_price_dine' => $request->get('menu_price_dine'),
+				'menu_price_take' => $request->get('menu_price_take'),
+				'menu_price_dlv' => $request->get('menu_price_dlv'),
+				'original_concept' => implode(',', $original_concept_name),
+				'segmentations_id' => $original_concept_ids,
+				'created_at' => $time_stamp,
+				'created_by' => $action_by,
+			];
+
+			foreach ($request->get('segmentations') as $key => $segmentation) {
+				$data[$segmentation] = '1';
+			}
+
+			$is_inserted = DB::table('menu_items')->insert($data);
+
+			if ($is_inserted) {
+				return redirect('admin/menu_items')
+					->with([
+						'message_type' => 'success',
+						'message' => "✔️ Non-Trade Item Added: $menu_item_description!"
+					]);
+			}
+			return redirect('admin/menu_items')
+				->with([
+					'message_type' => 'danger',
+					'message' => "Something went wrong, try again!"
+				]);
 		}
 
 		public function getEdit($id, $to_edit) {

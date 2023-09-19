@@ -104,6 +104,8 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/menu_items/packaging-detail/{id}', [AdminMenuItemsController::class, 'getPackagingDetail']);
     Route::get('/admin/menu_items/menu-data/{id}', [AdminMenuItemsController::class, 'getMenuDataDetail']);
     Route::get('/admin/menu_items/edit/{id}/{to_edit}', [AdminMenuItemsController::class, 'getEdit']);
+    Route::get('/admin/menu_items/add-non-trade-item', [AdminMenuItemsController::class, 'addNonTradeItem'])->name('add_non_trade_item');
+    Route::post('/admin/menu_items/submit-non-trade-item', [AdminMenuItemsController::class, 'submitNonTradeItem'])->name('submit_non_trade_item');
     Route::post('/admin/menu_items/submit-packaging', [AdminMenuItemsController::class, 'submitPackagings'])->name('menu_item_submit_packaging');
     Route::post('/admin/menu_items/submit-costing', [AdminMenuItemsController::class, 'submitCosting'])->name('menu_item_submit_costing');
     Route::post('/admin/menu_items/submit-menu-data', [AdminMenuItemsController::class, 'submitMenuData'])->name('menu_item_submit_menu_data');
