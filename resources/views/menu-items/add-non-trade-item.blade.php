@@ -121,19 +121,19 @@
                             <tr>
                                 <th style="width: 35%"><span class="required-star">*</span> Price Dine In</th>
                                 <td>
-                                    <input type="number" class="form-control" name="menu_price_dine" placeholder="0.00" step="0.01" required>
+                                    <input type="number" class="form-control" id="menu_price_dine" name="menu_price_dine" placeholder="0.00" step="0.01" required>
                                 </td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Price Take Out</th>
                                 <td>
-                                    <input type="number" class="form-control" name="menu_price_take" placeholder="0.00" step="0.01" required>
+                                    <input type="number" class="form-control" id="menu_price_take" name="menu_price_take" placeholder="0.00" step="0.01" required>
                                 </td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Price Deliver</th>
                                 <td>
-                                    <input type="number" class="form-control" name="menu_price_dlv" placeholder="0.00" step="0.01" required>
+                                    <input type="number" class="form-control"id="menu_price_dlv" name="menu_price_dlv" placeholder="0.00" step="0.01" required>
                                 </td>
                             </tr>
                             <tr>
@@ -170,20 +170,39 @@
         width: '100%',
     });
 
+    function checkPrices() {
+        const dineInPrice = Number($('#menu_price_dine').val());
+        const takeOutPrice = Number($('#menu_price_take').val());
+        const deliveryPrice = Number($('#menu_price_dlv').val());
+
+        return dineInPrice <= takeOutPrice && dineInPrice <= deliveryPrice;
+    }
+
     $(document).on('click', '#save-btn', function() {
-        Swal.fire({
-            title: 'Do you want to save this item?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes',
-            returnFocus: false,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $('#submit-btn').click();
-            }
-        });
+        const isValid = checkPrices();
+        if (isValid) {
+            Swal.fire({
+                title: 'Do you want to save this item?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                returnFocus: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#submit-btn').click();
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Oops..',
+                html: 'Please check the prices of the item! Take out and delivery prices should not be less than the dine in price.',
+                icon: 'error',
+                confirmButtonColor: '#3085d6',
+                returnFocus: false,
+            });
+        }
     });
 
     $('input').on('keypress', function(event) {

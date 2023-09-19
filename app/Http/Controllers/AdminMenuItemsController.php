@@ -882,6 +882,7 @@
 		}
 
 		public function submitNonTradeItem(Request $request) {
+			dd($request->all());
 			$time_stamp = date('Y-m-d H:i:s');
 			$action_by = CRUDBooster::myId();
 			$menu_item_description = $request->get('menu_item_description');
