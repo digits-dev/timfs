@@ -64,7 +64,7 @@
     <div class="panel-body">
         <h3 class="text-center">NON-TRADE ITEM</h3>
         <hr>
-        <form action="{{ route('submit_non_trade_item') }}" method="POST">
+        <form action="{{ route('submit_non_trade_item') }}" method="POST" autocomplete="off">
             @csrf
             <div class="row">
                 <div class="col-md-6">
