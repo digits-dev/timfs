@@ -131,7 +131,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Price Deliver</th>
+                                <th><span class="required-star">*</span> Price Delivery</th>
                                 <td>
                                     <input type="number" class="form-control"id="menu_price_dlv" name="menu_price_dlv" placeholder="0.00" step="0.01" required>
                                 </td>
