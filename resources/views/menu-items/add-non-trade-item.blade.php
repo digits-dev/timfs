@@ -89,18 +89,17 @@
                             <tr>
                                 <th><span class="required-star">*</span> Main Category</th>
                                 <td>
-                                    <select name="menu_categories_id" class="form-control" name="menu_categories_id" required>
-                                        <option selected value="{{ $menu_category->id }}">{{ $menu_category->category_description }}</option>
+                                    <select name="menu_categories_id" class="form-control" id="menu_categories_id" name="menu_categories_id" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($menu_categories as $menu_category)
+                                        <option value="{{ $menu_category->id }}">{{ $menu_category->category_description }}</option>
+                                        @endforeach
                                     </select>
                                 </td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Sub Category</th>
-                                <td>
-                                    <select name="menu_subcategories_id" class="form-control" name="menu_subcategories_id" required>
-                                        <option selected value="{{ $menu_subcategory->id }}">{{ $menu_subcategory->subcategory_description }}</option>
-                                    </select>
-                                </td>
+                                <td><input type="text" class="form-control" name="menu_subcategory" oninput="this.value = this.value.toUpperCase()" required></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Original Concept</th>
@@ -166,16 +165,16 @@
 </div>
 
 <script>
-    $('#segmentations, #original_concept').select2({
+    $('#segmentations, #original_concept, #menu_categories_id').select2({
         width: '100%',
     });
 
     function checkPrices() {
-        const dineInPrice = Number($('#menu_price_dine').val());
-        const takeOutPrice = Number($('#menu_price_take').val());
-        const deliveryPrice = Number($('#menu_price_dlv').val());
-
-        return dineInPrice <= takeOutPrice && dineInPrice <= deliveryPrice;
+        const dineInPrice = $('#menu_price_dine').val();
+        const takeOutPrice = $('#menu_price_take').val();
+        const deliveryPrice = $('#menu_price_dlv').val();
+        const isComplete = dineInPrice && takeOutPrice && deliveryPrice;
+        return isComplete;
     }
 
     $(document).on('click', '#save-btn', function() {
@@ -197,7 +196,7 @@
         } else {
             Swal.fire({
                 title: 'Oops..',
-                html: 'Please check the prices of the item! Take out and delivery prices should not be less than the dine in price.',
+                html: 'Please fill out all fields',
                 icon: 'error',
                 confirmButtonColor: '#3085d6',
                 returnFocus: false,

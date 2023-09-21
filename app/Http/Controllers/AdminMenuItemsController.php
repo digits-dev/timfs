@@ -16,6 +16,7 @@
 	use App\MenuPriceMaster;
 	use App\MenuSegmentation;
 	use App\MenuProductType;
+	use App\MenuSubcategory;
 	use Illuminate\Support\Facades\Request as Input;
     use Maatwebsite\Excel\HeadingRowImport;
     use Maatwebsite\Excel\Imports\HeadingRowFormatter;
@@ -852,17 +853,12 @@
 				->where('menu_type_description', 'OTHERS')
 				->first();
 
-			$data['menu_category'] = DB::table('menu_categories')
+			$data['menu_categories'] = DB::table('menu_categories')
 				->select('id', 'category_description')
 				->where('status', 'ACTIVE')
-				->where('category_description', 'OTHERS')
-				->first();
-
-			$data['menu_subcategory'] = DB::table('menu_subcategories')
-				->select('id', 'subcategory_description')
-				->where('status', 'ACTIVE')
-				->where('subcategory_description', 'OTHERS')
-				->first();
+				->orderBy('category_description', 'ASC')
+				->get()
+				->toArray();
 
 			$data['concepts'] = DB::table('segmentations')
 				->select('id', 'segment_column_description')
@@ -888,6 +884,9 @@
 			$product_type = MenuProductType::firstOrCreate([
 				'menu_product_type_description' => strtoupper($request->get('menu_product_type'))
 			]);
+			$menu_subcategory = MenuSubcategory::firstOrCreate([
+				'subcategory_description' => strtoupper($request->get('menu_subcategory'))
+			]);
 			$original_concept_ids = implode(',', $request->get('original_concept'));
 			$original_concept_name = DB::table('segmentations')
 				->whereIn('id', $request->get('original_concept'))
@@ -906,7 +905,7 @@
 				'menu_product_types_id' => $product_type->id,
 				'menu_types_id' => $request->get('menu_types_id'),
 				'menu_categories_id' => $request->get('menu_categories_id'),
-				'menu_subcategories_id' => $request->get('menu_subcategories_id'),
+				'menu_subcategories_id' => $menu_subcategory->id,
 				'menu_price_dine' => $request->get('menu_price_dine'),
 				'menu_price_take' => $request->get('menu_price_take'),
 				'menu_price_dlv' => $request->get('menu_price_dlv'),
@@ -919,7 +918,7 @@
 			foreach ($request->get('segmentations') as $key => $segmentation) {
 				$data[$segmentation] = '1';
 			}
-
+			
 			$is_inserted = DB::table('menu_items')->insert($data);
 
 			if ($is_inserted) {
