@@ -277,6 +277,7 @@
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
 			$postdata["created_by"]=CRUDBooster::myId();
+			$postdata["created_at"]=date('Y-m-d H:i:s');
 	    }
 
 	    /* 
