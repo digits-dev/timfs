@@ -779,7 +779,7 @@
         @if (CRUDBooster::isSuperAdmin() || CRUDBooster::myPrivilegeName() == 'Chef')
 		<button class="btn btn-success pull-right" id="publish-btn" {{$approval_status == 'FOR FOOD TASTING' ? '' : 'disabled'}}><i class="fa fa-upload"></i> Publish</button>
         @endif
-		<button class="btn btn-warning pull-right" id="food-tasting-btn" style="margin-right: 10px;" {{$approval_status == 'FOR FOOD TASTING' ? 'disabled' : ''}}><i class="fa fa-spoon"></i> Food Tasting</button>
+		<button class="btn btn-warning pull-right hide" id="food-tasting-btn" style="margin-right: 10px;" {{$approval_status == 'FOR FOOD TASTING' ? 'disabled' : ''}}><i class="fa fa-spoon"></i> Food Tasting</button>
 		<button class="btn btn-primary pull-right" id="save-btn" style="margin-right: 10px;"><i class="fa fa-save" ></i> Save</button>
         @if ($item)
 		<button class="btn btn-purple pull-right" id="archive-btn" style="margin-right: 10px;" {{$approval_status == 'ARCHIVED' ? 'disabled' : ''}}><i class="fa fa-eye-slash" ></i> Archive</button>
