@@ -777,7 +777,7 @@
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
         @if (CRUDBooster::isSuperAdmin() || CRUDBooster::myPrivilegeName() == 'Chef')
-		<button class="btn btn-success pull-right" id="publish-btn" {{$approval_status == 'FOR FOOD TASTING' ? '' : 'disabled'}}><i class="fa fa-upload"></i> Publish</button>
+		<button class="btn btn-success pull-right" id="publish-btn"><i class="fa fa-upload"></i> Publish</button>
         @endif
 		<button class="btn btn-warning pull-right hide" id="food-tasting-btn" style="margin-right: 10px;" {{$approval_status == 'FOR FOOD TASTING' ? 'disabled' : ''}}><i class="fa fa-spoon"></i> Food Tasting</button>
 		<button class="btn btn-primary pull-right" id="save-btn" style="margin-right: 10px;"><i class="fa fa-save" ></i> Save</button>
