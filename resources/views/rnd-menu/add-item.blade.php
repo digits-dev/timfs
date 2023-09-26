@@ -5,6 +5,7 @@
 <script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
 <link rel="stylesheet" href="{{asset('css/edit-rnd-menu.css')}}">
 <link rel="stylesheet" href="{{asset('css/custom.css')}}">
+<link rel="stylesheet" href="{{asset('css/costing.css')}}">
 @endpush
 @extends('crudbooster::admin_template')
 @section('content')
@@ -546,16 +547,142 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label"><span class="required-star">*</span> Portion Size</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <span class="custom-icon"><strong>÷</strong></span>
-                            </div>
-                            <input value="{{$item ? (float) $item->portion_size : '1'}}" type="number" class="form-control portion" placeholder="Portion Size">
-                        </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box-header text-center">
+                        <h3 class="box-title"><b>Costing</b></h3>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <table class="table table-striped table-bordered costing-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">PARTICULARS</th>
+                                <th class="text-center">VALUES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center text-bold">Portion Size</td>
+                                <td class="text-center">
+                                    <input type="number" value="{{ $item->portion_size ? (float) $item->portion_size : 1 }}" class="form-control portion-size" placeholder="Portion Size" step="any">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-bold">Recipe Cost Without Buffer</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control recipe-cost-wo-buffer" placeholder="Recipe Cost Without Buffer" step="any" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-bold">% Buffer</td>
+                                <td class="text-center">
+                                    <input name="buffer" value="{{ $item->buffer ? (float) $item->buffer : 6.5 }}" type="number" class="form-control buffer" placeholder="Buffer" step="any">
+                                </td>
+                            </tr>
+                            <tr class="divider">
+                                <td class="text-center text-bold">Final Recipe Cost</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control final-recipe-cost" placeholder="Final Recipe Cost" step="any" readonly>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-3">
+                    <table class="table table-striped table-bordered costing-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">PARTICULARS</th>
+                                <th class="text-center">VALUES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center text-bold">Packaging Cost</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control packaging-cost" placeholder="Packaging Cost" step="any" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-bold">% Ideal Food Cost</td>
+                                <td class="text-center">
+                                    <input name="ideal_food_cost" value="{{ $item->ideal_food_cost ? (float) $item->ideal_food_cost : 30 }}" type="number" class="form-control ideal-food-cost" placeholder="Ideal Food Cost" step="any">
+                                </td>
+                            </tr>
+                            <tr class="divider hide">
+                                <td class="text-center text-bold">Suggested Final SRP With VAT</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control suggested-final-srp-w-vat" placeholder="Suggested Final SRP With VAT" step="any" readonly>
+                                </td>
+                            </tr>
+                            <tr class="divider">
+                                <td class="text-center text-bold">Suggested Final SRP With VAT + Packaging Cost</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control suggested-final-srp-w-vat-plus-packaging-cost" placeholder="Suggested Final SRP With VAT + Packaging Cost" step="any" readonly>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-5">
+                    <table class="table table-striped table-bordered costing-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">PARTICULARS</th>
+                                <th class="text-center">VALUES</th>
+                            </tr>   
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center text-bold">Final SRP without VAT</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control final-srp-wo-vat" placeholder="Final SRP without VAT" step="any" readonly>
+                                </td>
+                            </tr>
+                            <tr class="hide">
+                                <td class="text-center text-bold">% Cost Packaging From Final SRP</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control cost-packaging-from-final-srp" placeholder="% Cost Packaging From Final SRP" step="any" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-bold">% Food Cost from Final SRP</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control food-cost-from-final-srp" placeholder="% Food Cost from Final SRP" step="any" readonly>
+                                </td>
+                            </tr>
+                            <tr class="hide">
+                                <td class="text-center text-bold">% Total Cost</td>
+                                <td class="text-center">
+                                    <input type="number" class="form-control total-cost" placeholder="% Total Cost" step="any" readonly>
+                                </td>
+                            </tr>
+                            <tr class="divider">
+                                <td class="text-center text-bold">Final SRP with VAT</td>
+                                <td>
+                                    <div class="row-srp">
+                                        <div class="srp-td">
+                                            <p class="text-center text-bold">Dine In</p>
+                                            <input name="menu_price_dine" type="number" value="{{ $item ? (float) $item->rnd_menu_srp : '' }}" class="form-control final-srp-w-vat-dine-in" placeholder="0.00" step="0.001" readonly>
+                                        </div>
+                                        <div class="srp-td">
+                                            <p class="text-center text-bold">Take Out</p>
+                                            <input name="menu_price_take" type="number" value="{{ $item ? (float) $item->rnd_menu_srp : '' }}" class="form-control final-srp-w-vat-take-out" placeholder="0.00" step="0.001" readonly>
+                                        </div>
+                                        <div class="srp-td">
+                                            <p class="text-center text-bold">Delivery</p>
+                                            <input name="menu_price_dlv" type="number" value="{{ $item ? (float) $item->rnd_menu_srp : '' }}" class="form-control final-srp-w-vat-delivery" placeholder="0.00" step="0.001" readonly>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <hr>
@@ -573,7 +700,7 @@
             </section>
             <hr>
             <div class="row">
-                <div class="col-md-4" style="margin-bottom: 15px;">
+                <div class="col-md-10" style="margin-bottom: 15px;">
                     <button class="btn btn-primary" id="add-existing-ingredient" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add existing ingredient</button>
                     <button class="btn btn-success" id="add-new-ingredient" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add new ingredient</button>
                 </div>
@@ -585,39 +712,6 @@
                                 <i class="fa fa-plus"></i>
                             </div>
                             <input type="text" class="form-control ingredient-total-cost" placeholder="Total Cost" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Cost Without Buffer</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <span class="custom-icon"><strong>₱</strong></span>
-                            </div>
-                            <input type="text" class="form-control recipe-cost-without-buffer" placeholder="Cost Without Buffer" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">% Buffer</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <span class="custom-icon"><strong>%</strong></span>
-                            </div>
-                            <input type="text" class="form-control buffer" placeholder="0.00" value="{{ $item->buffer ? (float) $item->buffer : 6.5 }}" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">% Ideal Food Cost</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <span class="custom-icon"><strong>%</strong></span>
-                            </div>
-                            <input type="text" class="form-control ideal_food_cost" placeholder="0.00%" value="{{ $item->ideal_food_cost ? (float) $item->ideal_food_cost : 30 }}" readonly>
                         </div>
                     </div>
                 </div>
@@ -722,6 +816,32 @@
                 timeout = setTimeout(later, wait);
                 if (callNow) func.apply(context, args);
             }
+        }
+
+        function computeCosting() {
+            const portionSize = $('.portion').val();
+            const recipeCostWithoutBuffer = $('.recipe-cost-without-buffer').val();
+            const buffer = $('.buffer').val();
+            
+            const packagingCost = $('.packaging-cost').val();
+            const idealFoodCost = $('.ideal-food-cost').val();
+            const finalSrpWithVat = $('.rnd_menu_srp').val();
+
+            const finalRecipeCost = $('.final-recipe-cost').val();
+            const suggestedFinalSrpWithVAT = math.round(finalRecipeCost / (idealFoodCost / 100) * 1.12, 4);
+            const suggestedFinalSrpWithVATPlusPackagingCost = math.round(suggestedFinalSrpWithVAT + Number(packagingCost), 4);
+            const finalSrpWithoutVAT = math.round(finalSrpWithVat / 1.12, 4);
+            const costPackagingFromFinalSrp = math.round(packagingCost / finalSrpWithoutVAT * 100, 2) || 0;
+            const foodCostFromFinalSrp = math.round(finalRecipeCost / finalSrpWithoutVAT * 100, 2) || 0;
+            const foodCostPercentage = math.round(math.round(finalRecipeCost / math.round((finalSrpWithVat - packagingCost) / 1.12, 4), 4) * 100, 2) || 0;
+
+            $('.suggested-final-srp-w-vat').val(suggestedFinalSrpWithVAT);
+            $('.suggested-final-srp-w-vat-plus-packaging-cost').val(suggestedFinalSrpWithVATPlusPackagingCost);
+            $('.final-srp-wo-vat').val(finalSrpWithoutVAT);
+            $('.cost-packaging-from-final-srp').val(costPackagingFromFinalSrp);
+            $('.food-cost-from-final-srp').val(foodCostPercentage);
+
+            $('.final-srp-w-vat-dine-in, .final-srp-w-vat-take-out, .final-srp-w-vat-delivery').val(finalSrpWithVat);
         }
 
         $.fn.firstLoad = function() {
@@ -1070,16 +1190,17 @@
             const packagingWrappers = jQuery.makeArray($('.packaging-section .packaging-wrapper, .packaging-section .new-packaging-wrapper'));
             const lowCost = Number(localStorage.getItem('lowCost')) || 30;
             const buffer = Number($('.buffer').val());
-            const idealFoodCost = Number($('.ideal_food_cost').val()) || 30;
+            const idealFoodCost = Number($('.ideal-food-cost').val()) || 30;
+            console.log(idealFoodCost);
             const totalIngredientCostInput = $('.ingredient-total-cost');
-            const totalCostInput = $('.total-cost');
-            const recipeCostWithoutBufferInput = $('.recipe-cost-without-buffer');
+            const recipeCostWithoutBufferInput = $('.recipe-cost-wo-buffer');
+            const finalRecipeCostInput = $('.final-recipe-cost');
             const foodCostInput = $('.food-cost');
-            const portionInput = $('.portion');
+            const portionInput = $('.portion-size');
             const srpInput = $('.rnd_menu_srp');
             const srp = srpInput.val() || 0;
             const percentageText = $('.percentage');
-            if (portionInput.val() <= 0) portionInput.val('1');
+            if (portionInput.val() <= 0)return;// portionInput.val('1');
             const portionSize = portionInput.val();
             let ingredientSum = 0;
             let packagingSum = 0;
@@ -1101,6 +1222,7 @@
             totalIngredientCostInput.val(ingredientSum);
             const foodCost = math.round((recipeCostWithoutBuffer * (1 + (buffer / 100))) / portionSize, 4);
             foodCostInput.val(foodCost);
+            finalRecipeCostInput.val(foodCost);
             const percentage = srp > 0 ? math.round(foodCost / srp * 100, 2) : 0;
 
             //looping through packaging wrappers 
@@ -1124,10 +1246,14 @@
             if (foodCostPercentage > idealFoodCost) {
                 $(percentageText).css('color', 'red');
                 foodCostInput.css({'color': 'red', 'outline': '2px solid red', 'font-weight': 'bold',});
+                $('.food-cost-from-final-srp').css({'color': 'red', 'outline': '2px solid red', 'font-weight': 'bold',});
             } else {
                 $(percentageText).css('color', '');
                 foodCostInput.css({'color': '', 'outline': '', 'font-weight': 'normal'});    
+                $('.food-cost-from-final-srp').css({'color': '', 'outline': '', 'font-weight': 'normal'});    
             }
+
+            computeCosting();
 
         }
 
@@ -1351,11 +1477,19 @@
             
             const portionData = $(document.createElement('input'))
                 .attr('name', 'portion_size')
-                .val($('.portion').val());
+                .val($('.portion-size').val());
 
             const segmentationData = $(document.createElement('input'))
                 .attr('name', 'segmentations_id')
                 .val($('.segmentation').val());
+
+            const bufferData = $(document.createElement('input'))
+                .attr('name', 'buffer')
+                .val($('.buffer').val());
+
+            const idealFoodCostData = $(document.createElement('input'))
+                .attr('name', 'idea_food_cost')
+                .val($('.ideal-food-cost').val());
 
             form.append(
                 csrf,
@@ -1366,6 +1500,8 @@
                 srpData,
                 portionData,
                 segmentationData,
+                bufferData,
+                idealFoodCostData,
             );
             $('.panel-body').append(form);
             form.submit();
@@ -1382,7 +1518,8 @@
 
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
-                $('.portion').val() > 0 && $('.rnd_menu_description').val() && $('.rnd_menu_srp').val();
+                $('.portion-size').val() > 0 && $('.rnd_menu_description').val() && $('.rnd_menu_srp').val() &&
+                $('.buffer').val() && $('.ideal-food-cost').val() > 0;
 
             const hasIngredient = $('#form-ingredient .ingredient-wrapper, #form-ingredient .new-ingredient-wrapper').length > 0;
             
@@ -1405,10 +1542,12 @@
                         .parents('.ingredient-entry, .packaging-entry')
                         .find('.display-ingredient, .display-packaging')
                         .css('outline', '2px solid red');
-                    if ($('.portion').val() == 0) $('.portion').css('outline', '2px solid red');
+                    if ($('.portion-size').val() == 0) $('.portion-size').css('outline', '2px solid red');
 					if (!$('.rnd_menu_description').val()) $('.rnd_menu_description').css('outline', '2px solid red');
 					if (!$('.rnd_menu_srp').val()) $('.rnd_menu_srp').css('outline', '2px solid red');
 					if (!$('.segmentation').val()) $('.segmentation').css('outline', '2px solid red');
+					if (!$('.buffer').val()) $('.buffer').css('outline', '2px solid red');
+					if ($('.ideal-food-cost').val() <= 0) $('.ideal-food-cost').css('outline', '2px solid red');
                 });
         }
 
@@ -1744,6 +1883,10 @@
                 $.fn.sumCost();
             });
         });
+
+        $(document).on('input', '.portion-size, .buffer, .ideal-food-cost', 'input', function() {
+            $.fn.sumCost();
+        })
 
 
         $('.loading-label').remove();

@@ -644,6 +644,8 @@
 			$food_cost_percentage = $request->get('food_cost_percentage');
 			$rnd_menu_srp = $request->get('rnd_menu_srp');
 			$portion_size = $request->get('portion_size');
+			$buffer = $request->get('buffer');
+			$ideal_food_cost = $request->get('ideal_food_cost');
 			$ingredient_total_cost = $request->get('ingredient_total_cost');
 			$ingredients = json_decode($request->get('ingredients'));
 			$packagings = json_decode($request->get('packagings'));
@@ -662,6 +664,8 @@
 						'segmentations_id' => $segmentations_id,
 						'rnd_code' => $rnd_code,
 						'portion_size' => $portion_size,
+						'buffer' => $buffer,
+						'ideal_food_cost' => $ideal_food_cost,
 						'rnd_menu_srp' => $rnd_menu_srp,
 						'created_by' => $action_by,
 						'created_at' => $time_stamp
