@@ -729,7 +729,6 @@
             </div>
         </form>
         <hr>
-        <hr>
         <form action="" id="form-packaging">
             <div class="row">
                 <div class="col-md-12">
