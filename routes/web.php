@@ -144,14 +144,18 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/delete-new-items/{table}/{id}', [AdminNewIngredientsController::class, 'deleteNewItem']);
 
     Route::post('/admin/new_ingredients/search-new-ingredients', [AdminNewIngredientsController::class, 'searchNewIngredients'])->name('search_new_ingredient');
-    Route::post('/admin/new_ingredients/edit-new-ingredients', [AdminNewIngredientsController::class, 'editNewIngredients'])->name('edit_new_ingredients');
+    Route::get('/admin/new_ingredients/get-tag/{id}', [AdminNewIngredientsController::class, 'getTag']);
+    Route::post('/admin/new_ingredients/tag-new-ingredient', [AdminNewIngredientsController::class, 'tagNewIngredient'])->name('tag_new_ingredient');
     Route::post('/admin/new_ingredients/search-item-for-tagging', [AdminNewIngredientsController::class, 'searchItemForTagging'])->name('search_item_for_tagging');
+    Route::post('/admin/new_ingredients/submit-edit', [AdminNewIngredientsController::class, 'submitEditNewIngredient'])->name('submit_edit_new_ingredient');
 
     Route::post('/admin/new_ingredients/add-new-items-comments', [AdminNewIngredientsController::class, 'addNewItemsComments'])->name('add_new_items_comments');
     Route::post('/admin/new_ingredients/delete-new-items-comments', [AdminNewIngredientsController::class, 'deleteNewItemsComments'])->name('delete_new_items_comments');
     
     Route::post('/admin/new_packagings/search-new-packagings', [AdminNewPackagingsController::class, 'searchNewPackagings'])->name('search_new_packaging');
-    Route::post('/admin/new_packagings/edit-new-packagings', [AdminNewpackagingsController::class, 'editNewPackagings'])->name('edit_new_packagings');
+    Route::get('/admin/new_packagings/get-tag/{id}', [AdminNewPackagingsController::class, 'getTag']);
+    Route::post('/admin/new_packagings/tag-new-packagings', [AdminNewpackagingsController::class, 'tagNewPackagings'])->name('tag_new_packagings');
+    Route::post('/admin/new_packagings/submit-edit', [AdminNewpackagingsController::class, 'submitEditNewPackaging'])->name('submit_edit_new_packaging');
     
     // batching ingredients
     Route::post('/admin/batching_ingredients/edit-batching-ingredient', [AdminBatchingIngredientsController::class, 'editBatchingIngredient'])->name('edit_batching_ingredient');

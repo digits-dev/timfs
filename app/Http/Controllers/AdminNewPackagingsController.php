@@ -59,6 +59,8 @@
 			$this->col[] = ["label"=>"Tagged Date","name"=>"tagged_at"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
+			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Updated Date","name"=>"updated_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -119,11 +121,21 @@
 				'color' => ' ',
 			];
 
-			if (in_array($my_privilege, $this->tagger) || CRUDBooster::isSuperAdmin()) {
+			if (CRUDBooster::isUpdate() || CRUDBooster::isSuperAdmin()) {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
 					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"[item_masters_id] == null && ([created_by] == CRUDBooster::myId() || CRUDBooster::isSuperAdmin())"
+				];
+			}
+
+			if (in_array($my_privilege, $this->tagger) || CRUDBooster::isSuperAdmin()) {
+				$this->addaction[] = [
+					'title'=>'Tag',
+					'url'=>CRUDBooster::mainpath('get-tag/[id]'),
+					'icon'=>'fa fa-tag',
 					'color' => ' ',
 					"showIf"=>"[item_masters_id] == null"
 				];
@@ -312,10 +324,6 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-			$my_privilege = CRUDBooster::myPrivilegeName();
-			if ($my_privilege == 'Purchasing Staff') {
-				$query->where('new_packagings.item_masters_id', null);
-			}
 	            
 	    }
 
@@ -507,11 +515,15 @@
 				->where('new_packagings.id', $id)
 				->select(
 					'*',
-					'new_packagings.created_at as created_at',
+					'created.name as created_name',
+					'updated.name as updated_name',
+					'new_packagings.created_at',
+					'new_packagings.updated_at',
 					'new_packagings.id as new_packagings_id'
 				)
 				->leftJoin('uoms', 'uoms.id', '=', 'new_packagings.uoms_id')
-				->leftJoin('cms_users', 'cms_users.id', '=', 'new_packagings.created_by')
+				->leftJoin('cms_users as created', 'created.id', '=', 'new_packagings.created_by')
+				->leftJoin('cms_users as updated', 'updated.id', 'new_packagings.updated_by')
 				->get()
 				->first();
 
@@ -523,7 +535,22 @@
 			
 			$data['table'] = 'new_packagings';
 
+			$data['comment_templates'] = $this->mainController->getCommentTemplate('packaging');
+
 			$data['comments_data'] = $this->mainController->getNewItemsComments($id, true, 'new_packagings');
+
+			$data['new_item_types'] = DB::table('new_item_types')
+				->where('new_item_types.status', 'ACTIVE')
+				->orderBy('item_type_description')
+				->get()
+				->toArray();
+
+			$data['uoms'] = DB::table('uoms')
+				->where('uoms.status', 'ACTIVE')
+				->orderBy('uoms.uom_description')
+				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
+				->get()
+				->toArray();
 
 			$data['item_usages'] = $this->mainController->getNewItemUsage($id, 'packaging');
 
@@ -534,7 +561,38 @@
 				);
 			}
 
-			return $this->view('new-items/edit-new-items', $data);
+			return $this->view('new-items/edit-new-item', $data);
+		}
+
+		public function submitEditNewPackaging(Request $request) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$new_packagings_id = $request->get('new_items_id');
+			$action_by = CRUDBooster::myId();
+			$time_stamp = date('Y-m-d H:i:s');
+
+			DB::table('new_packagings')
+				->where('new_packagings.id', $new_packagings_id)
+				->update([
+					'new_item_types_id' => $request->get('new_item_types_id'),
+					'item_description' => strtoupper($request->get('item_description')),
+					'packaging_size' => $request->get('packaging_size'),
+					'uoms_id' => $request->get('uoms_id'),
+					'ttp' => $request->get('ttp'),
+					'updated_at' => $time_stamp,
+					'updated_by' => $action_by,
+				]);
+			
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => "Item details updated!"
+				]);
 		}
 
 		public function getAdd() {
@@ -565,7 +623,70 @@
 			return $this->view('new-items/add-new-item', $data);
 		}
 
-		public function editNewPackagings(Request $request) {
+		public function getTag($id) {
+			if (!CRUDBooster::isUpdate())
+				CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+
+			$data = [];
+
+			$data['item'] = DB::table('new_packagings')
+				->where('new_packagings.id', $id)
+				->select(
+					'*',
+					'created.name as created_name',
+					'updated.name as updated_name',
+					'new_packagings.created_at',
+					'new_packagings.updated_at',
+					'new_packagings.id as new_packagings_id'
+				)
+				->leftJoin('uoms', 'uoms.id', '=', 'new_packagings.uoms_id')
+				->leftJoin('cms_users as created', 'created.id', '=', 'new_packagings.created_by')
+				->leftJoin('cms_users as updated', 'updated.id', '=', 'new_packagings.updated_by')
+				->get()
+				->first();
+
+			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
+				->where('status', 'ACTIVE')
+				->where('new_ingredients_id', $id)
+				->get()
+				->count();
+
+			$data['table'] = 'new_ingredients';
+
+			$data['comment_templates'] = $this->mainController->getCommentTemplate('ingredient');
+
+			$data['comments_data'] = $this->mainController->getNewItemsComments($id);
+
+			$data['new_item_types'] = DB::table('new_item_types')
+				->where('new_item_types.status', 'ACTIVE')
+				->orderBy('item_type_description')
+				->get()
+				->toArray();
+
+			$data['uoms'] = DB::table('uoms')
+				->where('uoms.status', 'ACTIVE')
+				->orderBy('uoms.uom_description')
+				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
+				->get()
+				->toArray();
+
+			$data['item_usages'] = $this->mainController->getNewItemUsage($id, 'ingredient');
+
+			if ($data['item']->item_masters_id) {
+				return CRUDBooster::redirect(
+					CRUDBooster::mainPath(),
+					"This item has already been tagged.", 'danger'
+				);
+			}
+
+
+			return $this->view('new-items/tag-new-item', $data);
+		}
+
+		public function tagNewPackagings(Request $request) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
@@ -586,7 +707,7 @@
 
 			if (!$item_masters_id) {
 				return CRUDBooster::redirect(
-					CRUDBooster::mainPath('edit/' . $new_packagings_id),
+					CRUDBooster::mainPath('get-tag/' . $new_packagings_id),
 					"I'm sorry, the tasteless code you entered is either not existing or from an inactive item.", 'danger'
 				);
 			} else {
