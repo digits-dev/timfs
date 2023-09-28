@@ -65,6 +65,8 @@
                         <th scope="col">RND Menu Item Description</th>
                         <th scope="col">RND Menu SRP</th>
                         <th scope="col">Portion Size</th>
+                        <th scope="col">Buffer</th>
+                        <th scope="col">Ideal Food Cost</th>
                         <th scope="col">Food Cost</th>
                         <th scope="col">Food Cost Percentage</th>
                     </tr>
@@ -75,6 +77,8 @@
                         <td>{{$item->rnd_menu_description}}</td>
                         <td class="peso">{{'₱ ' . (float) $item->rnd_menu_srp}}</td>
                         <td>{{(float) $item->portion_size}}</td>
+                        <td>{{(float) $item->buffer}}%</td>
+                        <td>{{(float) $item->ideal_food_cost}}%</td>
                         <td class="food-cost">{{$item->computed_food_cost ? '₱ ' . (float) $item->computed_food_cost : '0'}}</td>
                         <td class="food-cost-percentage">{{$item->computed_food_cost_percentage ? (float) $item->computed_food_cost_percentage . '%' : '0%'}}</td>
                     </tr>
