@@ -1487,7 +1487,7 @@
                 .val($('.buffer').val());
 
             const idealFoodCostData = $(document.createElement('input'))
-                .attr('name', 'idea_food_cost')
+                .attr('name', 'ideal_food_cost')
                 .val($('.ideal-food-cost').val());
 
             form.append(
