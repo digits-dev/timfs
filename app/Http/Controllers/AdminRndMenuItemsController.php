@@ -458,6 +458,8 @@
 					'rnd_menu_items.rnd_menu_srp',
 					'rnd_menu_items.rnd_menu_description',
 					'rnd_menu_items.portion_size',
+					'rnd_menu_items.buffer',
+					'rnd_menu_items.ideal_food_cost',
 					'computed_ingredient_total_cost',
 					'computed_food_cost',
 					'computed_food_cost_percentage',
@@ -644,6 +646,8 @@
 			$food_cost_percentage = $request->get('food_cost_percentage');
 			$rnd_menu_srp = $request->get('rnd_menu_srp');
 			$portion_size = $request->get('portion_size');
+			$buffer = $request->get('buffer');
+			$ideal_food_cost = $request->get('ideal_food_cost');
 			$ingredient_total_cost = $request->get('ingredient_total_cost');
 			$ingredients = json_decode($request->get('ingredients'));
 			$packagings = json_decode($request->get('packagings'));
@@ -662,6 +666,8 @@
 						'segmentations_id' => $segmentations_id,
 						'rnd_code' => $rnd_code,
 						'portion_size' => $portion_size,
+						'buffer' => $buffer,
+						'ideal_food_cost' => $ideal_food_cost,
 						'rnd_menu_srp' => $rnd_menu_srp,
 						'created_by' => $action_by,
 						'created_at' => $time_stamp
@@ -678,8 +684,13 @@
 						'rnd_menu_items.segmentations_id' => $segmentations_id,
 						'rnd_menu_items.rnd_menu_srp' => DB::raw("COALESCE(menu_items.menu_price_dine, $rnd_menu_srp)"),
 						'rnd_menu_items.portion_size' => $portion_size,
+						'rnd_menu_items.buffer' => $buffer,
+						'rnd_menu_items.ideal_food_cost' => $ideal_food_cost,
 						'rnd_menu_items.updated_at' => $time_stamp,
 						'rnd_menu_items.updated_by' => $action_by,
+						'menu_items.portion_size' => $portion_size,
+						'menu_items.buffer' => $buffer,
+						'menu_items.ideal_food_cost' => $ideal_food_cost,
 						'menu_items.menu_price_dine' => DB::raw("COALESCE(menu_items.menu_price_dine, $rnd_menu_srp)"),
 						'menu_items.menu_price_take' => DB::raw("COALESCE(menu_items.menu_price_take, $rnd_menu_srp)"),
 						'menu_items.menu_price_dlv' => DB::raw("COALESCE(menu_items.menu_price_dlv, $rnd_menu_srp)"),
@@ -1822,6 +1833,8 @@
 					'rnd_menu_items.rnd_menu_srp',
 					'rnd_menu_items.rnd_menu_description',
 					'rnd_menu_items.portion_size',
+					'rnd_menu_items.buffer',
+					'rnd_menu_items.ideal_food_cost',
 					'computed_ingredient_total_cost',
 					'computed_food_cost',
 					'computed_food_cost_percentage',

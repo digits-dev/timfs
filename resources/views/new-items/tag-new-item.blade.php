@@ -19,10 +19,10 @@
 </p>      
 <div class="panel panel-default">
     <div class="panel-heading">
-        <i class="fa fa-pencil"></i><strong> Edit {{CRUDBooster::getCurrentModule()->name}}</strong>
+        <i class="fa fa-tag"></i><strong> Tag {{CRUDBooster::getCurrentModule()->name}}</strong>
     </div>
     <div class="panel-body">
-        <form method="POST" action="{{ $table == 'new_ingredients' ? route('edit_new_ingredients') : route('edit_new_packagings')}}" id="form-main" autocomplete="off">
+        <form method="POST" action="{{ $table == 'new_ingredients' ? route('tag_new_ingredient') : route('tag_new_packaging')}}" id="form-main" autocomplete="off">
             @csrf
             <input type="text" name="new_items_id" class="hide" value="{{ $item->new_ingredients_id ?? $item->new_packagings_id }}">
             <div class="row">
@@ -58,6 +58,10 @@
                                 <th>TTP</th>
                                 <td>{{$item->ttp}}</td>
                             </tr>
+                            <tr>
+                                <th>Taget Date</th>
+                                <td>{{$item->target_date}}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -70,11 +74,19 @@
                             </tr>
                             <tr>
                                 <th>Created by</th>
-                                <td>{{$item->name}}</td>
+                                <td>{{$item->created_name}}</td>
                             </tr>
                             <tr>
                                 <th>Created Date</th>
                                 <td>{{$item->created_at}}</td>
+                            </tr>
+                            <tr>
+                                <th>Updated by</th>
+                                <td>{{$item->updated_name}}</td>
+                            </tr>
+                            <tr>
+                                <th>Updated Date</th>
+                                <td>{{$item->updated_at}}</td>
                             </tr>
                         </tbody>
                     </table>

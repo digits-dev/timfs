@@ -26,12 +26,16 @@
                                 <td>{{$item->nwi_code ?? $item->nwp_code}}</td>
                             </tr>
                             <tr>
+                                <th>Item Type</th>
+                                <td>{{$item->item_type_description}}</td>
+                            </tr>
+                            <tr>
                                 <th>Item Description</th>
                                 <td>{{$item->item_description}}</td>
                             </tr>
                             <tr>
                                 <th>Packaging Size</th>
-                                <td>{{$item->packaging_size}}</td>
+                                <td>{{(float) $item->packaging_size}}</td>
                             </tr>
                             <tr>
                                 <th>UOM</th>
@@ -39,7 +43,11 @@
                             </tr>
                             <tr>
                                 <th>TTP</th>
-                                <td>{{$item->ttp}}</td>
+                                <td>{{(float) $item->ttp}}</td>
+                            </tr>
+                            <tr>
+                                <th>Target Date</th>
+                                <td>{{$item->target_date}}</td>
                             </tr>
                             <tr>
                                 <th>Created by</th>
@@ -48,6 +56,14 @@
                             <tr>
                                 <th>Created Date</th>
                                 <td>{{$item->created_at}}</td>
+                            </tr>
+                            <tr>
+                                <th>Updated by</th>
+                                <td>{{$item->updator_name}}</td>
+                            </tr>
+                            <tr>
+                                <th>Updated Date</th>
+                                <td>{{$item->updated_at}}</td>
                             </tr>
                             <tr>
                                 <th>Tagged by</th>
@@ -66,30 +82,6 @@
                         </tbody>
                     </table>
                 </div>
-                <h3 class="text-center">ITEM USAGE</h3>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Item Code</th>
-                                <th>Item Description</th>
-                                <th>User</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (!$item_usages)
-                            <tr><td class="text-center" style="font-style: italic; color: grey" colspan="3">This item is currently not in use...</td></tr>
-                            @endif
-                            @foreach ($item_usages as $item_usage)
-                            <tr>
-                                <td>{{ $item_usage->item_code }}</td>
-                                <td>{{ $item_usage->item_description }}</td>
-                                <td>{{ $item_usage->name }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
             </div>
             <div class="col-md-6">
                 <hr>
@@ -99,11 +91,34 @@
                 </div>
             </div>
         </div>
-        <hr>
         <div class="row">
-            {{-- <div class="col-md-4"> --}}
-                
-            {{-- </div> --}}
+            <div class="col-md-6">
+                <hr>
+                <h3 class="text-center">ITEM USAGE</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Item Code</th>
+                                <th class="text-center">Item Description</th>
+                                <th class="text-center">User</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!$item_usages)
+                            <tr><td class="text-center" style="font-style: italic; color: grey" colspan="3">This item is currently not in use...</td></tr>
+                            @endif
+                            @foreach ($item_usages as $item_usage)
+                            <tr>
+                                <td class="text-center">{{ $item_usage->item_code }}</td>
+                                <td class="text-center">{{ $item_usage->item_description }}</td>
+                                <td class="text-center">{{ $item_usage->name }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
     <div class="panel-footer">
