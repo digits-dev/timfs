@@ -743,7 +743,7 @@
 					]);
 
 				DB::table('menu_packagings_details')
-					->where('new_packagings_id')
+					->where('new_packagings_id', $new_packagings_id)
 					->update([
 						'updated_by' => $action_by,
 						'updated_at' => $time_stamp,
