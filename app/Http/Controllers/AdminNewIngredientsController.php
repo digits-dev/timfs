@@ -52,6 +52,7 @@
 			$this->col[] = ["label"=>"Packaging Size","name"=>"packaging_size"];
 			$this->col[] = ["label"=>"UOM","name"=>"uoms_id","join"=>"uoms,uom_description"];
 			$this->col[] = ["label"=>"TTP","name"=>"ttp"];
+			$this->col[] = ["label"=>"Target Date","name"=>"target_date"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Tagged By","name"=>"tagged_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Tagged Date","name"=>"tagged_at"];
@@ -320,7 +321,10 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-	        //Your code here
+	        $query
+				->orderBy(DB::raw('item_masters_id is null'), 'desc')
+				->orderBy(DB::raw('target_date is null'), 'asc')
+				->orderBy('target_date', 'asc');
 	            
 	    }
 
@@ -349,6 +353,7 @@
 
 			$postdata['nwi_code'] = $nwi_code;
 			$postdata['comment'] = Input::get('comment');
+			$postdata['target_date'] = Input::get('target_date');
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
 			$postdata['created_by'] = CRUDBooster::myId();
 			$postdata['created_at'] = date('Y-m-d H:i:s');
