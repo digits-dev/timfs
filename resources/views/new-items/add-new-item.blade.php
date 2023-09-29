@@ -69,6 +69,10 @@
                                 <th><span class="required-star">*</span>  SRP</th>
                                 <td><input type="number" step="any" name="ttp" class="form-control" required placeholder="SRP"></td>
                             </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Target Date</th>
+                                <td><input type="date" step="any" name="target_date" class="form-control" required></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
