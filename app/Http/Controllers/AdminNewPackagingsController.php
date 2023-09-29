@@ -458,17 +458,22 @@
 					'new_packagings.created_at as created_at',
 					'new_packagings.id as new_packagings_id',
 					'creator.name as creator_name',
+					'updator.name as updator_name',
 					'tagger.name as tagger_name',
 					'new_packagings.created_at',
+					'new_packagings.updated_at',
 					'new_packagings.tagged_at',
 					'item_masters.id as item_masters_id',
 					'new_packagings.ttp as ttp',
-					'new_packagings.packaging_size as packaging_size'
+					'new_packagings.packaging_size as packaging_size',
+					'new_item_types.item_type_description'
 				)
 				->leftJoin('uoms', 'uoms.id', '=', 'new_packagings.uoms_id')
 				->leftJoin('cms_users as creator', 'creator.id', '=', 'new_packagings.created_by')
+				->leftJoin('cms_users as updator', 'updator.id', '=', 'new_packagings.updated_by')
 				->leftJoin('cms_users as tagger', 'tagger.id', '=', 'new_packagings.tagged_by')
 				->leftJoin('item_masters', 'item_masters.id', '=', 'new_packagings.item_masters_id')
+				->leftJoin('new_item_types', 'new_item_types.id', '=', 'new_packagings.new_item_types_id')
 				->get()
 				->first();
 

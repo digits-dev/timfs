@@ -455,17 +455,22 @@
 					'new_ingredients.created_at as created_at',
 					'new_ingredients.id as new_ingredients_id',
 					'creator.name as creator_name',
+					'updator.name as updator_name',
 					'tagger.name as tagger_name',
 					'new_ingredients.created_at',
+					'new_ingredients.updated_at',
 					'new_ingredients.tagged_at',
 					'item_masters.id as item_masters_id',
 					'new_ingredients.ttp as ttp',
-					'new_ingredients.packaging_size as packaging_size'
+					'new_ingredients.packaging_size as packaging_size',
+					'new_item_types.item_type_description'
 				)
 				->leftJoin('uoms', 'uoms.id', '=', 'new_ingredients.uoms_id')
 				->leftJoin('cms_users as creator', 'creator.id', '=', 'new_ingredients.created_by')
+				->leftJoin('cms_users as updator', 'updator.id', '=', 'new_ingredients.updated_by')
 				->leftJoin('cms_users as tagger', 'tagger.id', '=', 'new_ingredients.tagged_by')
 				->leftJoin('item_masters', 'item_masters.id', '=', 'new_ingredients.item_masters_id')
+				->leftJoin('new_item_types', 'new_item_types.id', '=', 'new_ingredients.new_item_types_id')
 				->get()
 				->first();
 
