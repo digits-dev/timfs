@@ -64,6 +64,10 @@
                                 <th><span class="required-star">*</span>  SRP</th>
                                 <td><input type="number" value="{{ $item ? (float) $item->ttp : '' }}" step="any" name="ttp" class="form-control" required placeholder="SRP"></td>
                             </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Target Date</th>
+                                <td><input type="date" value="{{ $item->target_date ? $item->target_date : '' }}" step="any" name="target_date" class="form-control" required></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

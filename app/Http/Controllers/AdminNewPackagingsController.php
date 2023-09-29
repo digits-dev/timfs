@@ -588,6 +588,7 @@
 					'packaging_size' => $request->get('packaging_size'),
 					'uoms_id' => $request->get('uoms_id'),
 					'ttp' => $request->get('ttp'),
+					'target_date' => $request->get('target_date'),
 					'updated_at' => $time_stamp,
 					'updated_by' => $action_by,
 				]);
