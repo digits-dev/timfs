@@ -58,6 +58,10 @@
                                 <th>TTP</th>
                                 <td>{{$item->ttp}}</td>
                             </tr>
+                            <tr>
+                                <th>Taget Date</th>
+                                <td>{{$item->target_date}}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
