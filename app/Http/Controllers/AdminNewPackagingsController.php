@@ -665,7 +665,7 @@
 				->get()
 				->count();
 
-			$data['table'] = 'new_ingredients';
+			$data['table'] = 'new_packagings';
 
 			$data['comment_templates'] = $this->mainController->getCommentTemplate('ingredient');
 

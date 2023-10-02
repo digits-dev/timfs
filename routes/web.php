@@ -154,7 +154,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     
     Route::post('/admin/new_packagings/search-new-packagings', [AdminNewPackagingsController::class, 'searchNewPackagings'])->name('search_new_packaging');
     Route::get('/admin/new_packagings/get-tag/{id}', [AdminNewPackagingsController::class, 'getTag']);
-    Route::post('/admin/new_packagings/tag-new-packagings', [AdminNewpackagingsController::class, 'tagNewPackagings'])->name('tag_new_packagings');
+    Route::post('/admin/new_packagings/tag-new-packagings', [AdminNewpackagingsController::class, 'tagNewPackagings'])->name('tag_new_packaging');
     Route::post('/admin/new_packagings/submit-edit', [AdminNewpackagingsController::class, 'submitEditNewPackaging'])->name('submit_edit_new_packaging');
     
     // batching ingredients
