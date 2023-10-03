@@ -210,6 +210,29 @@
 	        |
 	        */
 	        $this->index_statistic = array();
+			$tagged_items = DB::table('new_packagings')
+			->where('new_packagings.status', 'ACTIVE')
+			->whereNotNull('new_packagings.item_masters_id')
+			->count();
+
+			$pending_items = DB::table('new_packagings')
+				->where('new_packagings.status', 'ACTIVE')
+				->whereNull('new_packagings.item_masters_id')
+				->count();
+
+			$this->index_statistic[] = [
+				'label' => 'Pending Items',
+				'count' => $pending_items,
+				'icon' => 'fa fa-hourglass',
+				'color' => 'orange',
+			];
+
+			$this->index_statistic[] = [
+				'label' => 'Tagged Items',
+				'count' => $tagged_items,
+				'icon' => 'fa fa-tag',
+				'color' => 'green',
+			];
 
 
 
