@@ -40,8 +40,9 @@
 			$this->col[] = ["label"=>"Batching Description","name"=>"ingredient_description"];
 			$this->col[] = ["label"=>"Quantity","name"=>"quantity"];
 			$this->col[] = ["label"=>"UOM","name"=>"uoms_id","join"=>"packagings,packaging_description"];
-			$this->col[] = ["label"=>"TTP","name"=>"ttp"];
 			$this->col[] = ["label"=>"Total Cost","name"=>"id","join"=>"batching_ingredients_computed_food_cost,ingredient_total_cost","join_id"=>"id"];
+			$this->col[] = ["label"=>"Mark Up","name"=>"mark_up_percent"];
+			$this->col[] = ["label"=>"TTP","name"=>"ttp"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
@@ -574,6 +575,7 @@
 			$quantity = $request->get('quantity');
 			$uoms_id = $request->get('uoms_id');
 			$batching_ingredients_ttp = $request->get('ttp');
+			$mark_up_percent = $request->get('mark_up_percent');
 			$batching_ingredients_prepared_by_id = $request->get('batching_ingredients_prepared_by_id');
 			$ingredients = json_decode($request->get('ingredients'));
 			$time_stamp = date('Y-m-d H:i:s');
@@ -592,6 +594,7 @@
 						'quantity' => $quantity,
 						'uoms_id' => $uoms_id,
 						'ttp' => $batching_ingredients_ttp,
+						'mark_up_percent' => $mark_up_percent,
 						'created_by' => $action_by,
 						'created_at' => $time_stamp
 					]);
@@ -607,6 +610,7 @@
 						'quantity' => $quantity,
 						'uoms_id' => $uoms_id,
 						'ttp' => $batching_ingredients_ttp,
+						'mark_up_percent' => $mark_up_percent,
 						'updated_at' => $time_stamp,
 						'updated_by' => $action_by
 					]);
