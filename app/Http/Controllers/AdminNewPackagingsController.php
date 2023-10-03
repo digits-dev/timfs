@@ -210,6 +210,29 @@
 	        |
 	        */
 	        $this->index_statistic = array();
+			$tagged_items = DB::table('new_packagings')
+			->where('new_packagings.status', 'ACTIVE')
+			->whereNotNull('new_packagings.item_masters_id')
+			->count();
+
+			$pending_items = DB::table('new_packagings')
+				->where('new_packagings.status', 'ACTIVE')
+				->whereNull('new_packagings.item_masters_id')
+				->count();
+
+			$this->index_statistic[] = [
+				'label' => 'Pending Items',
+				'count' => $pending_items,
+				'icon' => 'fa fa-hourglass',
+				'color' => 'orange',
+			];
+
+			$this->index_statistic[] = [
+				'label' => 'Tagged Items',
+				'count' => $tagged_items,
+				'icon' => 'fa fa-tag',
+				'color' => 'green',
+			];
 
 
 
@@ -326,6 +349,7 @@
 	    */
 	    public function hook_query_index(&$query) {
 			$query
+				->where('new_packagings.status', 'ACTIVE')
 				->orderBy(DB::raw('item_masters_id is null'), 'desc')
 				->orderBy(DB::raw('target_date is null'), 'asc')
 				->orderBy('target_date', 'asc');   
@@ -665,7 +689,7 @@
 				->get()
 				->count();
 
-			$data['table'] = 'new_ingredients';
+			$data['table'] = 'new_packagings';
 
 			$data['comment_templates'] = $this->mainController->getCommentTemplate('ingredient');
 
