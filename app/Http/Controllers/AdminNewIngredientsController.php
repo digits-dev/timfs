@@ -345,6 +345,7 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        $query
+				->where('new_ingredients.status', 'ACTIVE')
 				->orderBy(DB::raw('item_masters_id is null'), 'desc')
 				->orderBy(DB::raw('target_date is null'), 'asc')
 				->orderBy('target_date', 'asc');
