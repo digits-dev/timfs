@@ -74,7 +74,7 @@
                         <td>{{$item->prepared_by}}</td>
                         <td>{{(float) $item->quantity}}</td>
                         <td>{{$item->packaging_description}}</td>
-                        <td>{{$item->mark_up_percent}}%</td>
+                        <td>{{(float) $item->mark_up_percent}}%</td>
                         <td>{{$item->ttp}}</td>
                         <td>{{$item->name}}</td>
                         <td>{{$item->created_at}}</td>
