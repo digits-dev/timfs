@@ -98,6 +98,11 @@ class PriceChangeController extends Controller
                     'ttp' 				    => DB::raw('`ttp_price_change`'),
                     'ttp_percentage' 	    => DB::raw('`ttp_percentage_price_change`')
                 ]);
+
+                DB::table('item_master_approvals')->where('tasteless_code', $item->tasteless_code)->update([
+                    'ttp' 				    => DB::raw('`ttp_price_change`'),
+                    'ttp_percentage' 	    => DB::raw('`ttp_percentage_price_change`')
+                ]);
         }
     }
 }
