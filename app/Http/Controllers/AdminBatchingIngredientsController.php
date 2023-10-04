@@ -10,6 +10,8 @@
 	class AdminBatchingIngredientsController extends \crocodicstudio\crudbooster\controllers\CBController {
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+			$this->recurse_count = 0;
+			self::updateTtp();
 		}
 
 	    public function cbInit() {
@@ -684,6 +686,28 @@
 		public function exportBatchingIngredients(Request $request) {
 			$filename = $request->input('filename');
 			return Excel::download(new BatchingIngredientsExport, $filename.'.xlsx');
+		}
+
+		public function updateTtp() {
+			$to_update = DB::table('batching_ingredients')
+				->where('batching_ingredients.status', 'ACTIVE')
+				->where('batching_ingredients.ttp', '!=', DB::raw('batching_ingredients_computed_food_cost.computed_ttp'))
+				->leftJoin('batching_ingredients_computed_food_cost', 'batching_ingredients_computed_food_cost.id', 'batching_ingredients.id')
+				->pluck('batching_ingredients.id')
+				->toArray();
+
+			if (!$to_update || $this->recurse_count > 10) return;
+
+			DB::table('batching_ingredients')
+				->whereIn('batching_ingredients.id', $to_update)
+				->leftJoin('batching_ingredients_computed_food_cost', 'batching_ingredients_computed_food_cost.id', 'batching_ingredients.id')
+				->update([
+					'batching_ingredients.ttp' => DB::raw('batching_ingredients_computed_food_cost.computed_ttp')
+				]);
+
+			$this->recurse_count++;
+
+			self::updateTtp();
 		}
 
 
