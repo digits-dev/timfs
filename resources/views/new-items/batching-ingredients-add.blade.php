@@ -341,37 +341,46 @@
                     No ingredients currently saved...
                 </div>
             </section>
-            <section class="section-footer">
-                <div class="add-buttons">
+            <hr>
+            <div class="row">
+                <div class="col-md-6" style="margin-bottom: 15px;">
                     <button class="btn btn-primary" id="add-existing-ingredient" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add existing ingredient</button>
                     <button class="btn btn-success" id="add-new-ingredient" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add new ingredient</button>
                 </div>
-                <hr>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="" class="control-label"><span class="required-star">*</span> TTP</label>
-                            <div class="input-group">
-                                <div class="input-group-addon text-bold">
-                                    ₱
-                                </div>
-                                <input type="number" value="{{$item->ttp ? (float) $item->ttp : ''}}" step="any" class="batching-ingredient-ttp form-control" placeholder="0.00" required>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">Total Cost </label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <span class="custom-icon"><strong>₱</strong></span>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="" class="control-label">Total Cost <label>
-                            <div class="input-group">
-                                <div class="input-group-addon">
-                                    <span class="custom-icon"><strong>₱</strong></span>
-                                </div>
-                                <input type="text" class="form-control food-cost" placeholder="Food Cost" readonly>
-                            </div>
+                            <input type="text" class="form-control food-cost" placeholder="Food Cost" readonly>
                         </div>
                     </div>
                 </div>
-            </section>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label"><span class="required-star">*</span> Mark Up Percent </label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <span class="custom-icon"><strong>%</strong></span>
+                            </div>
+                            <input type="number" class="form-control mark-up-percent" value="{{ $item->mark_up_percent ? (float) $item->mark_up_percent : 30 }}" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label">TTP</label>
+                        <div class="input-group">
+                            <div class="input-group-addon text-bold">
+                                ₱
+                            </div>
+                            <input type="number" value="{{$item->ttp ? (float) $item->ttp : ''}}" step="any" class="batching-ingredient-ttp form-control" placeholder="0.00" required readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
         <hr>
     </div>
@@ -652,7 +661,7 @@
                 $(this).val(value.toUpperCase());
             });
 
-            $('.batching-ingredient-ttp').keyup(function() {
+            $('.batching-ingredient-ttp, .mark-up-percent').keyup(function() {
                 const ttp = $(this);
                 const [int, dec] = ttp.val().split('.');
                 if (dec && dec.length > 4) {
@@ -667,10 +676,7 @@
             const ingredientWrappers = jQuery.makeArray($('.ingredient-section .ingredient-wrapper, .ingredient-section .new-ingredient-wrapper'));
             const foodCostInput = $('.food-cost');
             const portionInput = $('.portion');
-            const ttp = $('.batching-ingredient-ttp').val();
-            const portionTtpInput = $('.batching-ingredient-portion-ttp');
-            if (portionInput.val() <= 0) portionInput.val('1');
-            const portionSize = portionInput.val();
+            const markUpPercent = Number($('.mark-up-percent').val());
             let ingredientSum = 0;
 
             //looping through ingredient wrappers
@@ -686,8 +692,10 @@
             });
             ingredientSum = math.round(ingredientSum, 4);
             foodCostInput.val(ingredientSum);
-            const portionTtp = math.round(ttp / portionSize, 4);
-            portionTtpInput.val(portionTtp);
+            const markUpValue = markUpPercent ? ingredientSum / 100 * markUpPercent : 0;
+            let ttp = ingredientSum + markUpValue;
+            ttp = math.round(ttp, 4);
+            $('.batching-ingredient-ttp').val(ttp);
         }
 
         $.fn.formatSelected = function() {
@@ -874,6 +882,10 @@
                 .attr('name', 'batching_ingredients_prepared_by_id')
                 .val($('.prepared-by').val());
 
+            const markUpData = $(document.createElement('input'))
+                .attr('name', 'mark_up_percent')
+                .val($('.mark-up-percent').val());
+
             form.append(
                 csrf,
                 ingredientsData,
@@ -883,6 +895,7 @@
                 batchingQuantityData,
                 ttpData,
                 batchingIngredientsPreparedById,
+                markUpData,
             );
             $('.panel-body').append(form);
             form.submit();
@@ -899,7 +912,7 @@
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
                 $('.batching_quantity').val() > 0 && $('.ingredient-description').val() && $('.prepared-by').val()
-                && $('.batching-ingredient-ttp').val();
+                && $('.batching-ingredient-ttp').val() && $('.mark-up-percent').val();
 
             const hasIngredient = $('#form-ingredient .ingredient-wrapper, #form-ingredient .new-ingredient-wrapper').length > 0;
             
@@ -926,6 +939,7 @@
 					if (!$('.ingredient-description').val()) $('.ingredient-description').css('outline', '2px solid red');
                     if (!$('.prepared-by').val()) $('.prepared-by').css('outline', '2px solid red');
                     if (!$('.batching-ingredient-ttp').val()) $('.batching-ingredient-ttp').css('outline', '2px solid red');
+                    if (!$('.mark-up-percent').val()) $('.mark-up-percent').css('outline', '2px solid red');
                 });
         }
 

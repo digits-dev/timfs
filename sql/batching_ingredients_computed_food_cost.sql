@@ -1,3 +1,5 @@
+-- Active: 1678237171731@@127.0.0.1@3306@timfs
+
 SELECT
     batching_ingredients.id,
     batching_ingredients.ingredient_description,
@@ -5,7 +7,19 @@ SELECT
     batching_ingredients.quantity,
     batching_ingredients.uoms_id,
     batching_ingredients.ttp,
-    ROUND(SUM(subquery.cost), 4) as ingredient_total_cost
+    batching_ingredients.mark_up_percent,
+    ROUND(SUM(subquery.cost), 4) as ingredient_total_cost,
+    ROUND(
+        ROUND(SUM(subquery.cost), 4) / 100 * batching_ingredients.mark_up_percent,
+        4
+    ) AS mark_up_value,
+    ROUND(
+        ROUND(SUM(subquery.cost), 4) + ROUND(
+            ROUND(SUM(subquery.cost), 4) / 100 * batching_ingredients.mark_up_percent,
+            4
+        ),
+        4
+    ) AS computed_ttp
 FROM batching_ingredients
     JOIN (
         SELECT
