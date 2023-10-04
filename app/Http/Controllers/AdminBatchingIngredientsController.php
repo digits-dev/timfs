@@ -11,7 +11,6 @@
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
 			$this->recurse_count = 0;
-			self::updateTtp();
 		}
 
 	    public function cbInit() {
@@ -304,6 +303,8 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
+			self::updateTtp();
+			$query->where('batching_ingredients.status', 'ACTIVE');
 	            
 	    }
 
