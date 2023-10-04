@@ -61,6 +61,7 @@
                         <th>Prepared By</th>
                         <th>Quantity</th>
                         <th>UOM</th>
+                        <th>Mark Up</th>
                         <th>TTP</th>
                         <th>Created By</th>
                         <th>Created Date</th>
@@ -73,6 +74,7 @@
                         <td>{{$item->prepared_by}}</td>
                         <td>{{(float) $item->quantity}}</td>
                         <td>{{$item->packaging_description}}</td>
+                        <td>{{$item->mark_up_percent}}%</td>
                         <td>{{$item->ttp}}</td>
                         <td>{{$item->name}}</td>
                         <td>{{$item->created_at}}</td>
