@@ -37,6 +37,7 @@
 			$this->col[] = ["label"=>"User Email","name"=>"cms_users_id","join"=>"cms_users,email"];
 			$this->col[] = ["label"=>"User Name","name"=>"cms_users_id","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Concept Access","name"=>"menu_segmentations_id"];
+			$this->col[] = ["label"=>"Edit Access","name"=>"is_edit"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
@@ -58,6 +59,7 @@
 			$used_ids = implode(',', $used_ids);
 			$this->form[] = ['label'=>'User Name','name'=>'cms_users_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-6','datatable'=>'cms_users,email','datatable_where'=>"status=%27ACTIVE%27 and cms_users.id NOT IN ($used_ids)",'parent_select'=>'id_cms_privileges'];
 			$this->form[] = ['label'=>'Concept Access','name'=>'menu_segmentations_id','type'=>'select2-multi','validation'=>'required','width'=>'col-sm-6','datatable'=>'menu_segmentations,menu_segment_column_description'];
+			$this->form[] = ['label'=>'Edit Access','name'=>'is_edit','type'=>'select2','validation'=>'required','width'=>'col-sm-6','dataenum'=>'TRUE;FALSE'];			
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
