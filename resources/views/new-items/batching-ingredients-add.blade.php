@@ -343,9 +343,25 @@
             </section>
             <hr>
             <div class="row">
-                <div class="col-md-6" style="margin-bottom: 15px;">
+                <div class="col-md-4" style="margin-bottom: 15px;">
                     <button class="btn btn-primary" id="add-existing-ingredient" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add existing ingredient</button>
                     <button class="btn btn-success" id="add-new-ingredient" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add new ingredient</button>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="" class="control-label"><span class="required-star">*</span> Concept</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-sticky-note"></i>
+                            </div>
+                            <select class="form-control segmentations_id" required>
+                                <option value="" {{!$item->segmentations_id ? 'selected' : ''}} disabled>None selected</option>
+                                @foreach ($segmentations as $segmentation)
+                                <option value="{{ $segmentation->id }}" {{$item->segmentations_id == $segmentation->id ? 'selected' : ''}}>{{ $segmentation->segment_column_description }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
@@ -870,6 +886,10 @@
                 .attr('name', 'uoms_id')
                 .val($('.batching_uom').val());
 
+            const segmentationData = $(document.createElement('input'))
+                .attr('name', 'segmentations_id')
+                .val($('.segmentations_id').val());
+
             const batchingQuantityData = $(document.createElement('input'))
                 .attr('name', 'quantity')
                 .val($('.batching_quantity').val());
@@ -892,6 +912,7 @@
                 ingrediendDescription,
                 bachingIngredientId,
                 uomData,
+                segmentationData,
                 batchingQuantityData,
                 ttpData,
                 batchingIngredientsPreparedById,
@@ -912,7 +933,7 @@
             const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val()) &&
                 jQuery.makeArray($('form .cost')).every(e => !!$(e).val()?.replace(/[^0-9.]/g, '')) &&
                 $('.batching_quantity').val() > 0 && $('.ingredient-description').val() && $('.prepared-by').val()
-                && $('.batching-ingredient-ttp').val() && $('.mark-up-percent').val();
+                && $('.batching-ingredient-ttp').val() && $('.mark-up-percent').val() && $('.segmentations_id').val();
 
             const hasIngredient = $('#form-ingredient .ingredient-wrapper, #form-ingredient .new-ingredient-wrapper').length > 0;
             
@@ -940,6 +961,7 @@
                     if (!$('.prepared-by').val()) $('.prepared-by').css('outline', '2px solid red');
                     if (!$('.batching-ingredient-ttp').val()) $('.batching-ingredient-ttp').css('outline', '2px solid red');
                     if (!$('.mark-up-percent').val()) $('.mark-up-percent').css('outline', '2px solid red');
+                    if (!$('.segmentations_id').val()) $('.segmentations_id').css('outline', '2px solid red');
                 });
         }
 

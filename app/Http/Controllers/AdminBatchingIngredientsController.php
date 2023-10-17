@@ -41,6 +41,7 @@
 			$this->col[] = ["label"=>"Batching Description","name"=>"ingredient_description"];
 			$this->col[] = ["label"=>"Quantity","name"=>"quantity"];
 			$this->col[] = ["label"=>"UOM","name"=>"uoms_id","join"=>"packagings,packaging_description"];
+			$this->col[] = ["label"=>"Concept","name"=>"segmentations_id","join"=>"segmentations,segment_column_description"];
 			$this->col[] = ["label"=>"Total Cost","name"=>"id","join"=>"batching_ingredients_computed_food_cost,ingredient_total_cost","join_id"=>"id"];
 			$this->col[] = ["label"=>"Mark Up","name"=>"mark_up_percent"];
 			$this->col[] = ["label"=>"TTP","name"=>"ttp"];
@@ -524,6 +525,11 @@
 				->get()
 				->toArray();
 
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
 			if ($id) {
 				$data['ingredients'] = DB::table('batching_ingredients_auto_compute')
 					->where('batching_ingredients_id', $id)
@@ -580,6 +586,7 @@
 			$ingredient_description = strtoupper($request->get('ingredient_description'));
 			$quantity = $request->get('quantity');
 			$uoms_id = $request->get('uoms_id');
+			$segmentations_id = $request->get('segmentations_id');
 			$batching_ingredients_ttp = $request->get('ttp');
 			$mark_up_percent = $request->get('mark_up_percent');
 			$batching_ingredients_prepared_by_id = $request->get('batching_ingredients_prepared_by_id');
@@ -599,6 +606,7 @@
 						'bi_code' => $bi_code,
 						'quantity' => $quantity,
 						'uoms_id' => $uoms_id,
+						'segmentations_id' => $segmentations_id,
 						'ttp' => $batching_ingredients_ttp,
 						'mark_up_percent' => $mark_up_percent,
 						'created_by' => $action_by,
@@ -615,6 +623,7 @@
 						'batching_ingredients_prepared_by_id' => $batching_ingredients_prepared_by_id,
 						'quantity' => $quantity,
 						'uoms_id' => $uoms_id,
+						'segmentations_id' => $segmentations_id,
 						'ttp' => $batching_ingredients_ttp,
 						'mark_up_percent' => $mark_up_percent,
 						'updated_at' => $time_stamp,
