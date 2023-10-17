@@ -107,7 +107,7 @@
 				'url'=>CRUDBooster::mainpath('edit/[id]'),
 				'icon'=>'fa fa-pencil',
 				'color' => ' ',
-				"showIf"=>"[created_by] == $my_id || $is_admin",
+				"showIf"=>"[created_by] == $my_id || $is_admin || [is_update] == '1'",
 			];
 
 	        /* 
@@ -305,8 +305,20 @@
 	    public function hook_query_index(&$query) {
 	        //Your code here
 			self::updateTtp();
+			$my_concepts = (new AdminRndMenuItemsController)->getMyConcepts();
+			$my_concepts = implode(',', $my_concepts);
+			$is_update = (new AdminRndMenuItemsController)->isEdit();
 			$query->where('batching_ingredients.status', 'ACTIVE');
-	            
+
+			if ($is_update) {
+				$query->addSelect(DB::raw("
+					CASE
+					WHEN batching_ingredients.segmentations_id IN ($my_concepts) THEN '1'
+					ELSE '0'
+					END AS is_update
+				"));
+			}
+
 	    }
 
 	    /*
