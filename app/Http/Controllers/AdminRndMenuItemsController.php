@@ -97,6 +97,7 @@
 	        | 
 	        */
 	        $this->addaction = array();
+			$is_edit = self::isEdit();
 			$this->addaction[] = [
 				'title'=>'Detail',
 				'url'=>CRUDBooster::mainpath('detail/[id]'),
@@ -114,7 +115,7 @@
 					[approval_status] == 'ARCHIVED' ||
 					[approval_status] == 'REJECTED' ||
 					[approval_status] == 'FOR ADJUSTMENT') &&
-					(CRUDBooster::isSuperAdmin() || [created_by] == CRUDBooster::myId())",
+					(CRUDBooster::isSuperAdmin() || [created_by] == CRUDBooster::myId() || $is_edit)",
 			];
 
 			$this->addaction[] = [
@@ -2215,6 +2216,16 @@
 				->toArray();
 			
 			return ['no_codes' => array_merge($no_code_ingredients, $no_code_packagings)];
+		}
+
+		function isEdit() {
+			$my_id = CRUDBooster::myId();
+			$is_edit = DB::table('user_concept_acess')
+				->where('cms_users_id', $my_id)
+				->first()
+				->is_edit;
+
+			return $is_edit == 'TRUE';
 		}
 
 	}
