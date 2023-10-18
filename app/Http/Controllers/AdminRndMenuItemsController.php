@@ -2185,8 +2185,7 @@
 				->pluck('segmentations_id')
 				->toArray();
 
-			return $segmentations_id;
-
+			return array_filter($segmentations_id);
 		}
 
 		public function getItemWithoutCodes($rnd_menu_id) {
