@@ -539,6 +539,8 @@
 
 			$data['segmentations'] = DB::table('segmentations')
 				->where('status', 'ACTIVE')
+				->select('id', 'segment_column_description')
+				->orderBy('segment_column_description')
 				->get()
 				->toArray();
 
