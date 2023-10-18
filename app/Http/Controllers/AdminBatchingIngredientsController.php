@@ -329,7 +329,7 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	if (is_numeric($column_value)) $column_value = (float) $column_value;
-			if ($column_index == 8) {
+			if ($column_index == 9) {
 				$column_value = (float) $column_value . '%';
 			}
 	    }
