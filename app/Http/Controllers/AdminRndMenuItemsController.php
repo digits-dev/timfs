@@ -98,6 +98,7 @@
 	        */
 	        $this->addaction = array();
 			$is_edit = self::isEdit();
+			$is_edit = $is_edit ? $is_edit : 'false';
 			$this->addaction[] = [
 				'title'=>'Detail',
 				'url'=>CRUDBooster::mainpath('detail/[id]'),
@@ -115,7 +116,7 @@
 					[approval_status] == 'ARCHIVED' ||
 					[approval_status] == 'REJECTED' ||
 					[approval_status] == 'FOR ADJUSTMENT') &&
-					(CRUDBooster::isSuperAdmin() || [created_by] == CRUDBooster::myId() || $is_edit)",
+					(CRUDBooster::isSuperAdmin() || [created_by] == CRUDBooster::myId() || $is_edit == true)",
 			];
 
 			$this->addaction[] = [
