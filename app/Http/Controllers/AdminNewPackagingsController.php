@@ -691,9 +691,9 @@
 
 			$data['table'] = 'new_packagings';
 
-			$data['comment_templates'] = $this->mainController->getCommentTemplate('ingredient');
+			$data['comment_templates'] = $this->mainController->getCommentTemplate('packaging');
 
-			$data['comments_data'] = $this->mainController->getNewItemsComments($id);
+			$data['comments_data'] = $this->mainController->getNewItemsComments($id, true, 'new_packagings');
 
 			$data['new_item_types'] = DB::table('new_item_types')
 				->where('new_item_types.status', 'ACTIVE')
