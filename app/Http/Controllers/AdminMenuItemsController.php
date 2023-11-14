@@ -31,7 +31,8 @@
 			'Chef Assistant' => ['ingredients', 'packagings', 'costing', 'menu-data'],
 			'Marketing Encoder' => ['packagings', 'costing', 'menu-data'],
 			'Marketing Manager' => ['ingredients', 'packagings', 'costing', 'menu-data'],
-			'Sales Accounting' => ['costing', 'menu-data']
+			'Sales Accounting' => ['costing', 'menu-data'],
+			'Accounting - Ingredients' => ['ingredients', 'packagings', 'costing', 'menu-data'],
 		];
 
 		static $to_edit = [
