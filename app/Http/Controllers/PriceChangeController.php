@@ -96,12 +96,14 @@ class PriceChangeController extends Controller
         foreach($items as $item){
                 DB::table('item_masters')->where('tasteless_code', $item->tasteless_code)->update([
                     'ttp' 				    => DB::raw('`ttp_price_change`'),
-                    'ttp_percentage' 	    => DB::raw('`ttp_percentage_price_change`')
+                    'ttp_percentage' 	    => DB::raw('`ttp_percentage_price_change`'),
+                    'ttp_price_effective_date' => null,
                 ]);
 
                 DB::table('item_master_approvals')->where('tasteless_code', $item->tasteless_code)->update([
                     'ttp' 				    => DB::raw('`ttp_price_change`'),
-                    'ttp_percentage' 	    => DB::raw('`ttp_percentage_price_change`')
+                    'ttp_percentage' 	    => DB::raw('`ttp_percentage_price_change`'),
+                    'ttp_price_effective_date' => null,
                 ]);
         }
     }

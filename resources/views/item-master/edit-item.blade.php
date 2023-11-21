@@ -231,7 +231,7 @@
                             <tr>
                                 <th><span class="required-star">*</span> Sales Price</th>
                                 <td>
-                                    <input value="{{ $item->ttp }}"  type="number" step="any" class="form-control" name="ttp" id="ttp" required>
+                                    <input value="{{ $item->ttp }}"  type="number" step="any" class="form-control" name="ttp" id="ttp" {{$item->tasteless_code ? 'readonly' : ''}} required>
                                 </td>
                             </tr>
                         </tbody>
@@ -435,6 +435,17 @@
 
 <script type="application/javascript">
     const allSubcategories = {!! json_encode($subcategories) !!};
+    const today = new Date();
+
+    // Calculate tomorrow's date
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    // Format the date in YYYY-MM-DD for the input's value attribute
+    const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
+
+    // Set the minimum attribute for the input element
+    $('#ttp_price_effective_date').attr('min', tomorrowFormatted);
     getAllBrands();
     getAllSuppliers();
     function setBrand(brands) {
