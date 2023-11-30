@@ -18,7 +18,7 @@ class CreateSalesPriceChangeHistoriesTable extends Migration
             $table->string('tasteless_code')->length(10)->nullable();
             $table->decimal('sales_price', 18, 2)->unsigned()->nullable();
             $table->decimal('sales_price_change', 18, 2)->unsigned()->nullable();
-            $table->timestamp('effective_date')->nullable();
+            $table->date('effective_date')->nullable();
             $table->string('status')->default('CREATED')->length(20)->nullable();
             $table->integer('created_by')->unsigned()->nullable();
             $table->integer('approved_by')->unsigned()->nullable();
