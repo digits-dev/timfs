@@ -11,6 +11,7 @@
 	use App\HistoryLandedCost;
 	use App\HistoryPurchasePrice;
 	use App\HistoryTtp;
+	use App\SalesPriceChangeHistory;
 	use Illuminate\Http\Request;
 	use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Schema;
@@ -839,6 +840,25 @@
 					$details_of_item = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
 					$new_values = $differences['new_values'];
 					$old_values = $differences['old_values'];
+					if ($old_values && $new_values) {
+						if ((float) $old_values->ttp != (float) $new_values->ttp_price_change ||
+							(float) $old_values->ttp != (float) $new_values->ttp ||
+							$old_values->ttp_price_effective_date != $new_values->ttp_price_effective_date
+						) {
+							$sales_price_change_history = [
+								'tasteless_code' => $tasteless_code,
+								'sales_price' => $old_values->ttp,
+								'sales_price_change' => $new_values->ttp_price_change,
+								'effective_date' => $new_values->ttp_price_effective_date,
+								'status' => 'APPROVED',
+								'created_by' => $new_values->updated_by,
+								'created_at' => $new_values->updated_at,
+								'approved_at' => $time_stamp,
+								'approved_by' => $action_by,
+							];
+							SalesPriceChangeHistory::insert($sales_price_change_history);
+						}
+					}
 
 					if ($paired_differences || !$old_values) {
 						foreach ($paired_differences  as $column_name => $paired_difference) {

@@ -18,6 +18,7 @@
 	use App\Exports\POSExport;
 	use App\Exports\QBExport;
 	use App\Group;
+	use App\SalesPriceChangeHistory;
 	use App\Segmentation;
 	use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
@@ -1084,8 +1085,24 @@
 			} else if ($tasteless_code) {
 				$data['action_type'] = 'UPDATE';
 				$item_to_be_updated = ItemMasterApproval::where('tasteless_code', $tasteless_code);
-				$inserted_id = $item_to_be_updated->first()->id;
+				$item_from_item_masters = ItemMaster::where('tasteless_code', $tasteless_code)->first();
+				if ((float) $item_from_item_masters->ttp != (float) $data['ttp_price_change'] ||
+					(float) $item_from_item_masters->ttp != (float) $data['ttp'] ||
+					$item_from_item_masters->ttp_price_effective_date != $data['ttp_price_effective_date']
+				) {
+					$sales_price_change_history = [
+						'tasteless_code' => $tasteless_code,
+						'sales_price' => $data['ttp'],
+						'sales_price_change' => $data['ttp_price_change'],
+						'effective_date' => $data['ttp_price_effective_date'],
+						'status' => 'CREATED',
+						'created_by' => $action_by,
+						'created_at' => $time_stamp,
+					];
+					SalesPriceChangeHistory::insert($sales_price_change_history);
+				}
 				$item_to_be_updated->update($data);
+				$inserted_id = $item_to_be_updated->first()->id;
 			} else {
 				$data['action_type'] = 'CREATE';
 				ItemMasterApproval::where('id', $input['item_masters_approvals_id'])->update($data);
