@@ -437,15 +437,11 @@
     const allSubcategories = {!! json_encode($subcategories) !!};
     const today = new Date();
 
-    // Calculate tomorrow's date
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-
     // Format the date in YYYY-MM-DD for the input's value attribute
-    const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
+    const todayFormatted = today.toISOString().split('T')[0];
 
     // Set the minimum attribute for the input element
-    $('#ttp_price_effective_date').attr('min', tomorrowFormatted);
+    $('#ttp_price_effective_date').attr('min', todayFormatted);
     getAllBrands();
     getAllSuppliers();
     function setBrand(brands) {
@@ -658,13 +654,13 @@
         const otherOptions = $(`.segmentation_select option.${className}`).attr('disabled', false);
     });
 
-    $('#tax_codes_id').on('change', function() {        
-        $('#purchase_price').val("");
-        $('#ttp').val("");
-        $('#ttp_percentage').val("");
-        $('#landed_cost').val("");
-        $('#price').val("");
-    });
+    // $('#tax_codes_id').on('change', function() {        
+    //     $('#purchase_price').val("");
+    //     $('#ttp').val("");
+    //     $('#ttp_percentage').val("");
+    //     $('#landed_cost').val("");
+    //     $('#price').val("");
+    // });
 
     $('#full_item_description').on('input', function() {
         const text = $(this).val();
