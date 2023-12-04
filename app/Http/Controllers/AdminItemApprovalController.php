@@ -819,6 +819,12 @@
 					$differences = self::getUpdatedDetails($id);
 					$paired_differences = $differences['paired_differences'] ?? [];
 
+					if (array_key_exists('ttp_price_effective_date', $paired_differences)) {
+						if ($paired_differences['ttp_price_effective_date']['new'] < date('Y-m-d')) {
+							continue;
+						}
+					}
+
 					ItemMasterApproval::where('id', $id)->update([
 						'approval_status' => '200',
 						'tasteless_code' => $tasteless_code,
@@ -943,6 +949,7 @@
 			if ($action == 'approve') {
 				$message_type = 'success';
 				$message = '✔️ Item successfully approved.';
+				self::updateSalesPrice();
 			} else if ($action == 'reject') {
 				$message_type = 'success';
 				$message = '✖️ Item successfully rejected.';
@@ -1005,5 +1012,23 @@
 				'new_values' => $item_for_approval,
 			];
 			
+		}
+
+		public function updateSalesPrice() {
+			$items = ItemMaster::where('ttp_price_effective_date', date('Y-m-d'))->get();
+            
+			foreach($items as $item){
+				DB::table('item_masters')->where('tasteless_code', $item->tasteless_code)->update([
+					'ttp' => DB::raw('`ttp_price_change`'),
+					'ttp_percentage' => DB::raw('ttp_percentage_price_change'),
+					'ttp_price_effective_date' => null,
+				]);
+
+				DB::table('item_master_approvals')->where('tasteless_code', $item->tasteless_code)->update([
+					'ttp' => DB::raw('ttp_price_change'),
+					'ttp_percentage' => DB::raw('ttp_percentage_price_change'),
+					'ttp_price_effective_date' => null,
+				]);
+			}
 		}
 	}
