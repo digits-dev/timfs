@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+	use App\ItemSourcingMatrix;
 	use Session;
 	use Request;
 	use DB;
@@ -45,17 +46,17 @@
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$used_ids = DB::table('item_sourcing_matrices')->pluck('requestor_id')->toArray();
-
+			
 			if (in_array(CRUDBooster::getCurrentMethod(), ['getAdd'])) {
+				$used_ids = DB::table('item_sourcing_matrices')->whereNotNull('requestor_id')->pluck('requestor_id')->toArray();
 				$used_ids = implode(',', $used_ids);
 				$this->form[] = ['label'=>'Requestor','name'=>'requestor_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_users,name','datatable_where'=>"status='ACTIVE' and cms_users.id NOT IN ($used_ids)"];
 				$this->form[] = ['label'=>'Approver','name'=>'approver_ids','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_users,name','datatable_where'=>'status = "ACTIVE"'];
 				
-			} else if (in_array(CRUDBooster::getCurrentMethod(), ['getEdit', 'getDetail'])) {
+			} else {
 				$this->form[] = ['label'=>'Requestor','name'=>'requestor_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_users,name','disabled'=>true];
 				$this->form[] = ['label'=>'Approver','name'=>'approver_ids','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_users,name','datatable_where'=>'status = "ACTIVE"'];
-				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
+				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select2','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
 			}
 			# END FORM DO NOT REMOVE THIS LINE
 
