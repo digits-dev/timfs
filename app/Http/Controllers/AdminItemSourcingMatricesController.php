@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+	use App\ItemMaster;
 	use App\ItemSourcingMatrix;
 	use Session;
 	use Request;
