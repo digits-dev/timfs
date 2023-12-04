@@ -148,6 +148,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/new_ingredients/tag-new-ingredient', [AdminNewIngredientsController::class, 'tagNewIngredient'])->name('tag_new_ingredient');
     Route::post('/admin/new_ingredients/search-item-for-tagging', [AdminNewIngredientsController::class, 'searchItemForTagging'])->name('search_item_for_tagging');
     Route::post('/admin/new_ingredients/submit-edit', [AdminNewIngredientsController::class, 'submitEditNewIngredient'])->name('submit_edit_new_ingredient');
+    Route::get('/admin/new_ingredients/suggest-existing-ingredients', [AdminNewIngredientsController::class, 'suggestExistingIngredients'])->name('suggest_existing_ingredients');
 
     Route::post('/admin/new_ingredients/add-new-items-comments', [AdminNewIngredientsController::class, 'addNewItemsComments'])->name('add_new_items_comments');
     Route::post('/admin/new_ingredients/delete-new-items-comments', [AdminNewIngredientsController::class, 'deleteNewItemsComments'])->name('delete_new_items_comments');

@@ -5,6 +5,7 @@
 	use Illuminate\Support\Facades\Request as Input;
 	use DB;
 	use CRUDBooster;
+	use App\ItemMaster;
 
 	class AdminNewIngredientsController extends \crocodicstudio\crudbooster\controllers\CBController {
 		public function __construct() {
@@ -371,12 +372,29 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
+
+			// dd(Input::all());
 			$max_nwi_code = DB::table('new_ingredients')->max('nwi_code');
 			$nwi_code_int = (int) explode('-', $max_nwi_code)[1] + 1;
 			$nwi_code = 'NWI-' . str_pad($nwi_code_int, 5, '0', STR_PAD_LEFT);
+			$implodesegmentations = implode(',', Input::get('segmentations'));
 
 			$postdata['nwi_code'] = $nwi_code;
+			$postdata['segmentations'] = $implodesegmentations;
 			$postdata['comment'] = Input::get('comment');
+			$postdata['new_ingredient_reasons_id'] = Input::get('new_ingredient_reasons_id');
+			$postdata['existing_ingredient'] = Input::get('existing_ingredient');
+			$postdata['recommended_brand_one'] = Input::get('recommended_brand_one');
+			$postdata['recommended_brand_two'] = Input::get('recommended_brand_two');
+			$postdata['recommended_brand_three'] = Input::get('recommended_brand_three');
+			$postdata['initial_qty_needed'] = Input::get('initial_qty_needed');
+			$postdata['initial_qty_uoms_id'] = Input::get('initial_qty_uoms_id');
+			$postdata['forecast_qty_needed'] = Input::get('forecast_qty_needed');
+			$postdata['forecast_qty_uoms_id'] = Input::get('forecast_qty_uoms_id');
+			$postdata['budget_range'] = Input::get('budget_range');
+			$postdata['reference_link'] = Input::get('reference_link');
+			$postdata['new_ingredient_terms_id'] = Input::get('new_ingredient_terms_id');
+			$postdata['duration'] = Input::get('duration');
 			$postdata['target_date'] = Input::get('target_date');
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
 			$postdata['created_by'] = CRUDBooster::myId();
@@ -476,6 +494,8 @@
 				->where('new_ingredients.id', $id)
 				->select(
 					'*',
+					'item.tasteless_code',
+					'item_uom.uom_description',
 					'new_ingredients.created_at as created_at',
 					'new_ingredients.id as new_ingredients_id',
 					'creator.name as creator_name',
@@ -484,19 +504,46 @@
 					'new_ingredients.created_at',
 					'new_ingredients.updated_at',
 					'new_ingredients.tagged_at',
-					'item_masters.id as item_masters_id',
+					'item.id as item_masters_id',
 					'new_ingredients.ttp as ttp',
 					'new_ingredients.packaging_size as packaging_size',
-					'new_item_types.item_type_description'
+					'new_item_types.item_type_description',
+					'new_ingredients.segmentations',
+					'new_ingredient_reasons.description as reasons_description',
+					'existing.full_item_description as existing_ingredient',
+					'existing.tasteless_code as existing_ingredient_code',
+					'new_ingredients.recommended_brand_one as recommended_brand_one',
+					'new_ingredients.recommended_brand_two as recommended_brand_two',
+					'new_ingredients.recommended_brand_three as recommended_brand_three',
+					'new_ingredients.initial_qty_needed as initial_qty_needed',
+					'initial_uoms.uom_description as initial_qty_uoms',
+					'new_ingredients.forecast_qty_needed as forecast_qty_needed',
+					'forecast_uoms.uom_description as forecast_qty_uoms',
+					'new_ingredients.budget_range as budget_range',
+					'new_ingredients.reference_link as reference_link', 
+					'new_ingredients.duration as duration', 
+					'new_ingredient_terms.description as ingredient_terms',
+
 				)
-				->leftJoin('uoms', 'uoms.id', '=', 'new_ingredients.uoms_id')
+				->leftJoin('uoms as item_uom', 'item_uom.id', '=', 'new_ingredients.uoms_id')
 				->leftJoin('cms_users as creator', 'creator.id', '=', 'new_ingredients.created_by')
 				->leftJoin('cms_users as updator', 'updator.id', '=', 'new_ingredients.updated_by')
 				->leftJoin('cms_users as tagger', 'tagger.id', '=', 'new_ingredients.tagged_by')
-				->leftJoin('item_masters', 'item_masters.id', '=', 'new_ingredients.item_masters_id')
+				->leftJoin('item_masters as item', 'item.id', '=', 'new_ingredients.item_masters_id')
 				->leftJoin('new_item_types', 'new_item_types.id', '=', 'new_ingredients.new_item_types_id')
+				->leftJoin('new_ingredient_reasons', 'new_ingredient_reasons.id', '=', 'new_ingredients.new_ingredient_reasons_id')
+				->leftJoin('uoms as initial_uoms', 'initial_uoms.id', '=', 'new_ingredients.initial_qty_uoms_id')
+				->leftJoin('uoms as forecast_uoms', 'forecast_uoms.id', '=', 'new_ingredients.forecast_qty_uoms_id')
+				->leftJoin('new_ingredient_terms', 'new_ingredient_terms.id', '=', 'new_ingredients.new_ingredient_terms_id')
+				->leftJoin('item_masters as existing', 'existing.tasteless_code', '=', 'new_ingredients.existing_ingredient')
 				->get()
 				->first();
+
+			$segmentations = explode(',', $data['item']->segmentations);
+			$data['segmentations'] = DB::table('segmentations')
+					->whereIn("segment_column_name", $segmentations)
+					->pluck('segment_column_description')
+					->toArray();
 
 			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
 					->where('status', 'ACTIVE')
@@ -512,7 +559,7 @@
 
 			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
 
-			return $this->view('new-items/detail-new-items', $data);
+			return $this->view('new-items/detail-new-ingredients', $data);
 		}
 
 		public function searchNewIngredients(Request $request) {
@@ -539,7 +586,6 @@
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
 				);
-
 
 			$data = [];
 
@@ -583,6 +629,12 @@
 				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
 				->get()
 				->toArray();
+			
+			$data['new_ingredient_reasons'] = DB::table('new_ingredient_reasons')
+				->where('new_ingredient_reasons.status', 'ACTIVE')
+				->orderBy('new_ingredient_reasons.description')
+				->get()
+				->toArray();
 
 			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
 
@@ -594,7 +646,7 @@
 			}
 
 
-			return $this->view('new-items/edit-new-item', $data);
+			return $this->view('new-items/edit-new-ingredients', $data);
 		}
 
 		public function submitEditNewIngredient(Request $request) {
@@ -648,6 +700,27 @@
 				->orderBy('item_type_description')
 				->get()
 				->toArray();
+			
+			$data['new_ingredient_segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()
+				->toArray();
+
+			$data['new_ingredient_reasons'] = DB::table('new_ingredient_reasons')
+				->where('new_ingredient_reasons.status', 'ACTIVE')
+				->orderBy('description','asc')
+				->get();
+
+			$data['new_ingredient_uoms'] = DB::table('uoms')
+				->where('uoms.status', 'ACTIVE')
+				->whereIn('uoms.uom_code',['KGS', 'PCS'])
+				->get();
+
+			$data['new_ingredient_terms'] = DB::table('new_ingredient_terms')
+				->where('new_ingredient_terms.status', 'ACTIVE')
+				->orderBy('description','asc')
+				->get();
 
 			$data['comment_templates'] = self::getCommentTemplate('ingredient');
 
@@ -658,7 +731,7 @@
 
 			$data['created_at'] = date('Y-m-d');
 
-			return $this->view('new-items/add-new-item', $data);
+			return $this->view('new-items/add-new-ingredients', $data);
 		}
 
 		public function getTag($id) {
@@ -1051,4 +1124,25 @@
 				return array_merge($menu_items, $rnd_menu_items);
 			}
 		}
+
+		public function suggestExistingIngredients(Request $request){
+			$term = $request->input('term');
+			$suggestions = ItemMaster::where('item_masters.sku_statuses_id', 1)
+				->whereNotNull('item_masters.tasteless_code')
+				->whereRaw("(item_masters.tasteless_code like '%$term%' or item_masters.full_item_description like '%$term%')")
+				->select('item_masters.full_item_description as text', 'item_masters.tasteless_code as id')
+				->orderBy('item_masters.full_item_description', 'asc')
+				->get();
+
+			return response()->json($suggestions);
+		}
 	}
+	// public function suggestExistingIngredients(){
+	// 	$suggestions = ItemMaster::where('item_masters.sku_statuses_id', 1)
+	// 		->whereNotNull('item_masters.tasteless_code')
+	// 		->select('item_masters.full_item_description as text', 'item_masters.tasteless_code as id')
+	// 		->orderBy('item_masters.full_item_description', 'asc')
+	// 		->get();
+
+	// 	return response()->json($suggestions);
+	// }
