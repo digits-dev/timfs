@@ -136,7 +136,7 @@
                             <tr id="existingIngredientRow" hidden>
                                 <th><span class="required-star">*</span> Existing Ingredient</th>
                                 <td>
-                                    <select name="existing_ingredient" id="existing_ingredient" class="form-control" required>
+                                    <select name="existing_ingredient" id="existing_ingredient" class="form-control" >
                                     </select>
                                 </td>
                             </tr>

@@ -111,29 +111,26 @@
                                 <td><input type="date" step="any" name="target_date" class="form-control" required></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Segmentation</th>
+                                <th><span class="required-star">*</span> Packaging Type</th>
                                 <td>
-                                    <select name="segmentations[]" class="segmentation_select" id="new_ingredients_segmentation" class="form-control" multiple="multiple" >
-                                        @foreach ($new_ingredient_segmentations as $new_ingredient_segmentation)
-                                        <option  class="{{ $new_ingredient_segmentation->segment_column_name }}" value="{{ $new_ingredient_segmentation->segment_column_name }}">{{ $new_ingredient_segmentation->segment_column_description }}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th><span class="required-star">*</span> Reason</th>
-                                <td>
-                                    <select name="new_ingredient_reasons_id" id="new_ingredient_reasons_id" class="form-control" required>
+                                    <select name="packaging_types_id" id="packaging_types_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
-                                        @foreach ($new_ingredient_reasons as $new_ingredient_reason)
-                                        <option value="{{$new_ingredient_reason->id}}" description="{{$new_ingredient_reason->description}}">{{$new_ingredient_reason->description}}</option>
+                                        @foreach ($packaging_types as $packaging_type)
+                                        <option value="{{$packaging_type->id}}" description="{{$packaging_type->description}}">{{$packaging_type->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
                             </tr>
-                            <tr id="existingIngredientRow" hidden>
-                                <th><span class="required-star">*</span> Existing Ingredient</th>
-                                <td><input type="text" name="existing_ingredient" id="existing_ingredient" class="form-control"  placeholder="Required" oninput="this.value = this.value.toUpperCase()"></td>
+                            <tr id="stickerTypeRow" hidden>
+                                <th><span class="required-star">*</span> Sticker Type</th>
+                                <td>
+                                    <select name="sticker_types_id" id="sticker_types_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($packaging_stickers as $packaging_sticker)
+                                        <option value="{{$packaging_sticker->id}}" description="{{$packaging_sticker->description}}">{{$packaging_sticker->description}}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -142,75 +139,75 @@
                     <table class="table-responsive table">
                         <tbody>
                             <tr>
-                                <th><span class="required-star">*</span> Recommended Brand 1</th>
-                                <td><input type="text" name="recommended_brand_one" class="form-control" required placeholder="Required" oninput="this.value = this.value.toUpperCase()"></td>
-                            </tr>
-                            <tr>
-                                <th>Recommended Brand 2</th>
-                                <td><input type="text" name="recommended_brand_two" class="form-control" required placeholder="Optional" oninput="this.value = this.value.toUpperCase()"></td>
-                            </tr>
-                            <tr>
-                                <th>Recommended Brand 3</th>
-                                <td><input type="text" name="recommended_brand_three" class="form-control" required placeholder="Optional" oninput="this.value = this.value.toUpperCase()"></td>
-                            </tr>
-                            <tr>
-                                <th><span class="required-star">*</span> Initial Qty Needed</th>
+                                <th><span class="required-star">*</span> Packaging Use</th>
                                 <td>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <input type="number" step="any" name="initial_qty_needed" class="form-control" required placeholder="Initial Qty Needed">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <select name="initial_qty_uoms_id" id="initial_qty_uoms_id" class="form-control" required>
-                                                <option value="" disabled selected>None selected...</option>
-                                                @foreach ($new_ingredient_uoms as $new_ingredient_uom)
-                                                    <option value="{{$new_ingredient_uom->id}}">{{$new_ingredient_uom->uom_code}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
+                                    <select name="packaging_uses_id" id="packaging_uses_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($packaging_uses as $packaging_use)
+                                        <option value="{{$packaging_use->id}}" description="{{$packaging_use->description}}">{{$packaging_use->description}}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr id="beverageTypeRow" hidden>
+                                <th><span class="required-star">*</span> Packaging Beverage Type</th>
+                                <td>
+                                    <select name="packaging_beverage_types_id" id="packaging_beverage_types_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($packaging_beverage_types as $packaging_beverage_type)
+                                        <option value="{{$packaging_beverage_type->id}}" description="{{$packaging_beverage_type->description}}">{{$packaging_beverage_type->description}}</option>
+                                        @endforeach
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Forecast Qty Needed Per Month</th>
+                                <th><span class="required-star">*</span> Packaging Material Type</th>
                                 <td>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <input type="number" step="any" name="forecast_qty_needed" class="form-control" required placeholder="Forecast Qty Needed">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <select name="forecast_qty_uoms_id" id="forecast_qty_uoms_id" class="form-control" required>
-                                                <option value="" disabled selected>None selected...</option>
-                                                @foreach ($new_ingredient_uoms as $new_ingredient_uom)
-                                                    <option value="{{$new_ingredient_uom->id}}">{{$new_ingredient_uom->uom_code}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
+                                    <select name="packaging_material_types_id" id="packaging_material_types_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($packaging_material_types as $packaging_material_type)
+                                        <option value="{{$packaging_material_type->id}}" description="{{$packaging_material_type->description}}">{{$packaging_material_type->description}}</option>
+                                        @endforeach
+                                    </select>
                                 </td>
+                            </tr>
+                            <tr id="paperTypeRow" hidden>
+                                <th><span class="required-star">*</span> Packaging Paper Type</th>
+                                <td>
+                                    <select name="packaging_paper_types_id" id="packaging_paper_types_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($packaging_paper_types as $packaging_paper_type)
+                                        <option value="{{$packaging_paper_type->id}}" description="{{$packaging_paper_type->description}}">{{$packaging_paper_type->description}}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Packaging Design Type</th>
+                                <td>
+                                    <select name="packaging_design_types_id" id="packaging_design_types_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($packaging_designs as $packaging_design)
+                                        <option value="{{$packaging_design->id}}" description="{{$packaging_design->description}}">{{$packaging_design->description}}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Size</th>
+                                <td><input type="number" step="any" name="size" class="form-control" required placeholder="SRP" min="1"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Budget Range</th>
                                 <td><input type="number" name="budget_range" class="form-control" required placeholder="Budget Range" oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Reference Links</th>
-                                <td><input type="text" name="reference_link" class="form-control" required placeholder="Reference Links" oninput="this.value = this.value.toUpperCase()"></td>
+                                <th><span class="required-star">*</span> Initial Qty Needed (IN PC)</th>
+                                <td><input type="number" step="any" name="initial_qty_needed" class="form-control" required placeholder="Initial Qty Needed"></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Term</th>
-                                <td>
-                                    <select name="new_ingredient_terms_id" id="new_ingredient_terms_id" class="form-control" required>
-                                        <option value="" disabled selected>None selected...</option>
-                                        @foreach ($new_ingredient_terms as $new_ingredient_term)
-                                        <option value="{{$new_ingredient_term->id}}">{{$new_ingredient_term->description}}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th><span class="required-star">*</span> Duration</th>
-                                <td><input type="text" name="duration" class="form-control" required placeholder="Duration" oninput="this.value = this.value.toUpperCase()"></td>
+                                <th><span class="required-star">*</span> Forecast Qty Needed Per Month (IN PC)</th>
+                                <td><input type="number" step="any" name="forecast_qty_needed" class="form-control" required placeholder="Initial Qty Needed"></td>
                             </tr>
                         </tbody>
                     </table>
