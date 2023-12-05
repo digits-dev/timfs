@@ -597,11 +597,18 @@
 					'updated.name as updated_name',
 					'new_ingredients.created_at',
 					'new_ingredients.updated_at',
-					'new_ingredients.id as new_ingredients_id'
+					'new_ingredients.id as new_ingredients_id',
+					'new_ingredients.packaging_size',
+					'new_ingredients.segmentations',
+					'reasons.description as reason_description',
+					'existing.tasteless_code as existing_tasteless_code',
+					'existing.full_item_description as existing_item_description'
 				)
 				->leftJoin('uoms', 'uoms.id', '=', 'new_ingredients.uoms_id')
 				->leftJoin('cms_users as created', 'created.id', '=', 'new_ingredients.created_by')
 				->leftJoin('cms_users as updated', 'updated.id', '=', 'new_ingredients.updated_by')
+				->leftJoin('new_ingredient_reasons as reasons', 'reasons.id', '=', 'new_ingredients.new_ingredient_reasons_id')
+				->leftJoin('item_masters as existing', 'existing.tasteless_code', '=', 'new_ingredients.existing_ingredient')
 				->get()
 				->first();
 
@@ -635,6 +642,25 @@
 				->orderBy('new_ingredient_reasons.description')
 				->get()
 				->toArray();
+				
+			$data['new_ingredient_uoms'] = DB::table('uoms')
+				->where('uoms.status', 'ACTIVE')
+				->whereIn('uoms.uom_code',['KGS', 'PCS'])
+				->get()
+				->toArray();
+			
+			$data['new_ingredient_terms'] = DB::table('new_ingredient_terms')
+				->where('new_ingredient_terms.status', 'ACTIVE')
+				->orderBy('description')
+				->get()
+				->toArray();
+
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()
+				->toArray();
+				
 
 			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
 
@@ -669,6 +695,20 @@
 					'uoms_id' => $request->get('uoms_id'),
 					'ttp' => $request->get('ttp'),
 					'target_date' => $request->get('target_date'),
+					'segmentations' => implode(',', $request->get('segmentations')),
+					'new_ingredient_reasons_id' => $request->get('new_ingredient_reasons_id'),
+					'existing_ingredient' => $request->get('existing_ingredient'),
+					'recommended_brand_one' => $request->get('recommended_brand_one'),
+					'recommended_brand_two' => $request->get('recommended_brand_two'),
+					'recommended_brand_three' => $request->get('recommended_brand_three'),
+					'initial_qty_needed' => $request->get('initial_qty_needed'),
+					'initial_qty_uoms_id' => $request->get('initial_qty_uoms_id'),
+					'forecast_qty_needed' => $request->get('forecast_qty_needed'),
+					'forecast_qty_uoms_id' => $request->get('forecast_qty_uoms_id'),
+					'budget_range' => $request->get('budget_range'),
+					'reference_link' => $request->get('reference_link'),
+					'new_ingredient_terms_id' => $request->get('new_ingredient_terms_id'),
+					'duration' => $request->get('duration'),
 					'updated_at' => $time_stamp,
 					'updated_by' => $action_by,
 				]);

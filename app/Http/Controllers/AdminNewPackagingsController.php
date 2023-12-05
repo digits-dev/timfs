@@ -646,6 +646,48 @@
 				->get()
 				->toArray();
 
+			$data['packaging_types'] = DB::table('packaging_types')
+				->where('packaging_types.status', 'ACTIVE')
+				->orderBy('description')
+				->get()
+				->toArray();
+
+			$data['packaging_stickers'] = DB::table('packaging_stickers')
+				->where('packaging_stickers.status', 'ACTIVE')
+				->orderBy('description')
+				->get()
+				->toArray();
+
+			$data['packaging_uses'] = DB::table('packaging_uses')
+				->where('packaging_uses.status', 'ACTIVE')
+				->orderBy('description')
+				->get()
+				->toArray();
+
+			$data['packaging_beverage_types'] = DB::table('packaging_beverage_types')
+				->where('packaging_beverage_types.status', 'ACTIVE')
+				->orderBy('description')
+				->get()
+				->toArray();
+
+			$data['packaging_material_types'] = DB::table('packaging_material_types')
+				->where('packaging_material_types.status', 'ACTIVE')
+				->orderBy('description')
+				->get()
+				->toArray();
+
+			$data['packaging_paper_types'] = DB::table('packaging_paper_types')
+				->where('packaging_paper_types.status', 'ACTIVE')
+				->orderBy('description')
+				->get()
+				->toArray();
+
+			$data['packaging_designs'] = DB::table('packaging_designs')
+				->where('packaging_designs.status', 'ACTIVE')
+				->orderBy('description')
+				->get()
+				->toArray();
+
 			$data['comment_templates'] = $this->mainController->getCommentTemplate('packaging');
 
 			$data['created_by'] = DB::table('cms_users')
@@ -655,7 +697,7 @@
 
 			$data['created_at'] = date('Y-m-d');
 
-			return $this->view('new-items/add-new-item', $data);
+			return $this->view('new-items/add-new-packaging', $data);
 		}
 
 		public function getTag($id) {
