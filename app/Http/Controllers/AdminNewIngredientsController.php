@@ -6,6 +6,9 @@
 	use DB;
 	use CRUDBooster;
 	use App\ItemMaster;
+	use Intervention\Image\Facades\Image;
+	use Spatie\ImageOptimizer\OptimizerChainFactory;
+	use Illuminate\Support\Str;
 
 	class AdminNewIngredientsController extends \crocodicstudio\crudbooster\controllers\CBController {
 		public function __construct() {
@@ -901,10 +904,12 @@
 				->where("new_items_comments.$table" . '_id', $id)
 				->where('new_items_comments.status', 'ACTIVE')
 				->select(
-					'*', 
+					'cms_users.name', 
 					'cms_users.id as cms_users_id', 
 					'new_items_comments.created_at as comment_added_at', 
-					'new_items_comments.id as comment_id'
+					'new_items_comments.id as comment_id',
+					'new_items_comments.filename',
+					'new_items_comments.comment_content',
 				)
 				->leftJoin('cms_users', 'new_items_comments.created_by', '=', 'cms_users.id')
 				->orderBy('comment_added_at', 'ASC')
@@ -923,16 +928,37 @@
 		}
 
 		public function addNewItemsComments(Request $request) {
-			$comment_content = $request->comment_content;
-			$table = $request->table;
-			$new_items_id = $request->new_items_id;
+			$comment_content = $request['comment_content'];
+			$table = $request['table'];
+			$new_items_id = $request['new_items_id'];
+			$attached_image = $request['attached_image'];
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
+
+
+			if ($attached_image) {
+				$filename_filler = Str::random(10);
+				$img_file = $attached_image;
+				$filename = date('Y-m-d') . "-$filename_filler." . $img_file->getClientOriginalExtension();
+				$image = Image::make($img_file);
+				
+				$image->resize(1024, 768, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
+	
+				// Save the resized image to the public folder
+				$image->save(public_path('img/item-sourcing/' . $filename));
+				// Optimize the uploaded image
+				$optimizerChain = OptimizerChainFactory::create();
+				$optimizerChain->optimize(public_path('img/item-sourcing/' . $filename));
+			}
 
 			$inserted_id = DB::table('new_items_comments')
 				->insertGetId([
 					$table . '_id' => $new_items_id,
 					'comment_content' => $comment_content,
+					'filename' => $filename,
 					'created_by' => $action_by,
 					'created_at' => $time_stamp,
 				]);
@@ -941,10 +967,12 @@
 				->where('new_items_comments.id', $inserted_id)
 				->leftJoin('cms_users', 'new_items_comments.created_by', '=', 'cms_users.id')
 				->select(
-					'*', 
+					'cms_users.name', 
 					'cms_users.id as cms_users_id', 
 					'new_items_comments.created_at as comment_added_at', 
-					'new_items_comments.id as comment_id'
+					'new_items_comments.id as comment_id',
+					'new_items_comments.filename',
+					'new_items_comments.comment_content',
 				)
 				->get()
 				->first();
