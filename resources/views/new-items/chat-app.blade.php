@@ -69,7 +69,10 @@
         const myId = "{{ CRUDBooster::myId() }}";
         const scrollBody = $('.scroll-body');
         comments.forEach(comment => {
-            const sender = comment.name?.trim();
+            let sender = comment.name?.trim();
+            if (!sender || !sender.length) {
+                sender = 'Unknown Sender';
+            }
             const splittedBySpace = sender.split(' ');
             const initials = splittedBySpace[0][0] + splittedBySpace.at(-1)[0];
             const messageContainer = $(document.createElement('div')).addClass('flex');
@@ -163,7 +166,7 @@
 
     $('.message-form').on('submit', function(event) {
         event.preventDefault();
-        const message = $('.type-message').val();
+        const message = $('.type-message').val().trim();
         const image = $('.image-input').val();
         const newItemsId = "{{ $new_items_id }}";
         if (!message && !image) {
