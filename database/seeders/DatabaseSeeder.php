@@ -12,7 +12,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call(NewIngredientReasonSeeder::class);
-        // $this->call(UsersTableSeeder::class);
+        $this->call(NewIngredientReasonSeeder::class);
+        $this->call(ItemApprovalStatusSeeder::class);
+        $this->call(ItemSourcingStatusSeeder::class);
+        $this->call(NewIngredientReasonSeeder::class);
+        $this->call(NewIngredientTermSeeder::class);
+        $this->call(PackagingBeverageTypeSeeder::class);
+        $this->call(PackagingDesignSeeder::class);
+        $this->call(PackagingMaterialTypeSeeder::class);
+        $this->call(PackagingPaperTypeSeeder::class);
+        $this->call(PackagingStickerSeeder::class);
+        $this->call(PackagingTypeSeeder::class);
+        $this->call(PackagingUseSeeder::class);
     }
 }
