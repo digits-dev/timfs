@@ -821,7 +821,6 @@
 					trans('crudbooster.denied_access')
 				);
 			}
-
 			$data = [];
 
 			$data['action'] = $action;
