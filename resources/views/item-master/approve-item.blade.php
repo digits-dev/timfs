@@ -444,6 +444,18 @@
     differences = Object.keys(differences);
     console.log(differences);
 
+    if (differences.includes('ttp_price_effective_date')) {
+        const effectiveDate = $('#ttp_price_effective_date').val();
+        const today = new Date();
+        const todayFormatted = today.toISOString().split('T')[0];
+
+        if (new Date(effectiveDate) < new Date(todayFormatted)) {
+            $('#approve-btn').attr('disabled', true);
+            const td = $('#ttp_price_effective_date').parents('td');
+            td.append('<label class="label label-danger">Effective Date has expired.</label>')
+        }
+    }
+
     $('input, select').each(function() {
         const name = $(this).attr('name')
         if (differences.includes(name)) {
@@ -453,6 +465,7 @@
 
     $('.action-btn').on('click', function() {
         const action = $(this).attr('_action');
+        console.log($('#sales_price_effective_date'))
         $('#action-selected').val(action);
         Swal.fire({
             title: `Do you want to ${action} this item?`,
