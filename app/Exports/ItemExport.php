@@ -193,7 +193,7 @@ class ItemExport implements FromQuery, WithHeadings, WithMapping
 
         $items->addSelect('user1.name as created_by','item_masters.created_at','user2.name as updated_by','item_masters.updated_at');
 
-        if(!CRUDBooster::isSuperadmin()){
+        if(!in_array(CRUDBooster::myPrivilegeId(), [1, 13, 8])){
             $items->where('item_masters.sku_statuses_id','!=',2);
         }
 
