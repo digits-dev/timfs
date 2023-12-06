@@ -52,6 +52,28 @@
 			$this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
 			$this->col[] = ["label"=>"NWI Code","name"=>"nwi_code"];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
+			$this->col[] = ["label"=>"Last Comment","name"=>"id", "callback" => function($row) {
+				$comment = $row->comment_content;
+				if ($comment && strlen($comment) > 50) {
+					$comment = substr($comment, 0, 49) . '...';
+				}
+				$value = "";
+				if ($row->comment_by) {
+					$value .= "<div class='comment-data comment-by'>$row->comment_by</div>";
+				}
+				if ($row->comment_date) {
+					$value .= "<div class='comment-data comment-date'><span class='timeago' datetime='$row->comment_date'>$row->comment_date</span></div>";
+				}
+				if ($comment) {
+					$value .= "<div class='comment-data comment-content'>$comment</div>";
+				}
+				if ($row->comment_image) {
+					$url = asset('img/item-sourcing/' . $row->comment_image);
+					$img = "<img class='comment-image' src='$url' />";
+					$value .= $img;
+				}
+				return $value;
+			}];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
 			$this->col[] = ["label"=>"Packaging Size","name"=>"packaging_size"];
 			$this->col[] = ["label"=>"UOM","name"=>"uoms_id","join"=>"uoms,uom_description"];
@@ -261,6 +283,7 @@
 					function(){location.href=`$admin_path/delete-new-items/new_ingredients/` + dbId}
 				);
 			});
+
 			";
 
 
@@ -297,6 +320,9 @@
 	        |
 	        */
 	        $this->load_js = array();
+			$this->load_js[] = "https://unpkg.com/timeago.js/dist/timeago.min.js";
+			$this->load_js[] = asset('js/item-sourcing.js');
+
 	        
 	        
 	        
@@ -308,7 +334,11 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = NULL;
+	        $this->style_css = "
+				.comment-image {
+					max-width: 100px;
+				}
+			";
 	        
 	        
 	        
@@ -321,6 +351,7 @@
 	        |
 	        */
 	        $this->load_css = array();
+	        $this->load_css[] = asset('css/item-sourcing.css');
 	        
 	        
 	    }
@@ -349,10 +380,19 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        $query
+				->leftJoin('new_items_last_comment', 'new_items_last_comment.new_ingredients_id', 'new_ingredients.id')
+				->leftJoin('new_items_comments', 'new_items_comments.id', 'new_items_last_comment.new_items_comments_id')
+				->leftJoin('cms_users as commenter', 'commenter.id', 'new_items_comments.created_by')
+				->addSelect(
+					'new_items_comments.created_at as comment_date',
+					'commenter.name as comment_by',
+					'new_items_comments.comment_content',
+					'new_items_comments.filename as comment_image',
+				)
 				->where('new_ingredients.status', 'ACTIVE')
-				->orderBy(DB::raw('item_masters_id is null'), 'desc')
-				->orderBy(DB::raw('target_date is null'), 'asc')
-				->orderBy('target_date', 'asc');
+				->orderBy(DB::raw('new_ingredients.item_masters_id is null'), 'desc')
+				->orderBy(DB::raw('new_ingredients.target_date is null'), 'asc')
+				->orderBy('new_ingredients.target_date', 'asc');
 	            
 	    }
 

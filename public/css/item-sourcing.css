@@ -1,0 +1,32 @@
+.comment-data {
+    margin-bottom: 5px;
+}
+
+.comment-by {
+    font-weight: bolder;
+    font-size: 14px;
+    line-height: 14px;
+    margin: 0;
+}
+
+.comment-date {
+    color: #367fa9;
+    font-weight: 700;
+    font-size: 10px;
+    margin: 0;
+}
+
+.comment-content {
+    background-color: rgba(0, 0, 0, 0.751);
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 5px;
+}
+
+.comment-by, .comment-comment-date {
+    white-space: nowrap;
+}
+
+.comment-image {
+    max-width: 100px;
+}
