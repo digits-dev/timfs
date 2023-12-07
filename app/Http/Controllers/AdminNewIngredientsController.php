@@ -448,7 +448,13 @@
 			$nwi_code_int = (int) explode('-', $max_nwi_code)[1] + 1;
 			$nwi_code = 'NWI-' . str_pad($nwi_code_int, 5, '0', STR_PAD_LEFT);
 			$implodesegmentations = implode(',', Input::get('segmentations'));
+			$item_approval_statuses_id = DB::table('item_approval_statuses')
+				->where('status', 'ACTIVE')
+				->where('status_description', 'PENDING')
+				->pluck('id')
+				->first();
 
+			$postdata['item_approval_statuses_id'] = $item_approval_statuses_id;
 			$postdata['nwi_code'] = $nwi_code;
 			$postdata['segmentations'] = $implodesegmentations;
 			$postdata['comment'] = Input::get('comment');
