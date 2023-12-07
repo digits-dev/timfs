@@ -116,8 +116,8 @@
                                 <th><span class="required-star">*</span> Segmentation</th>
                                 <td>
                                     <select name="segmentations[]" class="segmentation_select" id="new_ingredients_segmentation" class="form-control" multiple="multiple" >
-                                        @foreach ($new_ingredient_segmentations as $new_ingredient_segmentation)
-                                        <option  class="{{ $new_ingredient_segmentation->segment_column_name }}" value="{{ $new_ingredient_segmentation->segment_column_name }}">{{ $new_ingredient_segmentation->segment_column_description }}</option>
+                                        @foreach ($segmentations as $segmentation)
+                                        <option  class="{{ $segmentation->segment_column_name }}" value="{{ $segmentation->segment_column_name }}">{{ $segmentation->segment_column_description }}</option>
                                         @endforeach
                                     </select>
                                 </td>

@@ -566,7 +566,33 @@
 					trans('crudbooster.denied_access')
 				);
 
-			$data['item'] = DB::table('new_ingredients')
+			$data['item'] = self::getSourcingDetails($id);
+
+			$segmentations = explode(',', $data['item']->segmentations);
+			$data['segmentations'] = DB::table('segmentations')
+					->whereIn("segment_column_name", $segmentations)
+					->pluck('segment_column_description')
+					->toArray();
+
+			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
+					->where('status', 'ACTIVE')
+					->where('new_ingredients_id', $id)
+					->get()
+					->count();
+
+			$data['table'] = 'new_ingredients';
+
+			$data['comments_data'] = self::getNewItemsComments($id, true);
+
+			$data['comment_templates'] = self::getCommentTemplate('ingredient');
+
+			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
+
+			return $this->view('new-items/detail-new-ingredients', $data);
+		}
+
+		public function getSourcingDetails($id) {
+			$item = DB::table('new_ingredients')
 				->where('new_ingredients.id', $id)
 				->select(
 					'*',
@@ -613,28 +639,7 @@
 				->leftJoin('item_masters as existing', 'existing.tasteless_code', '=', 'new_ingredients.existing_ingredient')
 				->get()
 				->first();
-
-			$segmentations = explode(',', $data['item']->segmentations);
-			$data['segmentations'] = DB::table('segmentations')
-					->whereIn("segment_column_name", $segmentations)
-					->pluck('segment_column_description')
-					->toArray();
-
-			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
-					->where('status', 'ACTIVE')
-					->where('new_ingredients_id', $id)
-					->get()
-					->count();
-
-			$data['table'] = 'new_ingredients';
-
-			$data['comments_data'] = self::getNewItemsComments($id, true);
-
-			$data['comment_templates'] = self::getCommentTemplate('ingredient');
-
-			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
-
-			return $this->view('new-items/detail-new-ingredients', $data);
+			return $item;
 		}
 
 		public function searchNewIngredients(Request $request) {
@@ -653,6 +658,25 @@
 				->toArray();
 
 			return json_encode($result);
+		}
+
+		public function getAdd() {
+
+			$data = [];
+
+			$submasters = self::getSubmasters();
+
+			$data['comment_templates'] = self::getCommentTemplate('ingredient');
+
+			$data['created_by'] = DB::table('cms_users')
+				->where('id', CRUDBooster::myId())
+				->get()
+				->first();
+
+			$data['created_at'] = date('Y-m-d');
+			$data = array_merge($data, $submasters);
+
+			return $this->view('new-items/add-new-ingredients', $data);
 		}
 
 		public function getEdit($id) {
@@ -700,43 +724,7 @@
 
 			$data['comments_data'] = self::getNewItemsComments($id);
 
-			$data['new_item_types'] = DB::table('new_item_types')
-				->where('new_item_types.status', 'ACTIVE')
-				->orderBy('item_type_description')
-				->get()
-				->toArray();
-
-			$data['uoms'] = DB::table('uoms')
-				->where('uoms.status', 'ACTIVE')
-				->orderBy('uoms.uom_description')
-				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
-				->get()
-				->toArray();
-			
-			$data['new_ingredient_reasons'] = DB::table('new_ingredient_reasons')
-				->where('new_ingredient_reasons.status', 'ACTIVE')
-				->orderBy('new_ingredient_reasons.description')
-				->get()
-				->toArray();
-				
-			$data['new_ingredient_uoms'] = DB::table('uoms')
-				->where('uoms.status', 'ACTIVE')
-				->whereIn('uoms.uom_code',['KGS', 'PCS'])
-				->get()
-				->toArray();
-			
-			$data['new_ingredient_terms'] = DB::table('new_ingredient_terms')
-				->where('new_ingredient_terms.status', 'ACTIVE')
-				->orderBy('description')
-				->get()
-				->toArray();
-
-			$data['segmentations'] = DB::table('segmentations')
-				->where('status', 'ACTIVE')
-				->orderBy('segment_column_description')
-				->get()
-				->toArray();
-				
+			$submasters = self::getSubmasters();				
 
 			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
 
@@ -746,9 +734,47 @@
 					"This item has already been tagged.", 'danger'
 				);
 			}
-
+			$data = array_merge($data, $submasters);
 
 			return $this->view('new-items/edit-new-ingredients', $data);
+		}
+
+		public function getSubmasters() {
+			$data = [];
+			$data['uoms'] = DB::table('uoms')
+				->where('uoms.status', 'ACTIVE')
+				->orderBy('uoms.uom_description')
+				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
+				->get()
+				->toArray();
+
+			$data['new_item_types'] = DB::table('new_item_types')
+				->where('new_item_types.status', 'ACTIVE')
+				->orderBy('item_type_description')
+				->get()
+				->toArray();
+			
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()
+				->toArray();
+
+			$data['new_ingredient_reasons'] = DB::table('new_ingredient_reasons')
+				->where('new_ingredient_reasons.status', 'ACTIVE')
+				->orderBy('description','asc')
+				->get();
+
+			$data['new_ingredient_uoms'] = DB::table('uoms')
+				->where('uoms.status', 'ACTIVE')
+				->whereIn('uoms.uom_code',['KGS', 'PCS'])
+				->get();
+
+			$data['new_ingredient_terms'] = DB::table('new_ingredient_terms')
+				->where('new_ingredient_terms.status', 'ACTIVE')
+				->orderBy('description','asc')
+				->get();
+			return $data;
 		}
 
 		public function submitEditNewIngredient(Request $request) {
@@ -798,56 +824,6 @@
 					'message' => "Item details updated!"
 				]);
 			
-		}
-
-		public function getAdd() {
-
-			$data = [];
-
-			$data['uoms'] = DB::table('uoms')
-				->where('uoms.status', 'ACTIVE')
-				->orderBy('uoms.uom_description')
-				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
-				->get()
-				->toArray();
-
-			$data['new_item_types'] = DB::table('new_item_types')
-				->where('new_item_types.status', 'ACTIVE')
-				->orderBy('item_type_description')
-				->get()
-				->toArray();
-			
-			$data['new_ingredient_segmentations'] = DB::table('segmentations')
-				->where('status', 'ACTIVE')
-				->orderBy('segment_column_description')
-				->get()
-				->toArray();
-
-			$data['new_ingredient_reasons'] = DB::table('new_ingredient_reasons')
-				->where('new_ingredient_reasons.status', 'ACTIVE')
-				->orderBy('description','asc')
-				->get();
-
-			$data['new_ingredient_uoms'] = DB::table('uoms')
-				->where('uoms.status', 'ACTIVE')
-				->whereIn('uoms.uom_code',['KGS', 'PCS'])
-				->get();
-
-			$data['new_ingredient_terms'] = DB::table('new_ingredient_terms')
-				->where('new_ingredient_terms.status', 'ACTIVE')
-				->orderBy('description','asc')
-				->get();
-
-			$data['comment_templates'] = self::getCommentTemplate('ingredient');
-
-			$data['created_by'] = DB::table('cms_users')
-				->where('id', CRUDBooster::myId())
-				->get()
-				->first();
-
-			$data['created_at'] = date('Y-m-d');
-
-			return $this->view('new-items/add-new-ingredients', $data);
 		}
 
 		public function getTag($id) {
@@ -1278,12 +1254,3 @@
 			return response()->json($suggestions);
 		}
 	}
-	// public function suggestExistingIngredients(){
-	// 	$suggestions = ItemMaster::where('item_masters.sku_statuses_id', 1)
-	// 		->whereNotNull('item_masters.tasteless_code')
-	// 		->select('item_masters.full_item_description as text', 'item_masters.tasteless_code as id')
-	// 		->orderBy('item_masters.full_item_description', 'asc')
-	// 		->get();
-
-	// 	return response()->json($suggestions);
-	// }
