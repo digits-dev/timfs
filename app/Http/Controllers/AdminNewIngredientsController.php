@@ -24,6 +24,13 @@
 				->leftJoin('cms_privileges', 'cms_privileges.id', '=', 'cms_users.id_cms_privileges')
 				->pluck('cms_users.id')
 				->toArray();
+
+			$this->status_badges = [
+				'info' => ['OPEN'],
+				'warning' => ['PENDING', 'ON HOLD'],
+				'success' => ['CLOSED', 'APPROVED'],
+				'danger' => ['CANCELLED', 'REJECTED'],
+			];
 		}
 
 	    public function cbInit() {
@@ -49,6 +56,24 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
+			$this->col[] = ["label"=>"Approval Status","name"=>"item_approval_statuses_id","join"=>"item_approval_statuses,status_description","callback"=>function($row) {
+				if ($row->approval_status) {
+					foreach ($this->status_badges as $key => $badge) {
+						if (in_array($row->approval_status, $badge)) {
+							return "<span class='label label-$key'>$row->approval_status</span>";
+						}
+					}
+				}
+			}];
+			$this->col[] = ["label"=>"Souring Status","name"=>"item_sourcing_statuses_id","join"=>"item_sourcing_statuses,status_description","callback"=>function($row) {
+				if ($row->sourcing_status) {
+					foreach ($this->status_badges as $key => $badge) {
+						if (in_array($row->sourcing_status, $badge)) {
+							return "<span class='label label-$key'>$row->sourcing_status</span>";
+						}
+					}
+				}
+			}];
 			$this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
 			$this->col[] = ["label"=>"NWI Code","name"=>"nwi_code"];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
@@ -388,6 +413,8 @@
 					'commenter.name as comment_by',
 					'new_items_comments.comment_content',
 					'new_items_comments.filename as comment_image',
+					'item_approval_statuses.status_description as approval_status',
+					'item_sourcing_statuses.status_description as sourcing_status',
 				)
 				->where('new_ingredients.status', 'ACTIVE')
 				->orderBy(DB::raw('new_ingredients.item_masters_id is null'), 'desc')
