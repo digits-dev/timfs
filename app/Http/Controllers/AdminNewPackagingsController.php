@@ -382,6 +382,19 @@
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
 			$postdata['comment'] = Input::get('comment');
 			$postdata['target_date'] = Input::get('target_date');
+			$postdata['packaging_types_id'] = Input::get('packaging_types_id');
+			$postdata['sticker_types_id'] = Input::get('sticker_types_id');
+			$postdata['packaging_uses_id'] = Input::get('packaging_uses_id');
+			$postdata['packaging_beverage_types_id'] = Input::get('packaging_beverage_types_id');
+			$postdata['packaging_material_types_id'] = Input::get('packaging_material_types_id');
+			$postdata['packaging_paper_types_id'] = Input::get('packaging_paper_types_id');
+			$postdata['packaging_design_types_id'] = Input::get('packaging_design_types_id');
+			$postdata['size'] = Input::get('size');
+			$postdata['budget_range'] = Input::get('budget_range');
+			$postdata['initial_qty_needed'] = Input::get('initial_qty_needed');
+			$postdata['initial_qty_uoms_id'] = Input::get('initial_qty_uoms_id');
+			$postdata['forecast_qty_needed'] = Input::get('forecast_qty_needed');
+			$postdata['forecast_qty_uoms_id'] = Input::get('forecast_qty_uoms_id');
 			$postdata['created_by'] = CRUDBooster::myId();
 			$postdata['created_at'] = date('Y-m-d H:i:s');
 	    }
@@ -639,6 +652,11 @@
 				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
 				->get()
 				->toArray();
+
+			$data['new_ingredient_uoms'] = DB::table('uoms')
+				->where('uoms.status', 'ACTIVE')
+				->whereIn('uoms.uom_code', ['PCS'])
+				->get();
 
 			$data['new_item_types'] = DB::table('new_item_types')
 				->where('new_item_types.status', 'ACTIVE')

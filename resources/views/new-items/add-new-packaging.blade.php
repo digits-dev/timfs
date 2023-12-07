@@ -103,11 +103,11 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span>  SRP</th>
+                                <th><span class="required-star">*</span> SRP</th>
                                 <td><input type="number" step="any" name="ttp" class="form-control" required placeholder="SRP"></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span>  Target Date</th>
+                                <th><span class="required-star">*</span> Target Date</th>
                                 <td><input type="date" step="any" name="target_date" class="form-control" required></td>
                             </tr>
                             <tr>
@@ -127,7 +127,7 @@
                                     <select name="sticker_types_id" id="sticker_types_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_stickers as $packaging_sticker)
-                                        <option value="{{$packaging_sticker->id}}" description="{{$packaging_sticker->description}}">{{$packaging_sticker->description}}</option>
+                                        <option value="{{$packaging_sticker->id}}" >{{$packaging_sticker->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
@@ -150,18 +150,18 @@
                                 </td>
                             </tr>
                             <tr id="beverageTypeRow" hidden>
-                                <th><span class="required-star">*</span> Packaging Beverage Type</th>
+                                <th><span class="required-star">*</span>  Beverage Type</th>
                                 <td>
                                     <select name="packaging_beverage_types_id" id="packaging_beverage_types_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_beverage_types as $packaging_beverage_type)
-                                        <option value="{{$packaging_beverage_type->id}}" description="{{$packaging_beverage_type->description}}">{{$packaging_beverage_type->description}}</option>
+                                        <option value="{{$packaging_beverage_type->id}}" >{{$packaging_beverage_type->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Packaging Material Type</th>
+                                <th><span class="required-star">*</span> Material Type</th>
                                 <td>
                                     <select name="packaging_material_types_id" id="packaging_material_types_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
@@ -172,18 +172,18 @@
                                 </td>
                             </tr>
                             <tr id="paperTypeRow" hidden>
-                                <th><span class="required-star">*</span> Packaging Paper Type</th>
+                                <th><span class="required-star">*</span> Paper Type</th>
                                 <td>
                                     <select name="packaging_paper_types_id" id="packaging_paper_types_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_paper_types as $packaging_paper_type)
-                                        <option value="{{$packaging_paper_type->id}}" description="{{$packaging_paper_type->description}}">{{$packaging_paper_type->description}}</option>
+                                        <option value="{{$packaging_paper_type->id}}" >{{$packaging_paper_type->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Packaging Design Type</th>
+                                <th><span class="required-star">*</span> Design Type</th>
                                 <td>
                                     <select name="packaging_design_types_id" id="packaging_design_types_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
@@ -202,12 +202,40 @@
                                 <td><input type="number" name="budget_range" class="form-control" required placeholder="Budget Range" oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Initial Qty Needed (IN PC)</th>
-                                <td><input type="number" step="any" name="initial_qty_needed" class="form-control" required placeholder="Initial Qty Needed"></td>
+                                <th><span class="required-star">*</span> Initial Qty Needed</th>
+                                <td>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input type="number" step="any" name="initial_qty_needed" class="form-control" required placeholder="Initial Qty Needed">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <select name="initial_qty_uoms_id" id="initial_qty_uoms_id" class="form-control" required >
+                                                <option value="" disabled selected>None selected...</option>
+                                                @foreach ($new_ingredient_uoms as $new_ingredient_uom)
+                                                    <option value="{{$new_ingredient_uom->id}}" selected>{{$new_ingredient_uom->uom_code}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Forecast Qty Needed Per Month (IN PC)</th>
-                                <td><input type="number" step="any" name="forecast_qty_needed" class="form-control" required placeholder="Initial Qty Needed"></td>
+                                <th><span class="required-star">*</span> Forecast Qty Needed Per Month</th>
+                                <td>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input type="number" step="any" name="forecast_qty_needed" class="form-control" required placeholder="Forecast Qty Needed">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <select name="forecast_qty_uoms_id" id="forecast_qty_uoms_id" class="form-control" required >
+                                                <option value="" disabled >None selected...</option>
+                                                @foreach ($new_ingredient_uoms as $new_ingredient_uom)
+                                                    <option value="{{$new_ingredient_uom->id}}" selected>{{$new_ingredient_uom->uom_code}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -239,15 +267,39 @@
         width:'100%',
     });
     
-    $('#new_ingredient_reasons_id').change(function () {
+    $('#packaging_types_id').change(function () {
         const selectedValue = $(this).val();
         const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
         
         console.log(selectedOption);
-        if (selectedOption === 'REPLACEMENT') {
-            $('#existingIngredientRow').show();
+        if (selectedOption === 'STICKER LABEL') {
+            $('#stickerTypeRow').show();
         } else {
-            $('#existingIngredientRow').hide();
+            $('#stickerTypeRow').hide();
+        }
+    });
+
+    $('#packaging_uses_id').change(function () {
+        const selectedValue = $(this).val();
+        const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
+        
+        console.log(selectedOption);
+        if (selectedOption === 'BEVERAGE') {
+            $('#beverageTypeRow').show();
+        } else {
+            $('#beverageTypeRow').hide();
+        }
+    });
+
+    $('#packaging_material_types_id').change(function () {
+        const selectedValue = $(this).val();
+        const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
+        
+        console.log(selectedOption);
+        if (selectedOption === 'PAPER') {
+            $('#paperTypeRow').show();
+        } else {
+            $('#paperTypeRow').hide();
         }
     });
 
@@ -266,6 +318,7 @@
             returnFocus: false,
         }).then((result) => {
             if (result.isConfirmed) {
+                
                 $('#submit-btn').click();
             }
         });

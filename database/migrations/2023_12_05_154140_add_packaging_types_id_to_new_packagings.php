@@ -14,7 +14,9 @@ class AddPackagingTypesIdToNewPackagings extends Migration
     public function up()
     {
         Schema::table('new_packagings', function (Blueprint $table) {
+            $table->integer('forecast_qty_uoms_id')->length(10)->unsigned()->nullable()->after('target_date');
             $table->decimal('forecast_qty_needed', 18, 2)->unsigned()->nullable()->after('target_date');
+            $table->integer('initial_qty_uoms_id')->length(10)->unsigned()->nullable()->after('target_date');
             $table->decimal('initial_qty_needed', 18, 2)->unsigned()->nullable()->after('target_date');
             $table->decimal('budget_range', 18, 2)->unsigned()->nullable()->after('target_date');
             $table->decimal('size', 18, 2)->unsigned()->nullable()->after('target_date');
@@ -48,7 +50,9 @@ class AddPackagingTypesIdToNewPackagings extends Migration
             $table->dropColumn('size');
             $table->dropColumn('budget_range');
             $table->dropColumn('initial_qty_needed');
+            $table->dropColumn('initial_qty_uoms_id');
             $table->dropColumn('forecast_qty_needed');
+            $table->dropColumn('forecast_qty_uoms_id');
 
         });
     }
