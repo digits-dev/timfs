@@ -159,6 +159,8 @@
 	        */
 	        $this->addaction = array();
 			$my_privilege = CRUDBooster::myPrivilegeName();
+			$my_requestor_ids = self::getMyRequestors();
+			$my_privilege = CRUDBooster::myPrivilegeName();
 
 			$this->addaction[] = [
 				'title'=>'Detail',
@@ -167,7 +169,6 @@
 				'color' => ' ',
 			];
 
-			$my_privilege = CRUDBooster::myPrivilegeName();
 
 			if (CRUDBooster::isUpdate() || CRUDBooster::isSuperAdmin()) {
 				$this->addaction[] = [
@@ -175,7 +176,7 @@
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
 					'icon'=>'fa fa-pencil',
 					'color' => ' ',
-					"showIf"=>"[item_masters_id] == null && ([created_by] == CRUDBooster::myId() || CRUDBooster::isSuperAdmin())"
+					"showIf"=>"[approval_status] == 'PENDING' && ([created_by] == CRUDBooster::myId() || CRUDBooster::isSuperAdmin())"
 				];
 			}
 
@@ -186,6 +187,20 @@
 					'icon'=>'fa fa-tag',
 					'color' => ' ',
 					"showIf"=>"[item_masters_id] == null"
+				];
+			}
+			
+			if ($my_requestor_ids) {
+				$requestor_json = json_encode($my_requestor_ids);
+				$this->addaction[] = [
+					'title'=>'Update Approval Status',
+					'url'=>CRUDBooster::mainpath('approve-or-reject/[id]'),
+					'icon'=>'fa fa-thumbs-up',
+					'color' => ' ',
+					"showIf"=>"
+						(in_array([created_by], $requestor_json) || CRUDBooster::isSuperAdmin()) && 
+						[approval_status] == 'PENDING'
+					"
 				];
 			}
 
@@ -600,11 +615,13 @@
 					'item_uom.uom_description',
 					'new_ingredients.id as new_ingredients_id',
 					'creator.name as creator_name',
+					'creator.id as creator_id',
 					'updator.name as updator_name',
 					'tagger.name as tagger_name',
 					'new_ingredients.created_at',
 					'new_ingredients.updated_at',
 					'new_ingredients.tagged_at',
+					'new_ingredients.id as new_ingredients_id',
 					'item.id as item_masters_id',
 					'new_ingredients.ttp',
 					'new_ingredients.packaging_size',
@@ -624,7 +641,8 @@
 					'new_ingredients.reference_link', 
 					'new_ingredients.duration', 
 					'new_ingredient_terms.description as ingredient_terms',
-
+					'approval_statuses.status_description as approval_status',
+					'sourcing_statuses.status_description as sourcing_status',
 				)
 				->leftJoin('uoms as item_uom', 'item_uom.id', '=', 'new_ingredients.uoms_id')
 				->leftJoin('cms_users as creator', 'creator.id', '=', 'new_ingredients.created_by')
@@ -637,6 +655,8 @@
 				->leftJoin('uoms as forecast_uoms', 'forecast_uoms.id', '=', 'new_ingredients.forecast_qty_uoms_id')
 				->leftJoin('new_ingredient_terms', 'new_ingredient_terms.id', '=', 'new_ingredients.new_ingredient_terms_id')
 				->leftJoin('item_masters as existing', 'existing.tasteless_code', '=', 'new_ingredients.existing_ingredient')
+				->leftJoin('item_approval_statuses as approval_statuses', 'approval_statuses.id', 'new_ingredients.item_approval_statuses_id')
+				->leftJoin('item_sourcing_statuses as sourcing_statuses', 'sourcing_statuses.id', 'new_ingredients.item_sourcing_statuses_id')
 				->get()
 				->first();
 			return $item;
@@ -1253,4 +1273,93 @@
 
 			return response()->json($suggestions);
 		}
+
+		public function getMyRequestors() {
+			$my_requestor_ids = DB::table('item_sourcing_matrices')
+				->where('status', 'ACTIVE')
+				->where('approver_ids', CRUDBooster::myId())
+				->pluck('requestor_id')
+				->toArray();
+
+			return $my_requestor_ids;
+		}
+
+		public function approveOrReject($id) {
+			$item = self::getSourcingDetails($id);
+
+			$my_requestor_ids = self::getMyRequestors();
+
+			if (!in_array($item->creator_id, $my_requestor_ids)) {
+				return CRUDBooster::redirect(
+					CRUDBooster::mainPath(),
+					trans('crudbooster.denied_access')
+				);
+			}
+
+			$data['item'] = $item;
+
+			$segmentations = explode(',', $data['item']->segmentations);
+			$data['segmentations'] = DB::table('segmentations')
+					->whereIn("segment_column_name", $segmentations)
+					->pluck('segment_column_description')
+					->toArray();
+
+			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
+					->where('status', 'ACTIVE')
+					->where('new_ingredients_id', $id)
+					->get()
+					->count();
+
+			$data['table'] = 'new_ingredients';
+
+			$data['comments_data'] = self::getNewItemsComments($id, true);
+
+			$data['comment_templates'] = self::getCommentTemplate('ingredient');
+
+			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
+
+			return $this->view('new-items/approve-new-ingredients', $data);
+
+		}
+
+		public function submitApproveOrReject(Request $request) {
+			$new_ingredients_id = $request->get('new_ingredients_id');
+			$action = $request->get('action');
+			$item = self::getSourcingDetails($new_ingredients_id);
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+
+			if ($item->approval_status != 'PENDING') {
+				return CRUDBooster::redirect(CRUDBooster::mainPath(), 'This item is not pending.', 'danger');
+			}
+
+			if ($action == 'approve') {
+				$item_approval_statuses_id = DB::table('item_approval_statuses')
+					->where('status', 'ACTIVE')
+					->where('status_description', 'APPROVED')
+					->pluck('id')
+					->first();
+
+				$params = ['✔️ Item successfully approved', 'success'];
+			} else if ($action == 'reject') {
+				$item_approval_statuses_id = DB::table('item_approval_statuses')
+					->where('status', 'ACTIVE')
+					->where('status_description', 'REJECTED')
+					->pluck('id')
+					->first();
+
+				$params = ['✖️ Item successfully rejected', 'success'];
+				
+			}
+
+			DB::table('new_ingredients')->where('id', $new_ingredients_id)->update([
+				'updated_by' => $action_by,
+				'updated_at' => $time_stamp,
+				'item_approval_statuses_id' => $item_approval_statuses_id,
+			]);
+
+			return CRUDBooster::redirect(CRUDBooster::mainPath(), ...$params);
+
+		}
+
 	}

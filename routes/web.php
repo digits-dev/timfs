@@ -140,7 +140,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/for_approval_rnd_menu/edit/return-item', [AdminRndMenuItemsForApprovalController::class, 'returnRNDMenu'])->name('return_rnd_menu');
     Route::post('/admin/approved_rnd_menu/edit/add-pos-update', [AdminRndMenuItemsApprovedController::class, 'addPosUpdate'])->name('add_pos_update');
 
-    //new items (new ingredients and packagings)
+    //ITEM SOURCING: new items (new ingredients and packagings)
     Route::get('/admin/delete-new-items/{table}/{id}', [AdminNewIngredientsController::class, 'deleteNewItem']);
 
     Route::post('/admin/new_ingredients/search-new-ingredients', [AdminNewIngredientsController::class, 'searchNewIngredients'])->name('search_new_ingredient');
@@ -152,6 +152,8 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
 
     Route::post('/admin/new_ingredients/add-new-items-comments', [AdminNewIngredientsController::class, 'addNewItemsComments'])->name('add_new_items_comments');
     Route::post('/admin/new_ingredients/delete-new-items-comments', [AdminNewIngredientsController::class, 'deleteNewItemsComments'])->name('delete_new_items_comments');
+    Route::get('/admin/new_ingredients/approve-or-reject/{id}', [AdminNewIngredientsController::class, 'approveOrReject']);
+    Route::post('/admin/new_ingredients/approve-or-reject/', [AdminNewIngredientsController::class, 'submitApproveOrReject'])->name('new_ingredients_submit_approve_or_reject');
     
     Route::post('/admin/new_packagings/search-new-packagings', [AdminNewPackagingsController::class, 'searchNewPackagings'])->name('search_new_packaging');
     Route::get('/admin/new_packagings/get-tag/{id}', [AdminNewPackagingsController::class, 'getTag']);
