@@ -200,7 +200,7 @@
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Reference Links</th>
-                                <td><input type="text" name="reference_link" class="form-control" required placeholder="Reference Links" oninput="this.value = this.value.toUpperCase()"></td>
+                                <td><input type="text" name="reference_link" class="form-control" required placeholder="Reference Links" ></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Term</th>
