@@ -21,10 +21,6 @@
                     <table class="table table-striped">
                         <tbody>
                             <tr>
-                                <th>Tasteless Code</th>
-                                <td>{{$item->tasteless_code}}</td>
-                            </tr>
-                            <tr>
                                 <th>{{$table == 'new_ingredients' ? 'NWI Code' : 'NWP Code'}}</th>
                                 <td>{{$item->nwi_code ?? $item->nwp_code}}</td>
                             </tr>
@@ -118,12 +114,6 @@
                                 <th>Updated Date</th>
                                 <td>{{$item->updated_at}}</td>
                             </tr>
-                            @if ($item->item_masters_id)
-                            <tr>
-                                <th>View Item Masters Details</th>
-                                <td><a href="{{CRUDBooster::adminPath('item_masters/detail/' . $item->item_masters_id)}}" target="_blank">View Details</a></td>
-                            </tr>
-                            @endif
                         </tbody>
                     </table>
                 </div>
