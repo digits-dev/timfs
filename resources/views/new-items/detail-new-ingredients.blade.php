@@ -107,22 +107,54 @@
                                 <th>Created Date</th>
                                 <td>{{$item->created_at}}</td>
                             </tr>
+                            @if ($item->updator_name)
                             <tr>
-                                <th>Updated by</th>
+                                <th>Updated By</th>
                                 <td>{{$item->updator_name}}</td>
                             </tr>
+                            @endif
+                            @if ($item->updated_at)
                             <tr>
                                 <th>Updated Date</th>
                                 <td>{{$item->updated_at}}</td>
                             </tr>
+                            @endif
+                            @if ($item->tagger_name)
                             <tr>
-                                <th>Tagged by</th>
+                                <th>Tagged By</th>
                                 <td>{{$item->tagger_name}}</td>
                             </tr>
+                            @endif
+                            @if ($item->approver_name)
+                            <tr>
+                                <th>Approval Status Updated By</th>
+                                <td>{{$item->approver_name}}</td>
+                            </tr>
+                            @endif
+                            @if ($item->approval_status_updated_at)
+                            <tr>
+                                <th>Approval Status Updated Date</th>
+                                <td>{{$item->approval_status_updated_at}}</td>
+                            </tr>
+                            @endif
+                            @if ($item->sourcer_name)
+                            <tr>
+                                <th>Sourcing Status Updated By</th>
+                                <td>{{$item->sourcer_name}}</td>
+                            </tr>
+                            @endif
+                            @if ($item->sourcing_status_updated_at)
+                            <tr>
+                                <th>Sourcing Status Updated Date</th>
+                                <td>{{$item->sourcing_status_updated_at}}</td>
+                            </tr>
+                            @endif
+                            @if ($item->tagged_at)
                             <tr>
                                 <th>Tagged Date</th>
                                 <td>{{$item->tagged_at}}</td>
                             </tr>
+                            @endif
                             @if ($item->item_masters_id)
                             <tr>
                                 <th>View Item Masters Details</th>

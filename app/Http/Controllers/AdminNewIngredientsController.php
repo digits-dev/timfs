@@ -179,16 +179,6 @@
 					"showIf"=>"[approval_status] == 'PENDING' && ([created_by] == CRUDBooster::myId() || CRUDBooster::isSuperAdmin())"
 				];
 			}
-
-			if (in_array($my_privilege, $this->tagger) || CRUDBooster::isSuperAdmin()) {
-				$this->addaction[] = [
-					'title'=>'Tag',
-					'url'=>CRUDBooster::mainpath('get-tag/[id]'),
-					'icon'=>'fa fa-tag',
-					'color' => ' ',
-					"showIf"=>"[item_masters_id] == null"
-				];
-			}
 			
 			if ($my_requestor_ids) {
 				$requestor_json = json_encode($my_requestor_ids);
@@ -201,6 +191,16 @@
 						(in_array([created_by], $requestor_json) || CRUDBooster::isSuperAdmin()) && 
 						[approval_status] == 'PENDING'
 					"
+				];
+			}
+
+			if (in_array($my_privilege, $this->tagger) || CRUDBooster::isSuperAdmin()) {
+				$this->addaction[] = [
+					'title'=>'Tag',
+					'url'=>CRUDBooster::mainpath('get-tag/[id]'),
+					'icon'=>'fa fa-tag',
+					'color' => ' ',
+					"showIf"=>"[item_masters_id] == null && [sourcing_status] == 'OPEN'"
 				];
 			}
 
@@ -425,6 +425,7 @@
 				->leftJoin('cms_users as commenter', 'commenter.id', 'new_items_comments.created_by')
 				->addSelect(
 					'new_items_comments.created_at as comment_date',
+					'new_ingredients.item_masters_id',
 					'commenter.name as comment_by',
 					'new_items_comments.comment_content',
 					'new_items_comments.filename as comment_image',
@@ -618,6 +619,8 @@
 					'creator.id as creator_id',
 					'updator.name as updator_name',
 					'tagger.name as tagger_name',
+					'approver.name as approver_name',
+					'sourcer.name as sourcer_name',
 					'new_ingredients.created_at',
 					'new_ingredients.updated_at',
 					'new_ingredients.tagged_at',
@@ -648,6 +651,8 @@
 				->leftJoin('cms_users as creator', 'creator.id', '=', 'new_ingredients.created_by')
 				->leftJoin('cms_users as updator', 'updator.id', '=', 'new_ingredients.updated_by')
 				->leftJoin('cms_users as tagger', 'tagger.id', '=', 'new_ingredients.tagged_by')
+				->leftJoin('cms_users as approver', 'approver.id', '=', 'new_ingredients.approval_status_updated_by')
+				->leftJoin('cms_users as sourcer', 'sourcer.id', '=', 'new_ingredients.sourcing_status_updated_by')
 				->leftJoin('item_masters as item', 'item.id', '=', 'new_ingredients.item_masters_id')
 				->leftJoin('new_item_types', 'new_item_types.id', '=', 'new_ingredients.new_item_types_id')
 				->leftJoin('new_ingredient_reasons', 'new_ingredient_reasons.id', '=', 'new_ingredients.new_ingredient_reasons_id')
@@ -1339,6 +1344,13 @@
 					->where('status_description', 'APPROVED')
 					->pluck('id')
 					->first();
+
+				$item_sourcing_statuses_id = DB::table('item_sourcing_statuses')
+					->where('status', 'ACTIVE')
+					->where('status_description', 'OPEN')
+					->pluck('id')
+					->first();
+
 				$params = ['✔️ Item successfully approved!', 'success'];
 
 			} else if ($action == 'reject') {
@@ -1355,6 +1367,7 @@
 				'approval_status_updated_by' => $action_by,
 				'approval_status_updated_at' => $time_stamp,
 				'item_approval_statuses_id' => $item_approval_statuses_id,
+				'item_sourcing_statuses_id' => $item_sourcing_statuses_id,
 			]);
 
 			return CRUDBooster::redirect(CRUDBooster::mainPath(), ...$params);
