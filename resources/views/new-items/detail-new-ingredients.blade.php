@@ -92,7 +92,7 @@
                                 <td>{{$item->reference_link}}</td>
                             </tr>
                             <tr>
-                                <th>New Ingredient Terms</th>
+                                <th>Term</th>
                                 <td>{{$item->ingredient_terms}}</td>
                             </tr>
                             <tr>
