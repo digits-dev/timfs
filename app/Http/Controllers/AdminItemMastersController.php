@@ -869,7 +869,7 @@
 		}
 
 		public function getItemDetails($tasteless_code) {
-			$item = DB::table('item_master_approvals')
+			$item = DB::table('item_masters')
 				->where('tasteless_code', $tasteless_code)
 				->get()
 				->first();
