@@ -254,8 +254,11 @@
         console.log(selectedOption);
         if (selectedOption === 'REPLACEMENT') {
             $('#existingIngredientRow').show();
+            $('#existing_ingredient').attr('required', true);
         } else {
             $('#existingIngredientRow').hide();
+            $('#existing_ingredient').attr('required', false);
+
         }
     });
 
