@@ -118,14 +118,6 @@
                                 <th>Updated Date</th>
                                 <td>{{$item->updated_at}}</td>
                             </tr>
-                            <tr>
-                                <th>Tagged by</th>
-                                <td>{{$item->tagger_name}}</td>
-                            </tr>
-                            <tr>
-                                <th>Tagged Date</th>
-                                <td>{{$item->tagged_at}}</td>
-                            </tr>
                             @if ($item->item_masters_id)
                             <tr>
                                 <th>View Item Masters Details</th>

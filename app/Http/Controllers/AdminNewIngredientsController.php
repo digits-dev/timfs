@@ -1339,8 +1339,8 @@
 					->where('status_description', 'APPROVED')
 					->pluck('id')
 					->first();
-
 				$params = ['✔️ Item successfully approved', 'success'];
+
 			} else if ($action == 'reject') {
 				$item_approval_statuses_id = DB::table('item_approval_statuses')
 					->where('status', 'ACTIVE')
@@ -1349,12 +1349,11 @@
 					->first();
 
 				$params = ['✖️ Item successfully rejected', 'success'];
-				
 			}
 
 			DB::table('new_ingredients')->where('id', $new_ingredients_id)->update([
-				'updated_by' => $action_by,
-				'updated_at' => $time_stamp,
+				'approval_status_updated_by' => $action_by,
+				'approval_status_updated_at' => $time_stamp,
 				'item_approval_statuses_id' => $item_approval_statuses_id,
 			]);
 
