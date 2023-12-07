@@ -643,6 +643,7 @@
 					'new_ingredients.id as new_ingredients_id',
 					'new_ingredients.packaging_size',
 					'new_ingredients.segmentations',
+					'new_ingredients.ttp',
 					'reasons.description as reason_description',
 					'existing.tasteless_code as existing_tasteless_code',
 					'existing.full_item_description as existing_item_description'
