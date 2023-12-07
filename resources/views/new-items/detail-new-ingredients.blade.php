@@ -47,7 +47,11 @@
                             </tr>
                             <tr>
                                 <th>Segmentations</th>
-                                <td>{{implode(',', $segmentations)}}</td>
+                                <td>
+                                    @foreach ($segmentations as $segmentation)
+                                    <span class="label label-primary">{{$segmentation}}</span>
+                                    @endforeach
+                                </td>
                             </tr>
                             <tr>
                                 <th>Reason</th>
