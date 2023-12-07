@@ -124,7 +124,7 @@
                             <tr id="stickerTypeRow" hidden>
                                 <th><span class="required-star">*</span> Sticker Type</th>
                                 <td>
-                                    <select name="sticker_types_id" id="sticker_types_id" class="form-control" required>
+                                    <select name="sticker_types_id" id="sticker_types_id" class="form-control" >
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_stickers as $packaging_sticker)
                                         <option value="{{$packaging_sticker->id}}" >{{$packaging_sticker->description}}</option>
@@ -152,7 +152,7 @@
                             <tr id="beverageTypeRow" hidden>
                                 <th><span class="required-star">*</span>  Beverage Type</th>
                                 <td>
-                                    <select name="packaging_beverage_types_id" id="packaging_beverage_types_id" class="form-control" required>
+                                    <select name="packaging_beverage_types_id" id="packaging_beverage_types_id" class="form-control" >
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_beverage_types as $packaging_beverage_type)
                                         <option value="{{$packaging_beverage_type->id}}" >{{$packaging_beverage_type->description}}</option>
@@ -174,7 +174,7 @@
                             <tr id="paperTypeRow" hidden>
                                 <th><span class="required-star">*</span> Paper Type</th>
                                 <td>
-                                    <select name="packaging_paper_types_id" id="packaging_paper_types_id" class="form-control" required>
+                                    <select name="packaging_paper_types_id" id="packaging_paper_types_id" class="form-control" >
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_paper_types as $packaging_paper_type)
                                         <option value="{{$packaging_paper_type->id}}" >{{$packaging_paper_type->description}}</option>
@@ -257,11 +257,6 @@
     </div>
 </div>
 
-
-
-
-
-
 <script>
     $('#new_ingredients_segmentation').select2({
         width:'100%',
@@ -270,42 +265,51 @@
     $('#packaging_types_id').change(function () {
         const selectedValue = $(this).val();
         const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
-        
         console.log(selectedOption);
         if (selectedOption === 'STICKER LABEL') {
             $('#stickerTypeRow').show();
+            $('#sticker_types_id').attr('required', true);
         } else {
             $('#stickerTypeRow').hide();
+            $('#sticker_types_id').attr('required', false);
         }
+    });
+    $('#packaging_types_id').change(function(){
+        $('#sticker_types_id').val('');
     });
 
     $('#packaging_uses_id').change(function () {
         const selectedValue = $(this).val();
         const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
-        
         console.log(selectedOption);
         if (selectedOption === 'BEVERAGE') {
             $('#beverageTypeRow').show();
+            $('#packaging_beverage_types_id').attr('required', true);
         } else {
             $('#beverageTypeRow').hide();
+            $('#packaging_beverage_types_id').attr('required', false);
         }
+    });
+    $('#packaging_uses_id').change(function(){
+        $('#packaging_beverage_types_id').val('');
     });
 
     $('#packaging_material_types_id').change(function () {
         const selectedValue = $(this).val();
         const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
-        
         console.log(selectedOption);
         if (selectedOption === 'PAPER') {
             $('#paperTypeRow').show();
+            $('#packaging_paper_types_id').attr('required', true);
         } else {
             $('#paperTypeRow').hide();
+            $('#packaging_paper_types_id').attr('required', false);
         }
     });
-
-    $('#new_ingredient_reasons_id').change(function(){
-        $('#existing_ingredient').val('');
+    $('#packaging_material_types_id').change(function(){
+        $('#packaging_paper_types_id').val('');
     });
+
     
     $('#save-btn').click(function() {
         Swal.fire({
