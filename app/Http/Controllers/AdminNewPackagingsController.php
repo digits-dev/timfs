@@ -477,8 +477,6 @@
 
 	    }
 
-
-
 	    //By the way, you can still create your own method in here... :) 
 
 		public function getDetail($id) {
@@ -488,31 +486,7 @@
 					trans('crudbooster.denied_access')
 				);
 
-			$data['item'] = DB::table('new_packagings')
-				->where('new_packagings.id', $id)
-				->select(
-					'*',
-					'new_packagings.created_at as created_at',
-					'new_packagings.id as new_packagings_id',
-					'creator.name as creator_name',
-					'updator.name as updator_name',
-					'tagger.name as tagger_name',
-					'new_packagings.created_at',
-					'new_packagings.updated_at',
-					'new_packagings.tagged_at',
-					'item_masters.id as item_masters_id',
-					'new_packagings.ttp as ttp',
-					'new_packagings.packaging_size as packaging_size',
-					'new_item_types.item_type_description'
-				)
-				->leftJoin('uoms', 'uoms.id', '=', 'new_packagings.uoms_id')
-				->leftJoin('cms_users as creator', 'creator.id', '=', 'new_packagings.created_by')
-				->leftJoin('cms_users as updator', 'updator.id', '=', 'new_packagings.updated_by')
-				->leftJoin('cms_users as tagger', 'tagger.id', '=', 'new_packagings.tagged_by')
-				->leftJoin('item_masters', 'item_masters.id', '=', 'new_packagings.item_masters_id')
-				->leftJoin('new_item_types', 'new_item_types.id', '=', 'new_packagings.new_item_types_id')
-				->get()
-				->first();
+			$data['item'] = self::getSourcingDetails($id);
 
 			$data['rnd_count'] = DB::table('rnd_menu_packagings_details')
 					->where('status', 'ACTIVE')
@@ -528,7 +502,59 @@
 
 			$data['item_usages'] = $this->mainController->getNewItemUsage($id, 'packaging');
 
-			return $this->view('new-items/detail-new-items', $data);
+			return $this->view('new-items/detail-new-packaging', $data);
+		}
+
+		public function getSourcingDetails($id) {
+			$item = DB::table('new_packagings')
+				->where('new_packagings.id', $id)
+				->select(
+					'*',
+					'new_packagings.created_at as created_at',
+					'new_packagings.id as new_packagings_id',
+					'creator.name as creator_name',
+					'updator.name as updator_name',
+					'tagger.name as tagger_name',
+					'new_packagings.created_at',
+					'new_packagings.updated_at',
+					'new_packagings.tagged_at',
+					'item_masters.id as item_masters_id',
+					'new_packagings.ttp as ttp',
+					'new_packagings.packaging_size as packaging_size',
+					'new_packagings.size as size',
+					'new_packagings.budget_range as budget_range',
+					'new_packagings.initial_qty_needed as initial_qty_needed',
+					'initial_uoms.uom_description as initial_qty_uoms',
+					'new_packagings.forecast_qty_needed as forecast_qty_needed',
+					'forecast_uoms.uom_description as forecast_qty_uoms',
+					'new_item_types.item_type_description',
+					'packaging_types.description as packaging_description',
+					'packaging_stickers.description as packaging_stickers',
+					'packaging_uses.description as packaging_uses',
+					'packaging_beverage_types.description as packaging_beverage',
+					'packaging_material_types.description as packaging_material',
+					'packaging_paper_types.description as packaging_paper',
+					'packaging_designs.description as packaging_design',
+				)
+				->leftJoin('uoms', 'uoms.id', '=', 'new_packagings.uoms_id')
+				->leftJoin('cms_users as creator', 'creator.id', '=', 'new_packagings.created_by')
+				->leftJoin('cms_users as updator', 'updator.id', '=', 'new_packagings.updated_by')
+				->leftJoin('cms_users as tagger', 'tagger.id', '=', 'new_packagings.tagged_by')
+				->leftJoin('item_masters', 'item_masters.id', '=', 'new_packagings.item_masters_id')
+				->leftJoin('new_item_types', 'new_item_types.id', '=', 'new_packagings.new_item_types_id')
+				->leftJoin('packaging_types', 'packaging_types.id', '=', 'new_packagings.packaging_types_id')
+				->leftJoin('packaging_stickers', 'packaging_stickers.id', '=', 'new_packagings.sticker_types_id')
+				->leftJoin('packaging_uses', 'packaging_uses.id', '=', 'new_packagings.packaging_uses_id')
+				->leftJoin('packaging_beverage_types', 'packaging_beverage_types.id', '=', 'new_packagings.packaging_beverage_types_id')
+				->leftJoin('packaging_material_types', 'packaging_material_types.id', '=', 'new_packagings.packaging_material_types_id')
+				->leftJoin('packaging_paper_types', 'packaging_paper_types.id', '=', 'new_packagings.packaging_paper_types_id')
+				->leftJoin('packaging_designs', 'packaging_designs.id', '=', 'new_packagings.packaging_design_types_id')
+				->leftJoin('uoms as initial_uoms', 'initial_uoms.id', '=', 'new_packagings.initial_qty_uoms_id')
+				->leftJoin('uoms as forecast_uoms', 'forecast_uoms.id', '=', 'new_packagings.forecast_qty_uoms_id')
+				->get()
+				->first();
+				return $item;
+
 		}
 
 		public function searchNewPackagings(Request $request) {
@@ -608,7 +634,7 @@
 				);
 			}
 
-			return $this->view('new-items/edit-new-item', $data);
+			return $this->view('new-items/edit-new-packaging', $data);
 		}
 
 		public function submitEditNewPackaging(Request $request) {
@@ -617,11 +643,9 @@
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
 				);
-
 			$new_packagings_id = $request->get('new_items_id');
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
-
 			DB::table('new_packagings')
 				->where('new_packagings.id', $new_packagings_id)
 				->update([
@@ -635,7 +659,6 @@
 					'updated_by' => $action_by,
 				]);
 			
-
 			return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
@@ -645,7 +668,15 @@
 
 		public function getAdd() {
 			$data = [];
+			$submasters = self::getSubmasters();
+			$data['created_at'] = date('Y-m-d');
+			$data = array_merge($data, $submasters);
+			return $this->view('new-items/add-new-packaging', $data);
+		}
 
+		public function getSubmasters() {
+
+			$data = [];
 			$data['uoms'] = DB::table('uoms')
 				->where('uoms.status', 'ACTIVE')
 				->orderBy('uoms.uom_description')
@@ -713,9 +744,7 @@
 				->get()
 				->first();
 
-			$data['created_at'] = date('Y-m-d');
-
-			return $this->view('new-items/add-new-packaging', $data);
+			return $data;
 		}
 
 		public function getTag($id) {
