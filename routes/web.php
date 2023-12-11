@@ -145,7 +145,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
 
     Route::post('/admin/new_ingredients/search-new-ingredients', [AdminNewIngredientsController::class, 'searchNewIngredients'])->name('search_new_ingredient');
     Route::get('/admin/new_ingredients/get-tag/{id}', [AdminNewIngredientsController::class, 'getTag']);
-    Route::post('/admin/new_ingredients/tag-new-ingredient', [AdminNewIngredientsController::class, 'tagNewIngredient'])->name('tag_new_ingredient');
+    Route::post('/admin/new_ingredients/tag-new-ingredient/{id}', [AdminNewIngredientsController::class, 'tagNewIngredient'])->name('tag_new_ingredient');
     Route::post('/admin/new_ingredients/search-item-for-tagging', [AdminNewIngredientsController::class, 'searchItemForTagging'])->name('search_item_for_tagging');
     Route::post('/admin/new_ingredients/submit-edit', [AdminNewIngredientsController::class, 'submitEditNewIngredient'])->name('submit_edit_new_ingredient');
     Route::get('/admin/new_ingredients/suggest-existing-ingredients', [AdminNewIngredientsController::class, 'suggestExistingIngredients'])->name('suggest_existing_ingredients');
@@ -154,6 +154,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/new_ingredients/delete-new-items-comments', [AdminNewIngredientsController::class, 'deleteNewItemsComments'])->name('delete_new_items_comments');
     Route::get('/admin/new_ingredients/approve-or-reject/{id}', [AdminNewIngredientsController::class, 'approveOrReject']);
     Route::post('/admin/new_ingredients/approve-or-reject/', [AdminNewIngredientsController::class, 'submitApproveOrReject'])->name('new_ingredients_submit_approve_or_reject');
+    Route::post('/admin/new_ingredients/submit-sourcing-status/{id}', [AdminNewIngredientsController::class, 'submitSourcingStatus'])->name('new_ingredients_submit_sourcing_status');
     
     Route::post('/admin/new_packagings/search-new-packagings', [AdminNewPackagingsController::class, 'searchNewPackagings'])->name('search_new_packaging');
     Route::get('/admin/new_packagings/get-tag/{id}', [AdminNewPackagingsController::class, 'getTag']);

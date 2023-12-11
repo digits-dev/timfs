@@ -200,7 +200,7 @@
 					'url'=>CRUDBooster::mainpath('get-tag/[id]'),
 					'icon'=>'fa fa-tag',
 					'color' => ' ',
-					"showIf"=>"[item_masters_id] == null && [sourcing_status] == 'OPEN'"
+					"showIf"=>"[item_masters_id] == null && in_array([sourcing_status], array('OPEN', 'ON HOLD', 'CANCELLED'))"
 				];
 			}
 
@@ -860,68 +860,44 @@
 
 			$data = [];
 
-			$data['item'] = DB::table('new_ingredients')
-				->where('new_ingredients.id', $id)
-				->select(
-					'*',
-					'created.name as created_name',
-					'updated.name as updated_name',
-					'new_ingredients.created_at',
-					'new_ingredients.updated_at',
-					'new_ingredients.id as new_ingredients_id'
-				)
-				->leftJoin('uoms', 'uoms.id', '=', 'new_ingredients.uoms_id')
-				->leftJoin('cms_users as created', 'created.id', '=', 'new_ingredients.created_by')
-				->leftJoin('cms_users as updated', 'updated.id', '=', 'new_ingredients.updated_by')
-				->get()
-				->first();
+			$data['item'] = self::getSourcingDetails($id);
+
+			$segmentations = explode(',', $data['item']->segmentations);
+			$data['segmentations'] = DB::table('segmentations')
+					->whereIn("segment_column_name", $segmentations)
+					->pluck('segment_column_description')
+					->toArray();
 
 			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
+					->where('status', 'ACTIVE')
+					->where('new_ingredients_id', $id)
+					->get()
+					->count();
+
+			$data['sourcing_statuses'] = DB::table('item_sourcing_statuses')
 				->where('status', 'ACTIVE')
-				->where('new_ingredients_id', $id)
+				->select('id', 'status_description')
 				->get()
-				->count();
+				->toArray();
 
 			$data['table'] = 'new_ingredients';
 
+			$data['comments_data'] = self::getNewItemsComments($id, true);
+
 			$data['comment_templates'] = self::getCommentTemplate('ingredient');
-
-			$data['comments_data'] = self::getNewItemsComments($id);
-
-			$data['new_item_types'] = DB::table('new_item_types')
-				->where('new_item_types.status', 'ACTIVE')
-				->orderBy('item_type_description')
-				->get()
-				->toArray();
-
-			$data['uoms'] = DB::table('uoms')
-				->where('uoms.status', 'ACTIVE')
-				->orderBy('uoms.uom_description')
-				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
-				->get()
-				->toArray();
 
 			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
 
-			if ($data['item']->item_masters_id) {
-				return CRUDBooster::redirect(
-					CRUDBooster::mainPath(),
-					"This item has already been tagged.", 'danger'
-				);
-			}
-
-
-			return $this->view('new-items/tag-new-item', $data);
+			return $this->view('new-items/tag-new-ingredients', $data);
 		}
 
-		public function tagNewIngredient(Request $request) {
+		public function tagNewIngredient(Request $request, $new_ingredients_id) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
 				);
 
-			$new_ingredients_id = $request->get('new_items_id');
 			$tasteless_code = $request->get('tasteless_code');
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
@@ -985,11 +961,10 @@
 
 				(new AdminMenuItemsController)->updateCostOfOtherMenu();
 
-				return redirect(CRUDBooster::mainpath())
-					->with([
-						'message_type' => 'success',
-						'message' => "Item successfully tagged!"
-					]);
+				return redirect(CRUDBooster::mainPath('get-tag/' . $new_ingredients_id))->with([
+					'message' => '✔️ Item successfully tagged!',
+					'message_type' => 'success',
+				]);
 			}
 			
 
@@ -1372,6 +1347,22 @@
 
 			return CRUDBooster::redirect(CRUDBooster::mainPath(), ...$params);
 
+		}
+
+		public function submitSourcingStatus(Request $request, $new_ingredients_id) {
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$item_sourcing_statuses_id = $request->get('item_sourcing_statuses_id');
+
+			DB::table('new_ingredients')
+				->where('id', $new_ingredients_id)
+				->update([
+					'item_sourcing_statuses_id' => $item_sourcing_statuses_id,
+					'sourcing_status_updated_by' => $action_by,
+					'sourcing_status_updated_at' => $time_stamp,
+				]);
+
+			return CRUDBooster::redirect(CRUDBooster::mainPath(), 'Sourcing status updated successfully.', 'success');
 		}
 
 	}
