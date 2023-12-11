@@ -592,14 +592,30 @@
 					'updated.name as updated_name',
 					'new_packagings.created_at',
 					'new_packagings.updated_at',
-					'new_packagings.id as new_packagings_id'
+					'new_packagings.updated_at',
+					'new_packagings.id as new_packagings_id',
+					'packaging_types.description as packaging_description',
+					'packaging_stickers.description as packaging_stickers',
+					'packaging_uses.description as packaging_uses',
+					'packaging_beverage_types.description as packaging_beverage',
+					'packaging_material_types.description as packaging_material',
+					'packaging_paper_types.description as packaging_paper',
+					'packaging_designs.description as packaging_design',
 				)
 				->leftJoin('uoms', 'uoms.id', '=', 'new_packagings.uoms_id')
 				->leftJoin('cms_users as created', 'created.id', '=', 'new_packagings.created_by')
 				->leftJoin('cms_users as updated', 'updated.id', 'new_packagings.updated_by')
+				->leftJoin('packaging_types', 'packaging_types.id', '=', 'new_packagings.packaging_types_id')
+				->leftJoin('packaging_stickers', 'packaging_stickers.id', '=', 'new_packagings.sticker_types_id')
+				->leftJoin('packaging_uses', 'packaging_uses.id', '=', 'new_packagings.packaging_uses_id')
+				->leftJoin('packaging_beverage_types', 'packaging_beverage_types.id', '=', 'new_packagings.packaging_beverage_types_id')
+				->leftJoin('packaging_material_types', 'packaging_material_types.id', '=', 'new_packagings.packaging_material_types_id')
+				->leftJoin('packaging_paper_types', 'packaging_paper_types.id', '=', 'new_packagings.packaging_paper_types_id')
+				->leftJoin('packaging_designs', 'packaging_designs.id', '=', 'new_packagings.packaging_design_types_id')
+				->leftJoin('uoms as initial_uoms', 'initial_uoms.id', '=', 'new_packagings.initial_qty_uoms_id')
+				->leftJoin('uoms as forecast_uoms', 'forecast_uoms.id', '=', 'new_packagings.forecast_qty_uoms_id')
 				->get()
 				->first();
-
 			$data['rnd_count'] = DB::table('rnd_menu_packagings_details')
 					->where('status', 'ACTIVE')
 					->where('new_packagings_id', $id)
@@ -627,12 +643,15 @@
 
 			$data['item_usages'] = $this->mainController->getNewItemUsage($id, 'packaging');
 
+			$submasters = self::getSubmasters();				
+
 			if ($data['item']->item_masters_id) {
 				return CRUDBooster::redirect(
 					CRUDBooster::mainPath(),
 					"This item has already been tagged.", 'danger'
 				);
 			}
+			$data = array_merge($data, $submasters);
 
 			return $this->view('new-items/edit-new-packaging', $data);
 		}
@@ -655,6 +674,20 @@
 					'uoms_id' => $request->get('uoms_id'),
 					'ttp' => $request->get('ttp'),
 					'target_date' => $request->get('target_date'),
+					'packaging_types_id' => $request->get('packaging_types_id'),
+					'sticker_types_id' => $request->get('sticker_types_id'),
+					'packaging_uses_id' => $request->get('packaging_uses_id'),
+					'packaging_beverage_types_id' => $request->get('packaging_beverage_types_id'),
+					'packaging_material_types_id' => $request->get('packaging_material_types_id'),
+					'packaging_paper_types_id' => $request->get('packaging_paper_types_id'),
+					'packaging_design_types_id' => $request->get('packaging_design_types_id'),
+					'size' => $request->get('size'),
+					'ttp' => $request->get('ttp'),
+					'budget_range' => $request->get('budget_range'),
+					'initial_qty_needed' => $request->get('initial_qty_needed'),
+					'initial_qty_uoms_id' => $request->get('initial_qty_uoms_id'),
+					'forecast_qty_needed' => $request->get('forecast_qty_needed'),
+					'forecast_qty_uoms_id' => $request->get('forecast_qty_uoms_id'),
 					'updated_at' => $time_stamp,
 					'updated_by' => $action_by,
 				]);

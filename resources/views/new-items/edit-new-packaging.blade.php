@@ -2,54 +2,10 @@
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <style>
     table, tbody, td, th {
         border: 1px solid black !important;
         padding-left: 50px;
-    }
-
-    .comment-textarea {
-        width: 100%;
-        min-height: 250px;
-        resize: none;
-        padding: 12px;
-    }
-    .select2-container--default .select2-selection--single {
-        border-radius: 0px !important
-    }
-
-    .select2-container .select2-selection--single {
-        height: 35px;
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        background-color: #3190c7 !important;
-        border-color: #367fa9 !important;
-        color: #fff !important;
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        color: #fff !important;
-    }
-
-    .select2-container--default .select2-selection--multiple{
-        border-radius: 0px !important;
-        width: 100% !important;
-    }
-
-    .select2-container .select2-selection--single .select2-selection__rendered{
-        padding: 0 !important;
-        margin-top: -2px;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__clear{
-        margin-right: 10px !important;
-        padding: 0 !important;
-    }
-    th {
-        width: 35%;
     }
 </style>
 @endpush
@@ -63,52 +19,58 @@
 </p>      
 <div class="panel panel-default">
     <div class="panel-heading">
-        <i class="fa fa-pencil"></i><strong> Add {{CRUDBooster::getCurrentModule()->name}}</strong>
+        <i class="fa fa-pencil"></i><strong> Edit {{CRUDBooster::getCurrentModule()->name}}</strong>
     </div>
     <div class="panel-body">
-        <form method="POST" action="{{CRUDBooster::mainPath('add-save')}}" name="form-main" id="form-main" autocomplete="off">
+        <div class="row">
+            <h3 class="text-center">ITEM DETAILS</h3>
+        </div>
+        <form method="POST" action="{{ $table == 'new_ingredients' ? route('submit_edit_new_ingredient') : route('submit_edit_new_packaging')}}" id="form-main" autocomplete="off">
             @csrf
+            <input type="text" name="new_items_id" class="hide" value="{{ $item->new_ingredients_id ?? $item->new_packagings_id }}">
             <div class="row">
                 <div class="col-md-6">
                     <table class="table-responsive table">
                         <tbody>
                             <tr>
-                                <th><span class="required-star">*</span> Item Description</th>
-                                <td><input type="text" name="item_description" class="form-control" required placeholder="Item Description" oninput="this.value = this.value.toUpperCase()"></td>
+                                <th>NWP Code</th>
+                                <th>{{ $item->nwp_code}}</th>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Item Type</th>
+                                <th><span class="required-star">*</span> Item Description</th>
+                                <td><input type="text" value="{{ $item->item_description }}" name="item_description" class="form-control" required placeholder="Item Description" oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Item Type</th>
                                 <td>
                                     <select name="new_item_types_id" id="new_item_types_id" class="form-control" required>
-                                        <option value="" disabled selected>None selected...</option>
                                         @foreach ($new_item_types as $new_item_type)
-                                        <option value="{{$new_item_type->id}}">{{$new_item_type->item_type_description}}</option>
+                                        <option value="{{$new_item_type->id}}" {{ $item->new_item_types_id == $new_item_type->id ? 'selected' : '' }}>{{$new_item_type->item_type_description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  Packaging Size</th>
-                                <td><input type="number" step="any" name="packaging_size" class="form-control" required placeholder="Packaging Size"></td>
+                                <td><input type="number" value="{{ $item ? (float) $item->packaging_size : '' }}" step="any" name="packaging_size" class="form-control" required placeholder="Packaging Size"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  UOM</th>
                                 <td>
                                     <select name="uoms_id" id="uoms_id" class="form-control" required>
-                                        <option value="" disabled selected>None selected...</option>
                                         @foreach ($uoms as $uom)
-                                        <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                                        <option value="{{$uom->id}}" {{ $item->uoms_id == $uom->id ? 'selected' : '' }}>{{$uom->uom_description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> SRP</th>
-                                <td><input type="number" step="any" name="ttp" class="form-control" required placeholder="SRP" min="0"></td>
+                                <th><span class="required-star">*</span>  SRP</th>
+                                <td><input type="number" value="{{ $item ? (float) $item->ttp : '' }}" step="any" name="ttp" class="form-control" required placeholder="SRP" min="0"></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Target Date</th>
-                                <td><input type="date" step="any" name="target_date" class="form-control" required></td>
+                                <th><span class="required-star">*</span>  Target Date</th>
+                                <td><input type="date" value="{{ $item->target_date ? $item->target_date : '' }}" step="any" name="target_date" class="form-control" required></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Packaging Type</th>
@@ -116,18 +78,18 @@
                                     <select name="packaging_types_id" id="packaging_types_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_types as $packaging_type)
-                                        <option value="{{$packaging_type->id}}" description="{{$packaging_type->description}}">{{$packaging_type->description}}</option>
+                                        <option value="{{$packaging_type->id}}" description="{{$packaging_type->description}}" {{ $item->packaging_types_id == $packaging_type->id ? 'selected' : '' }}>{{$packaging_type->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
                             </tr>
-                            <tr id="stickerTypeRow" hidden>
+                            <tr id="stickerTypeRow" {{ $item->packaging_description  != 'STICKER LABEL' ? 'hidden' : '' }}>
                                 <th><span class="required-star">*</span> Sticker Type</th>
                                 <td>
                                     <select name="sticker_types_id" id="sticker_types_id" class="form-control" >
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_stickers as $packaging_sticker)
-                                        <option value="{{$packaging_sticker->id}}" >{{$packaging_sticker->description}}</option>
+                                        <option value="{{$packaging_sticker->id}}" {{ $item->sticker_types_id == $packaging_sticker->id ? 'selected' : '' }}>{{$packaging_sticker->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
@@ -136,7 +98,7 @@
                     </table>
                 </div>
                 <div class="col-md-6">
-                    <table class="table-responsive table">
+                    <table class="table table-responsive">
                         <tbody>
                             <tr>
                                 <th><span class="required-star">*</span> Packaging Use</th>
@@ -144,18 +106,18 @@
                                     <select name="packaging_uses_id" id="packaging_uses_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_uses as $packaging_use)
-                                        <option value="{{$packaging_use->id}}" description="{{$packaging_use->description}}">{{$packaging_use->description}}</option>
+                                        <option value="{{$packaging_use->id}}" description="{{$packaging_use->description}}" {{ $item->packaging_uses_id == $packaging_use->id ? 'selected' : '' }}>{{$packaging_use->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
                             </tr>
-                            <tr id="beverageTypeRow" hidden>
+                            <tr id="beverageTypeRow" {{ $item->packaging_uses  != 'BEVERAGE' ? 'hidden' : '' }}>
                                 <th><span class="required-star">*</span>  Beverage Type</th>
                                 <td>
                                     <select name="packaging_beverage_types_id" id="packaging_beverage_types_id" class="form-control" >
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_beverage_types as $packaging_beverage_type)
-                                        <option value="{{$packaging_beverage_type->id}}" >{{$packaging_beverage_type->description}}</option>
+                                        <option value="{{$packaging_beverage_type->id}}" {{ $item->packaging_beverage_types_id == $packaging_beverage_type->id ? 'selected' : '' }}>{{$packaging_beverage_type->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
@@ -166,18 +128,18 @@
                                     <select name="packaging_material_types_id" id="packaging_material_types_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_material_types as $packaging_material_type)
-                                        <option value="{{$packaging_material_type->id}}" description="{{$packaging_material_type->description}}">{{$packaging_material_type->description}}</option>
+                                        <option value="{{$packaging_material_type->id}}" description="{{$packaging_material_type->description}}" {{ $item->packaging_material_types_id == $packaging_material_type->id ? 'selected' : '' }}>{{$packaging_material_type->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
                             </tr>
-                            <tr id="paperTypeRow" hidden>
+                            <tr id="paperTypeRow" {{ $item->packaging_material  != 'PAPER' ? 'hidden' : '' }}>
                                 <th><span class="required-star">*</span> Paper Type</th>
                                 <td>
                                     <select name="packaging_paper_types_id" id="packaging_paper_types_id" class="form-control" >
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_paper_types as $packaging_paper_type)
-                                        <option value="{{$packaging_paper_type->id}}" >{{$packaging_paper_type->description}}</option>
+                                        <option value="{{$packaging_paper_type->id}}" {{ $item->packaging_paper_types_id == $packaging_paper_type->id ? 'selected' : '' }}>{{$packaging_paper_type->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
@@ -188,25 +150,29 @@
                                     <select name="packaging_design_types_id" id="packaging_design_types_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_designs as $packaging_design)
-                                        <option value="{{$packaging_design->id}}" description="{{$packaging_design->description}}">{{$packaging_design->description}}</option>
+                                        <option value="{{$packaging_design->id}}" description="{{$packaging_design->description}}" {{ $item->packaging_design_types_id == $packaging_design->id ? 'selected' : '' }}>{{$packaging_design->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  Size</th>
-                                <td><input type="number" step="any" name="size" class="form-control" required placeholder="SRP" min="0"></td>
+                                <td><input type="number" value="{{ (float) $item->size }}" step="any" name="size" class="form-control" required placeholder="size" min="0"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  SRP</th>
+                                <td><input type="number" value="{{ (float) $item->ttp }}" step="any" name="ttp" class="form-control" required placeholder="SRP" min="0"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Budget Range</th>
-                                <td><input type="number" name="budget_range" class="form-control" required placeholder="Budget Range" min="0"></td>
+                                <td><input type="number" value="{{ (float) $item->budget_range }}" name="budget_range" class="form-control" required placeholder="Budget Range" min="0"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Initial Qty Needed</th>
                                 <td>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <input type="number" step="any" name="initial_qty_needed" class="form-control" required placeholder="Initial Qty Needed" min="0">
+                                            <input type="number" value="{{ (float) $item->initial_qty_needed }}" step="any" name="initial_qty_needed" class="form-control" required placeholder="Initial Qty Needed" min="0">
                                         </div>
                                         <div class="col-md-6">
                                             <select name="initial_qty_uoms_id" id="initial_qty_uoms_id" class="form-control" required >
@@ -224,7 +190,7 @@
                                 <td>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <input type="number" step="any" name="forecast_qty_needed" class="form-control" required placeholder="Forecast Qty Needed" min="0">
+                                            <input type="number" step="any" value="{{ (float) $item->forecast_qty_needed }}" name="forecast_qty_needed" class="form-control" required placeholder="Forecast Qty Needed" min="0">
                                         </div>
                                         <div class="col-md-6">
                                             <select name="forecast_qty_uoms_id" id="forecast_qty_uoms_id" class="form-control" required >
@@ -241,15 +207,44 @@
                     </table>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <hr>
-                    <h3 class="text-center"><span class="required-star">*</span> COMMENTS</h3>
-                    <textarea class="comment-textarea" name="comment" id="comment" form="form-main" required required placeholder="Type your comment here..."></textarea>
-                </div>
-            </div>
             <button type="submit" class="hide" id="submit-btn">Submit</button>
         </form>
+        <div class="row">
+            <div class="col-md-6">
+                <hr>
+                <h3 class="text-center">COMMENTS</h3>
+                <div class="chat-app">
+                    @include('new-items/chat-app', $comments_data)
+                </div>
+            </div>
+            <div class="col-md-6">
+                <hr>
+                <h3 class="text-center">ITEM USAGE</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Description</th>
+                                <th>User</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!$item_usages)
+                            <tr><td class="text-center" style="font-style: italic; color: grey" colspan="3">This item is currently not in use...</td></tr>
+                            @endif
+                            @foreach ($item_usages as $item_usage)
+                            <tr>
+                                <td>{{ $item_usage->item_code }}</td>
+                                <td>{{ $item_usage->item_description }}</td>
+                                <td>{{ $item_usage->name }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
@@ -257,11 +252,39 @@
     </div>
 </div>
 
+
+
+
+@endsection
+
+@push('bottom')
 <script>
-    $('#new_ingredients_segmentation').select2({
-        width:'100%',
+    $(document).ready(function() {
+        function showSwal() {
+            Swal.fire({
+                title: 'Do you want to save the changes?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Save'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#submit-btn').click();
+                }
+            });
+        }
+
+        $('#save-btn').click(showSwal);
+
+        $('input').on('keypress', function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                showSwal();
+            }
+        });
     });
-    
+
     $('#packaging_types_id').change(function () {
         const selectedValue = $(this).val();
         const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
@@ -309,25 +332,8 @@
     $('#packaging_material_types_id').change(function(){
         $('#packaging_paper_types_id').val('');
     });
-
     
-    $('#save-btn').click(function() {
-        Swal.fire({
-            title: 'Do you want to save this item?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Save',
-            returnFocus: false,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                
-                $('#submit-btn').click();
-            }
-        });
-    });
 </script>
 
 
-@endsection
+@endpush
