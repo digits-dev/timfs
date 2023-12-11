@@ -1294,7 +1294,7 @@
 
 			$my_requestor_ids = self::getMyRequestors();
 
-			if (!in_array($item->creator_id, $my_requestor_ids)) {
+			if (!in_array($item->creator_id, $my_requestor_ids) && !CRUDBooster::isSuperAdmin()) {
 				return CRUDBooster::redirect(
 					CRUDBooster::mainPath(),
 					trans('crudbooster.denied_access')
