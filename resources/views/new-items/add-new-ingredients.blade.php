@@ -163,7 +163,7 @@
                                 <td>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <input type="number" step="any" name="initial_qty_needed" class="form-control" required placeholder="Initial Qty Needed">
+                                            <input type="number" step="any" name="initial_qty_needed" class="form-control" required placeholder="Initial Qty Needed" min="0">
                                         </div>
                                         <div class="col-md-6">
                                             <select name="initial_qty_uoms_id" id="initial_qty_uoms_id" class="form-control" required>
@@ -181,7 +181,7 @@
                                 <td>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <input type="number" step="any" name="forecast_qty_needed" class="form-control" required placeholder="Forecast Qty Needed">
+                                            <input type="number" step="any" name="forecast_qty_needed" class="form-control" required placeholder="Forecast Qty Needed" min="0">
                                         </div>
                                         <div class="col-md-6">
                                             <select name="forecast_qty_uoms_id" id="forecast_qty_uoms_id" class="form-control" required>
@@ -196,7 +196,7 @@
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Budget Range</th>
-                                <td><input type="number" name="budget_range" class="form-control" required placeholder="Budget Range" oninput="this.value = this.value.toUpperCase()"></td>
+                                <td><input type="number" name="budget_range" class="form-control" required placeholder="Budget Range" min="0"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Reference Links</th>
@@ -215,7 +215,7 @@
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Duration</th>
-                                <td><input type="text" name="duration" class="form-control" required placeholder="Duration" oninput="this.value = this.value.toUpperCase()"></td>
+                                <td><input type="text" name="duration" class="form-control" required placeholder="Duration" min="0"></td>
                             </tr>
                         </tbody>
                     </table>
