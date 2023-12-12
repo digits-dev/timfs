@@ -267,7 +267,8 @@
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Save'
+                confirmButtonText: 'Save',
+                returnFocus: false,
             }).then((result) => {
                 if (result.isConfirmed) {
                     $('#submit-btn').click();
