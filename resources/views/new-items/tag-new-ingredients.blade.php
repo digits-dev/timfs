@@ -31,7 +31,7 @@
                                 <option value="" selected>CLOSED</option>
                                 @else
                                     @foreach ($sourcing_statuses as $sourcing_status)
-                                    <option value="{{ $sourcing_status->id }}">{{ $sourcing_status->status_description }}</option>
+                                    <option value="{{ $sourcing_status->id }}" {{ $item->sourcing_status == $sourcing_status->status_description ? 'selected' : '' }}>{{ $sourcing_status->status_description }}</option>
                                     @endforeach
                                 @endif
                             </select>
@@ -264,10 +264,15 @@
                 data: { tasteless_code:  tastelessCode, _token: "{{ csrf_token() }}",},
                 success: function(response) {
                     const data = JSON.parse(response) || {};
+                    let html = `⚠️ You won't be able to revert this action. This will update all rnd, menu, and batching that uses this item.`;
+                    if (data.full_item_description) {
+                        html += '<br>';
+                        html += `<strong>Item:</strong> ${data.full_item_description}`;
+                    }
                     Swal.close();
                     Swal.fire({
                         title: 'Do you want to tag to this item?',
-                        html: data.full_item_description ? `<strong>Item:</strong> ${data.full_item_description}` : undefined,
+                        html,
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#3085d6',
@@ -289,8 +294,15 @@
         }
 
         function showSwalForSourcing() {
+            const taggedItem = "{{ $item->item_masters_id }}";
+            const selectedSourcingStatus = $("#item_sourcing_statuses_id option:selected").text()
+            let html = null;
+            if (selectedSourcingStatus == 'CLOSED' && !taggedItem) {
+                html = '⚠️ Are you sure you want to update the status of this item sourcing to <span class="label label-success">CLOSED</span> without tagging?'
+            }
             Swal.fire({
                 title: 'Do you want save the changes?',
+                html,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
