@@ -108,6 +108,72 @@
                                 <td><input value="{{ $item->full_item_description ?: '' }}" title="{{ $item->full_item_description }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
                             </tr>
                             @endif
+                            <tr>
+                                <th>
+                                    Item Photo
+                                    @if ($item->image_filename)
+                                    <a href="{{ asset('img/item-master/' . $item->image_filename) }}" download="{{ $item->image_filename }}" class="btn btn-primary pull-right">
+                                        <i class="fa fa-download"></i>
+                                    </a>
+                                    @endif
+                                </th>
+                                <td><input value="{{ $item->image_filename }}" type="text" name="filename_1" id="filename_1" class="form-control" readonly /></td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    File 1
+                                    @if ($item->filename_1)
+                                    <a href="{{ asset('item-master-files/' . $item->filename_1) }}" download="{{ $item->filename_1 }}" class="btn btn-primary pull-right">
+                                        <i class="fa fa-download"></i>
+                                    </a>
+                                    @endif
+                                </th>
+                                <td><input value="{{ $item->filename_1 }}" type="text" name="filename_1" id="filename_1" class="form-control" readonly /></td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    File 2
+                                    @if ($item->filename_2)
+                                    <a href="{{ asset('item-master-files/' . $item->filename_2) }}" download="{{ $item->filename_2 }}" class="btn btn-primary pull-right">
+                                        <i class="fa fa-download"></i>
+                                    </a>
+                                    @endif
+                                </th>
+                                <td><input value="{{ $item->filename_2 }}" type="text" name="filename_2" id="filename_2" class="form-control" readonly /></td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    File 3
+                                    @if ($item->filename_3)
+                                    <a href="{{ asset('item-master-files/' . $item->filename_3) }}" download="{{ $item->filename_3 }}" class="btn btn-primary pull-right">
+                                        <i class="fa fa-download"></i>
+                                    </a>
+                                    @endif
+                                </th>
+                                <td><input value="{{ $item->filename_3 }}" type="text" name="filename_3" id="filename_3" class="form-control" readonly /></td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    File 4
+                                    @if ($item->filename_4)
+                                    <a href="{{ asset('item-master-files/' . $item->filename_4) }}" download="{{ $item->filename_4 }}" class="btn btn-primary pull-right">
+                                        <i class="fa fa-download"></i>
+                                    </a>
+                                    @endif
+                                </th>
+                                <td><input value="{{ $item->filename_4 }}" type="text" name="filename_4" id="filename_4" class="form-control" readonly /></td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    File 5
+                                    @if ($item->filename_5)
+                                    <a href="{{ asset('item-master-files/' . $item->filename_5) }}" download="{{ $item->filename_5 }}" class="btn btn-primary pull-right">
+                                        <i class="fa fa-download"></i>
+                                    </a>
+                                    @endif
+                                </th>
+                                <td><input value="{{ $item->filename_5 }}" type="text" name="filename_5" id="filename_5" class="form-control" readonly /></td>
+                            </tr>
                             @if (CRUDBooster::myColumnView()->brand_description)
                             <tr>
                                 <th><span class="required-star">*</span>  Brand Description</th>
@@ -217,6 +283,12 @@
                                     </select>
                                 </td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table-responsive table">
+                        <tbody>
                             @if (CRUDBooster::myColumnView()->currency)
                             <tr>
                                 <th><span class="required-star">*</span> Currency</th>
@@ -246,12 +318,6 @@
                                 </td>
                             </tr>
                             @endif
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <table class="table-responsive table">
-                        <tbody>
                             @if (CRUDBooster::myColumnView()->ttp)
                             @if ($item->tasteless_code)
                             <tr>
