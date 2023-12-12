@@ -47,6 +47,49 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
+			$this->col[] = ["label"=>"Approval Status","name"=>"item_approval_statuses_id","join"=>"item_approval_statuses,status_description","callback"=>function($row) {
+				if ($row->approval_status) {
+					foreach ($this->status_badges as $key => $badge) {
+						if (in_array($row->approval_status, $badge)) {
+							return "<span class='label label-$key'>$row->approval_status</span>";
+						}
+					}
+				}
+			}];
+			$this->col[] = ["label"=>"Souring Status","name"=>"item_sourcing_statuses_id","join"=>"item_sourcing_statuses,status_description","callback"=>function($row) {
+				if ($row->sourcing_status) {
+					foreach ($this->status_badges as $key => $badge) {
+						if (in_array($row->sourcing_status, $badge)) {
+							return "<span class='label label-$key'>$row->sourcing_status</span>";
+						}
+					}
+				}
+			}];
+			$this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
+			$this->col[] = ["label"=>"NWP Code","name"=>"nwp_code"];
+			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
+			$this->col[] = ["label"=>"Last Comment","name"=>"id", "callback" => function($row) {
+				$comment = $row->comment_content;
+				if ($comment && strlen($comment) > 50) {
+					$comment = substr($comment, 0, 49) . '...';
+				}
+				$value = "";
+				if ($row->comment_by) {
+					$value .= "<div class='comment-data comment-by'>$row->comment_by</div>";
+				}
+				if ($row->comment_date) {
+					$value .= "<div class='comment-data comment-date'><span class='timeago' datetime='$row->comment_date'>$row->comment_date</span></div>";
+				}
+				if ($comment) {
+					$value .= "<div class='comment-data comment-content'>$comment</div>";
+				}
+				if ($row->comment_image) {
+					$url = asset('img/item-sourcing/' . $row->comment_image);
+					$img = "<img class='comment-image' src='$url' />";
+					$value .= $img;
+				}
+				return $value;
+			}];
 			$this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
 			$this->col[] = ["label"=>"NWP Code","name"=>"nwp_code"];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
@@ -320,8 +363,8 @@
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-	        $this->load_css = array();
-	        
+			$this->load_css = array();
+	        $this->load_css[] = asset('css/item-sourcing.css');
 	        
 	    }
 
@@ -348,7 +391,19 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-			$query
+	        $query
+				->leftJoin('new_items_last_comment', 'new_items_last_comment.new_packagings_id', 'new_packagings.id')
+				->leftJoin('new_items_comments', 'new_items_comments.id', 'new_items_last_comment.new_items_comments_id')
+				->leftJoin('cms_users as commenter', 'commenter.id', 'new_items_comments.created_by')
+				->addSelect(
+					'new_items_comments.created_at as comment_date',
+					'new_packagings.item_masters_id',
+					'commenter.name as comment_by',
+					'new_items_comments.comment_content',
+					'new_items_comments.filename as comment_image',
+					'item_approval_statuses.status_description as approval_status',
+					'item_sourcing_statuses.status_description as sourcing_status',
+				)
 				->where('new_packagings.status', 'ACTIVE')
 				->orderBy(DB::raw('item_masters_id is null'), 'desc')
 				->orderBy(DB::raw('target_date is null'), 'asc')

@@ -293,7 +293,7 @@
             },
             cache: true
         },
-        width:'100%',
+        width:'190px',
     });
 
     $('#new_ingredient_reasons_id').change(function () {

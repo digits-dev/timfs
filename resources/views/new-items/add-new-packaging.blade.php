@@ -244,8 +244,8 @@
             <div class="row">
                 <div class="col-md-12">
                     <hr>
-                    <h3 class="text-center"><span class="required-star">*</span> COMMENTS</h3>
-                    <textarea class="comment-textarea" name="comment" id="comment" form="form-main" required required placeholder="Type your comment here..."></textarea>
+                    <h3 class="text-center"> COMMENTS</h3>
+                    <textarea class="comment-textarea" name="comment" id="comment" form="form-main" placeholder="Type your comment here..."></textarea>
                 </div>
             </div>
             <button type="submit" class="hide" id="submit-btn">Submit</button>
