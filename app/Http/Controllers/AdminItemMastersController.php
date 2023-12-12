@@ -25,6 +25,7 @@
 	use Illuminate\Support\Facades\Redirect;
 	use Carbon\Carbon;
 	use Illuminate\Support\Facades\Schema;
+	use Illuminate\Support\Facades\Storage;
 	use Intervention\Image\Facades\Image;
 	use Spatie\ImageOptimizer\OptimizerChainFactory;
 	use Illuminate\Support\Str;
@@ -1000,6 +1001,21 @@
 
 		public function submitAddOrEdit(Request $request) {
 			$input = $request->all();
+			$filenames = [];
+
+			for ($i = 1; $i <= 5; $i++) {
+				$file = $input['filename_' . $i];
+				if ($file) {
+					$filename = ($input['tasteless_code'] ?? 'new_item') 
+						. '_' 
+						. Str::random(10) 
+						. '.'
+						. $file->getClientOriginalExtension();
+					$file->move(public_path('item-master-files'), $filename);
+					$filenames['filename_' . $i] = $filename;
+				}
+			}
+
 			if ($input['item_photo']) {
 				$filename_filler = $input['tasteless_code'] ?? 'new_item';
 				$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
@@ -1077,6 +1093,8 @@
 				$data['created_by'] = $action_by;
 				$data['created_at'] = $time_stamp;
 			}
+
+			$data = array_merge($data, $filenames);
 
 			if (!$tasteless_code && !$input['item_masters_approvals_id']) {
 				$data['action_type'] = 'CREATE';

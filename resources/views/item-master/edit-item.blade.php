@@ -99,12 +99,32 @@
                             </tr>
                             @endif
                             <tr>
+                                <th><span class="required-star">*</span> Item Description</th>
+                                <td><input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr>
+                            <tr>
                                 <th><span class="required-star">{{ $item->tasteless_code && !$item->image_filename ? '*' : '' }}</span> Item Photo</th>
                                 <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ $item->tasteless_code && !$item->image_filename ? 'required' : '' }} ></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Item Description</th>
-                                <td><input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                                <th>File 1</th>
+                                <td><input type="file" name="filename_1" id="filename_1" class="form-control" /></td>
+                            </tr>
+                            <tr>
+                                <th>File 2</th>
+                                <td><input type="file" name="filename_2" id="filename_2" class="form-control" /></td>
+                            </tr>
+                            <tr>
+                                <th>File 3</th>
+                                <td><input type="file" name="filename_3" id="filename_3" class="form-control" /></td>
+                            </tr>
+                            <tr>
+                                <th>File 4</th>
+                                <td><input type="file" name="filename_4" id="filename_4" class="form-control" /></td>
+                            </tr>
+                            <tr>
+                                <th>File 5</th>
+                                <td><input type="file" name="filename_5" id="filename_5" class="form-control" /></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  Brand Description</th>
@@ -211,6 +231,12 @@
                                     </select>
                                 </td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table-responsive table">
+                        <tbody>
                             <tr>
                                 <th><span class="required-star">*</span> Currency</th>
                                 <td>
@@ -234,12 +260,6 @@
                                     <input value="{{ $item->ttp }}"  type="number" step="any" class="form-control" name="ttp" id="ttp" {{$item->tasteless_code ? 'readonly' : ''}} required>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <table class="table-responsive table">
-                        <tbody>
                             @if ($item->tasteless_code)
                             <tr>
                                 <th>Sales Price Change</th>

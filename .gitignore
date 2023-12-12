@@ -4,6 +4,7 @@
 /vendor
 /public/img/item-master/*
 /public/img/item-sourcing/*
+/public/item-master-files/*
 .env
 .env.backup
 .phpunit.result.cache
