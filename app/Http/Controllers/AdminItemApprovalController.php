@@ -51,7 +51,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			//----added by cris 20200630
 			$this->col[] = ["label" => "Action Type", "name" => "action_type"];
-			$this->col[] = ["label" => "Item Photo", "name" => "image_filename","visible" =>  true];
+			$this->col[] = ["label" => "Display Photo", "name" => "image_filename","visible" =>  true];
 			$this->col[] = ["label" => "Approval Status", "name" => "approval_status"];
 			$this->col[] = ["label" => "Tasteless Code", "name" => "tasteless_code"];
 			$this->col[] = ["label" => "Description", "name" => "full_item_description", "visible" => CRUDBooster::myColumnView()->full_item_description ? true : false];

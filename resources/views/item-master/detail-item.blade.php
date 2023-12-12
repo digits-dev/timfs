@@ -110,7 +110,7 @@
                             @endif
                             <tr>
                                 <th>
-                                    Item Photo
+                                    Display Photo
                                     @if ($item->image_filename)
                                     <a href="{{ asset('img/item-master/' . $item->image_filename) }}" download="{{ $item->image_filename }}" class="btn btn-primary pull-right">
                                         <i class="fa fa-download"></i>
@@ -501,7 +501,7 @@
                 @if ($item->image_filename)
                 <div class="col-md-6">
                     <div class="photo-section">
-                        <h3 class="text-center text-bold">ITEM PHOTO</h3>
+                        <h3 class="text-center text-bold">DISPLAY PHOTO</h3>
                         <img src="{{ asset('/img/item-master/' . $item->image_filename) }}" alt="Item Photo">
                     </div>
                 </div>

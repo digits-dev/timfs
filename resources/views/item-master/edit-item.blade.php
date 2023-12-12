@@ -103,7 +103,7 @@
                                 <td><input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">{{ $item->tasteless_code && !$item->image_filename ? '*' : '' }}</span> Item Photo</th>
+                                <th><span class="required-star">{{ $item->tasteless_code && !$item->image_filename ? '*' : '' }}</span> Display Photo</th>
                                 <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ $item->tasteless_code && !$item->image_filename ? 'required' : '' }} ></td>
                             </tr>
                             <tr>
@@ -438,7 +438,7 @@
                 @if ($item->image_filename)
                 <div class="col-md-6">
                     <div class="photo-section">
-                        <h3 class="text-center text-bold">ITEM PHOTO</h3>
+                        <h3 class="text-center text-bold">DISPLAY PHOTO</h3>
                         <img src="{{ asset('/img/item-master/' . $item->image_filename) }}" alt="Item Photo">
                     </div>
                 </div>

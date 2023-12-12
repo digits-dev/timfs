@@ -81,7 +81,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
             $this->col[] = ["label" => "Item ID", "name" => "id", "visible" => false];
-			$this->col[] = ["label" => "Item Photo", "name" => "image_filename","visible" =>  true];
+			$this->col[] = ["label" => "Display Photo", "name" => "image_filename","visible" =>  true];
     		$this->col[] = ["label" => "Tasteless Code", "name" => "tasteless_code","visible" =>  false];
     		$this->col[] = ["label" => "Preferred Vendor", "name" => "suppliers_id", "join" => "suppliers,last_name", "visible" => CRUDBooster::myColumnView()->supplier ? true : false];
     		$this->col[] = ["label" => "Item", "name" => "tasteless_code", "visible" =>  true];
