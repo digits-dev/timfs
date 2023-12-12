@@ -1,7 +1,8 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	use Illuminate\Http\Request;
+	use Illuminate\Support\Facades\Request as Input;
 	use DB;
 	use CRUDBooster;
 
@@ -18,31 +19,41 @@
 			$this->button_table_action = TRUE;   
 			$this->button_action_style = "button_icon";     
 			$this->button_add          = TRUE;
-			$this->button_delete       = TRUE;
+			$this->button_delete       = FALSE;
 			$this->button_edit         = TRUE;
 			$this->button_detail       = TRUE;
 			$this->button_show         = TRUE;
 			$this->button_filter       = TRUE;        
 			$this->button_export       = FALSE;	        
 			$this->button_import       = FALSE;
-			$this->button_bulk_action  = TRUE;	
+			$this->button_bulk_action  = FALSE;	
 			$this->sidebar_mode		   = "normal"; //normal,mini,collapse,collapse-mini
 			# END CONFIGURATION DO NOT REMOVE THIS LINE						      
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
-	        $this->col = [];
-			$this->col[] = array("label"=>"Created By","name"=>"created_by" );
+	    $this->col = [];
 		$this->col[] = array("label"=>"Description","name"=>"description" );
 		$this->col[] = array("label"=>"Status","name"=>"status" );
-		$this->col[] = array("label"=>"Updated By","name"=>"updated_by" );
+		$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
+		$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
+		$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
+		$this->col[] = ["label"=>"Updated Date","name"=>"updated_at"];
 
 			# END COLUMNS DO NOT REMOVE THIS LINE
 			# START FORM DO NOT REMOVE THIS LINE
 		$this->form = [];
-		$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-		$this->form[] = ["label"=>"Description","name"=>"description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-		$this->form[] = ["label"=>"Status","name"=>"status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-		$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+		$this->form[] = ["label"=>"Description","name"=>"description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255",'width'=>'col-sm-5'];
+		if(in_array(CRUDBooster::getCurrentMethod(), ['getDetail'])){
+			$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select2','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
+			$this->form[] = ["label"=>"Created By","name"=>"created_by",'type'=>'select',"datatable"=>"cms_users,name"];
+			$this->form[] = ["label"=>"Created Date","name"=>"created_at"];
+			$this->form[] = ["label"=>"Updated By","name"=>"updated_by",'type'=>'select',"datatable"=>"cms_users,name"];
+			$this->form[] = ["label"=>"Updated Date","name"=>"updated_at"];
+		}
+		if (in_array(CRUDBooster::getCurrentMethod(), ['getEdit'])){
+			$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select2','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
+		}
+
 
 			# END FORM DO NOT REMOVE THIS LINE     
 
@@ -251,8 +262,12 @@
 	    | @arr
 	    |
 	    */
-	    public function hook_before_add(&$postdata) {        
-	        //Your code here
+	    public function hook_before_add(&$postdata) {       
+			$description = strtoupper(Input::get('description'));
+
+			$postdata['description'] = $description;
+			$postdata['created_by']=CRUDBooster::myId();
+			$postdata['created_at'] = date('Y-m-d H:i:s');
 
 	    }
 
@@ -277,7 +292,12 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-	        //Your code here
+			$description = strtoupper(Input::get('description'));
+			$status = (Input::get('status'));
+
+			$postdata['description'] = $description;
+			$postdata['status'] = $status; 
+			$postdata['updated_by']=CRUDBooster::myId();
 
 	    }
 
@@ -289,7 +309,8 @@
 	    | 
 	    */
 	    public function hook_after_edit($id) {
-	        //Your code here 
+			$postdata['updated_by']=CRUDBooster::myId();
+			$postdata['updated_at'] = date('Y-m-d H:i:s');
 
 	    }
 
