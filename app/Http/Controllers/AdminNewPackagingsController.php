@@ -340,7 +340,8 @@
 	        |
 	        */
 	        $this->load_js = array();
-	        
+			$this->load_js[] = "https://unpkg.com/timeago.js/dist/timeago.min.js";
+			$this->load_js[] = asset('js/item-sourcing.js');
 	        
 	        
 	        /*
