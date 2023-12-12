@@ -81,7 +81,7 @@
         <h3 class="text-center text-bold">Item Masterfile</h3>
     </div>
     <div class="panel-body">
-        <form action="{{ $table == 'item_master_approvals' ? route('item_mater_approvals_submit_edit') : route('item_maters_submit_add_or_edit') }}" enctype="multipart/form-data" method="POST" class="form-main" autocomplete="off">
+        <form id="main-form" action="{{ $table == 'item_master_approvals' ? route('item_mater_approvals_submit_edit') : route('item_maters_submit_add_or_edit') }}" enctype="multipart/form-data" method="POST" class="form-main" autocomplete="off">
             <h3 class="text-center text-bold">ITEM DETAILS</h3>
             @csrf
             <input value="{{ $item->tasteless_code }}" name="tasteless_code" type="text" class="tasteless_code hide">
@@ -664,6 +664,18 @@
             event.preventDefault();
             return;
         }
+    });
+
+    $('#main-form').on('submit', function() {
+        Swal.fire({
+            title: 'Loading...',
+            html: 'Please wait...',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
     });
 
     disableSelected();
