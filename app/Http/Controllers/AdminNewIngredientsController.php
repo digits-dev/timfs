@@ -412,15 +412,6 @@
 					'item_sourcing_statuses.status_description as sourcing_status',
 				)
 				->where('new_ingredients.status', 'ACTIVE');
-
-				if (in_array($my_privilege, $this->tagger)) {
-					$query->whereIn('item_sourcing_statuses.status_description', ['OPEN', 'CANCELLED', 'ON HOLD']);
-				} else if ($my_requestor_ids && !CRUDBooster::isSuperAdmin()) {
-					$creators = [...$my_requestor_ids, CRUDBooster::myId()];
-					$query->whereIn("new_ingredients.created_by", $creators);
-				} else if (!CRUDBooster::isSuperAdmin()) {
-					$query->where('new_ingredients.created_by', CRUDbooster::myId());
-				}
 	            
 	    }
 
