@@ -13,7 +13,7 @@
 	class AdminNewIngredientsController extends \crocodicstudio\crudbooster\controllers\CBController {
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
-			$this->tagger = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
+			$this->tagger = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder', 'Purchasing Manager'];
 			$this->to_notify = DB::table('cms_users')
 				->where(function($sub_query) {
 					$sub_query
@@ -65,7 +65,7 @@
 					}
 				}
 			}];
-			$this->col[] = ["label"=>"Souring Status","name"=>"item_sourcing_statuses_id","join"=>"item_sourcing_statuses,status_description","callback"=>function($row) {
+			$this->col[] = ["label"=>"Sourcing Status","name"=>"item_sourcing_statuses_id","join"=>"item_sourcing_statuses,status_description","callback"=>function($row) {
 				if ($row->sourcing_status) {
 					foreach ($this->status_badges as $key => $badge) {
 						if (in_array($row->sourcing_status, $badge)) {
@@ -272,29 +272,6 @@
 	        |
 	        */
 	        $this->index_statistic = array();
-			$tagged_items = DB::table('new_ingredients')
-				->where('new_ingredients.status', 'ACTIVE')
-				->whereNotNull('new_ingredients.item_masters_id')
-				->count();
-
-			$pending_items = DB::table('new_ingredients')
-				->where('new_ingredients.status', 'ACTIVE')
-				->whereNull('new_ingredients.item_masters_id')
-				->count();
-
-			$this->index_statistic[] = [
-				'label' => 'Pending Items',
-				'count' => $pending_items,
-				'icon' => 'fa fa-hourglass',
-				'color' => 'orange',
-			];
-
-			$this->index_statistic[] = [
-				'label' => 'Tagged Items',
-				'count' => $tagged_items,
-				'icon' => 'fa fa-tag',
-				'color' => 'green',
-			];
 
 
 
@@ -419,6 +396,8 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			$my_requestor_ids = self::getMyRequestors();
 	        $query
 				->leftJoin('new_items_last_comment', 'new_items_last_comment.new_ingredients_id', 'new_ingredients.id')
 				->leftJoin('new_items_comments', 'new_items_comments.id', 'new_items_last_comment.new_items_comments_id')
@@ -432,10 +411,16 @@
 					'item_approval_statuses.status_description as approval_status',
 					'item_sourcing_statuses.status_description as sourcing_status',
 				)
-				->where('new_ingredients.status', 'ACTIVE')
-				->orderBy(DB::raw('new_ingredients.item_masters_id is null'), 'desc')
-				->orderBy(DB::raw('new_ingredients.target_date is null'), 'asc')
-				->orderBy('new_ingredients.target_date', 'asc');
+				->where('new_ingredients.status', 'ACTIVE');
+
+				if (in_array($my_privilege, $this->tagger)) {
+					$query->whereIn('item_sourcing_statuses.status_description', ['OPEN', 'CANCELLED', 'ON HOLD']);
+				} else if ($my_requestor_ids && !CRUDBooster::isSuperAdmin()) {
+					$creators = [...$my_requestor_ids, CRUDBooster::myId()];
+					$query->whereIn("new_ingredients.created_by", $creators);
+				} else if (!CRUDBooster::isSuperAdmin()) {
+					$query->where('new_ingredients.created_by', CRUDbooster::myId());
+				}
 	            
 	    }
 
@@ -519,7 +504,7 @@
 				'to' => CRUDBooster::mainPath("detail/$inserted_item->id"),
 			];
 
-			CRUDBooster::sendNotification($notif_config);
+			// CRUDBooster::sendNotification($notif_config);
 	    }
 
 	    /* 
@@ -1081,7 +1066,7 @@
 				'id_cms_users' => $to_notify,
 			];
 
-			CRUDBooster::sendNotification($notif_config);
+			// CRUDBooster::sendNotification($notif_config);
 
 			return json_encode([$response]);
 		}
