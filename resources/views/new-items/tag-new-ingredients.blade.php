@@ -264,7 +264,7 @@
                 data: { tasteless_code:  tastelessCode, _token: "{{ csrf_token() }}",},
                 success: function(response) {
                     const data = JSON.parse(response) || {};
-                    let html = `⚠️ You won't be able to revert this action. This will update all rnd, menu, and batching that uses this item.`;
+                    let html = `⚠️ You won't be able to revert this action. This will update all rnd, menu, and batching that use this item.`;
                     if (data.full_item_description) {
                         html += '<br>';
                         html += `<strong>Item:</strong> ${data.full_item_description}`;
