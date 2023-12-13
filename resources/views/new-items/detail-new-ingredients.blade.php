@@ -125,6 +125,12 @@
                                 <td>{{$item->tagger_name}}</td>
                             </tr>
                             @endif
+                            @if ($item->tagged_at)
+                            <tr>
+                                <th>Tagged Date</th>
+                                <td>{{$item->tagged_at}}</td>
+                            </tr>
+                            @endif
                             @if ($item->approver_name)
                             <tr>
                                 <th>Approval Status Updated By</th>
@@ -147,12 +153,6 @@
                             <tr>
                                 <th>Sourcing Status Updated Date</th>
                                 <td>{{$item->sourcing_status_updated_at}}</td>
-                            </tr>
-                            @endif
-                            @if ($item->tagged_at)
-                            <tr>
-                                <th>Tagged Date</th>
-                                <td>{{$item->tagged_at}}</td>
                             </tr>
                             @endif
                             @if ($item->item_masters_id)
