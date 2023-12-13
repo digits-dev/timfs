@@ -199,7 +199,7 @@
 					'url'=>CRUDBooster::mainpath('get-tag/[id]'),
 					'icon'=>'fa fa-tag',
 					'color' => ' ',
-					"showIf"=>"[item_masters_id] == null && in_array([sourcing_status], array('OPEN', 'ON HOLD', 'CANCELLED'))"
+					"showIf"=>"in_array([sourcing_status], array('OPEN', 'ON HOLD', 'CANCELLED'))"
 				];
 			}
 
