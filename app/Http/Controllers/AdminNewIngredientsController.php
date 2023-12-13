@@ -787,6 +787,10 @@
 			$new_ingredients_id = $request->get('new_items_id');
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
+			$item = self::getSourcingDetails($new_ingredients_id);
+			if ($item->sourcing_status != 'PENDING') {
+				return CRUDBooster::redirect(CRUDBooster::mainPath(), 'This item is not pending.', 'danger');
+			}
 
 			DB::table('new_ingredients')
 				->where('new_ingredients.id', $new_ingredients_id)
