@@ -898,8 +898,6 @@
 					->where('id', $new_ingredients_id)
 					->update([
 						'item_masters_id' => $item_masters_id,
-						'updated_by' => $action_by,
-						'updated_at' => $time_stamp,
 						'tagged_by' => $action_by,
 						'tagged_at' => $time_stamp,
 					]);
