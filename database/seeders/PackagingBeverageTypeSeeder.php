@@ -15,18 +15,18 @@ class PackagingBeverageTypeSeeder extends Seeder
     public function run()
     {
         DB::table('packaging_beverage_types')->updateOrInsert([
-            'description' => 'CAP',
+            'description' => 'CUP',
             ],
             [
-                'description' => 'CAP',
+                'description' => 'CUP',
                 'status' => 'ACTIVE'
             ]);
 
         DB::table('packaging_beverage_types')->updateOrInsert([
-            'description' => 'CAP WITH LID',
+            'description' => 'CUP WITH LID',
             ],
             [
-                'description' => 'CAP WITH LID',
+                'description' => 'CUP WITH LID',
                 'status' => 'ACTIVE'
             ]);
 

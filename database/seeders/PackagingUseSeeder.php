@@ -31,10 +31,10 @@ class PackagingUseSeeder extends Seeder
             ]);
 
         DB::table('packaging_uses')->updateOrInsert([
-            'description' => 'NA',
+            'description' => 'N/A',
             ],
             [
-                'description' => 'NA',
+                'description' => 'N/A',
                 'status' => 'ACTIVE'
             ]);
     }
