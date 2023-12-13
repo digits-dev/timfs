@@ -160,7 +160,6 @@
 	        $this->addaction = array();
 			$my_privilege = CRUDBooster::myPrivilegeName();
 			$my_requestor_ids = self::getMyRequestors();
-			$my_privilege = CRUDBooster::myPrivilegeName();
 
 			$this->addaction[] = [
 				'title'=>'Detail',
