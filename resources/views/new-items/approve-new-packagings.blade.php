@@ -164,7 +164,7 @@
 		<button class="btn btn-danger pull-right" _action="reject" id="reject-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-down" ></i> Reject</button>
     </div>
 </div>
-<form class="form-to-submit hide" action="{{ route('new_ingredients_submit_approve_or_reject') }}" method="POST">
+<form class="form-to-submit hide" action="{{ route('new_packagings_submit_approve_or_reject') }}" method="POST">
     @csrf
     <input type="text" name="new_packagings_id" value="{{ $item->new_packagings_id }}">
     <input type="text" name="action" id="action">

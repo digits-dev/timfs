@@ -7,9 +7,39 @@
 </p>      
 <div class="panel panel-default">
     <div class="panel-heading">
-        <i class="fa fa-eye"></i><strong> Detail {{CRUDBooster::getCurrentModule()->name}}</strong>
+        <i class="fa fa-eye"></i><strong> Tag {{CRUDBooster::getCurrentModule()->name}}</strong>
     </div>
     <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-6">
+                <form method="POST" action="{{ route('tag_new_packaging', $item->new_packagings_id) }}" id="tagging-form" autocomplete="off">
+                    @csrf
+                    <label for="">Tasteless Code</label>
+                    <div class="flex">
+                        <input value="{{ $item->tasteless_code }}" type="text" id="tasteless-code" class="form-control tasteless-code" name="tasteless_code" placeholder="Enter tasteless Code" {{ $item->tasteless_code ? 'readonly' : '' }}>
+                        <button type="button" id="tag-btn" class="btn btn-primary" style="margin-left: 5px" {{ $item->tasteless_code ? 'disabled' : '' }}><i class="fa fa-tag"></i> Tag</button>
+                    </div>
+                </form>
+            </div>
+                <div class="col-sm-6">
+                    <form method="POST" id="sourcing-form" action="{{ route('new_packagings_submit_sourcing_status', $item->new_packagings_id) }}">
+                        @csrf
+                        <label for="">Sourcing Status</label>
+                        <div class="flex">
+                            <select class="form-control" name="item_sourcing_statuses_id" id="item_sourcing_statuses_id">
+                                @if($item->sourcing_status == 'CLOSED')
+                                <option value="" selected>CLOSED</option>
+                                @else
+                                    @foreach ($sourcing_statuses as $sourcing_status)
+                                    <option value="{{ $sourcing_status->id }}" {{ $item->sourcing_status == $sourcing_status->status_description ? 'selected' : '' }}>{{ $sourcing_status->status_description }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            <button type="button" id="save-btn" class="btn btn-primary" style="margin-left: 5px"><i class="fa fa-save"></i> Save</button>
+                        </div>
+                    </form>
+                </div>
+        </div>
         <div class="row">
             <div class="col-md-6">
                 <hr>
@@ -171,38 +201,38 @@
                 <div class="chat-app">
                     @include('new-items/chat-app', $comments_data)
                 </div>
-            </div>
-            <div class="col-md-6">
-                <hr>
-                <h3 class="text-center">ITEM USAGE</h3>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th class="text-center">Item Code</th>
-                                <th class="text-center">Item Description</th>
-                                <th class="text-center">User</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (!$item_usages)
-                            <tr><td class="text-center" style="font-style: italic; color: grey" colspan="3">This item is currently not in use...</td></tr>
-                            @endif
-                            @foreach ($item_usages as $item_usage)
-                            <tr>
-                                <td class="text-center">{{ $item_usage->item_code }}</td>
-                                <td class="text-center">{{ $item_usage->item_description }}</td>
-                                <td class="text-center">{{ $item_usage->name }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <div class="col-md-12">
+                    <hr>
+                    <h3 class="text-center">ITEM USAGE</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Item Code</th>
+                                    <th class="text-center">Item Description</th>
+                                    <th class="text-center">User</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (!$item_usages)
+                                <tr><td class="text-center" style="font-style: italic; color: grey" colspan="3">This item is currently not in use...</td></tr>
+                                @endif
+                                @foreach ($item_usages as $item_usage)
+                                <tr>
+                                    <td class="text-center">{{ $item_usage->item_code }}</td>
+                                    <td class="text-center">{{ $item_usage->item_description }}</td>
+                                    <td class="text-center">{{ $item_usage->name }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="panel-footer">
-        <a class="btn btn-primary" href="{{ CRUDBooster::mainpath() }}" type="button"> <i class="fa fa-arrow-left" ></i> Back </a>
+        <a class="btn btn-default" href="{{ CRUDBooster::mainpath() }}" type="button"> Cancel </a>
     </div>
 </div>
 
@@ -213,6 +243,90 @@
 
 @push('bottom')
 <script>
+    $(document).ready(function() {
+        function showSwalForTagging() {
+            const tastelessCode = $('#tasteless-code').val().trim();
+            if (!tastelessCode) {
+                return;
+            }
+            Swal.fire({
+                title: 'Fetching...',
+                html: 'Please wait...',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+            $.ajax({
+                type: 'POST',
+                url: "{{ route('search_item_for_tagging') }}",
+                data: { tasteless_code:  tastelessCode, _token: "{{ csrf_token() }}",},
+                success: function(response) {
+                    const data = JSON.parse(response) || {};
+                    let html = `⚠️ You won't be able to revert this action. This will update all rnd and menu that uses this item.`;
+                    if (data.full_item_description) {
+                        html += '<br>';
+                        html += `<strong>Item:</strong> ${data.full_item_description}`;
+                    }
+                    Swal.close();
+                    Swal.fire({
+                        title: 'Do you want to tag to this item?',
+                        html,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Save',
+                        returnFocus: false,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $('#tagging-form').submit();
+                        }
+                    });
+                },
+                error: function(response) { 
+                    console.log(response);
+                    Swal.close();
+                    $('#submit-btn').click();
+                }  
+            });
+        }
+
+        function showSwalForSourcing() {
+            const taggedItem = "{{ $item->item_masters_id }}";
+            const selectedSourcingStatus = $("#item_sourcing_statuses_id option:selected").text()
+            let html = null;
+            if (selectedSourcingStatus == 'CLOSED' && !taggedItem) {
+                html = '⚠️ Are you sure you want to update the status of this item sourcing to <span class="label label-success">CLOSED</span> without tagging?'
+            }
+            Swal.fire({
+                title: 'Do you want save the changes?',
+                html,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Save',
+                returnFocus: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#sourcing-form').submit();
+                }
+            });
+        }
+
+        $('#tasteless-code').on('keypress', function(event) {
+            if (event.keyCode === 13) {
+                console.log('heey');
+                event.preventDefault();
+                showSwalForTagging();
+            }
+        });
+
+        $('#tag-btn').on('click', showSwalForTagging);
+        $('#save-btn').on('click', showSwalForSourcing);
+    });
 </script>
 
 
