@@ -427,7 +427,22 @@
 					'item_approval_statuses.status_description as approval_status',
 					'item_sourcing_statuses.status_description as sourcing_status',
 				)
-				->where('new_packagings.status', 'ACTIVE');   
+				->where('new_packagings.status', 'ACTIVE')
+				->orderByRaw("
+					CASE
+						WHEN sourcing_status = 'OPEN' THEN 1
+						WHEN sourcing_status = 'ON HOLD' THEN 2
+						WHEN sourcing_status = 'CANCELLED' THEN 3
+						WHEN sourcing_status = 'CLOSED' THEN 4
+					END ASC				
+				")
+				->orderByRaw("
+					CASE
+						WHEN approval_status = 'PENDING' THEN 1
+						WHEN approval_status = 'APPROVED' THEN 2
+						WHEN approval_status = 'REJECTED' THEN 3
+					END ASC				
+				");  
 	    }
 
 	    /*
