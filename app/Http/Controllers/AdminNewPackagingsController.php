@@ -22,6 +22,13 @@
 				->leftJoin('cms_privileges', 'cms_privileges.id', '=', 'cms_users.id_cms_privileges')
 				->pluck('cms_users.id')
 				->toArray();
+
+			$this->status_badges = [
+					'info' => ['OPEN'],
+					'warning' => ['PENDING', 'ON HOLD'],
+					'success' => ['CLOSED', 'APPROVED'],
+					'danger' => ['CANCELLED', 'REJECTED'],
+				];
 		}
 
 	    public function cbInit() {
@@ -56,7 +63,7 @@
 					}
 				}
 			}];
-			$this->col[] = ["label"=>"Souring Status","name"=>"item_sourcing_statuses_id","join"=>"item_sourcing_statuses,status_description","callback"=>function($row) {
+			$this->col[] = ["label"=>"Sourcing Status","name"=>"item_sourcing_statuses_id","join"=>"item_sourcing_statuses,status_description","callback"=>function($row) {
 				if ($row->sourcing_status) {
 					foreach ($this->status_badges as $key => $badge) {
 						if (in_array($row->sourcing_status, $badge)) {
@@ -157,6 +164,7 @@
 	        */
 	        $this->addaction = array();
 			$my_privilege = CRUDBooster::myPrivilegeName();
+			$my_requestor_ids = self::getMyRequestors();
 
 			$this->addaction[] = [
 				'title'=>'Detail',
@@ -171,7 +179,21 @@
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
 					'icon'=>'fa fa-pencil',
 					'color' => ' ',
-					"showIf"=>"[item_masters_id] == null && ([created_by] == CRUDBooster::myId() || CRUDBooster::isSuperAdmin())"
+					"showIf"=>"[approval_status] == 'PENDING' && ([created_by] == CRUDBooster::myId() || CRUDBooster::isSuperAdmin())"
+				];
+			}
+
+			if ($my_requestor_ids) {
+				$requestor_json = json_encode($my_requestor_ids);
+				$this->addaction[] = [
+					'title'=>'Update Approval Status',
+					'url'=>CRUDBooster::mainpath('approve-or-reject/[id]'),
+					'icon'=>'fa fa-thumbs-up',
+					'color' => ' ',
+					"showIf"=>"
+						(in_array([created_by], $requestor_json) || CRUDBooster::isSuperAdmin()) && 
+						[approval_status] == 'PENDING'
+					"
 				];
 			}
 
@@ -181,7 +203,7 @@
 					'url'=>CRUDBooster::mainpath('get-tag/[id]'),
 					'icon'=>'fa fa-tag',
 					'color' => ' ',
-					"showIf"=>"[item_masters_id] == null"
+					"showIf"=>"[item_masters_id] == null && in_array([sourcing_status], array('OPEN', 'ON HOLD', 'CANCELLED'))"
 				];
 			}
 
@@ -405,10 +427,7 @@
 					'item_approval_statuses.status_description as approval_status',
 					'item_sourcing_statuses.status_description as sourcing_status',
 				)
-				->where('new_packagings.status', 'ACTIVE')
-				->orderBy(DB::raw('item_masters_id is null'), 'desc')
-				->orderBy(DB::raw('target_date is null'), 'asc')
-				->orderBy('target_date', 'asc');   
+				->where('new_packagings.status', 'ACTIVE');   
 	    }
 
 	    /*
@@ -433,7 +452,13 @@
 			$max_nwp_code = DB::table('new_packagings')->max('nwp_code');
 			$nwp_code_int = (int) explode('-', $max_nwp_code)[1] + 1;
 			$nwp_code = 'NWP-' . str_pad($nwp_code_int, 5, '0', STR_PAD_LEFT);
+			$item_approval_statuses_id = DB::table('item_approval_statuses')
+				->where('status', 'ACTIVE')
+				->where('status_description', 'PENDING')
+				->pluck('id')
+				->first();
 
+			$postdata['item_approval_statuses_id'] = $item_approval_statuses_id;
 			$postdata['nwp_code'] = $nwp_code;
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
 			$postdata['comment'] = Input::get('comment');
@@ -552,9 +577,9 @@
 
 			$data['table'] = 'new_packagings';
 
-			$data['comments_data'] = (new AdminNewIngredientsController)->getNewItemsComments($id, true, 'new_packagings');
+			$data['comments_data'] = $this->mainController->getNewItemsComments($id, true, 'new_packagings');
 
-			$data['comment_templates'] = (new AdminNewIngredientsController)->getCommentTemplate('packaging');
+			$data['comment_templates'] = $this->mainController->getCommentTemplate('packaging');
 
 			$data['item_usages'] = $this->mainController->getNewItemUsage($id, 'packaging');
 
@@ -569,6 +594,7 @@
 					'new_packagings.created_at as created_at',
 					'new_packagings.id as new_packagings_id',
 					'creator.name as creator_name',
+					'creator.id as creator_id',
 					'updator.name as updator_name',
 					'tagger.name as tagger_name',
 					'new_packagings.created_at',
@@ -591,6 +617,8 @@
 					'packaging_material_types.description as packaging_material',
 					'packaging_paper_types.description as packaging_paper',
 					'packaging_designs.description as packaging_design',
+					'approval_statuses.status_description as approval_status',
+					'sourcing_statuses.status_description as sourcing_status',
 				)
 				->leftJoin('uoms', 'uoms.id', '=', 'new_packagings.uoms_id')
 				->leftJoin('cms_users as creator', 'creator.id', '=', 'new_packagings.created_by')
@@ -607,6 +635,8 @@
 				->leftJoin('packaging_designs', 'packaging_designs.id', '=', 'new_packagings.packaging_design_types_id')
 				->leftJoin('uoms as initial_uoms', 'initial_uoms.id', '=', 'new_packagings.initial_qty_uoms_id')
 				->leftJoin('uoms as forecast_uoms', 'forecast_uoms.id', '=', 'new_packagings.forecast_qty_uoms_id')
+				->leftJoin('item_approval_statuses as approval_statuses', 'approval_statuses.id', 'new_packagings.item_approval_statuses_id')
+				->leftJoin('item_sourcing_statuses as sourcing_statuses', 'sourcing_statuses.id', 'new_packagings.item_sourcing_statuses_id')
 				->get()
 				->first();
 				return $item;
@@ -962,5 +992,97 @@
 			
 
 		}
+
+		public function getMyRequestors() {
+			$my_requestor_ids = DB::table('item_sourcing_matrices')
+				->where('status', 'ACTIVE')
+				->where('approver_ids', CRUDBooster::myId())
+				->pluck('requestor_id')
+				->toArray();
+
+			return $my_requestor_ids;
+		}
+
+		public function approveOrReject($id) {
+			$item = self::getSourcingDetails($id);
+
+			$my_requestor_ids = self::getMyRequestors();
+
+			if (!in_array($item->creator_id, $my_requestor_ids) && !CRUDBooster::isSuperAdmin()) {
+				return CRUDBooster::redirect(
+					CRUDBooster::mainPath(),
+					trans('crudbooster.denied_access')
+				);
+			}
+
+			$data['item'] = $item;
+
+			$segmentations = explode(',', $data['item']->segmentations);
+			$data['segmentations'] = DB::table('segmentations')
+					->whereIn("segment_column_name", $segmentations)
+					->pluck('segment_column_description')
+					->toArray();
+
+			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
+					->where('status', 'ACTIVE')
+					->where('new_ingredients_id', $id)
+					->get()
+					->count();
+
+			$data['table'] = 'new_ingredients';
+
+			$data['comments_data'] = $this->mainController->getNewItemsComments($id, true, 'new_packagings');
+
+			$data['item_usages'] = $this->mainController->getNewItemUsage($id, 'packaging');
+
+			return $this->view('new-items/approve-new-packagings', $data);
+
+		}
+
+		public function submitApproveOrReject(Request $request) {
+			$new_packagings_id = $request->get('new_packagings_id');
+			$action = $request->get('action');
+			$item = self::getSourcingDetails($new_packagings_id);
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+
+			if ($item->approval_status != 'PENDING') {
+				return CRUDBooster::redirect(CRUDBooster::mainPath(), 'This item is not pending.', 'danger');
+			}
+
+			if ($action == 'approve') {
+				$item_approval_statuses_id = DB::table('item_approval_statuses')
+					->where('status', 'ACTIVE')
+					->where('status_description', 'APPROVED')
+					->pluck('id')
+					->first();
+
+				$item_sourcing_statuses_id = DB::table('item_sourcing_statuses')
+					->where('status', 'ACTIVE')
+					->where('status_description', 'OPEN')
+					->pluck('id')
+					->first();
+
+				$params = ['✔️ Item successfully approved!', 'success'];
+
+			} else if ($action == 'reject') {
+				$item_approval_statuses_id = DB::table('item_approval_statuses')
+					->where('status', 'ACTIVE')
+					->where('status_description', 'REJECTED')
+					->pluck('id')
+					->first();
+
+				$params = ['✖️ Item successfully rejected!', 'success'];
+			}
+
+			DB::table('new_packagings')->where('id', $new_packagings_id)->update([
+				'approval_status_updated_by' => $action_by,
+				'approval_status_updated_at' => $time_stamp,
+				'item_approval_statuses_id' => $item_approval_statuses_id,
+				'item_sourcing_statuses_id' => $item_sourcing_statuses_id,
+			]);
+
+			return CRUDBooster::redirect(CRUDBooster::mainPath(), ...$params);
+		} 
 
 	}

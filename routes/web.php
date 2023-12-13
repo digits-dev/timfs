@@ -157,6 +157,8 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/new_ingredients/submit-sourcing-status/{id}', [AdminNewIngredientsController::class, 'submitSourcingStatus'])->name('new_ingredients_submit_sourcing_status');
     
     Route::post('/admin/new_packagings/search-new-packagings', [AdminNewPackagingsController::class, 'searchNewPackagings'])->name('search_new_packaging');
+    Route::get('/admin/new_packagings/approve-or-reject/{id}', [AdminNewPackagingsController::class, 'approveOrReject']);
+    Route::post('/admin/new_packagings/approve-or-reject', [AdminNewPackagingsController::class, 'submitApproveOrReject'])->name('new_ingredients_submit_approve_or_reject');
     Route::get('/admin/new_packagings/get-tag/{id}', [AdminNewPackagingsController::class, 'getTag']);
     Route::post('/admin/new_packagings/tag-new-packagings', [AdminNewpackagingsController::class, 'tagNewPackagings'])->name('tag_new_packaging');
     Route::post('/admin/new_packagings/submit-edit', [AdminNewpackagingsController::class, 'submitEditNewPackaging'])->name('submit_edit_new_packaging');
