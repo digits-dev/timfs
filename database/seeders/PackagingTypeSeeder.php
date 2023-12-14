@@ -30,7 +30,7 @@ class PackagingTypeSeeder extends Seeder
                 'status' => 'ACTIVE'
             ]);
 
-        DB::table('packaging_uses')->updateOrInsert([
+        DB::table('packaging_types')->updateOrInsert([
             'description' => 'UNIFORM',
             ],
             [
