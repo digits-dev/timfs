@@ -184,20 +184,6 @@
                                     <input type="text" value="{{ $item->purchase_description }}" class="form-control" name="purchase_description" id="purchase_description" readonly>
                                 </td>
                             </tr>
-                            @if ($item->tasteless_code)
-                            <tr>
-                                <th>Accumulated Depreciation</th>
-                                <td>
-                                    <input type="text" value="{{ $item->accumulated_depreciation }}" class="form-control" name="accumulated_depreciation" id="accumulated_depreciation">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Quantity On Hand</th>
-                                <td>
-                                    <input type="text" value="{{ $item->quantity_on_hand }}" class="form-control" name="quantity_on_hand" id="quantity_on_hand">
-                                </td>
-                            </tr>
-                            @endif
                             <tr>
                                 <th><span class="required-star">*</span> Fulfillment Type</th>
                                 <td>
@@ -285,28 +271,14 @@
                                 <td>
                                     <input value="{{ $item->landed_cost }}" type="number" step="any" class="form-control" name="landed_cost" id="landed_cost" required>
                                 </td>
-                                <tr>
-                                    <th><span class="required-star">*</span> Preferred Vendor</th>
-                                    <td>
-                                        <select name="suppliers_id" id="suppliers_id" class="form-control" required>
-                                            <option value="" disabled selected>None selected...</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                @if ($item->tasteless_code)
-                                <tr>
-                                    <th>Tax Agency</th>
-                                    <td>
-                                        <input value="{{ $item->tax_agency }}" type="number" step="any" class="form-control" name="tax_agency" id="tax_agency">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>MPN</th>
-                                    <td>
-                                        <input value="{{ $item->mpn }}" type="number" step="any" class="form-control" name="mpn" id="mpn">
-                                    </td>
-                                </tr>
-                                @endif
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Preferred Vendor</th>
+                                <td>
+                                    <select name="suppliers_id" id="suppliers_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                    </select>
+                                </td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Reorder Pt (Min)</th>
