@@ -24,7 +24,7 @@ class AddNewIngredientsReasonsIdToNewIngredients extends Migration
             $table->integer('initial_qty_uoms_id')->length(10)->unsigned()->nullable()->after('initial_qty_needed');
             $table->decimal('forecast_qty_needed', 18, 2)->unsigned()->nullable()->after('initial_qty_uoms_id');
             $table->integer('forecast_qty_uoms_id')->length(10)->unsigned()->nullable()->after('forecast_qty_needed');
-            $table->decimal('budget_range', 18, 2)->unsigned()->nullable()->after('forecast_qty_uoms_id');
+            $table->text('budget_range')->nullable()->after('forecast_qty_uoms_id');
             $table->text('reference_link')->nullable()->after('budget_range');
             $table->integer('new_ingredient_terms_id')->length(10)->unsigned()->nullable()->after('reference_link');
             $table->string('duration')->length(255)->nullable()->after('new_ingredient_terms_id');

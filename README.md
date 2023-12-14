@@ -6,7 +6,8 @@
 - [x] Rename "REPLACEMENT" to "REPLACEMENT OF INGREDIENT"
 - [x] Add `required` attribute for brands 1 and 2
 - [ ] Auto update segmentations after tagging of item sourcing
-- [ ] Change input type from `number` to `text` for budget range, update db data type
+- [x] Change input type from `number` to `text` for budget range
+- [x] Update db data type for budget range to text
 - [x] Rename Module of "New Packaging" to "New Store Supplies"
 - [x] Rename "Packaging Type" to "Sourcing Category"
 - [x] Rename "Sticker Type" to "Sticker Material"
@@ -19,7 +20,7 @@
     - cotton
     - linen
     - denim
-- Add `required` attribute to display photo [input type="file"] (image and file for new store supplies, image for new ingredients)
+- [ ] Add `required` attribute to display photo [input type="file"] (image and file for new store supplies, image for new ingredients)
 - If Sticker Label is selected,
   - [ ] Show Sticker Material
   - [ ] Hide Packaging Use
@@ -35,7 +36,7 @@
   - [x] Packaging Use / Sourcing Usage
   - [x] Material Type
 - [x] Add 'UNIFORM' to Sourcing Category
-- [] If Sticker label is selected, show the ff. on sourcing usage:
+- [ ] If Sticker label is selected, show the ff. on sourcing usage:
   - takeout packaging 
   - marketing collaterals
   - merchandise

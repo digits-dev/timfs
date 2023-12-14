@@ -219,7 +219,7 @@
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Budget Range</th>
-                                <td><input type="number" name="budget_range" class="form-control" required placeholder="Budget Range" min="0"></td>
+                                <td><input type="text" name="budget_range" class="form-control" required placeholder="Budget Range"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Initial Qty Needed</th>
