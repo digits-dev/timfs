@@ -5,6 +5,7 @@
 - [x] Remove Beverage Type on new store supplies
 - [x] Rename "REPLACEMENT" to "REPLACEMENT OF INGREDIENT"
 - [x] Add `required` attribute for brands 1 and 2
+- [x] Prevent bulk approval on item master if one of the item effective date has expired.
 - [ ] Auto update segmentations after tagging of item sourcing
 - [x] Change input type from `number` to `text` for budget range
 - [x] Update db data type for budget range to text

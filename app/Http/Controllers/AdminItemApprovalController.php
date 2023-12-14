@@ -350,8 +350,8 @@
 	        */
 	        $this->button_selected = array();
 			if (in_array(CRUDBooster::myPrivilegeName(), $this->approver) || CRUDBooster::isSuperadmin()) {
-	        	$this->button_selected[] = ['label'=>'APPROVE','icon'=>'fa fa-check','name'=>'approve'];
-				$this->button_selected[] = ['label'=>'REJECT','icon'=>'fa fa-times','name'=>'reject'];
+	        	$this->button_selected[] = ['label'=>'APPROVE','icon'=>'fa fa-thumbs-up','name'=>'approve'];
+				$this->button_selected[] = ['label'=>'REJECT','icon'=>'fa fa-thumbs-down','name'=>'reject'];
 			}
 	                
 	        /* 
@@ -520,6 +520,23 @@
 	    |
 	    */
 	    public function actionButtonSelected($id_selected,$button_name) {
+
+			if ($button_name == 'approve') {
+				foreach ($id_selected as $id) {
+					$item_description = DB::table('item_master_approvals')
+						->pluck('full_item_description')
+						->first();
+					$differences = self::getUpdatedDetails($id);
+					$paired_differences = $differences['paired_differences'] ?? [];
+	
+					if (array_key_exists('ttp_price_effective_date', $paired_differences)) {
+						if ($paired_differences['ttp_price_effective_date']['new'] < date('Y-m-d')) {
+							return CRUDBooster::redirect(CRUDBooster::mainPath(), "Item: \"$item_description\" sales price effective date has expired.", 'danger');
+						}
+					}
+				}
+			}
+
 
 			return self::approve_or_reject($id_selected, $button_name);
 	    }
