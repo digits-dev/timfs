@@ -72,7 +72,7 @@
 					}
 				}
 			}];
-			$this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
+			// $this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
 			$this->col[] = ["label"=>"NWP Code","name"=>"nwp_code"];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
 			$this->col[] = ["label"=>"Last Comment","name"=>"id", "callback" => function($row) {
@@ -183,7 +183,7 @@
 				];
 			}
 
-			if ($my_requestor_ids) {
+			if ($my_requestor_ids || CRUDBooster::isSuperAdmin()) {
 				$requestor_json = json_encode($my_requestor_ids);
 				$this->addaction[] = [
 					'title'=>'Update Approval Status',

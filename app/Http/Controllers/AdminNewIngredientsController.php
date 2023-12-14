@@ -179,7 +179,7 @@
 				];
 			}
 			
-			if ($my_requestor_ids) {
+			if ($my_requestor_ids || CRUDBooster::isSuperAdmin()) {
 				$requestor_json = json_encode($my_requestor_ids);
 				$this->addaction[] = [
 					'title'=>'Update Approval Status',
