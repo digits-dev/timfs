@@ -1,5 +1,69 @@
 # 📄 TIMFS - Tasteless Item Masterfile System
 
+## TODOS - ADJUSTMENTS => MEETING WITH MS. YVETTE 12-13-2023
+- [ ] Hide "Item Type" on item sourcing
+- [ ] Remove Beverage Type on new store supplies
+- [ ] Rename "REPLACEMENT" to "REPLACEMENT OF INGREDIENT"
+- [ ] Add `required` attribute for brands 1 and 2
+- [ ] Auto update segmentations after tagging of item sourcing
+- [ ] Change input type from `number` to `text` for budget range, update db data type
+- [ ] Rename Module of "New Packaging" to "New Store Supplies"
+- [ ] Rename "Packaging Type" to "Sourcing Category"
+- [ ] Rename "Sticker Type" to "Sticker Material"
+- [ ] Rename "Custom" to "Customized" for Design Type
+- [ ] Remove N/A for Packaging Use
+- [ ] Require comment
+- [ ] Add new field: reference links => required
+- [ ] Add the ff. options to Material Type
+    - cotton
+    - linen
+    - denim
+- Add `required` attribute to display photo [input type="file"] (image and file for new store supplies, image for new ingredients)
+- If Sticker Label is selected,
+  - [ ] Show Sticker Material
+  - [ ] Hide Packaging Use
+  - [ ] Hide Material Type
+- If Takeout Container is selected,
+  - [ ] Show Packaging Use
+  - [ ] Show Material Type
+  - [ ] Hide Sticker Material
+- Add option "OTHERS" and new input field
+  - [ ] Reason
+  - [ ] Sourcing Category
+  - [ ] Sticker Material
+  - [ ] Packaging Use
+  - [ ] Material Type
+  - [ ] Packaging Use
+- [ ] Add 'UNIFORM' to Sourcing Category
+- If uniform is selected,
+  - [ ] Show Uniform Type
+  - Add options for uniform type
+    - apron
+    - cap
+    - chef's jacket
+    - short sleeve shirt
+    - long sleeve shirt
+    - long sleeve polo shirt
+    - short sleeve polo shirt
+    - 3/4 sleeve shirt
+    - name plate
+    - footwear
+    - others => new field
+  - [ ] If apron, cap, chef's jacket or shirt is selected, material types should be the ff:
+    - cotton
+    - linen
+    - denim
+    - others
+- [ ] If "Others" is selected in Sourcing Category, hide the ff:
+  - Packaging Use
+  - Beverage Type
+  - Material Type
+- Item Masters
+  - [ ] add file reference link
+  - [ ] remove upload of files
+  - [x] hide accumulated dep, qty on hand, tax agency and mpn
+
+
 ## ✅ TODOS:
 
 - [x] Show the SRP of the menu on the front end
