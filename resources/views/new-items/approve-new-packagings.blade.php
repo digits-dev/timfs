@@ -28,10 +28,10 @@
                                 <th>{{$table == 'new_ingredients' ? 'NWI Code' : 'NWP Code'}}</th>
                                 <td>{{$item->nwi_code ?? $item->nwp_code}}</td>
                             </tr>
-                            <tr>
+                            {{-- <tr>
                                 <th>Item Type</th>
                                 <td>{{$item->item_type_description}}</td>
-                            </tr>
+                            </tr> --}}
                             <tr>
                                 <th>Item Description</th>
                                 <td>{{$item->item_description}}</td>
@@ -53,17 +53,17 @@
                                 <td>{{$item->target_date}}</td>
                             </tr>
                             <tr>
-                                <th>Packaging Type</th>
+                                <th>Sourcing Category</th>
                                 <td>{{$item->packaging_description}}</td>
                             </tr>
                             @if($item->packaging_description == 'STICKER LABEL')
                             <tr>
-                                <th>Sticker Type</th>
+                                <th>Sticker Material</th>
                                 <td>{{$item->packaging_stickers}}</td>
                             </tr>
                             @endif
                                 <tr>
-                                    <th>Packaging Use</th>
+                                    <th>Sourcing Usage</th>
                                     <td>{{$item->packaging_uses}}</td>
                                 </tr>
                             @if($item->packaging_uses == 'BEVERAGE')

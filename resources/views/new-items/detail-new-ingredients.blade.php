@@ -25,10 +25,10 @@
                                 <th>{{$table == 'new_ingredients' ? 'NWI Code' : 'NWP Code'}}</th>
                                 <td>{{$item->nwi_code ?? $item->nwp_code}}</td>
                             </tr>
-                            <tr>
+                            {{-- <tr>
                                 <th>Item Type</th>
                                 <td>{{$item->item_type_description}}</td>
-                            </tr>
+                            </tr> --}}
                             <tr>
                                 <th>Item Description</th>
                                 <td>{{$item->item_description}}</td>

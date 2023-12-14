@@ -29,5 +29,21 @@ class PackagingTypeSeeder extends Seeder
                 'description' => 'STICKER LABEL',
                 'status' => 'ACTIVE'
             ]);
+
+        DB::table('packaging_uses')->updateOrInsert([
+            'description' => 'UNIFORM',
+            ],
+            [
+                'description' => 'UNIFORM',
+                'status' => 'ACTIVE'
+            ]);
+
+        DB::table('packaging_types')->updateOrInsert([
+            'description' => 'OTHERS',
+            ],
+            [
+                'description' => 'OTHERS',
+                'status' => 'ACTIVE'
+            ]);
     }
 }

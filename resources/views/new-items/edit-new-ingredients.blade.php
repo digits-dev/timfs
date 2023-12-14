@@ -85,7 +85,7 @@
                                 <th><span class="required-star">*</span> Item Description</th>
                                 <td><input type="text" value="{{ $item->item_description }}" name="item_description" class="form-control" required placeholder="Item Description" oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
-                            <tr>
+                            {{-- <tr>
                                 <th><span class="required-star">*</span>  Item Type</th>
                                 <td>
                                     <select name="new_item_types_id" id="new_item_types_id" class="form-control" required>
@@ -94,7 +94,7 @@
                                         @endforeach
                                     </select>
                                 </td>
-                            </tr>
+                            </tr> --}}
                             <tr>
                                 <th><span class="required-star">*</span>  Packaging Size</th>
                                 <td><input type="number" value="{{(float) $item->packaging_size}}" step="any" name="packaging_size" class="form-control" required placeholder="Packaging Size" min="1"></td>
@@ -137,11 +137,11 @@
                                     </select>
                                 </td>
                             </tr>
-                            <tr id="existingIngredientRow" {{ $item->reason_description  != 'REPLACEMENT' ? 'hidden' : '' }}>
+                            <tr id="existingIngredientRow" {{ $item->reason_description  != 'REPLACEMENT OF INGREDIENT' ? 'hidden' : '' }}>
                                 <th><span class="required-star">*</span> Existing Ingredient</th>
                                 <td>
                                     <select name="existing_ingredient" id="existing_ingredient" class="form-control" >
-                                        @if($item->reason_description  == 'REPLACEMENT')
+                                        @if($item->reason_description  == 'REPLACEMENT OF INGREDIENT')
                                         <option value="{{$item->existing_tasteless_code}}" selected>{{$item->existing_item_description}}</option>
                                         @endif
                                     </select>
@@ -158,8 +158,8 @@
                                 <td><input type="text" value="{{ $item->recommended_brand_one }}" name="recommended_brand_one" class="form-control" required placeholder="Required" oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
                             <tr>
-                                <th>Recommended Brand 2</th>
-                                <td><input type="text" value="{{ $item->recommended_brand_two }}" name="recommended_brand_two" class="form-control"  placeholder="Optional" oninput="this.value = this.value.toUpperCase()"></td>
+                                <th><span class="required-star">*</span> Recommended Brand 2</th>
+                                <td><input type="text" value="{{ $item->recommended_brand_two }}" name="recommended_brand_two" class="form-control" required placeholder="Required" oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
                             <tr>
                                 <th>Recommended Brand 3</th>
@@ -301,7 +301,7 @@
         const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
         
         console.log(selectedOption);
-        if (selectedOption === 'REPLACEMENT') {
+        if (selectedOption === 'REPLACEMENT OF INGREDIENT') {
             $('#existingIngredientRow').show();
             $('#existing_ingredient').attr('required', true);
         } else {

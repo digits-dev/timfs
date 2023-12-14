@@ -40,7 +40,7 @@
                                 <th><span class="required-star">*</span> Item Description</th>
                                 <td><input type="text" value="{{ $item->item_description }}" name="item_description" class="form-control" required placeholder="Item Description" oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
-                            <tr>
+                            {{-- <tr>
                                 <th><span class="required-star">*</span>  Item Type</th>
                                 <td>
                                     <select name="new_item_types_id" id="new_item_types_id" class="form-control" required>
@@ -49,7 +49,7 @@
                                         @endforeach
                                     </select>
                                 </td>
-                            </tr>
+                            </tr> --}}
                             <tr>
                                 <th><span class="required-star">*</span>  Packaging Size</th>
                                 <td><input type="number" value="{{ $item ? (float) $item->packaging_size : '' }}" step="any" name="packaging_size" class="form-control" required placeholder="Packaging Size"></td>
@@ -73,7 +73,7 @@
                                 <td><input type="date" value="{{ $item->target_date ? $item->target_date : '' }}" step="any" name="target_date" class="form-control" required></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Packaging Type</th>
+                                <th><span class="required-star">*</span> Sourcing Category</th>
                                 <td>
                                     <select name="packaging_types_id" id="packaging_types_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
@@ -84,7 +84,7 @@
                                 </td>
                             </tr>
                             <tr id="stickerTypeRow" {{ $item->packaging_description  != 'STICKER LABEL' ? 'hidden' : '' }}>
-                                <th><span class="required-star">*</span> Sticker Type</th>
+                                <th><span class="required-star">*</span> Sticker Material</th>
                                 <td>
                                     <select name="sticker_types_id" id="sticker_types_id" class="form-control" >
                                         <option value="" disabled selected>None selected...</option>
@@ -101,7 +101,7 @@
                     <table class="table table-responsive">
                         <tbody>
                             <tr>
-                                <th><span class="required-star">*</span> Packaging Use</th>
+                                <th><span class="required-star">*</span> Sourcing Usage</th>
                                 <td>
                                     <select name="packaging_uses_id" id="packaging_uses_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>

@@ -76,7 +76,7 @@
                                 <th><span class="required-star">*</span> Item Description</th>
                                 <td><input type="text" name="item_description" class="form-control" required placeholder="Item Description" oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
-                            <tr>
+                            {{-- <tr>
                                 <th><span class="required-star">*</span> Item Type</th>
                                 <td>
                                     <select name="new_item_types_id" id="new_item_types_id" class="form-control" required>
@@ -86,7 +86,7 @@
                                         @endforeach
                                     </select>
                                 </td>
-                            </tr>
+                            </tr> --}}
                             <tr>
                                 <th><span class="required-star">*</span>  Packaging Size</th>
                                 <td><input type="number" step="any" name="packaging_size" class="form-control" required placeholder="Packaging Size"></td>
@@ -111,7 +111,7 @@
                                 <td><input type="date" step="any" name="target_date" class="form-control" required></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Packaging Type</th>
+                                <th><span class="required-star">*</span> Sourcing Category</th>
                                 <td>
                                     <select name="packaging_types_id" id="packaging_types_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
@@ -122,7 +122,7 @@
                                 </td>
                             </tr>
                             <tr id="stickerTypeRow" hidden>
-                                <th><span class="required-star">*</span> Sticker Type</th>
+                                <th><span class="required-star">*</span> Sticker Material</th>
                                 <td>
                                     <select name="sticker_types_id" id="sticker_types_id" class="form-control" >
                                         <option value="" disabled selected>None selected...</option>
@@ -135,11 +135,11 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6"> 
                     <table class="table-responsive table">
                         <tbody>
                             <tr>
-                                <th><span class="required-star">*</span> Packaging Use</th>
+                                <th><span class="required-star">*</span> Sourcing Usage</th>
                                 <td>
                                     <select name="packaging_uses_id" id="packaging_uses_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
@@ -194,6 +194,26 @@
                                 </td>
                             </tr>
                             <tr>
+                                <th>File 1</th>
+                                <td><input type="file" name="filename_1" id="filename_1" class="form-control" /></td>
+                            </tr>
+                            <tr>
+                                <th>File 2</th>
+                                <td><input type="file" name="filename_2" id="filename_2" class="form-control" /></td>
+                            </tr>
+                            <tr>
+                                <th>File 3</th>
+                                <td><input type="file" name="filename_3" id="filename_3" class="form-control" /></td>
+                            </tr>
+                            <tr>
+                                <th>File 4</th>
+                                <td><input type="file" name="filename_4" id="filename_4" class="form-control" /></td>
+                            </tr>
+                            <tr>
+                                <th>File 5</th>
+                                <td><input type="file" name="filename_5" id="filename_5" class="form-control" /></td>
+                            </tr>
+                            <tr>
                                 <th><span class="required-star">*</span>  Size</th>
                                 <td><input type="number" step="any" name="size" class="form-control" required placeholder="SRP" min="0"></td>
                             </tr>
@@ -244,8 +264,8 @@
             <div class="row">
                 <div class="col-md-12">
                     <hr>
-                    <h3 class="text-center"> COMMENTS</h3>
-                    <textarea class="comment-textarea" name="comment" id="comment" form="form-main" placeholder="Type your comment here..."></textarea>
+                    <h3 class="text-center"><span class="required-star">*</span> COMMENTS</h3>
+                    <textarea class="comment-textarea" name="comment" id="comment" form="form-main" required recommend placeholder="Type your comment here..."></textarea>
                 </div>
             </div>
             <button type="submit" class="hide" id="submit-btn">Submit</button>

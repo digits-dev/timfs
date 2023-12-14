@@ -1,21 +1,21 @@
 # 📄 TIMFS - Tasteless Item Masterfile System
 
 ## TODOS - ADJUSTMENTS => MEETING WITH MS. YVETTE 12-13-2023
-- [ ] Hide "Item Type" on item sourcing
-- [ ] Remove Beverage Type on new store supplies
-- [ ] Rename "REPLACEMENT" to "REPLACEMENT OF INGREDIENT"
-- [ ] Add `required` attribute for brands 1 and 2
+- [x] Hide "Item Type" on item sourcing
+- [x] Remove Beverage Type on new store supplies
+- [x] Rename "REPLACEMENT" to "REPLACEMENT OF INGREDIENT"
+- [x] Add `required` attribute for brands 1 and 2
 - [ ] Auto update segmentations after tagging of item sourcing
 - [ ] Change input type from `number` to `text` for budget range, update db data type
-- [ ] Rename Module of "New Packaging" to "New Store Supplies"
-- [ ] Rename "Packaging Type" to "Sourcing Category"
-- [ ] Rename "Sticker Type" to "Sticker Material"
-- [ ] Rename "Custom" to "Customized" for Design Type
-- [ ] Rename "Packaging Use" to "Sourcing Usage"
-- [ ] Remove N/A for Packaging Use
-- [ ] Require comment
+- [x] Rename Module of "New Packaging" to "New Store Supplies"
+- [x] Rename "Packaging Type" to "Sourcing Category"
+- [x] Rename "Sticker Type" to "Sticker Material"
+- [x] Rename "Custom" to "Customized" for Design Type
+- [x] Rename "Packaging Use" to "Sourcing Usage"
+- [x] Remove N/A for Packaging Use
+- [x] Require comment
 - [ ] Add new field: reference links => required
-- [ ] Add the ff. options to Material Type
+- [x] Add the ff. options to Material Type
     - cotton
     - linen
     - denim
@@ -29,14 +29,13 @@
   - [ ] Show Material Type
   - [ ] Hide Sticker Material
 - Add option "OTHERS" and new input field
-  - [ ] Reason
-  - [ ] Sourcing Category
-  - [ ] Sticker Material
-  - [ ] Packaging Use / Sourcing Usage
-  - [ ] Material Type
-  - [ ] Packaging Use
-- [ ] Add 'UNIFORM' to Sourcing Category
-- [ ] If Sticker label is selected, show the ff. on sourcing usage:
+  - [x] Reason
+  - [x] Sourcing Category
+  - [x] Sticker Material
+  - [x] Packaging Use / Sourcing Usage
+  - [x] Material Type
+- [x] Add 'UNIFORM' to Sourcing Category
+- [] If Sticker label is selected, show the ff. on sourcing usage:
   - takeout packaging 
   - marketing collaterals
   - merchandise

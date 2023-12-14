@@ -80,7 +80,7 @@
                                 <th><span class="required-star">*</span> Item Description</th>
                                 <td><input type="text" name="item_description" class="form-control" required placeholder="Item Description" oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
-                            <tr>
+                            {{-- <tr>
                                 <th><span class="required-star">*</span> Item Type</th>
                                 <td>
                                     <select name="new_item_types_id" id="new_item_types_id" class="form-control" required>
@@ -90,7 +90,7 @@
                                         @endforeach
                                     </select>
                                 </td>
-                            </tr>
+                            </tr> --}}
                             <tr>
                                 <th><span class="required-star">*</span>  Packaging Size</th>
                                 <td><input type="number" step="any" name="packaging_size" class="form-control" required placeholder="Packaging Size"></td>
@@ -153,8 +153,8 @@
                                 <td><input type="text" name="recommended_brand_one" class="form-control" required placeholder="Required" oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
                             <tr>
-                                <th>Recommended Brand 2</th>
-                                <td><input type="text" name="recommended_brand_two" class="form-control"  placeholder="Optional" oninput="this.value = this.value.toUpperCase()"></td>
+                                <th><span class="required-star">*</span> Recommended Brand 2</th>
+                                <td><input type="text" name="recommended_brand_two" class="form-control"  required placeholder="Required" oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
                             <tr>
                                 <th>Recommended Brand 3</th>
@@ -226,8 +226,8 @@
             <div class="row">
                 <div class="col-md-12">
                     <hr>
-                    <h3 class="text-center">COMMENTS</h3>
-                    <textarea class="comment-textarea" name="comment" id="comment" form="form-main" placeholder="Type your comment here..."></textarea>
+                    <h3 class="text-center"><span class="required-star">*</span> COMMENTS</h3>
+                    <textarea class="comment-textarea" name="comment" id="comment" form="form-main" required placeholder="Type your comment here..."></textarea>
                 </div>
             </div>
             <button type="submit" class="hide" id="submit-btn">Submit</button>
@@ -254,7 +254,7 @@
         const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
         
         console.log(selectedOption);
-        if (selectedOption === 'REPLACEMENT') {
+        if (selectedOption === 'REPLACEMENT OF INGREDIENT') {
             $('#existingIngredientRow').show();
             $('#existing_ingredient').attr('required', true);
         } else {
