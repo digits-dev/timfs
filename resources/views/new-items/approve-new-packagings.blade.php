@@ -95,6 +95,10 @@
                                 <td>{{$item->budget_range}}</td>
                             </tr>
                             <tr>
+                                <th>Reference Link</th>
+                                <td>{{$item->reference_link}}</td>
+                            </tr>
+                            <tr>
                                 <th>Initial Qty Needed</th>
                                 <td>{{(float)$item->initial_qty_needed}} {{$item->initial_qty_uoms}}</td>
                             </tr>

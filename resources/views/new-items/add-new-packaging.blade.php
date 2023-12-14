@@ -193,26 +193,14 @@
                                     </select>
                                 </td>
                             </tr>
-                            <tr>
+                            {{-- <tr>
                                 <th>File 1</th>
                                 <td><input type="file" name="filename_1" id="filename_1" class="form-control" /></td>
                             </tr>
                             <tr>
                                 <th>File 2</th>
                                 <td><input type="file" name="filename_2" id="filename_2" class="form-control" /></td>
-                            </tr>
-                            <tr>
-                                <th>File 3</th>
-                                <td><input type="file" name="filename_3" id="filename_3" class="form-control" /></td>
-                            </tr>
-                            <tr>
-                                <th>File 4</th>
-                                <td><input type="file" name="filename_4" id="filename_4" class="form-control" /></td>
-                            </tr>
-                            <tr>
-                                <th>File 5</th>
-                                <td><input type="file" name="filename_5" id="filename_5" class="form-control" /></td>
-                            </tr>
+                            </tr> --}}
                             <tr>
                                 <th><span class="required-star">*</span>  Size</th>
                                 <td><input type="number" step="any" name="size" class="form-control" required placeholder="SRP" min="0"></td>
@@ -220,6 +208,10 @@
                             <tr>
                                 <th><span class="required-star">*</span> Budget Range</th>
                                 <td><input type="text" name="budget_range" class="form-control" required placeholder="Budget Range"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Reference Links</th>
+                                <td><input type="text" name="reference_link" class="form-control" required placeholder="Reference Links" ></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Initial Qty Needed</th>

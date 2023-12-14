@@ -484,6 +484,7 @@
 			$postdata['packaging_design_types_id'] = Input::get('packaging_design_types_id');
 			$postdata['size'] = Input::get('size');
 			$postdata['budget_range'] = Input::get('budget_range');
+			$postdata['reference_link'] = Input::get('reference_link');
 			$postdata['initial_qty_needed'] = Input::get('initial_qty_needed');
 			$postdata['initial_qty_uoms_id'] = Input::get('initial_qty_uoms_id');
 			$postdata['forecast_qty_needed'] = Input::get('forecast_qty_needed');
@@ -619,6 +620,7 @@
 					'new_packagings.packaging_size as packaging_size',
 					'new_packagings.size as size',
 					'new_packagings.budget_range as budget_range',
+					'new_packagings.reference_link', 
 					'new_packagings.initial_qty_needed as initial_qty_needed',
 					'initial_uoms.uom_description as initial_qty_uoms',
 					'new_packagings.forecast_qty_needed as forecast_qty_needed',
@@ -790,6 +792,7 @@
 					'size' => $request->get('size'),
 					'ttp' => $request->get('ttp'),
 					'budget_range' => $request->get('budget_range'),
+					'reference_link' => $request->get('reference_link'),
 					'initial_qty_needed' => $request->get('initial_qty_needed'),
 					'initial_qty_uoms_id' => $request->get('initial_qty_uoms_id'),
 					'forecast_qty_needed' => $request->get('forecast_qty_needed'),

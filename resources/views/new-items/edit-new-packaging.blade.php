@@ -168,6 +168,10 @@
                                 <td><input type="text" value="{{  $item->budget_range }}" name="budget_range" class="form-control" required placeholder="Budget Range"></td>
                             </tr>
                             <tr>
+                                <th><span class="required-star">*</span> Reference Links</th>
+                                <td><input type="text" name="reference_link" value="{{ $item->reference_link }}" class="form-control" required placeholder="Reference Links" ></td>
+                            </tr>
+                            <tr>
                                 <th><span class="required-star">*</span> Initial Qty Needed</th>
                                 <td>
                                     <div class="row">

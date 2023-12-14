@@ -15,7 +15,7 @@
 - [x] Rename "Packaging Use" to "Sourcing Usage"
 - [x] Remove N/A for Packaging Use
 - [x] Require comment
-- [ ] Add new field: reference links => required
+- [x] Add new field: reference links => required
 - [x] Add the ff. options to Material Type
     - cotton
     - linen
@@ -43,7 +43,7 @@
   - other => new field
 - If uniform is selected,
   - [ ] Show Uniform Type
-  - Add options for uniform type
+  - [ ] Add options for uniform type
     - apron
     - cap
     - chef's jacket

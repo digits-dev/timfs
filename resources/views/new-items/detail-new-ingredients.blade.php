@@ -57,7 +57,7 @@
                                 <th>Reason</th>
                                 <td>{{$item->reasons_description}}</td>
                             </tr>
-                            @if($item->reasons_description == 'REPLACEMENT')
+                            @if($item->reasons_description == 'REPLACEMENT OF INGREDIENT')
                                 <tr>
                                     <th>Exisiting Ingredient</th>
                                     <td><b>{{ $item->existing_ingredient_code }}</b> - {{$item->existing_ingredient}}</td>
