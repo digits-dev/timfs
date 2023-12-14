@@ -11,6 +11,7 @@
 - [ ] Rename "Packaging Type" to "Sourcing Category"
 - [ ] Rename "Sticker Type" to "Sticker Material"
 - [ ] Rename "Custom" to "Customized" for Design Type
+- [ ] Rename "Packaging Use" to "Sourcing Usage"
 - [ ] Remove N/A for Packaging Use
 - [ ] Require comment
 - [ ] Add new field: reference links => required
@@ -31,10 +32,15 @@
   - [ ] Reason
   - [ ] Sourcing Category
   - [ ] Sticker Material
-  - [ ] Packaging Use
+  - [ ] Packaging Use / Sourcing Usage
   - [ ] Material Type
   - [ ] Packaging Use
 - [ ] Add 'UNIFORM' to Sourcing Category
+- [ ] If Sticker label is selected, show the ff. on sourcing usage:
+  - takeout packaging 
+  - marketing collaterals
+  - merchandise
+  - other => new field
 - If uniform is selected,
   - [ ] Show Uniform Type
   - Add options for uniform type
