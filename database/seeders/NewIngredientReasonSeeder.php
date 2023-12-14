@@ -23,10 +23,10 @@ class NewIngredientReasonSeeder extends Seeder
             ]);
 
         DB::table('new_ingredient_reasons')->updateOrInsert([
-            'description' => 'REPLACEMENT',
+            'description' => 'REPLACEMENT OF INGREDIENT',
             ],
             [
-                'description' => 'REPLACEMENT',
+                'description' => 'REPLACEMENT OF INGREDIENT',
                 'status' => 'ACTIVE'
             ]);
         DB::table('new_ingredient_reasons')->updateOrInsert([
@@ -42,6 +42,14 @@ class NewIngredientReasonSeeder extends Seeder
             ],
             [
                 'description' => 'RND',
+                'status' => 'ACTIVE'
+            ]);
+
+        DB::table('new_ingredient_reasons')->updateOrInsert([
+            'description' => 'OTHERS',
+            ],
+            [
+                'description' => 'OTHERS',
                 'status' => 'ACTIVE'
             ]);
     }

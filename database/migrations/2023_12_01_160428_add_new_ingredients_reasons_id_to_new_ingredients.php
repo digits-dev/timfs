@@ -41,6 +41,7 @@ class AddNewIngredientsReasonsIdToNewIngredients extends Migration
         Schema::table('new_ingredients', function (Blueprint $table) {
             $table->dropColumn('segmentations');
             $table->dropColumn('new_ingredient_reasons_id');
+            $table->dropColumn('existing_ingredient');
             $table->dropColumn('recommended_brand_one');
             $table->dropColumn('recommended_brand_two');
             $table->dropColumn('recommended_brand_three');

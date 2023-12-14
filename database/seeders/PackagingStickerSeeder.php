@@ -45,5 +45,13 @@ class PackagingStickerSeeder extends Seeder
                 'description' => 'VINYL',
                 'status' => 'ACTIVE'
             ]);
+
+        DB::table('packaging_stickers')->updateOrInsert([
+            'description' => 'OTHERS',
+            ],
+            [
+                'description' => 'OTHERS',
+                'status' => 'ACTIVE'
+            ]);
     }
 }

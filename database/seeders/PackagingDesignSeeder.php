@@ -23,10 +23,10 @@ class PackagingDesignSeeder extends Seeder
             ]);
 
         DB::table('packaging_designs')->updateOrInsert([
-            'description' => 'CUSTOM',
+            'description' => 'CUSTOMIZED',
             ],
             [
-                'description' => 'CUSTOM',
+                'description' => 'CUSTOMIZED',
                 'status' => 'ACTIVE'
             ]);
     }

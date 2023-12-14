@@ -31,10 +31,34 @@ class PackagingUseSeeder extends Seeder
             ]);
 
         DB::table('packaging_uses')->updateOrInsert([
-            'description' => 'N/A',
+            'description' => 'TAKEOUT PACKAGING',
             ],
             [
-                'description' => 'N/A',
+                'description' => 'TAKEOUT PACKAGING',
+                'status' => 'ACTIVE'
+            ]);
+
+        DB::table('packaging_uses')->updateOrInsert([
+            'description' => 'MARKETING COLLATERALS',
+            ],
+            [
+                'description' => 'MARKETING COLLATERALS',
+                'status' => 'ACTIVE'
+            ]);
+
+        DB::table('packaging_uses')->updateOrInsert([
+            'description' => 'MERCHANDISE',
+            ],
+            [
+                'description' => 'MERCHANDISE',
+                'status' => 'ACTIVE'
+            ]);
+
+        DB::table('packaging_uses')->updateOrInsert([
+            'description' => 'OTHERS',
+            ],
+            [
+                'description' => 'OTHERS',
                 'status' => 'ACTIVE'
             ]);
     }
