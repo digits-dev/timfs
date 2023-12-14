@@ -118,61 +118,6 @@
                                 <td class="with-download"><input value="{{ $item->image_filename }}" type="text" name="image_filename" id="image_filename" accept="image/*" class="form-control" readonly></td>
                             </tr>
                             <tr>
-                                <th>
-                                    File 1
-                                    @if ($item->filename_1)
-                                    <a href="{{ asset('item-master-files/' . $item->filename_1) }}" download="{{ $item->filename_1 }}" class="btn btn-primary pull-right">
-                                        <i class="fa fa-download"></i>
-                                    </a>
-                                    @endif
-                                </th>
-                                <td><input value="{{ $item->filename_1 }}" type="text" name="filename_1" id="filename_1" class="form-control" readonly /></td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    File 2
-                                    @if ($item->filename_2)
-                                    <a href="{{ asset('item-master-files/' . $item->filename_2) }}" download="{{ $item->filename_2 }}" class="btn btn-primary pull-right">
-                                        <i class="fa fa-download"></i>
-                                    </a>
-                                    @endif
-                                </th>
-                                <td><input value="{{ $item->filename_2 }}" type="text" name="filename_2" id="filename_2" class="form-control" readonly /></td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    File 3
-                                    @if ($item->filename_3)
-                                    <a href="{{ asset('item-master-files/' . $item->filename_3) }}" download="{{ $item->filename_3 }}" class="btn btn-primary pull-right">
-                                        <i class="fa fa-download"></i>
-                                    </a>
-                                    @endif
-                                </th>
-                                <td><input value="{{ $item->filename_3 }}" type="text" name="filename_3" id="filename_3" class="form-control" readonly /></td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    File 4
-                                    @if ($item->filename_4)
-                                    <a href="{{ asset('item-master-files/' . $item->filename_4) }}" download="{{ $item->filename_4 }}" class="btn btn-primary pull-right">
-                                        <i class="fa fa-download"></i>
-                                    </a>
-                                    @endif
-                                </th>
-                                <td><input value="{{ $item->filename_4 }}" type="text" name="filename_4" id="filename_4" class="form-control" readonly /></td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    File 5
-                                    @if ($item->filename_5)
-                                    <a href="{{ asset('item-master-files/' . $item->filename_5) }}" download="{{ $item->filename_5 }}" class="btn btn-primary pull-right">
-                                        <i class="fa fa-download"></i>
-                                    </a>
-                                    @endif
-                                </th>
-                                <td><input value="{{ $item->filename_5 }}" type="text" name="filename_5" id="filename_5" class="form-control" readonly /></td>
-                            </tr>
-                            <tr>
                                 <th><span class="required-star">*</span>  Brand Description</th>
                                 <td>
                                     <select value="{{ $item->brands_id }}" name="brands_id" id="brands_id" class="form-control" required disabled>
@@ -263,12 +208,6 @@
                                     </select>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <table class="table-responsive table">
-                        <tbody>
                             <tr>
                                 <th><span class="required-star">*</span> Currency</th>
                                 <td>
@@ -292,6 +231,12 @@
                                     <input value="{{ $item->ttp }}"  type="number" step="any" class="form-control" name="ttp" id="ttp" required readonly>
                                 </td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table-responsive table">
+                        <tbody>
                             @if ($item->tasteless_code)
                             <tr>
                                 <th>Sales Price Change</th>

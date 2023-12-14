@@ -1001,20 +1001,6 @@
 
 		public function submitAddOrEdit(Request $request) {
 			$input = $request->all();
-			$filenames = [];
-
-			for ($i = 1; $i <= 5; $i++) {
-				$file = $input['filename_' . $i];
-				if ($file) {
-					$filename = ($input['tasteless_code'] ?? 'new_item') 
-						. '_' 
-						. Str::random(10) 
-						. '.'
-						. $file->getClientOriginalExtension();
-					$file->move(public_path('item-master-files'), $filename);
-					$filenames['filename_' . $i] = $filename;
-				}
-			}
 
 			if ($input['item_photo']) {
 				$filename_filler = $input['tasteless_code'] ?? 'new_item';
@@ -1093,8 +1079,6 @@
 				$data['created_by'] = $action_by;
 				$data['created_at'] = $time_stamp;
 			}
-
-			$data = array_merge($data, $filenames);
 
 			if (!$tasteless_code && !$input['item_masters_approvals_id']) {
 				$data['action_type'] = 'CREATE';
