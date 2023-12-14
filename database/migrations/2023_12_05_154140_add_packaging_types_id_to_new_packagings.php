@@ -18,6 +18,7 @@ class AddPackagingTypesIdToNewPackagings extends Migration
             $table->decimal('forecast_qty_needed', 18, 2)->unsigned()->nullable()->after('target_date');
             $table->integer('initial_qty_uoms_id')->length(10)->unsigned()->nullable()->after('target_date');
             $table->decimal('initial_qty_needed', 18, 2)->unsigned()->nullable()->after('target_date');
+            $table->text('reference_link')->nullable()->after('target_date');
             $table->text('budget_range')->nullable()->after('target_date');
             $table->decimal('size', 18, 2)->unsigned()->nullable()->after('target_date');
             $table->integer('packaging_design_types_id')->length(10)->unsigned()->nullable()->after('target_date');
@@ -49,6 +50,7 @@ class AddPackagingTypesIdToNewPackagings extends Migration
             $table->dropColumn('packaging_design_types_id');
             $table->dropColumn('size');
             $table->dropColumn('budget_range');
+            $table->dropColumn('reference_link');
             $table->dropColumn('initial_qty_needed');
             $table->dropColumn('initial_qty_uoms_id');
             $table->dropColumn('forecast_qty_needed');
