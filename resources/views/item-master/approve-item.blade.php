@@ -120,7 +120,7 @@
                             <tr>
                                 <th>File Reference Link</th>
                                 <td>
-                                    <div class="form-control">
+                                    <div class="form-control" name="file_link">
                                         <a href="{{ $item->file_link }}" target="_blank" class="">{{ $item->file_link }}</a>
                                     </div>
                                 </td>
@@ -447,7 +447,7 @@
         }
     }
 
-    $('input, select').each(function() {
+    $('input, select, div').each(function() {
         const name = $(this).attr('name')
         if (differences.includes(name)) {
             $(this).addClass('edited-field');
