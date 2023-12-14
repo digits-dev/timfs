@@ -395,8 +395,6 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-			$my_privilege = CRUDBooster::myPrivilegeName();
-			$my_requestor_ids = self::getMyRequestors();
 	        $query
 				->leftJoin('new_items_last_comment', 'new_items_last_comment.new_ingredients_id', 'new_ingredients.id')
 				->leftJoin('new_items_comments', 'new_items_comments.id', 'new_items_last_comment.new_items_comments_id')
@@ -413,17 +411,14 @@
 				->where('new_ingredients.status', 'ACTIVE')
 				->orderByRaw("
 					CASE
-						WHEN sourcing_status = 'OPEN' THEN 1
-						WHEN sourcing_status = 'ON HOLD' THEN 2
-						WHEN sourcing_status = 'CANCELLED' THEN 3
-						WHEN sourcing_status = 'CLOSED' THEN 4
-					END ASC				
-				")
-				->orderByRaw("
-					CASE
-						WHEN approval_status = 'PENDING' THEN 1
-						WHEN approval_status = 'APPROVED' THEN 2
-						WHEN approval_status = 'REJECTED' THEN 3
+						WHEN item_approval_statuses.status_description = 'REJECTED' THEN 7
+						WHEN item_sourcing_statuses.status_description = 'CANCELLED' THEN 6
+						WHEN item_sourcing_statuses.status_description = 'CLOSED' THEN 5
+						WHEN item_sourcing_statuses.status_description = 'ON HOLD' THEN 4
+						WHEN item_approval_statuses.status_description = 'APPROVED' THEN 3
+						WHEN item_sourcing_statuses.status_description = 'OPEN' THEN 2
+						WHEN item_approval_statuses.status_description = 'PENDING' THEN 1
+						ELSE 8
 					END ASC				
 				");
 	    }
@@ -445,14 +440,17 @@
 	    | @arr
 	    |
 	    */
-	    public function hook_before_add(&$postdata) {        
+	    public function hook_before_add(&$postdata) {
 	        //Your code here
 
 			// dd(Input::all());
 			$max_nwi_code = DB::table('new_ingredients')->max('nwi_code');
 			$nwi_code_int = (int) explode('-', $max_nwi_code)[1] + 1;
 			$nwi_code = 'NWI-' . str_pad($nwi_code_int, 5, '0', STR_PAD_LEFT);
-			$implodesegmentations = implode(',', Input::get('segmentations'));
+			$segmentations = Input::get('segmentations');
+			if ($segmentations) {
+				$implodesegmentations = implode(',', Input::get('segmentations'));
+			}
 			$item_approval_statuses_id = DB::table('item_approval_statuses')
 				->where('status', 'ACTIVE')
 				->where('status_description', 'PENDING')
@@ -802,7 +800,11 @@
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
 			$item = self::getSourcingDetails($new_ingredients_id);
-			if ($item->sourcing_status != 'PENDING') {
+			$segmentations = $request->get('segmentations');
+			if ($segmentations) {
+				$implodesegmentations = implode(',', Input::get('segmentations'));
+			}
+			if ($item->approval_status != 'PENDING') {
 				return CRUDBooster::redirect(CRUDBooster::mainPath(), 'This item is not pending.', 'danger');
 			}
 
@@ -815,7 +817,7 @@
 					'uoms_id' => $request->get('uoms_id'),
 					'ttp' => $request->get('ttp'),
 					'target_date' => $request->get('target_date'),
-					'segmentations' => implode(',', $request->get('segmentations')),
+					'segmentations' => $implodesegmentations,
 					'new_ingredient_reasons_id' => $request->get('new_ingredient_reasons_id'),
 					'existing_ingredient' => $request->get('existing_ingredient'),
 					'recommended_brand_one' => $request->get('recommended_brand_one'),

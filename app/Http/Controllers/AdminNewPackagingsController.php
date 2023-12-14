@@ -430,19 +430,16 @@
 				->where('new_packagings.status', 'ACTIVE')
 				->orderByRaw("
 					CASE
-						WHEN sourcing_status = 'OPEN' THEN 1
-						WHEN sourcing_status = 'ON HOLD' THEN 2
-						WHEN sourcing_status = 'CANCELLED' THEN 3
-						WHEN sourcing_status = 'CLOSED' THEN 4
+						WHEN item_approval_statuses.status_description = 'REJECTED' THEN 7
+						WHEN item_sourcing_statuses.status_description = 'CANCELLED' THEN 6
+						WHEN item_sourcing_statuses.status_description = 'CLOSED' THEN 5
+						WHEN item_sourcing_statuses.status_description = 'ON HOLD' THEN 4
+						WHEN item_approval_statuses.status_description = 'APPROVED' THEN 3
+						WHEN item_sourcing_statuses.status_description = 'OPEN' THEN 2
+						WHEN item_approval_statuses.status_description = 'PENDING' THEN 1
+						ELSE 8
 					END ASC				
-				")
-				->orderByRaw("
-					CASE
-						WHEN approval_status = 'PENDING' THEN 1
-						WHEN approval_status = 'APPROVED' THEN 2
-						WHEN approval_status = 'REJECTED' THEN 3
-					END ASC				
-				");  
+				");
 	    }
 
 	    /*
@@ -770,6 +767,10 @@
 			$new_packagings_id = $request->get('new_items_id');
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
+			$item = self::getSourcingDetails($new_packagings_id);
+			if ($item->approval_status != 'PENDING') {
+				return CRUDBooster::redirect(CRUDBooster::mainPath(), 'This item is not pending.', 'danger');
+			}
 			DB::table('new_packagings')
 				->where('new_packagings.id', $new_packagings_id)
 				->update([
