@@ -65,8 +65,8 @@
   - Beverage Type
   - Material Type
 - Item Masters
-  - [ ] add file reference link
-  - [ ] remove upload of files
+  - [x] add file reference link
+  - [x] remove upload of files
   - [x] hide accumulated dep, qty on hand, tax agency and mpn
 
 

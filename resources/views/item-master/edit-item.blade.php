@@ -107,6 +107,10 @@
                                 <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ $item->tasteless_code && !$item->image_filename ? 'required' : '' }} ></td>
                             </tr>
                             <tr>
+                                <th>File Reference Link</th>
+                                <td><input type="text" name="file_link" id="file_link" class="form-control"></td>
+                            </tr>
+                            <tr>
                                 <th><span class="required-star">*</span>  Brand Description</th>
                                 <td>
                                     <select value="{{ $item->brands_id }}" name="brands_id" id="brands_id" class="form-control" required>

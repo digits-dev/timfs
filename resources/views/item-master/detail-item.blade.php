@@ -119,6 +119,14 @@
                                 </th>
                                 <td><input value="{{ $item->image_filename }}" type="text" name="filename_1" id="filename_1" class="form-control" readonly /></td>
                             </tr>
+                            <tr>
+                                <th>File Reference Link</th>
+                                <td>
+                                    <div class="form-control">
+                                        <a href="{{ $item->file_link }}" target="_blank" class="">{{ $item->file_link }}</a>
+                                    </div>
+                                </td>
+                            </tr>
                             @if (CRUDBooster::myColumnView()->brand_description)
                             <tr>
                                 <th><span class="required-star">*</span>  Brand Description</th>

@@ -118,6 +118,14 @@
                                 <td class="with-download"><input value="{{ $item->image_filename }}" type="text" name="image_filename" id="image_filename" accept="image/*" class="form-control" readonly></td>
                             </tr>
                             <tr>
+                                <th>File Reference Link</th>
+                                <td>
+                                    <div class="form-control">
+                                        <a href="{{ $item->file_link }}" target="_blank" class="">{{ $item->file_link }}</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
                                 <th><span class="required-star">*</span>  Brand Description</th>
                                 <td>
                                     <select value="{{ $item->brands_id }}" name="brands_id" id="brands_id" class="form-control" required disabled>
