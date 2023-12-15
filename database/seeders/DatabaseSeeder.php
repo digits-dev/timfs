@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PackagingPaperTypeSeeder::class);
         $this->call(PackagingStickerSeeder::class);
         $this->call(PackagingTypeSeeder::class);
+        $this->call(PackagingUniformTypeSeeder::class);
         $this->call(PackagingUseSeeder::class);
     }
 }
