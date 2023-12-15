@@ -75,6 +75,12 @@
 				}
 			}];
 			// $this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
+			$this->col[] = ["label"=>"Display Photo","name"=>"image_filename","callback"=>function($row) {
+				if ($row->image_filename) {
+					$url = asset('img/item-sourcing/' . $row->image_filename);
+					return "<img src='$url' style='max-width: 100px'>";
+				}
+			}];
 			$this->col[] = ["label"=>"NWI Code","name"=>"nwi_code"];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
 			$this->col[] = ["label"=>"Last Comment","name"=>"id", "callback" => function($row) {
@@ -444,13 +450,29 @@
 	    public function hook_before_add(&$postdata) {
 	        //Your code here
 
-			// dd(Input::all());
+			$input = Input::all();
 			$max_nwi_code = DB::table('new_ingredients')->max('nwi_code');
 			$nwi_code_int = (int) explode('-', $max_nwi_code)[1] + 1;
 			$nwi_code = 'NWI-' . str_pad($nwi_code_int, 5, '0', STR_PAD_LEFT);
-			$segmentations = Input::get('segmentations');
+			$segmentations = $input['segmentations'];
+			$item_photo = $input['display_photo'];
+			if ($item_photo) {
+				$filename_filler = $nwi_code . '_' . Str::random(10);
+				$image_filename = date('Y-m-d') . "-$filename_filler." . $item_photo->getClientOriginalExtension();
+				$image = Image::make($item_photo);
+				
+				$image->resize(1024, 768, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
+	
+				$image->save(public_path('img/item-sourcing/' . $image_filename));
+				$optimizerChain = OptimizerChainFactory::create();
+				$optimizerChain->optimize(public_path('img/item-sourcing/' . $image_filename));
+			}
+
 			if ($segmentations) {
-				$implodesegmentations = implode(',', Input::get('segmentations'));
+				$implodesegmentations = implode(',', $input['segmentations']);
 			}
 			$item_approval_statuses_id = DB::table('item_approval_statuses')
 				->where('status', 'ACTIVE')
@@ -459,23 +481,24 @@
 				->first();
 
 			$postdata['item_approval_statuses_id'] = $item_approval_statuses_id;
+			$postdata['image_filename'] = $image_filename;
 			$postdata['nwi_code'] = $nwi_code;
 			$postdata['segmentations'] = $implodesegmentations;
-			$postdata['comment'] = Input::get('comment');
-			$postdata['new_ingredient_reasons_id'] = Input::get('new_ingredient_reasons_id');
-			$postdata['existing_ingredient'] = Input::get('existing_ingredient');
-			$postdata['recommended_brand_one'] = Input::get('recommended_brand_one');
-			$postdata['recommended_brand_two'] = Input::get('recommended_brand_two');
-			$postdata['recommended_brand_three'] = Input::get('recommended_brand_three');
-			$postdata['initial_qty_needed'] = Input::get('initial_qty_needed');
-			$postdata['initial_qty_uoms_id'] = Input::get('initial_qty_uoms_id');
-			$postdata['forecast_qty_needed'] = Input::get('forecast_qty_needed');
-			$postdata['forecast_qty_uoms_id'] = Input::get('forecast_qty_uoms_id');
-			$postdata['budget_range'] = Input::get('budget_range');
-			$postdata['reference_link'] = Input::get('reference_link');
-			$postdata['new_ingredient_terms_id'] = Input::get('new_ingredient_terms_id');
-			$postdata['duration'] = Input::get('duration');
-			$postdata['target_date'] = Input::get('target_date');
+			$postdata['comment'] = $input['comment'];
+			$postdata['new_ingredient_reasons_id'] = $input['new_ingredient_reasons_id'];
+			$postdata['existing_ingredient'] = $input['existing_ingredient'];
+			$postdata['recommended_brand_one'] = $input['recommended_brand_one'];
+			$postdata['recommended_brand_two'] = $input['recommended_brand_two'];
+			$postdata['recommended_brand_three'] = $input['recommended_brand_three'];
+			$postdata['initial_qty_needed'] = $input['initial_qty_needed'];
+			$postdata['initial_qty_uoms_id'] = $input['initial_qty_uoms_id'];
+			$postdata['forecast_qty_needed'] = $input['forecast_qty_needed'];
+			$postdata['forecast_qty_uoms_id'] = $input['forecast_qty_uoms_id'];
+			$postdata['budget_range'] = $input['budget_range'];
+			$postdata['reference_link'] = $input['reference_link'];
+			$postdata['new_ingredient_terms_id'] = $input['new_ingredient_terms_id'];
+			$postdata['duration'] = $input['duration'];
+			$postdata['target_date'] = $input['target_date'];
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
 			$postdata['created_by'] = CRUDBooster::myId();
 			$postdata['created_at'] = date('Y-m-d H:i:s');
@@ -613,6 +636,7 @@
 					'new_ingredients.updated_at',
 					'new_ingredients.tagged_at',
 					'new_ingredients.id as new_ingredients_id',
+					'new_ingredients.image_filename',
 					'item.id as item_masters_id',
 					'new_ingredients.ttp',
 					'new_ingredients.packaging_size',
@@ -713,6 +737,7 @@
 					'new_ingredients.packaging_size',
 					'new_ingredients.segmentations',
 					'new_ingredients.ttp',
+					'new_ingredients.image_filename',
 					'reasons.description as reason_description',
 					'existing.tasteless_code as existing_tasteless_code',
 					'existing.full_item_description as existing_item_description'
@@ -797,6 +822,7 @@
 					trans('crudbooster.denied_access')
 				);
 
+			$inputs = $request->all();
 			$new_ingredients_id = $request->get('new_items_id');
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
@@ -809,32 +835,55 @@
 				return CRUDBooster::redirect(CRUDBooster::mainPath(), 'This item is not pending.', 'danger');
 			}
 
+			$item_photo = $inputs['display_photo'];
+			if ($item_photo) {
+				$filename_filler = $item->nwi_code . '_' . Str::random(10);
+				$image_filename = date('Y-m-d') . "-$filename_filler." . $item_photo->getClientOriginalExtension();
+				$image = Image::make($item_photo);
+				
+				$image->resize(1024, 768, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
+	
+				$image->save(public_path('img/item-sourcing/' . $image_filename));
+				$optimizerChain = OptimizerChainFactory::create();
+				$optimizerChain->optimize(public_path('img/item-sourcing/' . $image_filename));
+			}
+
+			$data = [
+				'new_item_types_id' => $request->get('new_item_types_id'),
+				'item_description' => strtoupper($request->get('item_description')),
+				'packaging_size' => $request->get('packaging_size'),
+				'uoms_id' => $request->get('uoms_id'),
+				'ttp' => $request->get('ttp'),
+				'image_filename' => $image_filename,
+				'target_date' => $request->get('target_date'),
+				'segmentations' => $implodesegmentations,
+				'new_ingredient_reasons_id' => $request->get('new_ingredient_reasons_id'),
+				'existing_ingredient' => $request->get('existing_ingredient'),
+				'recommended_brand_one' => $request->get('recommended_brand_one'),
+				'recommended_brand_two' => $request->get('recommended_brand_two'),
+				'recommended_brand_three' => $request->get('recommended_brand_three'),
+				'initial_qty_needed' => $request->get('initial_qty_needed'),
+				'initial_qty_uoms_id' => $request->get('initial_qty_uoms_id'),
+				'forecast_qty_needed' => $request->get('forecast_qty_needed'),
+				'forecast_qty_uoms_id' => $request->get('forecast_qty_uoms_id'),
+				'budget_range' => $request->get('budget_range'),
+				'reference_link' => $request->get('reference_link'),
+				'new_ingredient_terms_id' => $request->get('new_ingredient_terms_id'),
+				'duration' => $request->get('duration'),
+				'updated_at' => $time_stamp,
+				'updated_by' => $action_by,
+			];
+
+			if ($image_filename) {
+				$data['image_filename'] = $image_filename;
+			}
+
 			DB::table('new_ingredients')
 				->where('new_ingredients.id', $new_ingredients_id)
-				->update([
-					'new_item_types_id' => $request->get('new_item_types_id'),
-					'item_description' => strtoupper($request->get('item_description')),
-					'packaging_size' => $request->get('packaging_size'),
-					'uoms_id' => $request->get('uoms_id'),
-					'ttp' => $request->get('ttp'),
-					'target_date' => $request->get('target_date'),
-					'segmentations' => $implodesegmentations,
-					'new_ingredient_reasons_id' => $request->get('new_ingredient_reasons_id'),
-					'existing_ingredient' => $request->get('existing_ingredient'),
-					'recommended_brand_one' => $request->get('recommended_brand_one'),
-					'recommended_brand_two' => $request->get('recommended_brand_two'),
-					'recommended_brand_three' => $request->get('recommended_brand_three'),
-					'initial_qty_needed' => $request->get('initial_qty_needed'),
-					'initial_qty_uoms_id' => $request->get('initial_qty_uoms_id'),
-					'forecast_qty_needed' => $request->get('forecast_qty_needed'),
-					'forecast_qty_uoms_id' => $request->get('forecast_qty_uoms_id'),
-					'budget_range' => $request->get('budget_range'),
-					'reference_link' => $request->get('reference_link'),
-					'new_ingredient_terms_id' => $request->get('new_ingredient_terms_id'),
-					'duration' => $request->get('duration'),
-					'updated_at' => $time_stamp,
-					'updated_by' => $action_by,
-				]);
+				->update($data);
 			
 
 			(new AdminMenuItemsController)->updateCostOfOtherMenu();
@@ -857,6 +906,10 @@
 			$data = [];
 
 			$data['item'] = self::getSourcingDetails($id);
+
+			if (!$data['item']->sourcing_status || $data['item']->sourcing_statua == 'CLOSED') {
+				return CRUDBooster::redirect(CRUDBooster::mainPath(), 'This item cannot be tagged.', 'danger');
+			}
 
 			$segmentations = explode(',', $data['item']->segmentations);
 			$data['segmentations'] = DB::table('segmentations')

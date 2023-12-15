@@ -14,6 +14,7 @@ class AddNewIngredientsReasonsIdToNewIngredients extends Migration
     public function up()
     {
         Schema::table('new_ingredients', function (Blueprint $table) {
+            $table->string('image_filename')->length(255)->after('ttp')->nullable();
             $table->string('segmentations')->length(255)->nullable()->after('target_date');
             $table->integer('new_ingredient_reasons_id')->length(10)->unsigned()->nullable()->after('segmentations');
             $table->string('existing_ingredient')->nullable()->after('new_ingredient_reasons_id');
@@ -39,6 +40,7 @@ class AddNewIngredientsReasonsIdToNewIngredients extends Migration
     public function down()
     {
         Schema::table('new_ingredients', function (Blueprint $table) {
+            $table->dropColumn('image_filename');
             $table->dropColumn('segmentations');
             $table->dropColumn('new_ingredient_reasons_id');
             $table->dropColumn('existing_ingredient');

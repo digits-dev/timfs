@@ -5,6 +5,16 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <style>
+    .photo-section {
+        max-width: 400px;
+        margin: 0 auto; 
+    }
+
+    .photo-section img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
     table, tbody, td, th {
         border: 1px solid black !important;
         padding-left: 50px;
@@ -70,7 +80,7 @@
         <div class="row">
             <h3 class="text-center">ITEM DETAILS</h3>
         </div>
-        <form method="POST" action="{{ $table == 'new_ingredients' ? route('submit_edit_new_ingredient') : route('submit_edit_new_packaging')}}" id="form-main" autocomplete="off">
+        <form method="POST" action="{{ $table == 'new_ingredients' ? route('submit_edit_new_ingredient') : route('submit_edit_new_packaging')}}" id="form-main" enctype="multipart/form-data" autocomplete="off">
             @csrf
             <input type="text" name="new_items_id" class="hide" value="{{ $item->new_ingredients_id ?? $item->new_packagings_id }}">
             <div class="row">
@@ -112,6 +122,10 @@
                             <tr>
                                 <th><span class="required-star">*</span>  SRP</th>
                                 <td><input type="number" value="{{ $item ? (float) $item->ttp : '' }}" step="any" name="ttp" class="form-control" required placeholder="SRP" min="1"></td>
+                            </tr>
+                            <tr>
+                                <th>Replace Display Photo</th>
+                                <td><input type="file" name="display_photo" class="form-control" accept="image/*" ></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  Target Date</th>
@@ -261,6 +275,13 @@
                         </tbody>
                     </table>
                 </div>
+                @if ($item->image_filename)
+                <hr>
+                <div class="photo-section">
+                    <h3 class="text-center">DISPLAY PHOTO</h3>
+                    <img src="{{ asset('img/item-sourcing/' . $item->image_filename) }}" alt="display photo">
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -269,12 +290,6 @@
 		<button class="btn btn-primary pull-right" id="save-btn"><i class="fa fa-save" ></i> Save</button>
     </div>
 </div>
-
-
-
-
-
-
 
 <script>
     $('#new_ingredients_segmentation').select2({
@@ -338,6 +353,18 @@
             event.preventDefault();
             showSwal();
         }
+    });
+
+    $('form').on('submit', function() {
+        Swal.fire({
+            title: 'Loading...',
+            html: 'Please wait...',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
     });
 </script>
 

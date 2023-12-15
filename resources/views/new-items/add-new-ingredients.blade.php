@@ -70,7 +70,7 @@
         <i class="fa fa-pencil"></i><strong> Add {{CRUDBooster::getCurrentModule()->name}}</strong>
     </div>
     <div class="panel-body">
-        <form method="POST" action="{{CRUDBooster::mainPath('add-save')}}" name="form-main" id="form-main" autocomplete="off">
+        <form method="POST" action="{{CRUDBooster::mainPath('add-save')}}" name="form-main" id="form-main" enctype="multipart/form-data" autocomplete="off">
             @csrf
             <div class="row">
                 <div class="col-md-6">
@@ -109,6 +109,10 @@
                             <tr>
                                 <th><span class="required-star">*</span>  SRP</th>
                                 <td><input type="number" step="any" name="ttp" class="form-control" required placeholder="SRP"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Display Photo</th>
+                                <td><input type="file" name="display_photo" class="form-control" accept="image/*"  required></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  Target Date</th>
@@ -314,6 +318,18 @@
             cache: true
         },
         width:'190px',
+    });
+
+    $('form').on('submit', function() {
+        Swal.fire({
+            title: 'Loading...',
+            html: 'Please wait...',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
     });
 
 </script>
