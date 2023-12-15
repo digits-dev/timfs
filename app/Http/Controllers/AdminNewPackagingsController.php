@@ -430,6 +430,7 @@
 				->where('new_packagings.status', 'ACTIVE')
 				->orderByRaw("
 					CASE
+						WHEN new_packagings.item_masters_id IS NULL THEN 8
 						WHEN item_approval_statuses.status_description = 'REJECTED' THEN 7
 						WHEN item_sourcing_statuses.status_description = 'CANCELLED' THEN 6
 						WHEN item_sourcing_statuses.status_description = 'CLOSED' THEN 5
@@ -437,8 +438,8 @@
 						WHEN item_approval_statuses.status_description = 'APPROVED' THEN 3
 						WHEN item_sourcing_statuses.status_description = 'OPEN' THEN 2
 						WHEN item_approval_statuses.status_description = 'PENDING' THEN 1
-						ELSE 8
-					END ASC				
+						ELSE 9
+					END ASC					
 				");
 	    }
 
