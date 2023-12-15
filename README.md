@@ -23,13 +23,11 @@
     - denim
 - [ ] Add `required` attribute to display photo [input type="file"] (image and file for new store supplies, image for new ingredients)
 - If Sticker Label is selected,
-  - [ ] Show Sticker Material
-  - [ ] Hide Packaging Use
-  - [ ] Hide Material Type
+  - [] Show Sticker Material
+  - [] Hide Material Type
 - If Takeout Container is selected,
-  - [ ] Show Packaging Use
-  - [ ] Show Material Type
-  - [ ] Hide Sticker Material
+  - [] Show Material Type
+  - [] Hide Sticker Material
 - Add option "OTHERS" and new input field
   - [x] Reason
   - [x] Sourcing Category

@@ -132,35 +132,7 @@
                                     </select>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-6"> 
-                    <table class="table-responsive table">
-                        <tbody>
-                            <tr>
-                                <th><span class="required-star">*</span> Sourcing Usage</th>
-                                <td>
-                                    <select name="packaging_uses_id" id="packaging_uses_id" class="form-control" required>
-                                        <option value="" disabled selected>None selected...</option>
-                                        @foreach ($packaging_uses as $packaging_use)
-                                        <option value="{{$packaging_use->id}}" description="{{$packaging_use->description}}">{{$packaging_use->description}}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr id="beverageTypeRow" hidden>
-                                <th><span class="required-star">*</span>  Beverage Type</th>
-                                <td>
-                                    <select name="packaging_beverage_types_id" id="packaging_beverage_types_id" class="form-control" >
-                                        <option value="" disabled selected>None selected...</option>
-                                        @foreach ($packaging_beverage_types as $packaging_beverage_type)
-                                        <option value="{{$packaging_beverage_type->id}}" >{{$packaging_beverage_type->description}}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
+                            <tr id="materialTypeRow" hidden>
                                 <th><span class="required-star">*</span> Material Type</th>
                                 <td>
                                     <select name="packaging_material_types_id" id="packaging_material_types_id" class="form-control" required>
@@ -178,6 +150,23 @@
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($packaging_paper_types as $packaging_paper_type)
                                         <option value="{{$packaging_paper_type->id}}" >{{$packaging_paper_type->description}}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6"> 
+                    <table class="table-responsive table">
+                        <tbody>
+                            <tr>
+                                <th><span class="required-star">*</span> Sourcing Usage</th>
+                                <td>
+                                    <select name="packaging_uses_id" id="packaging_uses_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($packaging_uses as $packaging_use)
+                                        <option value="{{$packaging_use->id}}" description="{{$packaging_use->description}}">{{$packaging_use->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
@@ -275,49 +264,28 @@
     });
     
     $('#packaging_types_id').change(function () {
-        const selectedValue = $(this).val();
-        const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
-        console.log(selectedOption);
-        if (selectedOption === 'STICKER LABEL') {
-            $('#stickerTypeRow').show();
-            $('#sticker_types_id').attr('required', true);
-        } else {
-            $('#stickerTypeRow').hide();
-            $('#sticker_types_id').attr('required', false);
-        }
-    });
-    $('#packaging_types_id').change(function(){
-        $('#sticker_types_id').val('');
+    const selectedOption = $(this).find(`option[value="${$(this).val()}"]`).attr('description');
+    const showStickerType = selectedOption === 'STICKER LABEL';
+    const showTakeoutContainer = selectedOption === 'TAKEOUT CONTAINER';
+    $('#stickerTypeRow').toggle(showStickerType);
+    $('#sticker_types_id').attr('required', showStickerType);
+    $('#materialTypeRow').toggle(showTakeoutContainer);
+    $('#packaging_material_types_id').attr('required', showTakeoutContainer);
     });
 
-    $('#packaging_uses_id').change(function () {
-        const selectedValue = $(this).val();
-        const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
-        console.log(selectedOption);
-        if (selectedOption === 'BEVERAGE') {
-            $('#beverageTypeRow').show();
-            $('#packaging_beverage_types_id').attr('required', true);
-        } else {
-            $('#beverageTypeRow').hide();
-            $('#packaging_beverage_types_id').attr('required', false);
-        }
+    $('#packaging_types_id').change(function(){
+        $('#sticker_types_id, #packaging_material_types_id').val('');
     });
-    $('#packaging_uses_id').change(function(){
-        $('#packaging_beverage_types_id').val('');
-    });
+
 
     $('#packaging_material_types_id').change(function () {
         const selectedValue = $(this).val();
         const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
-        console.log(selectedOption);
-        if (selectedOption === 'PAPER') {
-            $('#paperTypeRow').show();
-            $('#packaging_paper_types_id').attr('required', true);
-        } else {
-            $('#paperTypeRow').hide();
-            $('#packaging_paper_types_id').attr('required', false);
-        }
+        const showPaper = selectedOption === 'PAPER'
+        $('#paperTypeRow').toggle(showPaper)
+        $('#packaging_paper_types_id').attr('required',showPaper)
     });
+    
     $('#packaging_material_types_id').change(function(){
         $('#packaging_paper_types_id').val('');
     });

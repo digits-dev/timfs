@@ -111,17 +111,6 @@
                                     </select>
                                 </td>
                             </tr>
-                            <tr id="beverageTypeRow" {{ $item->packaging_uses  != 'BEVERAGE' ? 'hidden' : '' }}>
-                                <th><span class="required-star">*</span>  Beverage Type</th>
-                                <td>
-                                    <select name="packaging_beverage_types_id" id="packaging_beverage_types_id" class="form-control" >
-                                        <option value="" disabled selected>None selected...</option>
-                                        @foreach ($packaging_beverage_types as $packaging_beverage_type)
-                                        <option value="{{$packaging_beverage_type->id}}" {{ $item->packaging_beverage_types_id == $packaging_beverage_type->id ? 'selected' : '' }}>{{$packaging_beverage_type->description}}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                            </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Material Type</th>
                                 <td>

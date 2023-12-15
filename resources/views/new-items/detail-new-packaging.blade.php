@@ -63,12 +63,6 @@
                                     <th>Sourcing Usage</th>
                                     <td>{{$item->packaging_uses}}</td>
                                 </tr>
-                            @if($item->packaging_uses == 'BEVERAGE')
-                                <tr>
-                                    <th>Beverage Type</th>
-                                    <td>{{$item->packaging_beverage}}</td>
-                                </tr>
-                            @endif
                                 <tr>
                                     <th>Material Type</th>
                                     <td>{{$item->packaging_material}}</td>
