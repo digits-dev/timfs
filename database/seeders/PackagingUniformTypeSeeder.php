@@ -31,10 +31,10 @@ class PackagingUniformTypeSeeder extends Seeder
             ]);
         
         DB::table('packaging_uniform_types')->updateOrInsert([
-            'description' => 'CHEF"S JACKET',
+            'description' => "CHEF'S JACKET",
             ],
             [
-                'description' => 'CHEF"S JACKET',
+                'description' => "CHEF'S JACKET",
                 'status' => 'ACTIVE'
             ]);
         

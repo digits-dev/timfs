@@ -856,6 +856,12 @@
 				->get()
 				->toArray();
 
+			$data['packaging_uniform_types'] = DB::table('packaging_uniform_types')
+				->where('packaging_uniform_types.status', 'ACTIVE')
+				->orderBy('description')
+				->get()
+				->toArray();
+
 			$data['packaging_beverage_types'] = DB::table('packaging_beverage_types')
 				->where('packaging_beverage_types.status', 'ACTIVE')
 				->orderBy('description')

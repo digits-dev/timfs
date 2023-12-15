@@ -132,7 +132,18 @@
                                     </select>
                                 </td>
                             </tr>
-                            <tr id="materialTypeRow" hidden>
+                            <tr hidden>
+                                <th><span class="required-star">*</span> Uniform Type</th>
+                                <td>
+                                    <select name="packaging_uniform_types_id" id="packaging_uniform_types_id" class="form-control" >
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($packaging_uniform_types as $packaging_uniform_type)
+                                        <option value="{{$packaging_uniform_type->id}}" >{{$packaging_uniform_type->description}}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr hidden>
                                 <th><span class="required-star">*</span> Material Type</th>
                                 <td>
                                     <select name="packaging_material_types_id" id="packaging_material_types_id" class="form-control" required>
@@ -143,7 +154,7 @@
                                     </select>
                                 </td>
                             </tr>
-                            <tr id="paperTypeRow" hidden>
+                            <tr hidden>
                                 <th><span class="required-star">*</span> Paper Type</th>
                                 <td>
                                     <select name="packaging_paper_types_id" id="packaging_paper_types_id" class="form-control" >
@@ -259,36 +270,143 @@
 </div>
 
 <script>
+
+    function hideTR(rows = []) {
+        rows.forEach(row => {
+            $(row).find('select').val('');
+            $(row).find('input').text('');
+            $(row).find('input, select').removeAttr('required');
+            $(row).hide();
+        });
+    }
+
+    function showTR(rows = []) {
+        rows.forEach(row => {
+            $(row).show();
+            $(row).find('input, select').attr('required', true);
+        });
+    }
+
+    function showOptions(select, optionValues) {
+        const allSelect = $(select).find('option').show().get();
+        allSelect.forEach(select => {
+            const optionText = $(select).text();
+            if (optionValues.includes(optionText)) {
+                $(select).hide();
+            }
+        });
+    }
+
+    function filterOptions(select, availableOptions) {
+        const options = $(select).find('option').get();
+
+        options.forEach(option => {
+            const optionText = $(option).text();
+            if (availableOptions.includes(optionText)) {
+                $(option).show();
+            } else {
+                $(option).hide();
+            }
+        })
+    }
+
+    $('#packaging_types_id').on('change', function() {
+        const value = $(this).find('option:selected').text();
+        const toHide = $(`
+            #sticker_types_id, 
+            #packaging_material_types_id, 
+            #packaging_paper_types_id, 
+            #packaging_uniform_types_id        
+        `).parents('tr').get();
+        let toShow = [];
+        if (value === 'STICKER LABEL') {
+            toShow = $('#sticker_types_id').parents('tr').get();
+        } else if (value === 'TAKEOUT CONTAINER') {
+            toShow = $('#packaging_material_types_id').parents('tr').get();
+            const availableOptions = ['PLASTIC', 'PAPER', 'OTHERS'];
+            filterOptions($('#packaging_material_types_id'), availableOptions);
+        } else if (value === 'UNIFORM') {
+            toShow = $('#packaging_uniform_types_id').parents('tr').get();
+        }
+        hideTR(toHide);
+        showTR(toShow);
+    });
+
+    $('#packaging_material_types_id').on('change', function() {
+        const value = $(this).find('option:selected').text();
+        const toHide = $('#sticker_types_id, #packaging_paper_types_id').parents('tr').get();
+        hideTR(toHide);
+        if (value === 'PAPER') {
+            showTR($('#packaging_paper_types_id').parents('tr').get());
+        }
+    });
+
+    $('#packaging_uniform_types_id').on('change', function() {
+        const withMaterials = [
+            'APRON', 
+            'CAP', 
+            "CHEF'S JACKET", 
+            'SHORT SLEEVES SHIRT',
+            'LONG SLEEVES SHIRT',
+            'SHORT SLEEVES POLO SHIRT',
+            'LONG SLEEVES POLO SHIRT'
+        ];
+        const value = $(this).find('option:selected').text();
+        const toHide = $(`
+            #sticker_types_id, 
+            #packaging_material_types_id, 
+            #packaging_paper_types_id        
+        `).parents('tr').get();
+        let toShow = [];
+
+        if (withMaterials.includes(value)) {
+            toShow = $('#packaging_material_types_id').parents('tr').get();
+            const availableOptions = [
+                'COTTON',
+                'LINEN',
+                'DENIM',
+                'OTHERS',
+            ];
+            filterOptions($('#packaging_material_types_id'), availableOptions);
+        } else {
+            toHide.push($('#packaging_material_types_id').parents('tr').get());
+        }
+        hideTR(toHide);
+        showTR(toShow);
+    })
+
+
+
     $('#new_ingredients_segmentation').select2({
         width:'100%',
     });
     
-    $('#packaging_types_id').change(function () {
-    const selectedOption = $(this).find(`option[value="${$(this).val()}"]`).attr('description');
-    const showStickerType = selectedOption === 'STICKER LABEL';
-    const showTakeoutContainer = selectedOption === 'TAKEOUT CONTAINER';
-    $('#stickerTypeRow').toggle(showStickerType);
-    $('#sticker_types_id').attr('required', showStickerType);
-    $('#materialTypeRow').toggle(showTakeoutContainer);
-    $('#packaging_material_types_id').attr('required', showTakeoutContainer);
-    });
+    // $('#packaging_types_id').change(function () {
+    // const selectedOption = $(this).find(`option[value="${$(this).val()}"]`).attr('description');
+    // const showStickerType = selectedOption === 'STICKER LABEL';
+    // const showTakeoutContainer = selectedOption === 'TAKEOUT CONTAINER';
+    // $('#stickerTypeRow').toggle(showStickerType);
+    // $('#sticker_types_id').attr('required', showStickerType);
+    // $('#materialTypeRow').toggle(showTakeoutContainer);
+    // $('#packaging_material_types_id').attr('required', showTakeoutContainer);
+    // });
 
-    $('#packaging_types_id').change(function(){
-        $('#sticker_types_id, #packaging_material_types_id').val('');
-    });
+    // $('#packaging_types_id').change(function(){
+    //     $('#sticker_types_id, #packaging_material_types_id').val('');
+    // });
 
 
-    $('#packaging_material_types_id').change(function () {
-        const selectedValue = $(this).val();
-        const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
-        const showPaper = selectedOption === 'PAPER'
-        $('#paperTypeRow').toggle(showPaper)
-        $('#packaging_paper_types_id').attr('required',showPaper)
-    });
+    // $('#packaging_material_types_id').change(function () {
+    //     const selectedValue = $(this).val();
+    //     const selectedOption = $(this).find(`option[value="${selectedValue}"]`).attr('description');
+    //     const showPaper = selectedOption === 'PAPER'
+    //     $('#paperTypeRow').toggle(showPaper)
+    //     $('#packaging_paper_types_id').attr('required',showPaper)
+    // });
     
-    $('#packaging_material_types_id').change(function(){
-        $('#packaging_paper_types_id').val('');
-    });
+    // $('#packaging_material_types_id').change(function(){
+    //     $('#packaging_paper_types_id').val('');
+    // });
 
     
     $('#save-btn').click(function() {
