@@ -6,7 +6,7 @@
 - [x] Rename "REPLACEMENT" to "REPLACEMENT OF INGREDIENT"
 - [x] Add `required` attribute for brands 1 and 2
 - [x] Prevent bulk approval on item master if one of the item effective date has expired.
-- [ ] Auto update segmentations after tagging of item sourcing
+- [ ] ~~Auto update segmentations after tagging of item sourcing~~
 - [x] Change input type from `number` to `text` for budget range
 - [x] Update db data type for budget range to text
 - [x] Rename Module of "New Packaging" to "New Store Supplies"
@@ -23,11 +23,11 @@
     - denim
 - [ ] Add `required` attribute to display photo [input type="file"] (image and file for new store supplies, image for new ingredients)
 - If Sticker Label is selected,
-  - [] Show Sticker Material
-  - [] Hide Material Type
+  - [x] Show Sticker Material
+  - [x] Hide Material Type
 - If Takeout Container is selected,
-  - [] Show Material Type
-  - [] Hide Sticker Material
+  - [x] Show Material Type
+  - [x] Hide Sticker Material
 - Add option "OTHERS" and new input field
   - [x] Reason
   - [x] Sourcing Category
@@ -41,8 +41,8 @@
   - merchandise
   - other => new field
 - If uniform is selected,
-  - [ ] Show Uniform Type
-  - [ ] Add options for uniform type
+  - [x] Show Uniform Type
+  - [x] Add options for uniform type
     - apron
     - cap
     - chef's jacket
@@ -54,15 +54,17 @@
     - name plate
     - footwear
     - others => new field
-  - [ ] If apron, cap, chef's jacket or shirt is selected, material types should be the ff:
+  - [x] If apron, cap, chef's jacket or shirt is selected, material types should be the ff:
     - cotton
     - linen
     - denim
     - others
-- [ ] If "Others" is selected in Sourcing Category, hide the ff:
+- [x] If "Others" is selected in Sourcing Category, hide the ff:
   - Packaging Use
   - Beverage Type
   - Material Type
+- [ ] Add all these select logic to edit page
+- [ ] Update the detail, approve, and tag page to show all information
 - Item Masters
   - [x] add file reference link
   - [x] remove upload of files
