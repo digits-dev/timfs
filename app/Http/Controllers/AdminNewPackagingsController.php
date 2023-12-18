@@ -472,6 +472,7 @@
 				->first();
 
 			$postdata['item_approval_statuses_id'] = $item_approval_statuses_id;
+			$postdata['others'] = Input::get('others');
 			$postdata['nwp_code'] = $nwp_code;
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
 			$postdata['comment'] = Input::get('comment');
@@ -834,54 +835,63 @@
 
 			$data['new_item_types'] = DB::table('new_item_types')
 				->where('new_item_types.status', 'ACTIVE')
+				->orderByRaw('item_type_description = "OTHERS"')
 				->orderBy('item_type_description')
 				->get()
 				->toArray();
 
 			$data['packaging_types'] = DB::table('packaging_types')
 				->where('packaging_types.status', 'ACTIVE')
+				->orderByRaw('description = "OTHERS"')
 				->orderBy('description')
 				->get()
 				->toArray();
 
 			$data['packaging_stickers'] = DB::table('packaging_stickers')
 				->where('packaging_stickers.status', 'ACTIVE')
+				->orderByRaw('description = "OTHERS"')
 				->orderBy('description')
 				->get()
 				->toArray();
 
 			$data['packaging_uses'] = DB::table('packaging_uses')
 				->where('packaging_uses.status', 'ACTIVE')
+				->orderByRaw('description = "OTHERS"')
 				->orderBy('description')
 				->get()
 				->toArray();
 
 			$data['packaging_uniform_types'] = DB::table('packaging_uniform_types')
 				->where('packaging_uniform_types.status', 'ACTIVE')
+				->orderByRaw('description = "OTHERS"')
 				->orderBy('description')
 				->get()
 				->toArray();
 
 			$data['packaging_beverage_types'] = DB::table('packaging_beverage_types')
 				->where('packaging_beverage_types.status', 'ACTIVE')
+				->orderByRaw('description = "OTHERS"')
 				->orderBy('description')
 				->get()
 				->toArray();
 
 			$data['packaging_material_types'] = DB::table('packaging_material_types')
 				->where('packaging_material_types.status', 'ACTIVE')
+				->orderByRaw('description = "OTHERS"')
 				->orderBy('description')
 				->get()
 				->toArray();
 
 			$data['packaging_paper_types'] = DB::table('packaging_paper_types')
 				->where('packaging_paper_types.status', 'ACTIVE')
+				->orderByRaw('description = "OTHERS"')
 				->orderBy('description')
 				->get()
 				->toArray();
 
 			$data['packaging_designs'] = DB::table('packaging_designs')
 				->where('packaging_designs.status', 'ACTIVE')
+				->orderByRaw('description = "OTHERS"')
 				->orderBy('description')
 				->get()
 				->toArray();

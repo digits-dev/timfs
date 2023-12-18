@@ -68,6 +68,7 @@
     <div class="panel-body">
         <form method="POST" action="{{CRUDBooster::mainPath('add-save')}}" name="form-main" id="form-main" autocomplete="off">
             @csrf
+            <input type="text" name="others" id="others" hidden>
             <div class="row">
                 <div class="col-md-6">
                     <table class="table-responsive table">
@@ -203,7 +204,7 @@
                             </tr> --}}
                             <tr>
                                 <th><span class="required-star">*</span>  Size</th>
-                                <td><input type="number" step="any" name="size" class="form-control" required placeholder="SRP" min="0"></td>
+                                <td><input type="number" step="any" name="size" class="form-control" required placeholder="Size" min="0"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Budget Range</th>
@@ -310,6 +311,17 @@
         })
     }
 
+    function jsonifyOthers() {
+        const selects = $('.other-input').get();
+        const obj = {};
+        selects.forEach(select => {
+            const id = $(select).attr('for');
+            const value = $(select).val();
+            obj[id] = value;
+        });
+        $('#others').val(JSON.stringify(obj));
+    }
+
     $('#packaging_types_id').on('change', function() {
         const value = $(this).find('option:selected').text();
         const toHide = $(`
@@ -376,10 +388,28 @@
         showTR(toShow);
     })
 
-
-
     $('#new_ingredients_segmentation').select2({
         width:'100%',
+    });
+
+    $('select').on('change', function() {
+        const value = $(this).find('option:selected').text();
+        const td = $(this).parents('td');
+        const name = $(this).attr('name');
+        if (value === 'OTHER' || value === 'OTHERS') {
+            const input = $('<input>')
+                .addClass('form-control')
+                .addClass('other-input')
+                .attr('data-select', 'others')
+                .attr('placeholder', 'Please specify...')
+                .attr('for', name)
+                .attr('oninput', "this.value = this.value.toUpperCase()")
+                .attr('required', true)
+                .css('margin-top', '3px');
+            td.append(input);
+        } else {
+            td.find('input[data-select="others"]').remove();
+        }
     });
     
     // $('#packaging_types_id').change(function () {
@@ -411,6 +441,7 @@
 
     
     $('#save-btn').click(function() {
+        jsonifyOthers();
         Swal.fire({
             title: 'Do you want to save this item?',
             icon: 'warning',
@@ -421,7 +452,6 @@
             returnFocus: false,
         }).then((result) => {
             if (result.isConfirmed) {
-                
                 $('#submit-btn').click();
             }
         });
