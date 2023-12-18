@@ -349,7 +349,8 @@
             'SHORT SLEEVES SHIRT',
             'LONG SLEEVES SHIRT',
             'SHORT SLEEVES POLO SHIRT',
-            'LONG SLEEVES POLO SHIRT'
+            'LONG SLEEVES POLO SHIRT',
+            '3/4 SLEEVE SHIRT'
         ];
         const value = $(this).find('option:selected').text();
         const toHide = $(`
