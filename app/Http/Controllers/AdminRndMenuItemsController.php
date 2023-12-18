@@ -1530,9 +1530,11 @@
 		public function getApproveByAccounting($id) {
 			$data = [];
 
-			$data['item'] = DB::table('rnd_menu_costing')
+			$item = DB::table('rnd_menu_costing')
 				->where('rnd_menu_items_id', $id)
 				->first();
+
+			$data['item'] = $item;
 
 			$no_codes_data = self::getItemWithoutCodes($id);
 
@@ -1545,6 +1547,12 @@
 			$data['workflow'] = self::getWorkFlowDetails($id);
 
 			$data['menu_items_data'] = self::getMenuItemDetails($data['item']->menu_items_id);
+
+			$data['ingredients_data']['ingredients'] = self::getIngredients($id);
+			$data['ingredients_data']['item'] = $item;
+
+			$data['packagings_data']['packagings'] = self::getPackagings($id);
+			$data['ingredients_data']['item'] = $item;
 
 			$data['page_title'] = 'Approve RND Menu';
 

@@ -257,7 +257,7 @@
         </form>
         <section class="menu-and-comment">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <hr>
                     <h3 class="text-center">MENU ITEM DETAILS</h3>
                     <table class="table table-striped">
@@ -317,6 +317,16 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="col-md-8">
+                    <hr>
+                    <h3 class="text-center">INGREDIENTS</h3>
+                    @include('rnd-menu/components/ingredients', $ingredients_data)
+                    <hr>
+                    <h3 class="text-center">PACKAGINGS</h3>
+                    @include('rnd-menu/components/packagings', $packagings_data)
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <hr>
                     <h3 class="text-center">COMMENTS</h3>
@@ -324,8 +334,6 @@
                         @include('rnd-menu/chat-app', $comments_data)
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     <section class="workflow-details">
                         <hr>
