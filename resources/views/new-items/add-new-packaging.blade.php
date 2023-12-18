@@ -276,6 +276,7 @@
         rows.forEach(row => {
             $(row).find('select').val('');
             $(row).find('input').text('');
+            $(row).find('.other-input').remove();
             $(row).find('input, select').removeAttr('required');
             $(row).hide();
         });
