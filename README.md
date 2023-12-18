@@ -28,12 +28,13 @@
 - If Takeout Container is selected,
   - [x] Show Material Type
   - [x] Hide Sticker Material
-- Add option "OTHERS" and new input field
+- Add option "OTHERS"
   - [x] Reason
   - [x] Sourcing Category
   - [x] Sticker Material
   - [x] Packaging Use / Sourcing Usage
   - [x] Material Type
+- [ ] New input field For 'Others'
 - [x] Add 'UNIFORM' to Sourcing Category
 - [ ] If Sticker label is selected, show the ff. on sourcing usage:
   - takeout packaging 
