@@ -70,6 +70,10 @@
   - [x] add file reference link
   - [x] remove upload of files
   - [x] hide accumulated dep, qty on hand, tax agency and mpn
+- Menu Master File
+  - [x] Show costing and ingredients to accounting manager
+- RND 
+  - [ ] Show ingredients on approval phase
 
 
 ## ✅ TODOS:
