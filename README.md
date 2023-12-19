@@ -36,7 +36,7 @@
   - [x] Material Type
 - [ ] New input field For 'Others'
 - [x] Add 'UNIFORM' to Sourcing Category
-- [ ] If Sticker label is selected, show the ff. on sourcing usage:
+- [x] If Sticker label is selected, show the ff. on sourcing usage:
   - takeout packaging 
   - marketing collaterals
   - merchandise
@@ -73,7 +73,7 @@
 - Menu Master File
   - [x] Show costing and ingredients to accounting manager
 - RND 
-  - [ ] Show ingredients on approval phase
+  - [x] Show ingredients on approval phase
 
 
 ## ✅ TODOS:
