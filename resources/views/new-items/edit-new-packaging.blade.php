@@ -78,9 +78,10 @@
         <div class="row">
             <h3 class="text-center">ITEM DETAILS</h3>
         </div>
-        <form method="POST" action="{{ $table == 'new_ingredients' ? route('submit_edit_new_ingredient') : route('submit_edit_new_packaging')}}" id="form-main" autocomplete="off">
+        <form method="POST" action="{{ $table == 'new_ingredients' ? route('submit_edit_new_ingredient') : route('submit_edit_new_packaging')}}" id="form-main" enctype="multipart/form-data" autocomplete="off">
             @csrf
             <input type="text" name="new_items_id" class="hide" value="{{ $item->new_ingredients_id ?? $item->new_packagings_id }}">
+            <input type="text" name="others" id="others" hidden>
             <div class="row">
                 <div class="col-md-6">
                     <table class="table-responsive table">
@@ -350,7 +351,10 @@
             });
         }
 
-        $('#save-btn').click(showSwal);
+        $('#save-btn').click(function() {
+            jsonifyOthers();
+            showSwal();
+        });
 
         $('input').on('keypress', function(event) {
             if (event.keyCode === 13) {
@@ -549,16 +553,16 @@
         reloadOptions();
 
         $('form').on('submit', function() {
-        Swal.fire({
-            title: 'Loading...',
-            html: 'Please wait...',
-            allowEscapeKey: false,
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading()
-            },
+            Swal.fire({
+                title: 'Loading...',
+                html: 'Please wait...',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading()
+                },
+            });
         });
-    });
 
     });    
 </script>

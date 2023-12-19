@@ -816,6 +816,8 @@
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
 				);
+
+			$input = $request->all();
 			$new_packagings_id = $request->get('new_items_id');
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
@@ -823,34 +825,75 @@
 			if ($item->approval_status != 'PENDING') {
 				return CRUDBooster::redirect(CRUDBooster::mainPath(), 'This item is not pending.', 'danger');
 			}
+
+			$nwp_code = $item->nwp_code;
+
+			$item_photo = $input['display_photo'];
+			$file = $input['file'];
+
+			if ($item_photo) {
+				$filename_filler = $nwp_code . '_' . Str::random(10);
+				$image_filename = date('Y-m-d') . "-$filename_filler." . $item_photo->getClientOriginalExtension();
+				$image = Image::make($item_photo);
+				
+				$image->resize(1024, 768, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
+	
+				$image->save(public_path('img/item-sourcing/' . $image_filename));
+				$optimizerChain = OptimizerChainFactory::create();
+				$optimizerChain->optimize(public_path('img/item-sourcing/' . $image_filename));
+			}
+
+			if ($file) {
+				$filename = $nwp_code
+					. '_' 
+					. Str::random(10) 
+					. '.'
+					. $file->getClientOriginalExtension();
+				$file->move(public_path('item-sourcing-files/'), $filename);
+				$filenames['filename_' . $i] = $filename;
+			}
+
+			$data = [
+				'others' => $request->get('others'),
+				'new_item_types_id' => $request->get('new_item_types_id'),
+				'item_description' => strtoupper($request->get('item_description')),
+				'packaging_size' => $request->get('packaging_size'),
+				'uoms_id' => $request->get('uoms_id'),
+				'ttp' => $request->get('ttp'),
+				'target_date' => $request->get('target_date'),
+				'packaging_types_id' => $request->get('packaging_types_id'),
+				'sticker_types_id' => $request->get('sticker_types_id'),
+				'packaging_uses_id' => $request->get('packaging_uses_id'),
+				'packaging_beverage_types_id' => $request->get('packaging_beverage_types_id'),
+				'packaging_material_types_id' => $request->get('packaging_material_types_id'),
+				'packaging_paper_types_id' => $request->get('packaging_paper_types_id'),
+				'packaging_design_types_id' => $request->get('packaging_design_types_id'),
+				'packaging_uniform_types_id' => $request['packaging_uniform_types_id'],
+				'size' => $request->get('size'),
+				'ttp' => $request->get('ttp'),
+				'budget_range' => $request->get('budget_range'),
+				'reference_link' => $request->get('reference_link'),
+				'initial_qty_needed' => $request->get('initial_qty_needed'),
+				'initial_qty_uoms_id' => $request->get('initial_qty_uoms_id'),
+				'forecast_qty_needed' => $request->get('forecast_qty_needed'),
+				'forecast_qty_uoms_id' => $request->get('forecast_qty_uoms_id'),
+				'updated_at' => $time_stamp,
+				'updated_by' => $action_by,
+			];
+			if ($image_filename) {
+				$data['image_filename'] = $image_filename;
+			}
+			if ($filename) {
+				$data['filename'] = $filename;
+
+			}
+
 			DB::table('new_packagings')
 				->where('new_packagings.id', $new_packagings_id)
-				->update([
-					'new_item_types_id' => $request->get('new_item_types_id'),
-					'item_description' => strtoupper($request->get('item_description')),
-					'packaging_size' => $request->get('packaging_size'),
-					'uoms_id' => $request->get('uoms_id'),
-					'ttp' => $request->get('ttp'),
-					'target_date' => $request->get('target_date'),
-					'packaging_types_id' => $request->get('packaging_types_id'),
-					'sticker_types_id' => $request->get('sticker_types_id'),
-					'packaging_uses_id' => $request->get('packaging_uses_id'),
-					'packaging_beverage_types_id' => $request->get('packaging_beverage_types_id'),
-					'packaging_material_types_id' => $request->get('packaging_material_types_id'),
-					'packaging_paper_types_id' => $request->get('packaging_paper_types_id'),
-					'packaging_design_types_id' => $request->get('packaging_design_types_id'),
-					'packaging_uniform_types_id' => $request['packaging_uniform_types_id'],
-					'size' => $request->get('size'),
-					'ttp' => $request->get('ttp'),
-					'budget_range' => $request->get('budget_range'),
-					'reference_link' => $request->get('reference_link'),
-					'initial_qty_needed' => $request->get('initial_qty_needed'),
-					'initial_qty_uoms_id' => $request->get('initial_qty_uoms_id'),
-					'forecast_qty_needed' => $request->get('forecast_qty_needed'),
-					'forecast_qty_uoms_id' => $request->get('forecast_qty_uoms_id'),
-					'updated_at' => $time_stamp,
-					'updated_by' => $action_by,
-				]);
+				->update($data);
 			
 			return redirect(CRUDBooster::mainpath())
 				->with([
