@@ -519,6 +519,7 @@
 			$postdata['packaging_material_types_id'] = $input['packaging_material_types_id'];
 			$postdata['packaging_paper_types_id'] = $input['packaging_paper_types_id'];
 			$postdata['packaging_design_types_id'] = $input['packaging_design_types_id'];
+			$postdata['packaging_uniform_types_id'] = $input['packaging_uniform_types_id'];
 			$postdata['size'] = $input['size'];
 			$postdata['budget_range'] = $input['budget_range'];
 			$postdata['reference_link'] = $input['reference_link'];
@@ -725,7 +726,7 @@
 
 			$data = [];
 
-			$data['item'] = DB::table('new_packagings')
+			$item = DB::table('new_packagings')
 				->where('new_packagings.id', $id)
 				->select(
 					'*',
@@ -757,11 +758,16 @@
 				->leftJoin('uoms as forecast_uoms', 'forecast_uoms.id', '=', 'new_packagings.forecast_qty_uoms_id')
 				->get()
 				->first();
+
+			$data['item'] = $item;
+
 			$data['rnd_count'] = DB::table('rnd_menu_packagings_details')
 					->where('status', 'ACTIVE')
 					->where('new_packagings_id', $id)
 					->get()
 					->count();
+
+			$data['others'] = json_decode($item->others);
 			
 			$data['table'] = 'new_packagings';
 
@@ -826,6 +832,7 @@
 					'packaging_material_types_id' => $request->get('packaging_material_types_id'),
 					'packaging_paper_types_id' => $request->get('packaging_paper_types_id'),
 					'packaging_design_types_id' => $request->get('packaging_design_types_id'),
+					'packaging_uniform_types_id' => $request['packaging_uniform_types_id'],
 					'size' => $request->get('size'),
 					'ttp' => $request->get('ttp'),
 					'budget_range' => $request->get('budget_range'),
