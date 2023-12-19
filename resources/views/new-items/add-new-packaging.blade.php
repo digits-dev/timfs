@@ -77,17 +77,6 @@
                                 <th><span class="required-star">*</span> Item Description</th>
                                 <td><input type="text" name="item_description" class="form-control" required placeholder="Item Description" oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
-                            {{-- <tr>
-                                <th><span class="required-star">*</span> Item Type</th>
-                                <td>
-                                    <select name="new_item_types_id" id="new_item_types_id" class="form-control" required>
-                                        <option value="" disabled selected>None selected...</option>
-                                        @foreach ($new_item_types as $new_item_type)
-                                        <option value="{{$new_item_type->id}}">{{$new_item_type->item_type_description}}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                            </tr> --}}
                             <tr>
                                 <th><span class="required-star">*</span>  Packaging Size</th>
                                 <td><input type="number" step="any" name="packaging_size" class="form-control" required placeholder="Packaging Size"></td>
@@ -384,10 +373,6 @@
         }
         hideTR(toHide);
         showTR(toShow);
-    })
-
-    $('#new_ingredients_segmentation').select2({
-        width:'100%',
     });
 
     $('select').on('change', function() {
