@@ -100,7 +100,7 @@
 				}
 				return $value;
 			}];
-			$this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
+			// $this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
 			$this->col[] = ["label"=>"NWP Code","name"=>"nwp_code"];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
