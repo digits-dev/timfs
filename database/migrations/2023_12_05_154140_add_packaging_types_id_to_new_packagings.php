@@ -14,6 +14,8 @@ class AddPackagingTypesIdToNewPackagings extends Migration
     public function up()
     {
         Schema::table('new_packagings', function (Blueprint $table) {
+            $table->string('image_filename')->length(255)->nullable()->after('ttp');
+            $table->string('filename')->length(255)->nullable()->after('ttp');
             $table->integer('forecast_qty_uoms_id')->length(10)->unsigned()->nullable()->after('target_date');
             $table->decimal('forecast_qty_needed', 18, 2)->unsigned()->nullable()->after('target_date');
             $table->integer('initial_qty_uoms_id')->length(10)->unsigned()->nullable()->after('target_date');
@@ -42,6 +44,8 @@ class AddPackagingTypesIdToNewPackagings extends Migration
     public function down()
     {
         Schema::table('new_packagings', function (Blueprint $table) {
+            $table->dropColumn('image_filename');
+            $table->dropColumn('filename');
             $table->dropColumn('packaging_types_id');
             $table->dropColumn('sticker_types_id');
             $table->dropColumn('packaging_uses_id');
