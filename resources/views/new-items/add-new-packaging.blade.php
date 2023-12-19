@@ -66,7 +66,7 @@
         <i class="fa fa-pencil"></i><strong> Add {{CRUDBooster::getCurrentModule()->name}}</strong>
     </div>
     <div class="panel-body">
-        <form method="POST" action="{{CRUDBooster::mainPath('add-save')}}" name="form-main" id="form-main" autocomplete="off">
+        <form method="POST" action="{{CRUDBooster::mainPath('add-save')}}" name="form-main" id="form-main" enctype="multipart/form-data" autocomplete="off">
             @csrf
             <input type="text" name="others" id="others" hidden>
             <div class="row">
@@ -100,6 +100,24 @@
                                 <th><span class="required-star">*</span> Target Date</th>
                                 <td><input type="date" step="any" name="target_date" class="form-control" required></td>
                             </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Display Photo</th>
+                                <td><input type="file" name="display_photo" class="form-control" accept="image/*"  required></td>
+                            </tr>
+                            <tr>
+                                <th>File</th>
+                                <td><input type="file" name="file" class="form-control" ></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Reference Links</th>
+                                <td><input type="text" name="reference_link" class="form-control" required placeholder="Reference Links" ></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6"> 
+                    <table class="table-responsive table">
+                        <tbody>
                             <tr>
                                 <th><span class="required-star">*</span> Sourcing Category</th>
                                 <td>
@@ -155,12 +173,6 @@
                                     </select>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-6"> 
-                    <table class="table-responsive table">
-                        <tbody>
                             <tr>
                                 <th><span class="required-star">*</span> Sourcing Usage</th>
                                 <td>
@@ -190,10 +202,6 @@
                             <tr>
                                 <th><span class="required-star">*</span> Budget Range</th>
                                 <td><input type="text" name="budget_range" class="form-control" required placeholder="Budget Range"></td>
-                            </tr>
-                            <tr>
-                                <th><span class="required-star">*</span> Reference Links</th>
-                                <td><input type="text" name="reference_link" class="form-control" required placeholder="Reference Links" ></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Initial Qty Needed</th>

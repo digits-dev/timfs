@@ -5,6 +5,9 @@
 	use Illuminate\Support\Facades\Request as Input;
 	use DB;
 	use CRUDBooster;
+	use Intervention\Image\Facades\Image;
+	use Spatie\ImageOptimizer\OptimizerChainFactory;
+	use Illuminate\Support\Str;
 
 	class AdminNewPackagingsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -462,9 +465,39 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
+
+			$input = Input::all();
 			$max_nwp_code = DB::table('new_packagings')->max('nwp_code');
 			$nwp_code_int = (int) explode('-', $max_nwp_code)[1] + 1;
 			$nwp_code = 'NWP-' . str_pad($nwp_code_int, 5, '0', STR_PAD_LEFT);
+			$item_photo = $input['display_photo'];
+			$file = $input['file'];
+
+			if ($item_photo) {
+				$filename_filler = $nwp_code . '_' . Str::random(10);
+				$image_filename = date('Y-m-d') . "-$filename_filler." . $item_photo->getClientOriginalExtension();
+				$image = Image::make($item_photo);
+				
+				$image->resize(1024, 768, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
+	
+				$image->save(public_path('img/item-sourcing/' . $image_filename));
+				$optimizerChain = OptimizerChainFactory::create();
+				$optimizerChain->optimize(public_path('img/item-sourcing/' . $image_filename));
+			}
+
+			if ($file) {
+				$filename = $nwp_code
+						. '_' 
+						. Str::random(10) 
+						. '.'
+						. $file->getClientOriginalExtension();
+				$file->move(public_path('item-sourcing-files/'), $filename);
+				$filenames['filename_' . $i] = $filename;
+			}
+
 			$item_approval_statuses_id = DB::table('item_approval_statuses')
 				->where('status', 'ACTIVE')
 				->where('status_description', 'PENDING')
@@ -472,25 +505,27 @@
 				->first();
 
 			$postdata['item_approval_statuses_id'] = $item_approval_statuses_id;
-			$postdata['others'] = Input::get('others');
+			$postdata['others'] = $input['others'];
+			$postdata['image_filename'] = $image_filename;
+			$postdata['filename'] = $image_filename;
 			$postdata['nwp_code'] = $nwp_code;
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
-			$postdata['comment'] = Input::get('comment');
-			$postdata['target_date'] = Input::get('target_date');
-			$postdata['packaging_types_id'] = Input::get('packaging_types_id');
-			$postdata['sticker_types_id'] = Input::get('sticker_types_id');
-			$postdata['packaging_uses_id'] = Input::get('packaging_uses_id');
-			$postdata['packaging_beverage_types_id'] = Input::get('packaging_beverage_types_id');
-			$postdata['packaging_material_types_id'] = Input::get('packaging_material_types_id');
-			$postdata['packaging_paper_types_id'] = Input::get('packaging_paper_types_id');
-			$postdata['packaging_design_types_id'] = Input::get('packaging_design_types_id');
-			$postdata['size'] = Input::get('size');
-			$postdata['budget_range'] = Input::get('budget_range');
-			$postdata['reference_link'] = Input::get('reference_link');
-			$postdata['initial_qty_needed'] = Input::get('initial_qty_needed');
-			$postdata['initial_qty_uoms_id'] = Input::get('initial_qty_uoms_id');
-			$postdata['forecast_qty_needed'] = Input::get('forecast_qty_needed');
-			$postdata['forecast_qty_uoms_id'] = Input::get('forecast_qty_uoms_id');
+			$postdata['comment'] = $input['comment'];
+			$postdata['target_date'] = $input['target_date'];
+			$postdata['packaging_types_id'] = $input['packaging_types_id'];
+			$postdata['sticker_types_id'] = $input['sticker_types_id'];
+			$postdata['packaging_uses_id'] = $input['packaging_uses_id'];
+			$postdata['packaging_beverage_types_id'] = $input['packaging_beverage_types_id'];
+			$postdata['packaging_material_types_id'] = $input['packaging_material_types_id'];
+			$postdata['packaging_paper_types_id'] = $input['packaging_paper_types_id'];
+			$postdata['packaging_design_types_id'] = $input['packaging_design_types_id'];
+			$postdata['size'] = $input['size'];
+			$postdata['budget_range'] = $input['budget_range'];
+			$postdata['reference_link'] = $input['reference_link'];
+			$postdata['initial_qty_needed'] = $input['initial_qty_needed'];
+			$postdata['initial_qty_uoms_id'] = $input['initial_qty_uoms_id'];
+			$postdata['forecast_qty_needed'] = $input['forecast_qty_needed'];
+			$postdata['forecast_qty_uoms_id'] = $input['forecast_qty_uoms_id'];
 			$postdata['created_by'] = CRUDBooster::myId();
 			$postdata['created_at'] = date('Y-m-d H:i:s');
 	    }
