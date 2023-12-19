@@ -1,4 +1,20 @@
 @extends('crudbooster::admin_template')
+@push('head')
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    .photo-section {
+        max-width: 400px;
+        margin: 0 auto; 
+    }
+
+    .photo-section img {
+        max-width: 100%;
+        max-height: 350px;
+        display: block;
+        margin: 0 auto;
+    }
+</style>
+@endpush
 @section('content')
 <p class="noprint">
     <a title='Return' href="{{ CRUDBooster::mainPath() }}">
@@ -192,6 +208,31 @@
                         </tbody>
                     </table>
                 </div>
+                <hr>
+                <h3 class="text-center">ITEM USAGE</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Item Code</th>
+                                <th class="text-center">Item Description</th>
+                                <th class="text-center">User</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!$item_usages)
+                            <tr><td class="text-center" style="font-style: italic; color: grey" colspan="3">This item is currently not in use...</td></tr>
+                            @endif
+                            @foreach ($item_usages as $item_usage)
+                            <tr>
+                                <td class="text-center">{{ $item_usage->item_code }}</td>
+                                <td class="text-center">{{ $item_usage->item_description }}</td>
+                                <td class="text-center">{{ $item_usage->name }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="col-md-6">
                 <hr>
@@ -199,33 +240,13 @@
                 <div class="chat-app">
                     @include('new-items/chat-app', $comments_data)
                 </div>
-                <div class="col-md-12">
-                    <hr>
-                    <h3 class="text-center">ITEM USAGE</h3>
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">Item Code</th>
-                                    <th class="text-center">Item Description</th>
-                                    <th class="text-center">User</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (!$item_usages)
-                                <tr><td class="text-center" style="font-style: italic; color: grey" colspan="3">This item is currently not in use...</td></tr>
-                                @endif
-                                @foreach ($item_usages as $item_usage)
-                                <tr>
-                                    <td class="text-center">{{ $item_usage->item_code }}</td>
-                                    <td class="text-center">{{ $item_usage->item_description }}</td>
-                                    <td class="text-center">{{ $item_usage->name }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                @if ($item->image_filename)
+                <hr>
+                <div class="photo-section">
+                    <h3 class="text-center">DISPLAY PHOTO</h3>
+                    <img src="{{ asset('img/item-sourcing/' . $item->image_filename) }}" alt="display photo">
                 </div>
+                @endif
             </div>
         </div>
     </div>

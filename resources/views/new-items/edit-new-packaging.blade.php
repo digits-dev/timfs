@@ -3,10 +3,63 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
 <style>
+    .photo-section {
+        max-width: 400px;
+        margin: 0 auto; 
+    }
+
+    .photo-section img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
     table, tbody, td, th {
         border: 1px solid black !important;
         padding-left: 50px;
     }
+
+    .comment-textarea {
+        width: 100%;
+        min-height: 250px;
+        resize: none;
+        padding: 12px;
+    }
+    .select2-container--default .select2-selection--single {
+        border-radius: 0px !important
+    }
+
+    .select2-container .select2-selection--single {
+        height: 35px;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #3190c7 !important;
+        border-color: #367fa9 !important;
+        color: #fff !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #fff !important;
+    }
+
+    .select2-container--default .select2-selection--multiple{
+        border-radius: 0px !important;
+        width: 100% !important;
+    }
+
+    .select2-container .select2-selection--single .select2-selection__rendered{
+        padding: 0 !important;
+        margin-top: -2px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__clear{
+        margin-right: 10px !important;
+        padding: 0 !important;
+    }
+    th {
+        width: 35%;
+    }
+
 </style>
 @endpush
 
@@ -255,6 +308,13 @@
                         </tbody>
                     </table>
                 </div>
+                @if ($item->image_filename)
+                <hr>
+                <div class="photo-section">
+                    <h3 class="text-center">DISPLAY PHOTO</h3>
+                    <img src="{{ asset('img/item-sourcing/' . $item->image_filename) }}" alt="display photo">
+                </div>
+                @endif
             </div>
         </div>
     </div>
