@@ -25,6 +25,7 @@ class AddPackagingTypesIdToNewPackagings extends Migration
             $table->integer('packaging_paper_types_id')->length(10)->unsigned()->nullable()->after('target_date');
             $table->integer('packaging_material_types_id')->length(10)->unsigned()->nullable()->after('target_date');
             $table->integer('packaging_beverage_types_id')->length(10)->unsigned()->nullable()->after('target_date');
+            $table->integer('packaging_uniform_types_id')->length(10)->unsigned()->nullable()->after('target_date');
             $table->integer('packaging_uses_id')->length(10)->unsigned()->nullable()->after('target_date');
             $table->integer('sticker_types_id')->length(10)->unsigned()->nullable()->after('target_date');
             $table->integer('packaging_types_id')->length(10)->unsigned()->nullable()->after('target_date');
@@ -44,6 +45,7 @@ class AddPackagingTypesIdToNewPackagings extends Migration
             $table->dropColumn('packaging_types_id');
             $table->dropColumn('sticker_types_id');
             $table->dropColumn('packaging_uses_id');
+            $table->dropColumn('packaging_uniform_types_id');
             $table->dropColumn('packaging_beverage_types_id');
             $table->dropColumn('packaging_material_types_id');
             $table->dropColumn('packaging_paper_types_id');

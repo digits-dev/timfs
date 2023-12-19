@@ -122,6 +122,17 @@
                                     </select>
                                 </td>
                             </tr>
+                            <tr hidden>
+                                <th><span class="required-star">*</span> Material Type</th>
+                                <td>
+                                    <select name="packaging_material_types_id" id="packaging_material_types_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($packaging_material_types as $packaging_material_type)
+                                        <option value="{{$packaging_material_type->id}}" description="{{$packaging_material_type->description}}">{{$packaging_material_type->description}}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
                             <tr id="stickerTypeRow" hidden>
                                 <th><span class="required-star">*</span> Sticker Material</th>
                                 <td>
@@ -144,17 +155,7 @@
                                     </select>
                                 </td>
                             </tr>
-                            <tr hidden>
-                                <th><span class="required-star">*</span> Material Type</th>
-                                <td>
-                                    <select name="packaging_material_types_id" id="packaging_material_types_id" class="form-control" required>
-                                        <option value="" disabled selected>None selected...</option>
-                                        @foreach ($packaging_material_types as $packaging_material_type)
-                                        <option value="{{$packaging_material_type->id}}" description="{{$packaging_material_type->description}}">{{$packaging_material_type->description}}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                            </tr>
+
                             <tr hidden>
                                 <th><span class="required-star">*</span> Paper Type</th>
                                 <td>
@@ -194,14 +195,6 @@
                                     </select>
                                 </td>
                             </tr>
-                            {{-- <tr>
-                                <th>File 1</th>
-                                <td><input type="file" name="filename_1" id="filename_1" class="form-control" /></td>
-                            </tr>
-                            <tr>
-                                <th>File 2</th>
-                                <td><input type="file" name="filename_2" id="filename_2" class="form-control" /></td>
-                            </tr> --}}
                             <tr>
                                 <th><span class="required-star">*</span>  Size</th>
                                 <td><input type="number" step="any" name="size" class="form-control" required placeholder="Size" min="0"></td>
