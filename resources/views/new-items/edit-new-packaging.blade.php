@@ -488,6 +488,18 @@
         loadPage();
         reloadOptions();
 
+        $('form').on('submit', function() {
+        Swal.fire({
+            title: 'Loading...',
+            html: 'Please wait...',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
+    });
+
     });    
 </script>
 
