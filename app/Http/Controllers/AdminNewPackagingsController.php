@@ -75,6 +75,12 @@
 					}
 				}
 			}];
+			$this->col[] = ["label"=>"Display Photo","name"=>"image_filename","callback"=>function($row) {
+				if ($row->image_filename) {
+					$url = asset('img/item-sourcing/' . $row->image_filename);
+					return "<img src='$url' style='max-width: 100px'>";
+				}
+			}];
 			// $this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
 			$this->col[] = ["label"=>"NWP Code","name"=>"nwp_code"];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
@@ -100,9 +106,6 @@
 				}
 				return $value;
 			}];
-			// $this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
-			$this->col[] = ["label"=>"NWP Code","name"=>"nwp_code"];
-			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
 			$this->col[] = ["label"=>"Packaging Size","name"=>"packaging_size"];
 			$this->col[] = ["label"=>"UOM","name"=>"uoms_id","join"=>"uoms,uom_description"];
@@ -283,24 +286,24 @@
 			->whereNotNull('new_packagings.item_masters_id')
 			->count();
 
-			$pending_items = DB::table('new_packagings')
-				->where('new_packagings.status', 'ACTIVE')
-				->whereNull('new_packagings.item_masters_id')
-				->count();
+			// $pending_items = DB::table('new_packagings')
+			// 	->where('new_packagings.status', 'ACTIVE')
+			// 	->whereNull('new_packagings.item_masters_id')
+			// 	->count();
 
-			$this->index_statistic[] = [
-				'label' => 'Pending Items',
-				'count' => $pending_items,
-				'icon' => 'fa fa-hourglass',
-				'color' => 'orange',
-			];
+			// $this->index_statistic[] = [
+			// 	'label' => 'Pending Items',
+			// 	'count' => $pending_items,
+			// 	'icon' => 'fa fa-hourglass',
+			// 	'color' => 'orange',
+			// ];
 
-			$this->index_statistic[] = [
-				'label' => 'Tagged Items',
-				'count' => $tagged_items,
-				'icon' => 'fa fa-tag',
-				'color' => 'green',
-			];
+			// $this->index_statistic[] = [
+			// 	'label' => 'Tagged Items',
+			// 	'count' => $tagged_items,
+			// 	'icon' => 'fa fa-tag',
+			// 	'color' => 'green',
+			// ];
 
 
 
