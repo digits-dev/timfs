@@ -66,7 +66,7 @@
                             </tr>
                             <tr>
                                 <th>Reason</th>
-                                <td>{{$item->reasons_description}}</td>
+                                <td>{{$item->other_values->new_ingredient_reasons_id ?? $item->reasons_description}}</td>
                             </tr>
                             @if($item->reasons_description == 'REPLACEMENT OF INGREDIENT')
                                 <tr>

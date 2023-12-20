@@ -677,6 +677,8 @@
 				->leftJoin('item_sourcing_statuses as sourcing_statuses', 'sourcing_statuses.id', 'new_ingredients.item_sourcing_statuses_id')
 				->get()
 				->first();
+				
+			$item->other_values = json_decode($item->others);
 			return $item;
 		}
 
