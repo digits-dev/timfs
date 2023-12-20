@@ -41,10 +41,6 @@
                                 <th>{{$table == 'new_ingredients' ? 'NWI Code' : 'NWP Code'}}</th>
                                 <td>{{$item->nwi_code ?? $item->nwp_code}}</td>
                             </tr>
-                            {{-- <tr>
-                                <th>Item Type</th>
-                                <td>{{$item->item_type_description}}</td>
-                            </tr> --}}
                             <tr>
                                 <th>Item Description</th>
                                 <td>{{$item->item_description}}</td>
@@ -67,26 +63,36 @@
                             </tr>
                             <tr>
                                 <th>Sourcing Category</th>
-                                <td>{{$item->packaging_description}}</td>
+                                <td>{{$item->other_values->packaging_types_id ?? $item->packaging_description}}</td>
                             </tr>
-                            @if($item->packaging_description == 'STICKER LABEL')
-                            <tr>
-                                <th>Sticker Material</th>
-                                <td>{{$item->packaging_stickers}}</td>
-                            </tr>
-                            @endif
+                            @if($item->packaging_stickers)
                                 <tr>
-                                    <th>Sourcing Usage</th>
-                                    <td>{{$item->packaging_uses}}</td>
+                                    <th>Sticker Material</th>
+                                    <td>{{$item->other_values->sticker_types_id ?? $item->packaging_stickers}}</td>
                                 </tr>
+                            @endif
+                            @if($item->packaging_uniform_types)
+                                <tr>
+                                    <th>Uniform Type</th>
+                                    <td>{{$item->other_values->packaging_uniform_types_id ?? $item->packaging_uniform_types}}</td>
+                                </tr>
+                            @endif
+                            @if($item->packaging_material)
                                 <tr>
                                     <th>Material Type</th>
-                                    <td>{{$item->packaging_material}}</td>
+                                    <td>{{$item->other_values->packaging_material_types_id ?? $item->packaging_material}}</td>
                                 </tr>
-                            @if($item->packaging_material == 'PAPER')
+                            @endif
+                            @if ($item->packaging_uses)
+                                <tr>
+                                    <th>Sourcing Usage</th>
+                                    <td>{{$item->other_values->packaging_uses_id ?? $item->packaging_uses}}</td>
+                                </tr>    
+                            @endif
+                            @if($item->packaging_paper)
                                 <tr>
                                     <th>Paper Type</th>
-                                    <td>{{$item->packaging_paper}}</td>
+                                    <td>{{$item->other_values->packaging_paper_types_id ?? $item->packaging_paper}}</td>
                                 </tr>
                             @endif
                             <tr>
@@ -121,14 +127,60 @@
                                 <th>Created Date</th>
                                 <td>{{$item->created_at}}</td>
                             </tr>
+                            @if ($item->updator_name)
                             <tr>
-                                <th>Updated by</th>
+                                <th>Updated By</th>
                                 <td>{{$item->updator_name}}</td>
                             </tr>
+                            @endif
+                            @if ($item->updated_at)
                             <tr>
                                 <th>Updated Date</th>
                                 <td>{{$item->updated_at}}</td>
                             </tr>
+                            @endif
+                            @if ($item->tagger_name)
+                            <tr>
+                                <th>Tagged By</th>
+                                <td>{{$item->tagger_name}}</td>
+                            </tr>
+                            @endif
+                            @if ($item->tagged_at)
+                            <tr>
+                                <th>Tagged Date</th>
+                                <td>{{$item->tagged_at}}</td>
+                            </tr>
+                            @endif
+                            @if ($item->approver_name)
+                            <tr>
+                                <th>Approval Status Updated By</th>
+                                <td>{{$item->approver_name}}</td>
+                            </tr>
+                            @endif
+                            @if ($item->approval_status_updated_at)
+                            <tr>
+                                <th>Approval Status Updated Date</th>
+                                <td>{{$item->approval_status_updated_at}}</td>
+                            </tr>
+                            @endif
+                            @if ($item->sourcer_name)
+                            <tr>
+                                <th>Sourcing Status Updated By</th>
+                                <td>{{$item->sourcer_name}}</td>
+                            </tr>
+                            @endif
+                            @if ($item->sourcing_status_updated_at)
+                            <tr>
+                                <th>Sourcing Status Updated Date</th>
+                                <td>{{$item->sourcing_status_updated_at}}</td>
+                            </tr>
+                            @endif
+                            @if ($item->item_masters_id)
+                            <tr>
+                                <th>View Item Masters Details</th>
+                                <td><a href="{{CRUDBooster::adminPath('item_masters/detail/' . $item->item_masters_id)}}" target="_blank">View Details</a></td>
+                            </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>

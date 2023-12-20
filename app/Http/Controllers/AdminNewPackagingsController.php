@@ -3,6 +3,7 @@
 	use Session;
 	use Illuminate\Http\Request;
 	use Illuminate\Support\Facades\Request as Input;
+	use Illuminate\Support\Facades\Schema;
 	use DB;
 	use CRUDBooster;
 	use Intervention\Image\Facades\Image;
@@ -498,7 +499,6 @@
 						. '.'
 						. $file->getClientOriginalExtension();
 				$file->move(public_path('item-sourcing-files/'), $filename);
-				$filenames['filename_' . $i] = $filename;
 			}
 
 			$item_approval_statuses_id = DB::table('item_approval_statuses')
@@ -702,7 +702,9 @@
 				->leftJoin('item_sourcing_statuses as sourcing_statuses', 'sourcing_statuses.id', 'new_packagings.item_sourcing_statuses_id')
 				->get()
 				->first();
-				return $item;
+
+			$item->other_values = json_decode($item->others);
+			return $item;
 
 		}
 

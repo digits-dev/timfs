@@ -1,4 +1,19 @@
 @extends('crudbooster::admin_template')
+@push('head')
+<style>
+    .photo-section {
+        max-width: 400px;
+        margin: 0 auto; 
+    }
+
+    .photo-section img {
+        max-width: 100%;
+        max-height: 350px;
+        display: block;
+        margin: 0 auto;
+    }
+</style>
+@endpush
 @section('content')
 <p class="noprint">
     <a title='Return' href="{{ CRUDBooster::mainPath() }}">
@@ -25,10 +40,6 @@
                                 <th>{{$table == 'new_ingredients' ? 'NWI Code' : 'NWP Code'}}</th>
                                 <td>{{$item->nwi_code ?? $item->nwp_code}}</td>
                             </tr>
-                            {{-- <tr>
-                                <th>Item Type</th>
-                                <td>{{$item->item_type_description}}</td>
-                            </tr> --}}
                             <tr>
                                 <th>Item Description</th>
                                 <td>{{$item->item_description}}</td>
@@ -51,26 +62,36 @@
                             </tr>
                             <tr>
                                 <th>Sourcing Category</th>
-                                <td>{{$item->packaging_description}}</td>
+                                <td>{{$item->other_values->packaging_types_id ?? $item->packaging_description}}</td>
                             </tr>
-                            @if($item->packaging_description == 'STICKER LABEL')
-                            <tr>
-                                <th>Sticker Material</th>
-                                <td>{{$item->packaging_stickers}}</td>
-                            </tr>
-                            @endif
+                            @if($item->packaging_stickers)
                                 <tr>
-                                    <th>Sourcing Usage</th>
-                                    <td>{{$item->packaging_uses}}</td>
+                                    <th>Sticker Material</th>
+                                    <td>{{$item->other_values->sticker_types_id ?? $item->packaging_stickers}}</td>
                                 </tr>
+                            @endif
+                            @if($item->packaging_uniform_types)
+                                <tr>
+                                    <th>Uniform Type</th>
+                                    <td>{{$item->other_values->packaging_uniform_types_id ?? $item->packaging_uniform_types}}</td>
+                                </tr>
+                            @endif
+                            @if($item->packaging_material)
                                 <tr>
                                     <th>Material Type</th>
-                                    <td>{{$item->packaging_material}}</td>
+                                    <td>{{$item->other_values->packaging_material_types_id ?? $item->packaging_material}}</td>
                                 </tr>
-                            @if($item->packaging_material == 'PAPER')
+                            @endif
+                            @if ($item->packaging_uses)
+                                <tr>
+                                    <th>Sourcing Usage</th>
+                                    <td>{{$item->other_values->packaging_uses_id ?? $item->packaging_uses}}</td>
+                                </tr>    
+                            @endif
+                            @if($item->packaging_paper)
                                 <tr>
                                     <th>Paper Type</th>
-                                    <td>{{$item->packaging_paper}}</td>
+                                    <td>{{$item->other_values->packaging_paper_types_id ?? $item->packaging_paper}}</td>
                                 </tr>
                             @endif
                             <tr>
@@ -161,6 +182,31 @@
                             @endif
                         </tbody>
                     </table>
+                    <hr>
+                    <h3 class="text-center">ITEM USAGE</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Item Code</th>
+                                    <th class="text-center">Item Description</th>
+                                    <th class="text-center">User</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (!$item_usages)
+                                <tr><td class="text-center" style="font-style: italic; color: grey" colspan="3">This item is currently not in use...</td></tr>
+                                @endif
+                                @foreach ($item_usages as $item_usage)
+                                <tr>
+                                    <td class="text-center">{{ $item_usage->item_code }}</td>
+                                    <td class="text-center">{{ $item_usage->item_description }}</td>
+                                    <td class="text-center">{{ $item_usage->name }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">
@@ -169,33 +215,15 @@
                 <div class="chat-app">
                     @include('new-items/chat-app', $comments_data)
                 </div>
-            </div>
-            <div class="col-md-6">
-                <hr>
-                <h3 class="text-center">ITEM USAGE</h3>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th class="text-center">Item Code</th>
-                                <th class="text-center">Item Description</th>
-                                <th class="text-center">User</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (!$item_usages)
-                            <tr><td class="text-center" style="font-style: italic; color: grey" colspan="3">This item is currently not in use...</td></tr>
-                            @endif
-                            @foreach ($item_usages as $item_usage)
-                            <tr>
-                                <td class="text-center">{{ $item_usage->item_code }}</td>
-                                <td class="text-center">{{ $item_usage->item_description }}</td>
-                                <td class="text-center">{{ $item_usage->name }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                @if ($item->image_filename)
+                <div class="col-md-12">
+                    <hr>
+                    <h3 class="text-center">DISPLAY PHOTO</h3>
+                    <div class="photo-section">
+                        <img src="{{ asset('img/item-sourcing/' . $item->image_filename) }}" alt="">
+                    </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>
