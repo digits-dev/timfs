@@ -422,12 +422,12 @@
                 if ($('#packaging_material_types_id').find('option:selected').text() != 'PAPER') {
                     toHide.push($('#packaging_paper_types_id').parents('tr').get());
                 }
-                toShow = $('#sticker_types_id').parents('tr').get();
+                toShow = $('#sticker_types_id, #packaging_uses_id').parents('tr').get();
                 const availableSourcing = ['MARKETING COLLATERALS', 'MERCHANDISE', 'TAKEOUT PACKAGING', 'OTHERS'];
                 toHide = $(`#packaging_uniform_types_id, #packaging_material_types_id`).parents('tr').get();
                 filterOptions($('#packaging_uses_id'), availableSourcing);
             } else if (value === 'TAKEOUT CONTAINER') {
-                toShow = $('#packaging_material_types_id').parents('tr').get();
+                toShow = $('#packaging_material_types_id, #packaging_uses_id').parents('tr').get();
                 const availableMaterials = ['PLASTIC', 'PAPER', 'OTHERS'];
                 const availableSourcing = ['BEVERAGE', 'FOOD', 'OTHERS'];
                 filterOptions($('#packaging_material_types_id'), availableMaterials);

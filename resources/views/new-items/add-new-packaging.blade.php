@@ -322,11 +322,11 @@
         `).parents('tr').get();
         let toShow = [];
         if (value === 'STICKER LABEL') {
-            toShow = $('#sticker_types_id').parents('tr').get();
+            toShow = $('#sticker_types_id, #packaging_uses_id').parents('tr').get();
             const availableSourcing = ['MARKETING COLLATERALS', 'MERCHANDISE', 'TAKEOUT PACKAGING', 'OTHERS'];
             filterOptions($('#packaging_uses_id'), availableSourcing);
         } else if (value === 'TAKEOUT CONTAINER') {
-            toShow = $('#packaging_material_types_id').parents('tr').get();
+            toShow = $('#packaging_material_types_id, #packaging_uses_id').parents('tr').get();
             const availableMaterials = ['PLASTIC', 'PAPER', 'OTHERS'];
             const availableSourcing = ['BEVERAGE', 'FOOD', 'OTHERS'];
             filterOptions($('#packaging_material_types_id'), availableMaterials);
