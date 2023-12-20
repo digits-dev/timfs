@@ -510,7 +510,7 @@
 			$postdata['item_approval_statuses_id'] = $item_approval_statuses_id;
 			$postdata['others'] = $input['others'];
 			$postdata['image_filename'] = $image_filename;
-			$postdata['filename'] = $image_filename;
+			$postdata['filename'] = $filename;
 			$postdata['nwp_code'] = $nwp_code;
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
 			$postdata['comment'] = $input['comment'];
