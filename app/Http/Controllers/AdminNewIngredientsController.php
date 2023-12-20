@@ -481,6 +481,7 @@
 				->first();
 
 			$postdata['item_approval_statuses_id'] = $item_approval_statuses_id;
+			$postdata['others'] =  $input['others'];
 			$postdata['image_filename'] = $image_filename;
 			$postdata['nwi_code'] = $nwi_code;
 			$postdata['segmentations'] = $implodesegmentations;
@@ -725,7 +726,7 @@
 
 			$data = [];
 
-			$data['item'] = DB::table('new_ingredients')
+			$item = DB::table('new_ingredients')
 				->where('new_ingredients.id', $id)
 				->select(
 					'*',
@@ -749,6 +750,10 @@
 				->leftJoin('item_masters as existing', 'existing.tasteless_code', '=', 'new_ingredients.existing_ingredient')
 				->get()
 				->first();
+
+			$data['item'] = $item;
+
+			$data['others'] = json_decode($item->others);
 
 			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
 					->where('status', 'ACTIVE')
@@ -800,7 +805,8 @@
 
 			$data['new_ingredient_reasons'] = DB::table('new_ingredient_reasons')
 				->where('new_ingredient_reasons.status', 'ACTIVE')
-				->orderBy('description','asc')
+				->orderByRaw('description = "OTHERS"')
+				->orderBy('description')
 				->get();
 
 			$data['new_ingredient_uoms'] = DB::table('uoms')
@@ -810,7 +816,8 @@
 
 			$data['new_ingredient_terms'] = DB::table('new_ingredient_terms')
 				->where('new_ingredient_terms.status', 'ACTIVE')
-				->orderBy('description','asc')
+				->orderByRaw('description = "OTHERS"')
+				->orderBy('description')
 				->get();
 			return $data;
 		}
@@ -822,7 +829,7 @@
 					trans('crudbooster.denied_access')
 				);
 
-			$inputs = $request->all();
+			$inputs = $request->all();dd($inputs);
 			$new_ingredients_id = $request->get('new_items_id');
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
@@ -852,12 +859,12 @@
 			}
 
 			$data = [
+				'others' => $request->get('others'),
 				'new_item_types_id' => $request->get('new_item_types_id'),
 				'item_description' => strtoupper($request->get('item_description')),
 				'packaging_size' => $request->get('packaging_size'),
 				'uoms_id' => $request->get('uoms_id'),
 				'ttp' => $request->get('ttp'),
-				'image_filename' => $image_filename,
 				'target_date' => $request->get('target_date'),
 				'segmentations' => $implodesegmentations,
 				'new_ingredient_reasons_id' => $request->get('new_ingredient_reasons_id'),
@@ -876,6 +883,7 @@
 				'updated_at' => $time_stamp,
 				'updated_by' => $action_by,
 			];
+
 
 			if ($image_filename) {
 				$data['image_filename'] = $image_filename;

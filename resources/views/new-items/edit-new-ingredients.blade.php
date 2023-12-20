@@ -83,6 +83,7 @@
         <form method="POST" action="{{ $table == 'new_ingredients' ? route('submit_edit_new_ingredient') : route('submit_edit_new_packaging')}}" id="form-main" enctype="multipart/form-data" autocomplete="off">
             @csrf
             <input type="text" name="new_items_id" class="hide" value="{{ $item->new_ingredients_id ?? $item->new_packagings_id }}">
+            <input type="text" value="{{ $item->others }}" name="others" id="others" hidden>
             <div class="row">
                 <div class="col-md-6">
                     <table class="table-responsive table">
@@ -292,6 +293,48 @@
 </div>
 
 <script>
+    function jsonifyOthers() {
+        const selects = $('.other-input').get();
+        const obj = {};
+        selects.forEach(select => {
+            const id = $(select).attr('for');
+            const value = $(select).val();
+            console.log(id, value);
+            obj[id] = value;
+        });
+        $('#others').val(JSON.stringify(obj));
+    }
+
+    function loadPage() {
+        const otherValues = {!! json_encode($others) !!} || {};
+        const entries = Object.entries(otherValues);
+        entries.forEach(entry => {
+            [key, value] = entry;
+            const td = $(`#${key}`).parents('td');
+            const input = $('<input>')
+                .val(value)
+                .addClass('form-control')
+                .addClass('other-input')
+                .attr('data-select', 'others')
+                .attr('placeholder', 'Please specify...')
+                .attr('for', key)
+                .attr('oninput', "this.value = this.value.toUpperCase()")
+                .attr('required', true)
+                .css('margin-top', '3px');
+            td.append(input);
+        });
+
+        const packagingType = $('#packaging_types_id').find('option:selected').text();
+        console.log(packagingType);
+        if (packagingType == 'STICKER LABEL') {
+            const availableSourcing = ['MARKETING COLLATERALS', 'MERCHANDISE', 'TAKEOUT PACKAGING', 'OTHERS'];
+            filterOptions($('#packaging_uses_id'), availableSourcing);
+        } else if (packagingType == 'UNIFORM') {
+            const availableOptions = ['COTTON', 'LINEN', 'DENIM','OTHERS'];
+            filterOptions($('#packaging_material_types_id'), availableOptions);
+        }
+    }
+
     $('#new_ingredients_segmentation').select2({
         width:'100%',
     });
@@ -346,7 +389,10 @@
         });
     }
 
-    $('#save-btn').click(showSwal);
+    $('#save-btn').click(function() {
+        jsonifyOthers();
+        showSwal();
+    });
 
     $('input').on('keypress', function(event) {
         if (event.keyCode === 13) {
@@ -366,6 +412,28 @@
             },
         });
     });
+
+    $('select').on('change', function() {
+        const value = $(this).find('option:selected').text();
+        const td = $(this).parents('td');
+        const name = $(this).attr('name');
+        if (value === 'OTHER' || value === 'OTHERS') {
+            const input = $('<input>')
+                .addClass('form-control')
+                .addClass('other-input')
+                .attr('data-select', 'others')
+                .attr('placeholder', 'Please specify...')
+                .attr('for', name)
+                .attr('oninput', "this.value = this.value.toUpperCase()")
+                .attr('required', true)
+                .css('margin-top', '3px');
+            td.append(input);
+        } else {
+            td.find('input[data-select="others"]').remove();
+        }
+    });
+
+    loadPage();
 </script>
 
 

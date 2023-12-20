@@ -460,7 +460,7 @@
                     .addClass('other-input')
                     .attr('data-select', 'others')
                     .attr('placeholder', 'Please specify...')
-                    .attr('for', name)
+                    .attr('for', id)
                     .attr('oninput', "this.value = this.value.toUpperCase()")
                     .attr('required', true)
                     .css('margin-top', '3px');
