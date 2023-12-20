@@ -671,6 +671,7 @@
 					'new_item_types.item_type_description',
 					'packaging_types.description as packaging_description',
 					'packaging_stickers.description as packaging_stickers',
+					'packaging_uniform_types.description as packaging_uniform_types',
 					'packaging_uses.description as packaging_uses',
 					'packaging_beverage_types.description as packaging_beverage',
 					'packaging_material_types.description as packaging_material',
@@ -689,6 +690,7 @@
 				->leftJoin('new_item_types', 'new_item_types.id', '=', 'new_packagings.new_item_types_id')
 				->leftJoin('packaging_types', 'packaging_types.id', '=', 'new_packagings.packaging_types_id')
 				->leftJoin('packaging_stickers', 'packaging_stickers.id', '=', 'new_packagings.sticker_types_id')
+				->leftJoin('packaging_uniform_types', 'packaging_uniform_types.id', '=', 'new_packagings.packaging_uniform_types_id')
 				->leftJoin('packaging_uses', 'packaging_uses.id', '=', 'new_packagings.packaging_uses_id')
 				->leftJoin('packaging_beverage_types', 'packaging_beverage_types.id', '=', 'new_packagings.packaging_beverage_types_id')
 				->leftJoin('packaging_material_types', 'packaging_material_types.id', '=', 'new_packagings.packaging_material_types_id')
