@@ -401,7 +401,7 @@
         }
     });
 
-    $('form').on('submit', function() {
+    $('#form-main').on('submit', function() {
         Swal.fire({
             title: 'Loading...',
             html: 'Please wait...',

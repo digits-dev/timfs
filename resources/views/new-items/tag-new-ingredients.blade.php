@@ -351,7 +351,7 @@
         $('#save-btn').on('click', showSwalForSourcing);
     });
 
-    $('form').on('submit', function() {
+    $('#sourcing-form, #tagging-form').on('submit', function() {
         Swal.fire({
             title: 'Loading...',
             html: 'Please wait...',

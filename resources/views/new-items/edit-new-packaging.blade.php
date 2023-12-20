@@ -460,7 +460,7 @@
                     .addClass('other-input')
                     .attr('data-select', 'others')
                     .attr('placeholder', 'Please specify...')
-                    .attr('for', id)
+                    .attr('for', key)
                     .attr('oninput', "this.value = this.value.toUpperCase()")
                     .attr('required', true)
                     .css('margin-top', '3px');
@@ -552,7 +552,7 @@
         loadPage();
         reloadOptions();
 
-        $('form').on('submit', function() {
+        $('form-main').on('submit', function() {
             Swal.fire({
                 title: 'Loading...',
                 html: 'Please wait...',

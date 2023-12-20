@@ -260,7 +260,7 @@
             }
         });
     });
-    $('form').on('submit', function() {
+    $('.form-to-submit').on('submit', function() {
         Swal.fire({
             title: 'Loading...',
             html: 'Please wait...',
