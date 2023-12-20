@@ -829,7 +829,7 @@
 					trans('crudbooster.denied_access')
 				);
 
-			$inputs = $request->all();dd($inputs);
+			$inputs = $request->all();
 			$new_ingredients_id = $request->get('new_items_id');
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');

@@ -21,7 +21,7 @@
     - cotton
     - linen
     - denim
-- [ ] Add `required` attribute to display photo [input type="file"] (image and file for new store supplies, image for new ingredients)
+- [x] Add `required` attribute to display photo [input type="file"] (image and file for new store supplies, image for new ingredients)
 - If Sticker Label is selected,
   - [x] Show Sticker Material
   - [x] Hide Material Type
