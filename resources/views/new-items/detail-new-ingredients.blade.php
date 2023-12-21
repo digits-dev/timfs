@@ -100,7 +100,7 @@
                             </tr>
                             <tr>
                                 <th>Reference Link</th>
-                                <td>{{$item->reference_link}}</td>
+                                <td><a href="{{$item->reference_link}}">{{$item->reference_link}}</a></td>
                             </tr>
                             <tr>
                                 <th>Term</th>
