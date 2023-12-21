@@ -351,7 +351,7 @@
             },
             cache: true
         },
-        width:'190px',
+        width:'200px',
     });
 
     $('#new_ingredient_reasons_id').change(function () {

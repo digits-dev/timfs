@@ -330,7 +330,7 @@
             },
             cache: true
         },
-        width:'190px',
+        width:'200px',
     });
 
     $('select').on('change', function() {
