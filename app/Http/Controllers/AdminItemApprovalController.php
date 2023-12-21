@@ -535,7 +535,7 @@
 					$paired_differences = $differences['paired_differences'] ?? [];
 	
 					if (array_key_exists('ttp_price_effective_date', $paired_differences)) {
-						if ($paired_differences['ttp_price_effective_date']['new'] < date('Y-m-d')) {
+						if ($paired_differences['ttp_price_effective_date']['new'] < date('Y-m-d') && $item->ttp_price_effective_date) {
 							return CRUDBooster::redirect(CRUDBooster::mainPath(), "Item: \"$item_description\" sales price effective date has expired.", 'danger');
 						}
 					}
@@ -842,7 +842,7 @@
 					$paired_differences = $differences['paired_differences'] ?? [];
 
 					if (array_key_exists('ttp_price_effective_date', $paired_differences)) {
-						if ($paired_differences['ttp_price_effective_date']['new'] < date('Y-m-d')) {
+						if ($paired_differences['ttp_price_effective_date']['new'] < date('Y-m-d') && $paired_differences['ttp_price_effective_date']['new']) {
 							continue;
 						}
 					}
