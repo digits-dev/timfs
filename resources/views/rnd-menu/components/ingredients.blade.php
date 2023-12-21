@@ -36,6 +36,7 @@
             <thead>
                 <tr>
                     <th scope="col">Status</th>
+                    <th scope="col">From</th>
                     <th scope="col">Item Code</th>
                     <th scope="col">Ingredient</th>
                     <th scope="col">Packaging Size</th>
@@ -91,6 +92,17 @@
                                 <span class="label label-primary">{{ $status }}</span>
                                 @endif
                             </td>
+                            <td>
+                                @if ($ingredient->item_masters_id)
+                                <span class="label label-info">IMFS</span>
+                                @elseif ($ingredient->menu_item_description)
+                                <span class="label label-warning">MIMF</span>
+                                @elseif ($ingredient->ingredient_description)
+                                <span class="label label-secondary">BATCH</span>
+                                @else
+                                <span class="label label-success">NEW</span>
+                                @endif
+                            </td>
                             <td>{{ $ingredient->item_code }}</td>
                             <td>
                                 <span class="{{ $ingredient->is_checked ? 'primary_ingredient_description' : '' }}">
@@ -116,7 +128,7 @@
             </tbody>
             <tfoot>
                 <tr class="text-bold">
-                    <td colspan="9" class="text-bold text-right">Total Ingredient Cost</td>
+                    <td colspan="10" class="text-bold text-right">Total Ingredient Cost</td>
                     <td>{{ (float) $item->recipe_cost_wo_buffer }}</td>
                 </tr>
             </tfoot>
