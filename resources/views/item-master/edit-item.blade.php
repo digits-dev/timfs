@@ -108,7 +108,7 @@
                             </tr>
                             <tr>
                                 <th>File Reference Link</th>
-                                <td><input type="text" name="file_link" id="file_link" class="form-control"></td>
+                                <td><input type="text" value="{{ $item->file_link ?: '' }}" name="file_link" id="file_link" class="form-control"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  Brand Description</th>
