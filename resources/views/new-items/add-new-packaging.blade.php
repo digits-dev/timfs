@@ -104,10 +104,10 @@
                                 <th><span class="required-star">*</span>  Display Photo</th>
                                 <td><input type="file" name="display_photo" class="form-control" accept="image/*"  required></td>
                             </tr>
-                            <tr>
+                            {{-- <tr>
                                 <th>File</th>
                                 <td><input type="file" name="file" class="form-control" ></td>
-                            </tr>
+                            </tr> --}}
                             <tr>
                                 <th><span class="required-star">*</span> Reference Links</th>
                                 <td><input type="text" name="reference_link" class="form-control" required placeholder="Reference Links" ></td>

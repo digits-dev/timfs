@@ -91,12 +91,12 @@
                                 <th>Target Date</th>
                                 <td>{{$item->target_date}}</td>
                             </tr>
-                            @if ($item->filename)
+                            {{-- @if ($item->filename)
                             <tr>
                                 <th>File</th>
                                 <td><a href="{{ asset('item-sourcing-files/' . $item->filename) }}" download>Download</a></td>
                             </tr>
-                            @endif
+                            @endif --}}
                             <tr>
                                 <th>Sourcing Category</th>
                                 <td>{{$item->other_values->packaging_types_id ?? $item->packaging_description}}</td>
