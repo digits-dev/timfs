@@ -417,7 +417,6 @@
 				->where('new_ingredients.status', 'ACTIVE')
 				->orderByRaw("
 					CASE
-						WHEN new_ingredients.item_masters_id IS NULL THEN 8
 						WHEN item_approval_statuses.status_description = 'REJECTED' THEN 7
 						WHEN item_sourcing_statuses.status_description = 'CANCELLED' THEN 6
 						WHEN item_sourcing_statuses.status_description = 'CLOSED' THEN 5
