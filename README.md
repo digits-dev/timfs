@@ -34,7 +34,7 @@
   - [x] Sticker Material
   - [x] Packaging Use / Sourcing Usage
   - [x] Material Type
-- [ ] New input field For 'Others'
+- [x] New input field For 'Others'
 - [x] Add 'UNIFORM' to Sourcing Category
 - [x] If Sticker label is selected, show the ff. on sourcing usage:
   - takeout packaging 
@@ -64,8 +64,8 @@
   - Packaging Use
   - Beverage Type
   - Material Type
-- [ ] Add all these select logic to edit page
-- [ ] Update the detail, approve, and tag page to show all information
+- [x] Add all these select logic to edit page
+- [x] Update the detail, approve, and tag page to show all information
 - Item Masters
   - [x] add file reference link
   - [x] remove upload of files
