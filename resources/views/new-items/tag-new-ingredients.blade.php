@@ -131,7 +131,7 @@
                             </tr>
                             <tr>
                                 <th>Reference Link</th>
-                                <td><a href="{{$item->reference_link}}">{{$item->reference_link}}</a></td>
+                                <td><a href="{{$item->reference_link}}"target="_blank">{{$item->reference_link}}</a></td>
                             </tr>
                             <tr>
                                 <th>Term</th>
