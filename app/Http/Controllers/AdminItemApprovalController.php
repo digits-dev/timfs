@@ -523,9 +523,14 @@
 
 			if ($button_name == 'approve') {
 				foreach ($id_selected as $id) {
-					$item_description = DB::table('item_master_approvals')
-						->pluck('full_item_description')
+					$item = DB::table('item_master_approvals')
+						->where('id', $id)
 						->first();
+
+					if ($item->approval_status != 202) {
+						continue;
+					}
+					$item_description = $item->full_item_description;
 					$differences = self::getUpdatedDetails($id);
 					$paired_differences = $differences['paired_differences'] ?? [];
 	
