@@ -1,11 +1,11 @@
 # 📄 TIMFS - Tasteless Item Masterfile System
 
 ## TODOS - ADJUSTMENTS => MEETING WITH MS. YVETTE 12-13-2023
+### Item Sourcing
 - [x] Hide "Item Type" on item sourcing
 - [x] Remove Beverage Type on new store supplies
 - [x] Rename "REPLACEMENT" to "REPLACEMENT OF INGREDIENT"
 - [x] Add `required` attribute for brands 1 and 2
-- [x] Prevent bulk approval on item master if one of the item effective date has expired.
 - [ ] ~~Auto update segmentations after tagging of item sourcing~~
 - [x] Change input type from `number` to `text` for budget range
 - [x] Update db data type for budget range to text
@@ -66,13 +66,15 @@
   - Material Type
 - [x] Add all these select logic to edit page
 - [x] Update the detail, approve, and tag page to show all information
-- Item Masters
+
+### Item Masters
   - [x] add file reference link
   - [x] remove upload of files
   - [x] hide accumulated dep, qty on hand, tax agency and mpn
-- Menu Master File
+  - [x] prevent bulk approval on item master if one of the item effective date has expired
+### Menu Master File
   - [x] Show costing and ingredients to accounting manager
-- RND 
+### RND 
   - [x] Show ingredients on approval phase
 
 
