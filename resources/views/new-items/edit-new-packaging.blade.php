@@ -479,6 +479,10 @@
         }
 
         $('#packaging_types_id').on('change', reloadOptions);
+        $('#packaging_types_id').on('change', function() {
+            $('#packaging_uses_id').val("");
+        });
+
 
         $('#packaging_material_types_id').on('change', function() {
             const value = $(this).find('option:selected').text();
