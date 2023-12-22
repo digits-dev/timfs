@@ -243,6 +243,7 @@
                     </table>
                 </div>
             </div>
+            <div class="text-bold" style="color: rgb(24, 24, 165);">**Please provide the google drive link of the file in the reference link if applicable.**</div>
             <div class="row">
                 <div class="col-md-12">
                     <hr>

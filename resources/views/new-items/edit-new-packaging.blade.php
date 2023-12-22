@@ -273,6 +273,7 @@
                     </table>
                 </div>
             </div>
+            <div class="text-bold" style="color: rgb(24, 24, 165);">**Please provide the google drive link of the file in the reference link if applicable.**</div>
             <button type="submit" class="hide" id="submit-btn">Submit</button>
         </form>
         <div class="row">
