@@ -155,5 +155,56 @@ class MenuSeeder extends Seeder
                 'is_active' => 0
             ]);
         }
+
+        self::addHistoryModule();
+    }
+
+    public function addHistoryModule() {
+        $history_module_id = DB::table('cms_menus')
+            ->where('name', 'History Module')
+            ->pluck('id')
+            ->first();
+
+        $menu_name = 'Sales Price Change History';
+        $menu_controller = 'AdminSalesPriceChangeHistoriesController';
+        $path = 'sales_price_change_histories';
+        $table_name = 'sales_price_change_histories';
+        $sorting = DB::table('cms_menus')
+            ->where('parent_id', $history_module_id)
+            ->max('sorting');
+
+        DB::table('cms_menus')->updateOrInsert(['name' => $menu_name], [
+            'name' => $menu_name,
+            'type' => 'Route',
+            'path' => $menu_controller . 'GetIndex',
+            'color' => null,
+            'icon' => 'fa fa-circle-o',
+            'parent_id' => $history_module_id,
+            'is_active' => 1,
+            'is_dashboard' => 0,
+            'id_cms_privileges' => 1,
+            'sorting' => $sorting + 1,
+        ]);
+
+        $id_cms_menus = DB::table('cms_menus')
+            ->where('name', $menu_name)
+            ->pluck('id')
+            ->first();
+
+        DB::table('cms_menus_privileges')->updateOrInsert(['id_cms_menus' => $id_cms_menus, 'id_cms_privileges' => 1], [
+            'id_cms_menus' => $id_cms_menus, 
+            'id_cms_privileges' => 1
+        ]);
+
+        DB::table('cms_moduls')->updateOrInsert(['name' => $menu_name], [
+            'name' => $menu_name,
+            'icon' => 'fa fa-circle-o',
+            'path' => $path,
+            'table_name' => $table_name,
+            'controller' => $menu_controller,
+            'is_protected' => 0,
+            'is_active' => 0,
+        ]);
+
     }
 }
