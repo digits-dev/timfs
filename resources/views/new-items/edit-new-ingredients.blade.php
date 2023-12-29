@@ -216,7 +216,7 @@
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Budget Range</th>
-                                <td><input type="text" name="budget_range" value="{{ $item->budget_range }}" class="form-control" required placeholder="Budget Range" ></td>
+                                <td><input type="text" name="budget_range" value="{{ $item->budget_range }}" class="form-control" oninput="this.value = this.value.toUpperCase()" required placeholder="Budget Range" ></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Reference Links</th>

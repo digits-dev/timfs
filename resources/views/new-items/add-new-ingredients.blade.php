@@ -203,7 +203,7 @@
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Budget Range</th>
-                                <td><input type="text" name="budget_range" class="form-control" required placeholder="Budget Range"></td>
+                                <td><input type="text" name="budget_range" class="form-control" oninput="this.value = this.value.toUpperCase()" required placeholder="Budget Range"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Reference Links</th>
@@ -222,7 +222,7 @@
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Duration</th>
-                                <td><input type="text" name="duration" class="form-control" required placeholder="Duration" min="0"></td>
+                                <td><input type="text" name="duration" class="form-control" oninput="this.value = this.value.toUpperCase()" required placeholder="Duration" min="0"></td>
                             </tr>
                         </tbody>
                     </table>
