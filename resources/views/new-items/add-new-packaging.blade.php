@@ -197,7 +197,7 @@
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  Size</th>
-                                <td><input type="number" step="any" name="size" class="form-control" required placeholder="Size" min="0"></td>
+                                <td><input type="text" step="any" name="size" class="form-control" oninput="this.value = this.value.toUpperCase()" required placeholder="Size" min="0"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Budget Range</th>

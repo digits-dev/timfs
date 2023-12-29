@@ -223,7 +223,7 @@
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  Size</th>
-                                <td><input type="number" value="{{ (float) $item->size }}" step="any" name="size" class="form-control" required placeholder="size" min="0"></td>
+                                <td><input type="text" value="{{ $item->size }}" step="any" name="size" class="form-control" oninput="this.value = this.value.toUpperCase()" required placeholder="size" min="0"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  SRP</th>

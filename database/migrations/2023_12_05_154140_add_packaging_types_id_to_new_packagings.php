@@ -22,7 +22,7 @@ class AddPackagingTypesIdToNewPackagings extends Migration
             $table->decimal('initial_qty_needed', 18, 2)->unsigned()->nullable()->after('target_date');
             $table->text('reference_link')->nullable()->after('target_date');
             $table->text('budget_range')->nullable()->after('target_date');
-            $table->decimal('size', 18, 2)->unsigned()->nullable()->after('target_date');
+            $table->text('size')->nullable()->after('target_date');
             $table->integer('packaging_design_types_id')->length(10)->unsigned()->nullable()->after('target_date');
             $table->integer('packaging_paper_types_id')->length(10)->unsigned()->nullable()->after('target_date');
             $table->integer('packaging_material_types_id')->length(10)->unsigned()->nullable()->after('target_date');
