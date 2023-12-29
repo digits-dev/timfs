@@ -50,7 +50,7 @@
 			
 			if (in_array(CRUDBooster::getCurrentMethod(), ['getAdd'])) {
 				$used_ids = DB::table('item_sourcing_matrices')->whereNotNull('requestor_id')->pluck('requestor_id')->toArray();
-				$used_ids = implode(',', $used_ids);
+				$used_ids = implode(',', $used_ids) ?: '0';
 				$this->form[] = ['label'=>'Requestor','name'=>'requestor_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_users,name','datatable_where'=>"status='ACTIVE' and cms_users.id NOT IN ($used_ids)"];
 				$this->form[] = ['label'=>'Approver','name'=>'approver_ids','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_users,name','datatable_where'=>'status = "ACTIVE"'];
 				
