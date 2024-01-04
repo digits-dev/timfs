@@ -1098,9 +1098,10 @@
 		}
 
 		public function getMyRequestors() {
+			$my_id = CRUDBooster::myId();
 			$my_requestor_ids = DB::table('item_sourcing_matrices')
 				->where('status', 'ACTIVE')
-				->where('approver_ids', CRUDBooster::myId())
+				->where(DB::raw("FIND_IN_SET($my_id, approver_ids)"), '>', 0)
 				->pluck('requestor_id')
 				->toArray();
 

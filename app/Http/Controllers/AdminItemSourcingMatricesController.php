@@ -37,7 +37,19 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"Requestor","name"=>"requestor_id","join"=>"cms_users,name"];
-			$this->col[] = ["label"=>"Approver","name"=>"approver_ids","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Approver","name"=>"approver_ids","join"=>"cms_users,name","callback"=>function($row) {
+				$approver_ids = explode(',', $row->approver_ids ?: '0');
+				$approver_names = DB::table('cms_users')
+					->whereIn('id', $approver_ids)
+					->pluck('name')
+					->toArray();
+
+				$approvers = array_map(function($approver_name) {
+					return "<span class='label label-info'>$approver_name</span>";
+				}, $approver_names);
+
+				return implode(' ', $approvers);
+			}];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
 			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
@@ -48,16 +60,11 @@
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 			
-			if (in_array(CRUDBooster::getCurrentMethod(), ['getAdd'])) {
-				$used_ids = DB::table('item_sourcing_matrices')->whereNotNull('requestor_id')->pluck('requestor_id')->toArray();
-				$used_ids = implode(',', $used_ids) ?: '0';
-				$this->form[] = ['label'=>'Requestor','name'=>'requestor_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_users,name','datatable_where'=>"status='ACTIVE' and cms_users.id NOT IN ($used_ids)"];
-				$this->form[] = ['label'=>'Approver','name'=>'approver_ids','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_users,name','datatable_where'=>'status = "ACTIVE"'];
-				
-			} else {
+		if (in_array(CRUDBooster::getCurrentMethod(), ['getDetail'])) {
 				$this->form[] = ['label'=>'Requestor','name'=>'requestor_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_users,name','disabled'=>true];
-				$this->form[] = ['label'=>'Approver','name'=>'approver_ids','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_users,name','datatable_where'=>'status = "ACTIVE"'];
+				$this->form[] = ['label'=>'Approver','name'=>'approver_ids','type'=>'text','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_users,name','datatable_where'=>'status = "ACTIVE"'];
 				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select2','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
+				
 			}
 			# END FORM DO NOT REMOVE THIS LINE
 
@@ -275,7 +282,9 @@
 	    | @arr
 	    |
 	    */
-	    public function hook_before_add(&$postdata) {        
+	    public function hook_before_add(&$postdata) {
+			$postdata['requestor_id'] = Request::get('requestor_id');
+			$postdata['approver_ids'] = Request::get('approver_ids');
 			$postdata['created_by'] = CRUDBooster::myId();
 			$postdata['created_at'] = date('Y-m-d H:i:s');
 	    }
@@ -301,6 +310,9 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
+			$postdata['requestor_id'] = Request::get('requestor_id');
+			$postdata['approver_ids'] = Request::get('approver_ids');
+			$postdata['status'] = Request::get('status');
 	        $postdata['updated_by'] = CRUDBooster::myId();
 			$postdata['updated_at'] = date('Y-m-d H:i:s');
 	    }
@@ -341,9 +353,71 @@
 
 	    }
 
+		public function getAdd() {
+			$data = [];
+			$data['used_ids'] = DB::table('item_sourcing_matrices')
+				->where('status', 'ACTIVE')
+				->pluck('requestor_id')
+				->toArray();
 
+			$data['page_title'] = 'Add New Data Matrix';
 
-	    //By the way, you can still create your own method in here... :) 
+			$data['users'] = DB::table('cms_users')
+				->where('status', 'ACTIVE')
+				->orderBy('name', 'asc')
+				->select('name', 'id')
+				->get()
+				->toArray();
+			
+			return $this->view('item-sourcing-matrix.add-sourcing-matrix', $data);
+		}
 
+		public function getEdit($id) {
+			$data = [];
+
+			$data['item'] = DB::table('item_sourcing_matrices')
+				->where('id', $id)
+				->first();
+
+			$data['page_title'] = 'Edit Data Matrix';
+
+			$data['users'] = DB::table('cms_users')
+				->where('status', 'ACTIVE')
+				->orderBy('name', 'asc')
+				->select('name', 'id')
+				->get()
+				->toArray();
+
+			$data['approver_ids'] = explode(',', $data['item']->approver_ids);
+
+			$data['statuses'] = ['ACTIVE', 'INACTIVE'];
+			
+			return $this->view('item-sourcing-matrix.edit-sourcing-matrix', $data);
+		}
+
+		public function getDetail($id) {
+			$item = DB::table('item_sourcing_matrices')
+				->select(
+					'cms_users.name as requestor',
+					'item_sourcing_matrices.approver_ids',
+					'item_sourcing_matrices.status',
+				)
+				->leftJoin('cms_users', 'cms_users.id', 'item_sourcing_matrices.requestor_id')
+				->where('item_sourcing_matrices.id', $id)
+				->first();
+
+			$approver_names = DB::table('cms_users')
+				->whereIn('id', explode(',', $item->approver_ids ?: '0'))
+				->pluck('name')
+				->toArray();
+
+			$data['rows'] = [
+				'Requestor' => $item->requestor,
+				'Approver' => $approver_names,
+				'Status' => $item->status,
+			];
+
+			return $this->view('custom_detail', $data);
+		}
 
 	}
