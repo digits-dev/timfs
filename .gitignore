@@ -3,6 +3,9 @@
 /storage/*.key
 /vendor
 /public/img/item-master/*
+/public/img/item-sourcing/*
+/public/item-master-files/*
+/public/item-sourcing-files/*
 .env
 .env.backup
 .phpunit.result.cache
