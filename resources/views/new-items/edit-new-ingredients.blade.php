@@ -351,8 +351,20 @@
             },
             cache: true
         },
-        width:'200px',
+        width: '100%',
+        templateResult: formatResult,  // Function to format results
+        templateSelection: formatSelection,  // Function to format selected items
     });
+
+    function formatResult(result) {
+        return result.text;
+    }
+
+    // Custom function to format selected items
+    function formatSelection(selection) {
+        // Use ellipsis for long texts in selected items
+        return selection.text.length > 20 ? selection.text.substring(0, 20) + '...' : selection.text;
+    }
 
     $('#new_ingredient_reasons_id').change(function () {
         const selectedValue = $(this).val();

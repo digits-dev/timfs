@@ -245,10 +245,6 @@
 </div>
 
 
-
-
-
-
 <script>
     function jsonifyOthers() {
         const selects = $('.other-input').get();
@@ -301,23 +297,6 @@
         });
     });
 
-        // $("#existing_ingredient").autocomplete({
-        //     source: function (request, response) {
-        //         $.ajax({
-        //             url: "{{ route('suggest_existing_ingredients') }}",
-        //             dataType: 'json',
-        //             data: {
-        //                 term: request.term
-        //             },
-        //             success: function (data) {
-        //                 response(data);
-        //             }
-        //         });
-        //     },
-        //     minLength: 2,
-        //     delay: 750 // adjust as needed
-        // });
-
     $('#existing_ingredient').select2({
         ajax: {
             url: "{{ route('suggest_existing_ingredients') }}",
@@ -330,8 +309,20 @@
             },
             cache: true
         },
-        width:'200px',
+        width: '100%',
+        templateResult: formatResult,  // Function to format results
+        templateSelection: formatSelection,  // Function to format selected items
     });
+
+    function formatResult(result) {
+        return result.text;
+    }
+
+    // Custom function to format selected items
+    function formatSelection(selection) {
+        // Use ellipsis for long texts in selected items
+        return selection.text.length > 20 ? selection.text.substring(0, 20) + '...' : selection.text;
+    }
 
     $('select').on('change', function() {
         const value = $(this).find('option:selected').text();
