@@ -33,7 +33,7 @@
 			'Marketing Manager' => ['ingredients', 'packagings', 'costing', 'menu-data'],
 			'Sales Accounting' => ['costing', 'menu-data'],
 			'Accounting - Ingredients' => ['ingredients', 'packagings', 'costing', 'menu-data'],
-			'Accounting Manager' => ['ingredients', 'costing'],
+			'Accounting Manager' => ['ingredients', 'packagings', 'costing', 'menu-data'],
 		];
 
 		static $to_edit = [
