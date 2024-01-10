@@ -5,11 +5,15 @@
 	use Illuminate\Support\Facades\Request as Input;
 	use DB;
 	use CRUDBooster;
+	use App\ItemMaster;
+	use Intervention\Image\Facades\Image;
+	use Spatie\ImageOptimizer\OptimizerChainFactory;
+	use Illuminate\Support\Str;
 
 	class AdminNewIngredientsController extends \crocodicstudio\crudbooster\controllers\CBController {
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
-			$this->tagger = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
+			$this->tagger = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder', 'Purchasing Manager'];
 			$this->to_notify = DB::table('cms_users')
 				->where(function($sub_query) {
 					$sub_query
@@ -20,6 +24,13 @@
 				->leftJoin('cms_privileges', 'cms_privileges.id', '=', 'cms_users.id_cms_privileges')
 				->pluck('cms_users.id')
 				->toArray();
+
+			$this->status_badges = [
+				'info' => ['OPEN'],
+				'warning' => ['PENDING', 'ON HOLD'],
+				'success' => ['CLOSED', 'APPROVED'],
+				'danger' => ['CANCELLED', 'REJECTED'],
+			];
 		}
 
 	    public function cbInit() {
@@ -45,9 +56,55 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
+			$this->col[] = ["label"=>"Approval Status","name"=>"item_approval_statuses_id","join"=>"item_approval_statuses,status_description","callback"=>function($row) {
+				if ($row->approval_status) {
+					foreach ($this->status_badges as $key => $badge) {
+						if (in_array($row->approval_status, $badge)) {
+							return "<span class='label label-$key'>$row->approval_status</span>";
+						}
+					}
+				}
+			}];
+			$this->col[] = ["label"=>"Sourcing Status","name"=>"item_sourcing_statuses_id","join"=>"item_sourcing_statuses,status_description","callback"=>function($row) {
+				if ($row->sourcing_status) {
+					foreach ($this->status_badges as $key => $badge) {
+						if (in_array($row->sourcing_status, $badge)) {
+							return "<span class='label label-$key'>$row->sourcing_status</span>";
+						}
+					}
+				}
+			}];
+			// $this->col[] = ["label"=>"Item Type","name"=>"new_item_types_id","join"=>"new_item_types,item_type_description"];
+			$this->col[] = ["label"=>"Display Photo","name"=>"image_filename","callback"=>function($row) {
+				if ($row->image_filename) {
+					$url = asset('img/item-sourcing/' . $row->image_filename);
+					return "<img src='$url' style='max-width: 100px'>";
+				}
+			}];
 			$this->col[] = ["label"=>"NWI Code","name"=>"nwi_code"];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"item_masters_id","join"=>"item_masters,tasteless_code"];
+			$this->col[] = ["label"=>"Last Comment","name"=>"id", "callback" => function($row) {
+				$comment = $row->comment_content;
+				if ($comment && strlen($comment) > 50) {
+					$comment = substr($comment, 0, 49) . '...';
+				}
+				$value = "";
+				if ($row->comment_by) {
+					$value .= "<div class='comment-data comment-by'>$row->comment_by</div>";
+				}
+				if ($row->comment_date) {
+					$value .= "<div class='comment-data comment-date'><span class='timeago' datetime='$row->comment_date'>$row->comment_date</span></div>";
+				}
+				if ($comment) {
+					$value .= "<div class='comment-data comment-content'>$comment</div>";
+				}
+				if ($row->comment_image) {
+					$url = asset('img/item-sourcing/' . $row->comment_image);
+					$img = "<img class='comment-image' src='$url' />";
+					$value .= $img;
+				}
+				return $value;
+			}];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
 			$this->col[] = ["label"=>"Packaging Size","name"=>"packaging_size"];
 			$this->col[] = ["label"=>"UOM","name"=>"uoms_id","join"=>"uoms,uom_description"];
@@ -108,6 +165,7 @@
 	        */
 	        $this->addaction = array();
 			$my_privilege = CRUDBooster::myPrivilegeName();
+			$my_requestor_ids = self::getMyRequestors();
 
 			$this->addaction[] = [
 				'title'=>'Detail',
@@ -116,7 +174,6 @@
 				'color' => ' ',
 			];
 
-			$my_privilege = CRUDBooster::myPrivilegeName();
 
 			if (CRUDBooster::isUpdate() || CRUDBooster::isSuperAdmin()) {
 				$this->addaction[] = [
@@ -124,7 +181,21 @@
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
 					'icon'=>'fa fa-pencil',
 					'color' => ' ',
-					"showIf"=>"[item_masters_id] == null && ([created_by] == CRUDBooster::myId() || CRUDBooster::isSuperAdmin())"
+					"showIf"=>"[approval_status] == 'PENDING' && ([created_by] == CRUDBooster::myId() || CRUDBooster::isSuperAdmin())"
+				];
+			}
+			
+			if ($my_requestor_ids || CRUDBooster::isSuperAdmin()) {
+				$requestor_json = json_encode($my_requestor_ids);
+				$this->addaction[] = [
+					'title'=>'Update Approval Status',
+					'url'=>CRUDBooster::mainpath('approve-or-reject/[id]'),
+					'icon'=>'fa fa-thumbs-up',
+					'color' => ' ',
+					"showIf"=>"
+						(in_array([created_by], $requestor_json) || CRUDBooster::isSuperAdmin()) && 
+						[approval_status] == 'PENDING'
+					"
 				];
 			}
 
@@ -134,7 +205,7 @@
 					'url'=>CRUDBooster::mainpath('get-tag/[id]'),
 					'icon'=>'fa fa-tag',
 					'color' => ' ',
-					"showIf"=>"[item_masters_id] == null"
+					"showIf"=>"in_array([sourcing_status], array('OPEN', 'ON HOLD', 'CANCELLED'))"
 				];
 			}
 
@@ -206,29 +277,6 @@
 	        |
 	        */
 	        $this->index_statistic = array();
-			$tagged_items = DB::table('new_ingredients')
-				->where('new_ingredients.status', 'ACTIVE')
-				->whereNotNull('new_ingredients.item_masters_id')
-				->count();
-
-			$pending_items = DB::table('new_ingredients')
-				->where('new_ingredients.status', 'ACTIVE')
-				->whereNull('new_ingredients.item_masters_id')
-				->count();
-
-			$this->index_statistic[] = [
-				'label' => 'Pending Items',
-				'count' => $pending_items,
-				'icon' => 'fa fa-hourglass',
-				'color' => 'orange',
-			];
-
-			$this->index_statistic[] = [
-				'label' => 'Tagged Items',
-				'count' => $tagged_items,
-				'icon' => 'fa fa-tag',
-				'color' => 'green',
-			];
 
 
 
@@ -257,6 +305,7 @@
 					function(){location.href=`$admin_path/delete-new-items/new_ingredients/` + dbId}
 				);
 			});
+
 			";
 
 
@@ -293,6 +342,9 @@
 	        |
 	        */
 	        $this->load_js = array();
+			$this->load_js[] = "https://unpkg.com/timeago.js/dist/timeago.min.js";
+			$this->load_js[] = asset('js/item-sourcing.js');
+
 	        
 	        
 	        
@@ -304,7 +356,11 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = NULL;
+	        $this->style_css = "
+				.comment-image {
+					max-width: 100px;
+				}
+			";
 	        
 	        
 	        
@@ -317,6 +373,7 @@
 	        |
 	        */
 	        $this->load_css = array();
+	        $this->load_css[] = asset('css/item-sourcing.css');
 	        
 	        
 	    }
@@ -345,11 +402,31 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        $query
+				->leftJoin('new_items_last_comment', 'new_items_last_comment.new_ingredients_id', 'new_ingredients.id')
+				->leftJoin('new_items_comments', 'new_items_comments.id', 'new_items_last_comment.new_items_comments_id')
+				->leftJoin('cms_users as commenter', 'commenter.id', 'new_items_comments.created_by')
+				->addSelect(
+					'new_items_comments.created_at as comment_date',
+					'new_ingredients.item_masters_id',
+					'commenter.name as comment_by',
+					'new_items_comments.comment_content',
+					'new_items_comments.filename as comment_image',
+					'item_approval_statuses.status_description as approval_status',
+					'item_sourcing_statuses.status_description as sourcing_status',
+				)
 				->where('new_ingredients.status', 'ACTIVE')
-				->orderBy(DB::raw('item_masters_id is null'), 'desc')
-				->orderBy(DB::raw('target_date is null'), 'asc')
-				->orderBy('target_date', 'asc');
-	            
+				->orderByRaw("
+					CASE
+						WHEN item_approval_statuses.status_description = 'REJECTED' THEN 7
+						WHEN item_sourcing_statuses.status_description = 'CANCELLED' THEN 6
+						WHEN item_sourcing_statuses.status_description = 'CLOSED' THEN 5
+						WHEN item_sourcing_statuses.status_description = 'ON HOLD' THEN 4
+						WHEN item_approval_statuses.status_description = 'APPROVED' THEN 3
+						WHEN item_sourcing_statuses.status_description = 'OPEN' THEN 2
+						WHEN item_approval_statuses.status_description = 'PENDING' THEN 1
+						ELSE 9
+					END ASC				
+				");
 	    }
 
 	    /*
@@ -369,15 +446,59 @@
 	    | @arr
 	    |
 	    */
-	    public function hook_before_add(&$postdata) {        
+	    public function hook_before_add(&$postdata) {
 	        //Your code here
+
+			$input = Input::all();
 			$max_nwi_code = DB::table('new_ingredients')->max('nwi_code');
 			$nwi_code_int = (int) explode('-', $max_nwi_code)[1] + 1;
 			$nwi_code = 'NWI-' . str_pad($nwi_code_int, 5, '0', STR_PAD_LEFT);
+			$segmentations = $input['segmentations'];
+			$item_photo = $input['display_photo'];
+			if ($item_photo) {
+				$filename_filler = $nwi_code . '_' . Str::random(10);
+				$image_filename = date('Y-m-d') . "-$filename_filler." . $item_photo->getClientOriginalExtension();
+				$image = Image::make($item_photo);
+				
+				$image->resize(1024, 768, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
+	
+				$image->save(public_path('img/item-sourcing/' . $image_filename));
+				$optimizerChain = OptimizerChainFactory::create();
+				$optimizerChain->optimize(public_path('img/item-sourcing/' . $image_filename));
+			}
 
+			if ($segmentations) {
+				$implodesegmentations = implode(',', $input['segmentations']);
+			}
+			$item_approval_statuses_id = DB::table('item_approval_statuses')
+				->where('status', 'ACTIVE')
+				->where('status_description', 'PENDING')
+				->pluck('id')
+				->first();
+
+			$postdata['item_approval_statuses_id'] = $item_approval_statuses_id;
+			$postdata['others'] =  $input['others'];
+			$postdata['image_filename'] = $image_filename;
 			$postdata['nwi_code'] = $nwi_code;
-			$postdata['comment'] = Input::get('comment');
-			$postdata['target_date'] = Input::get('target_date');
+			$postdata['segmentations'] = $implodesegmentations;
+			$postdata['comment'] = $input['comment'];
+			$postdata['new_ingredient_reasons_id'] = $input['new_ingredient_reasons_id'];
+			$postdata['existing_ingredient'] = $input['existing_ingredient'];
+			$postdata['recommended_brand_one'] = $input['recommended_brand_one'];
+			$postdata['recommended_brand_two'] = $input['recommended_brand_two'];
+			$postdata['recommended_brand_three'] = $input['recommended_brand_three'];
+			$postdata['initial_qty_needed'] = $input['initial_qty_needed'];
+			$postdata['initial_qty_uoms_id'] = $input['initial_qty_uoms_id'];
+			$postdata['forecast_qty_needed'] = $input['forecast_qty_needed'];
+			$postdata['forecast_qty_uoms_id'] = $input['forecast_qty_uoms_id'];
+			$postdata['budget_range'] = $input['budget_range'];
+			$postdata['reference_link'] = $input['reference_link'];
+			$postdata['new_ingredient_terms_id'] = $input['new_ingredient_terms_id'];
+			$postdata['duration'] = $input['duration'];
+			$postdata['target_date'] = $input['target_date'];
 			$postdata['item_description'] = strtoupper($postdata['item_description']);
 			$postdata['created_by'] = CRUDBooster::myId();
 			$postdata['created_at'] = date('Y-m-d H:i:s');
@@ -409,7 +530,7 @@
 				'to' => CRUDBooster::mainPath("detail/$inserted_item->id"),
 			];
 
-			CRUDBooster::sendNotification($notif_config);
+			// CRUDBooster::sendNotification($notif_config);
 	    }
 
 	    /* 
@@ -472,31 +593,13 @@
 					trans('crudbooster.denied_access')
 				);
 
-			$data['item'] = DB::table('new_ingredients')
-				->where('new_ingredients.id', $id)
-				->select(
-					'*',
-					'new_ingredients.created_at as created_at',
-					'new_ingredients.id as new_ingredients_id',
-					'creator.name as creator_name',
-					'updator.name as updator_name',
-					'tagger.name as tagger_name',
-					'new_ingredients.created_at',
-					'new_ingredients.updated_at',
-					'new_ingredients.tagged_at',
-					'item_masters.id as item_masters_id',
-					'new_ingredients.ttp as ttp',
-					'new_ingredients.packaging_size as packaging_size',
-					'new_item_types.item_type_description'
-				)
-				->leftJoin('uoms', 'uoms.id', '=', 'new_ingredients.uoms_id')
-				->leftJoin('cms_users as creator', 'creator.id', '=', 'new_ingredients.created_by')
-				->leftJoin('cms_users as updator', 'updator.id', '=', 'new_ingredients.updated_by')
-				->leftJoin('cms_users as tagger', 'tagger.id', '=', 'new_ingredients.tagged_by')
-				->leftJoin('item_masters', 'item_masters.id', '=', 'new_ingredients.item_masters_id')
-				->leftJoin('new_item_types', 'new_item_types.id', '=', 'new_ingredients.new_item_types_id')
-				->get()
-				->first();
+			$data['item'] = self::getSourcingDetails($id);
+
+			$segmentations = explode(',', $data['item']->segmentations);
+			$data['segmentations'] = DB::table('segmentations')
+					->whereIn("segment_column_name", $segmentations)
+					->pluck('segment_column_description')
+					->toArray();
 
 			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
 					->where('status', 'ACTIVE')
@@ -512,7 +615,70 @@
 
 			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
 
-			return $this->view('new-items/detail-new-items', $data);
+			return $this->view('new-items/detail-new-ingredients', $data);
+		}
+
+		public function getSourcingDetails($id) {
+			$item = DB::table('new_ingredients')
+				->where('new_ingredients.id', $id)
+				->select(
+					'*',
+					'item.tasteless_code',
+					'item_uom.uom_description',
+					'new_ingredients.id as new_ingredients_id',
+					'creator.name as creator_name',
+					'creator.id as creator_id',
+					'updator.name as updator_name',
+					'tagger.name as tagger_name',
+					'approver.name as approver_name',
+					'sourcer.name as sourcer_name',
+					'new_ingredients.created_at',
+					'new_ingredients.updated_at',
+					'new_ingredients.tagged_at',
+					'new_ingredients.id as new_ingredients_id',
+					'new_ingredients.image_filename',
+					'item.id as item_masters_id',
+					'new_ingredients.ttp',
+					'new_ingredients.packaging_size',
+					'new_item_types.item_type_description',
+					'new_ingredients.segmentations',
+					'new_ingredient_reasons.description as reasons_description',
+					'existing.full_item_description as existing_ingredient',
+					'existing.tasteless_code as existing_ingredient_code',
+					'new_ingredients.recommended_brand_one',
+					'new_ingredients.recommended_brand_two',
+					'new_ingredients.recommended_brand_three',
+					'new_ingredients.initial_qty_needed',
+					'initial_uoms.uom_description as initial_qty_uoms',
+					'new_ingredients.forecast_qty_needed',
+					'forecast_uoms.uom_description as forecast_qty_uoms',
+					'new_ingredients.budget_range',
+					'new_ingredients.reference_link', 
+					'new_ingredients.duration', 
+					'new_ingredient_terms.description as ingredient_terms',
+					'approval_statuses.status_description as approval_status',
+					'sourcing_statuses.status_description as sourcing_status',
+				)
+				->leftJoin('uoms as item_uom', 'item_uom.id', '=', 'new_ingredients.uoms_id')
+				->leftJoin('cms_users as creator', 'creator.id', '=', 'new_ingredients.created_by')
+				->leftJoin('cms_users as updator', 'updator.id', '=', 'new_ingredients.updated_by')
+				->leftJoin('cms_users as tagger', 'tagger.id', '=', 'new_ingredients.tagged_by')
+				->leftJoin('cms_users as approver', 'approver.id', '=', 'new_ingredients.approval_status_updated_by')
+				->leftJoin('cms_users as sourcer', 'sourcer.id', '=', 'new_ingredients.sourcing_status_updated_by')
+				->leftJoin('item_masters as item', 'item.id', '=', 'new_ingredients.item_masters_id')
+				->leftJoin('new_item_types', 'new_item_types.id', '=', 'new_ingredients.new_item_types_id')
+				->leftJoin('new_ingredient_reasons', 'new_ingredient_reasons.id', '=', 'new_ingredients.new_ingredient_reasons_id')
+				->leftJoin('uoms as initial_uoms', 'initial_uoms.id', '=', 'new_ingredients.initial_qty_uoms_id')
+				->leftJoin('uoms as forecast_uoms', 'forecast_uoms.id', '=', 'new_ingredients.forecast_qty_uoms_id')
+				->leftJoin('new_ingredient_terms', 'new_ingredient_terms.id', '=', 'new_ingredients.new_ingredient_terms_id')
+				->leftJoin('item_masters as existing', 'existing.tasteless_code', '=', 'new_ingredients.existing_ingredient')
+				->leftJoin('item_approval_statuses as approval_statuses', 'approval_statuses.id', 'new_ingredients.item_approval_statuses_id')
+				->leftJoin('item_sourcing_statuses as sourcing_statuses', 'sourcing_statuses.id', 'new_ingredients.item_sourcing_statuses_id')
+				->get()
+				->first();
+				
+			$item->other_values = json_decode($item->others);
+			return $item;
 		}
 
 		public function searchNewIngredients(Request $request) {
@@ -533,6 +699,25 @@
 			return json_encode($result);
 		}
 
+		public function getAdd() {
+
+			$data = [];
+
+			$submasters = self::getSubmasters();
+
+			$data['comment_templates'] = self::getCommentTemplate('ingredient');
+
+			$data['created_by'] = DB::table('cms_users')
+				->where('id', CRUDBooster::myId())
+				->get()
+				->first();
+
+			$data['created_at'] = date('Y-m-d');
+			$data = array_merge($data, $submasters);
+
+			return $this->view('new-items/add-new-ingredients', $data);
+		}
+
 		public function getEdit($id) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(
@@ -540,10 +725,9 @@
 					trans('crudbooster.denied_access')
 				);
 
-
 			$data = [];
 
-			$data['item'] = DB::table('new_ingredients')
+			$item = DB::table('new_ingredients')
 				->where('new_ingredients.id', $id)
 				->select(
 					'*',
@@ -551,13 +735,26 @@
 					'updated.name as updated_name',
 					'new_ingredients.created_at',
 					'new_ingredients.updated_at',
-					'new_ingredients.id as new_ingredients_id'
+					'new_ingredients.id as new_ingredients_id',
+					'new_ingredients.packaging_size',
+					'new_ingredients.segmentations',
+					'new_ingredients.ttp',
+					'new_ingredients.image_filename',
+					'reasons.description as reason_description',
+					'existing.tasteless_code as existing_tasteless_code',
+					'existing.full_item_description as existing_item_description'
 				)
 				->leftJoin('uoms', 'uoms.id', '=', 'new_ingredients.uoms_id')
 				->leftJoin('cms_users as created', 'created.id', '=', 'new_ingredients.created_by')
 				->leftJoin('cms_users as updated', 'updated.id', '=', 'new_ingredients.updated_by')
+				->leftJoin('new_ingredient_reasons as reasons', 'reasons.id', '=', 'new_ingredients.new_ingredient_reasons_id')
+				->leftJoin('item_masters as existing', 'existing.tasteless_code', '=', 'new_ingredients.existing_ingredient')
 				->get()
 				->first();
+
+			$data['item'] = $item;
+
+			$data['others'] = json_decode($item->others);
 
 			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
 					->where('status', 'ACTIVE')
@@ -571,18 +768,7 @@
 
 			$data['comments_data'] = self::getNewItemsComments($id);
 
-			$data['new_item_types'] = DB::table('new_item_types')
-				->where('new_item_types.status', 'ACTIVE')
-				->orderBy('item_type_description')
-				->get()
-				->toArray();
-
-			$data['uoms'] = DB::table('uoms')
-				->where('uoms.status', 'ACTIVE')
-				->orderBy('uoms.uom_description')
-				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
-				->get()
-				->toArray();
+			$submasters = self::getSubmasters();				
 
 			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
 
@@ -592,9 +778,49 @@
 					"This item has already been tagged.", 'danger'
 				);
 			}
+			$data = array_merge($data, $submasters);
 
+			return $this->view('new-items/edit-new-ingredients', $data);
+		}
 
-			return $this->view('new-items/edit-new-item', $data);
+		public function getSubmasters() {
+			$data = [];
+			$data['uoms'] = DB::table('uoms')
+				->where('uoms.status', 'ACTIVE')
+				->orderBy('uoms.uom_description')
+				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
+				->get()
+				->toArray();
+
+			$data['new_item_types'] = DB::table('new_item_types')
+				->where('new_item_types.status', 'ACTIVE')
+				->orderBy('item_type_description')
+				->get()
+				->toArray();
+			
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()
+				->toArray();
+
+			$data['new_ingredient_reasons'] = DB::table('new_ingredient_reasons')
+				->where('new_ingredient_reasons.status', 'ACTIVE')
+				->orderByRaw('description = "OTHERS"')
+				->orderBy('description')
+				->get();
+
+			$data['new_ingredient_uoms'] = DB::table('uoms')
+				->where('uoms.status', 'ACTIVE')
+				->whereIn('uoms.uom_code',['KGS', 'PCS'])
+				->get();
+
+			$data['new_ingredient_terms'] = DB::table('new_ingredient_terms')
+				->where('new_ingredient_terms.status', 'ACTIVE')
+				->orderByRaw('description = "OTHERS"')
+				->orderBy('description')
+				->get();
+			return $data;
 		}
 
 		public function submitEditNewIngredient(Request $request) {
@@ -604,22 +830,69 @@
 					trans('crudbooster.denied_access')
 				);
 
+			$inputs = $request->all();
 			$new_ingredients_id = $request->get('new_items_id');
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
+			$item = self::getSourcingDetails($new_ingredients_id);
+			$segmentations = $request->get('segmentations');
+			if ($segmentations) {
+				$implodesegmentations = implode(',', Input::get('segmentations'));
+			}
+			if ($item->approval_status != 'PENDING') {
+				return CRUDBooster::redirect(CRUDBooster::mainPath(), 'This item is not pending.', 'danger');
+			}
+
+			$item_photo = $inputs['display_photo'];
+			if ($item_photo) {
+				$filename_filler = $item->nwi_code . '_' . Str::random(10);
+				$image_filename = date('Y-m-d') . "-$filename_filler." . $item_photo->getClientOriginalExtension();
+				$image = Image::make($item_photo);
+				
+				$image->resize(1024, 768, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
+	
+				$image->save(public_path('img/item-sourcing/' . $image_filename));
+				$optimizerChain = OptimizerChainFactory::create();
+				$optimizerChain->optimize(public_path('img/item-sourcing/' . $image_filename));
+			}
+
+			$data = [
+				'others' => $request->get('others'),
+				'new_item_types_id' => $request->get('new_item_types_id'),
+				'item_description' => strtoupper($request->get('item_description')),
+				'packaging_size' => $request->get('packaging_size'),
+				'uoms_id' => $request->get('uoms_id'),
+				'ttp' => $request->get('ttp'),
+				'target_date' => $request->get('target_date'),
+				'segmentations' => $implodesegmentations,
+				'new_ingredient_reasons_id' => $request->get('new_ingredient_reasons_id'),
+				'existing_ingredient' => $request->get('existing_ingredient'),
+				'recommended_brand_one' => $request->get('recommended_brand_one'),
+				'recommended_brand_two' => $request->get('recommended_brand_two'),
+				'recommended_brand_three' => $request->get('recommended_brand_three'),
+				'initial_qty_needed' => $request->get('initial_qty_needed'),
+				'initial_qty_uoms_id' => $request->get('initial_qty_uoms_id'),
+				'forecast_qty_needed' => $request->get('forecast_qty_needed'),
+				'forecast_qty_uoms_id' => $request->get('forecast_qty_uoms_id'),
+				'budget_range' => $request->get('budget_range'),
+				'reference_link' => $request->get('reference_link'),
+				'new_ingredient_terms_id' => $request->get('new_ingredient_terms_id'),
+				'duration' => $request->get('duration'),
+				'updated_at' => $time_stamp,
+				'updated_by' => $action_by,
+			];
+
+
+			if ($image_filename) {
+				$data['image_filename'] = $image_filename;
+			}
 
 			DB::table('new_ingredients')
 				->where('new_ingredients.id', $new_ingredients_id)
-				->update([
-					'new_item_types_id' => $request->get('new_item_types_id'),
-					'item_description' => strtoupper($request->get('item_description')),
-					'packaging_size' => $request->get('packaging_size'),
-					'uoms_id' => $request->get('uoms_id'),
-					'ttp' => $request->get('ttp'),
-					'target_date' => $request->get('target_date'),
-					'updated_at' => $time_stamp,
-					'updated_by' => $action_by,
-				]);
+				->update($data);
 			
 
 			(new AdminMenuItemsController)->updateCostOfOtherMenu();
@@ -632,35 +905,6 @@
 			
 		}
 
-		public function getAdd() {
-
-			$data = [];
-
-			$data['uoms'] = DB::table('uoms')
-				->where('uoms.status', 'ACTIVE')
-				->orderBy('uoms.uom_description')
-				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
-				->get()
-				->toArray();
-
-			$data['new_item_types'] = DB::table('new_item_types')
-				->where('new_item_types.status', 'ACTIVE')
-				->orderBy('item_type_description')
-				->get()
-				->toArray();
-
-			$data['comment_templates'] = self::getCommentTemplate('ingredient');
-
-			$data['created_by'] = DB::table('cms_users')
-				->where('id', CRUDBooster::myId())
-				->get()
-				->first();
-
-			$data['created_at'] = date('Y-m-d');
-
-			return $this->view('new-items/add-new-item', $data);
-		}
-
 		public function getTag($id) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(
@@ -670,68 +914,48 @@
 
 			$data = [];
 
-			$data['item'] = DB::table('new_ingredients')
-				->where('new_ingredients.id', $id)
-				->select(
-					'*',
-					'created.name as created_name',
-					'updated.name as updated_name',
-					'new_ingredients.created_at',
-					'new_ingredients.updated_at',
-					'new_ingredients.id as new_ingredients_id'
-				)
-				->leftJoin('uoms', 'uoms.id', '=', 'new_ingredients.uoms_id')
-				->leftJoin('cms_users as created', 'created.id', '=', 'new_ingredients.created_by')
-				->leftJoin('cms_users as updated', 'updated.id', '=', 'new_ingredients.updated_by')
-				->get()
-				->first();
+			$data['item'] = self::getSourcingDetails($id);
+
+			if (!$data['item']->sourcing_status || $data['item']->sourcing_statua == 'CLOSED') {
+				return CRUDBooster::redirect(CRUDBooster::mainPath(), 'This item cannot be tagged.', 'danger');
+			}
+
+			$segmentations = explode(',', $data['item']->segmentations);
+			$data['segmentations'] = DB::table('segmentations')
+					->whereIn("segment_column_name", $segmentations)
+					->pluck('segment_column_description')
+					->toArray();
 
 			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
+					->where('status', 'ACTIVE')
+					->where('new_ingredients_id', $id)
+					->get()
+					->count();
+
+			$data['sourcing_statuses'] = DB::table('item_sourcing_statuses')
 				->where('status', 'ACTIVE')
-				->where('new_ingredients_id', $id)
+				->select('id', 'status_description')
 				->get()
-				->count();
+				->toArray();
 
 			$data['table'] = 'new_ingredients';
 
+			$data['comments_data'] = self::getNewItemsComments($id, true);
+
 			$data['comment_templates'] = self::getCommentTemplate('ingredient');
-
-			$data['comments_data'] = self::getNewItemsComments($id);
-
-			$data['new_item_types'] = DB::table('new_item_types')
-				->where('new_item_types.status', 'ACTIVE')
-				->orderBy('item_type_description')
-				->get()
-				->toArray();
-
-			$data['uoms'] = DB::table('uoms')
-				->where('uoms.status', 'ACTIVE')
-				->orderBy('uoms.uom_description')
-				->whereNotIn('uoms.uom_description', ['LTR (LTR)', 'KILOGRAM (KGS)'])
-				->get()
-				->toArray();
 
 			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
 
-			if ($data['item']->item_masters_id) {
-				return CRUDBooster::redirect(
-					CRUDBooster::mainPath(),
-					"This item has already been tagged.", 'danger'
-				);
-			}
-
-
-			return $this->view('new-items/tag-new-item', $data);
+			return $this->view('new-items/tag-new-ingredients', $data);
 		}
 
-		public function tagNewIngredient(Request $request) {
+		public function tagNewIngredient(Request $request, $new_ingredients_id) {
 			if (!CRUDBooster::isUpdate())
 				CRUDBooster::redirect(
 					CRUDBooster::adminPath(),
 					trans('crudbooster.denied_access')
 				);
 
-			$new_ingredients_id = $request->get('new_items_id');
 			$tasteless_code = $request->get('tasteless_code');
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
@@ -753,8 +977,6 @@
 					->where('id', $new_ingredients_id)
 					->update([
 						'item_masters_id' => $item_masters_id,
-						'updated_by' => $action_by,
-						'updated_at' => $time_stamp,
 						'tagged_by' => $action_by,
 						'tagged_at' => $time_stamp,
 					]);
@@ -795,11 +1017,10 @@
 
 				(new AdminMenuItemsController)->updateCostOfOtherMenu();
 
-				return redirect(CRUDBooster::mainpath())
-					->with([
-						'message_type' => 'success',
-						'message' => "Item successfully tagged!"
-					]);
+				return redirect(CRUDBooster::mainPath('get-tag/' . $new_ingredients_id))->with([
+					'message' => '✔️ Item successfully tagged!',
+					'message_type' => 'success',
+				]);
 			}
 			
 
@@ -828,10 +1049,12 @@
 				->where("new_items_comments.$table" . '_id', $id)
 				->where('new_items_comments.status', 'ACTIVE')
 				->select(
-					'*', 
+					'cms_users.name', 
 					'cms_users.id as cms_users_id', 
 					'new_items_comments.created_at as comment_added_at', 
-					'new_items_comments.id as comment_id'
+					'new_items_comments.id as comment_id',
+					'new_items_comments.filename',
+					'new_items_comments.comment_content',
 				)
 				->leftJoin('cms_users', 'new_items_comments.created_by', '=', 'cms_users.id')
 				->orderBy('comment_added_at', 'ASC')
@@ -850,16 +1073,37 @@
 		}
 
 		public function addNewItemsComments(Request $request) {
-			$comment_content = $request->comment_content;
-			$table = $request->table;
-			$new_items_id = $request->new_items_id;
+			$comment_content = $request['comment_content'];
+			$table = $request['table'];
+			$new_items_id = $request['new_items_id'];
+			$attached_image = $request['attached_image'];
 			$action_by = CRUDBooster::myId();
 			$time_stamp = date('Y-m-d H:i:s');
+
+
+			if ($attached_image) {
+				$filename_filler = Str::random(10);
+				$img_file = $attached_image;
+				$filename = date('Y-m-d') . "-$filename_filler." . $img_file->getClientOriginalExtension();
+				$image = Image::make($img_file);
+				
+				$image->resize(1024, 768, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
+	
+				// Save the resized image to the public folder
+				$image->save(public_path('img/item-sourcing/' . $filename));
+				// Optimize the uploaded image
+				$optimizerChain = OptimizerChainFactory::create();
+				$optimizerChain->optimize(public_path('img/item-sourcing/' . $filename));
+			}
 
 			$inserted_id = DB::table('new_items_comments')
 				->insertGetId([
 					$table . '_id' => $new_items_id,
 					'comment_content' => $comment_content,
+					'filename' => $filename,
 					'created_by' => $action_by,
 					'created_at' => $time_stamp,
 				]);
@@ -868,10 +1112,12 @@
 				->where('new_items_comments.id', $inserted_id)
 				->leftJoin('cms_users', 'new_items_comments.created_by', '=', 'cms_users.id')
 				->select(
-					'*', 
+					'cms_users.name', 
 					'cms_users.id as cms_users_id', 
 					'new_items_comments.created_at as comment_added_at', 
-					'new_items_comments.id as comment_id'
+					'new_items_comments.id as comment_id',
+					'new_items_comments.filename',
+					'new_items_comments.comment_content',
 				)
 				->get()
 				->first();
@@ -891,7 +1137,7 @@
 				'id_cms_users' => $to_notify,
 			];
 
-			CRUDBooster::sendNotification($notif_config);
+			// CRUDBooster::sendNotification($notif_config);
 
 			return json_encode([$response]);
 		}
@@ -1051,4 +1297,129 @@
 				return array_merge($menu_items, $rnd_menu_items);
 			}
 		}
+
+		public function suggestExistingIngredients(Request $request){
+			$term = $request->input('term');
+			$suggestions = ItemMaster::where('item_masters.sku_statuses_id', 1)
+				->whereNotNull('item_masters.tasteless_code')
+				->whereRaw("(item_masters.tasteless_code like '%$term%' or item_masters.full_item_description like '%$term%')")
+				->select('item_masters.full_item_description as text', 'item_masters.tasteless_code as id')
+				->orderBy('item_masters.full_item_description', 'asc')
+				->get();
+
+			return response()->json($suggestions);
+		}
+
+		public function getMyRequestors() {
+			$my_id = CRUDBooster::myId();
+			$my_requestor_ids = DB::table('item_sourcing_matrices')
+				->where('status', 'ACTIVE')
+				->where(DB::raw("FIND_IN_SET($my_id, approver_ids)"), '>', 0)
+				->pluck('requestor_id')
+				->toArray();
+
+			return $my_requestor_ids;
+		}
+
+		public function approveOrReject($id) {
+			$item = self::getSourcingDetails($id);
+
+			$my_requestor_ids = self::getMyRequestors();
+
+			if (!in_array($item->creator_id, $my_requestor_ids) && !CRUDBooster::isSuperAdmin()) {
+				return CRUDBooster::redirect(
+					CRUDBooster::mainPath(),
+					trans('crudbooster.denied_access')
+				);
+			}
+
+			$data['item'] = $item;
+
+			$segmentations = explode(',', $data['item']->segmentations);
+			$data['segmentations'] = DB::table('segmentations')
+					->whereIn("segment_column_name", $segmentations)
+					->pluck('segment_column_description')
+					->toArray();
+
+			$data['rnd_count'] = DB::table('rnd_menu_ingredients_details')
+					->where('status', 'ACTIVE')
+					->where('new_ingredients_id', $id)
+					->get()
+					->count();
+
+			$data['table'] = 'new_ingredients';
+
+			$data['comments_data'] = self::getNewItemsComments($id, true);
+
+			$data['comment_templates'] = self::getCommentTemplate('ingredient');
+
+			$data['item_usages'] = self::getNewItemUsage($id, 'ingredient');
+
+			return $this->view('new-items/approve-new-ingredients', $data);
+
+		}
+
+		public function submitApproveOrReject(Request $request) {
+			$new_ingredients_id = $request->get('new_ingredients_id');
+			$action = $request->get('action');
+			$item = self::getSourcingDetails($new_ingredients_id);
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+
+			if ($item->approval_status != 'PENDING') {
+				return CRUDBooster::redirect(CRUDBooster::mainPath(), 'This item is not pending.', 'danger');
+			}
+
+			if ($action == 'approve') {
+				$item_approval_statuses_id = DB::table('item_approval_statuses')
+					->where('status', 'ACTIVE')
+					->where('status_description', 'APPROVED')
+					->pluck('id')
+					->first();
+
+				$item_sourcing_statuses_id = DB::table('item_sourcing_statuses')
+					->where('status', 'ACTIVE')
+					->where('status_description', 'OPEN')
+					->pluck('id')
+					->first();
+
+				$params = ['✔️ Item successfully approved!', 'success'];
+
+			} else if ($action == 'reject') {
+				$item_approval_statuses_id = DB::table('item_approval_statuses')
+					->where('status', 'ACTIVE')
+					->where('status_description', 'REJECTED')
+					->pluck('id')
+					->first();
+
+				$params = ['✖️ Item successfully rejected!', 'success'];
+			}
+
+			DB::table('new_ingredients')->where('id', $new_ingredients_id)->update([
+				'approval_status_updated_by' => $action_by,
+				'approval_status_updated_at' => $time_stamp,
+				'item_approval_statuses_id' => $item_approval_statuses_id,
+				'item_sourcing_statuses_id' => $item_sourcing_statuses_id,
+			]);
+
+			return CRUDBooster::redirect(CRUDBooster::mainPath(), ...$params);
+
+		}
+
+		public function submitSourcingStatus(Request $request, $new_ingredients_id) {
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$item_sourcing_statuses_id = $request->get('item_sourcing_statuses_id');
+
+			DB::table('new_ingredients')
+				->where('id', $new_ingredients_id)
+				->update([
+					'item_sourcing_statuses_id' => $item_sourcing_statuses_id,
+					'sourcing_status_updated_by' => $action_by,
+					'sourcing_status_updated_at' => $time_stamp,
+				]);
+
+			return CRUDBooster::redirect(CRUDBooster::mainPath(), 'Sourcing status updated successfully.', 'success');
+		}
+
 	}

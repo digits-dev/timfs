@@ -18,12 +18,14 @@
 	use App\Exports\POSExport;
 	use App\Exports\QBExport;
 	use App\Group;
+	use App\SalesPriceChangeHistory;
 	use App\Segmentation;
 	use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
 	use Illuminate\Support\Facades\Redirect;
 	use Carbon\Carbon;
 	use Illuminate\Support\Facades\Schema;
+	use Illuminate\Support\Facades\Storage;
 	use Intervention\Image\Facades\Image;
 	use Spatie\ImageOptimizer\OptimizerChainFactory;
 	use Illuminate\Support\Str;
@@ -79,7 +81,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
             $this->col[] = ["label" => "Item ID", "name" => "id", "visible" => false];
-			$this->col[] = ["label" => "Item Photo", "name" => "image_filename","visible" =>  true];
+			$this->col[] = ["label" => "Display Photo", "name" => "image_filename","visible" =>  true];
     		$this->col[] = ["label" => "Tasteless Code", "name" => "tasteless_code","visible" =>  false];
     		$this->col[] = ["label" => "Preferred Vendor", "name" => "suppliers_id", "join" => "suppliers,last_name", "visible" => CRUDBooster::myColumnView()->supplier ? true : false];
     		$this->col[] = ["label" => "Item", "name" => "tasteless_code", "visible" =>  true];
@@ -820,7 +822,6 @@
 					trans('crudbooster.denied_access')
 				);
 			}
-
 			$data = [];
 
 			$data['action'] = $action;
@@ -869,7 +870,7 @@
 		}
 
 		public function getItemDetails($tasteless_code) {
-			$item = DB::table('item_master_approvals')
+			$item = DB::table('item_masters')
 				->where('tasteless_code', $tasteless_code)
 				->get()
 				->first();
@@ -1000,6 +1001,7 @@
 
 		public function submitAddOrEdit(Request $request) {
 			$input = $request->all();
+
 			if ($input['item_photo']) {
 				$filename_filler = $input['tasteless_code'] ?? 'new_item';
 				$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
@@ -1084,8 +1086,24 @@
 			} else if ($tasteless_code) {
 				$data['action_type'] = 'UPDATE';
 				$item_to_be_updated = ItemMasterApproval::where('tasteless_code', $tasteless_code);
-				$inserted_id = $item_to_be_updated->first()->id;
+				$item_from_item_masters = ItemMaster::where('tasteless_code', $tasteless_code)->first();
+				if ((float) $item_from_item_masters->ttp != (float) $data['ttp_price_change'] ||
+					(float) $item_from_item_masters->ttp != (float) $data['ttp'] ||
+					$item_from_item_masters->ttp_price_effective_date != $data['ttp_price_effective_date']
+				) {
+					$sales_price_change_history = [
+						'tasteless_code' => $tasteless_code,
+						'sales_price' => $data['ttp'],
+						'sales_price_change' => $data['ttp_price_change'],
+						'effective_date' => $data['ttp_price_effective_date'],
+						'status' => 'CREATED',
+						'created_by' => $action_by,
+						'created_at' => $time_stamp,
+					];
+					SalesPriceChangeHistory::insert($sales_price_change_history);
+				}
 				$item_to_be_updated->update($data);
+				$inserted_id = $item_to_be_updated->first()->id;
 			} else {
 				$data['action_type'] = 'CREATE';
 				ItemMasterApproval::where('id', $input['item_masters_approvals_id'])->update($data);

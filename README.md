@@ -1,5 +1,83 @@
 # 📄 TIMFS - Tasteless Item Masterfile System
 
+## TODOS - ADJUSTMENTS => MEETING WITH MS. YVETTE 12-13-2023
+### Item Sourcing
+- [x] Hide "Item Type" on item sourcing
+- [x] Remove Beverage Type on new store supplies
+- [x] Rename "REPLACEMENT" to "REPLACEMENT OF INGREDIENT"
+- [x] Add `required` attribute for brands 1 and 2
+- [ ] ~~Auto update segmentations after tagging of item sourcing~~
+- [x] Change input type from `number` to `text` for budget range
+- [x] Update db data type for budget range to text
+- [x] Rename Module of "New Packaging" to "New Store Supplies"
+- [x] Rename "Packaging Type" to "Sourcing Category"
+- [x] Rename "Sticker Type" to "Sticker Material"
+- [x] Rename "Custom" to "Customized" for Design Type
+- [x] Rename "Packaging Use" to "Sourcing Usage"
+- [x] Remove N/A for Packaging Use
+- [x] Require comment
+- [x] Add new field: reference links => required
+- [x] Add the ff. options to Material Type
+    - cotton
+    - linen
+    - denim
+- [x] Add `required` attribute to display photo [input type="file"] (image and file for new store supplies, image for new ingredients)
+- If Sticker Label is selected,
+  - [x] Show Sticker Material
+  - [x] Hide Material Type
+- If Takeout Container is selected,
+  - [x] Show Material Type
+  - [x] Hide Sticker Material
+- Add option "OTHERS"
+  - [x] Reason
+  - [x] Sourcing Category
+  - [x] Sticker Material
+  - [x] Packaging Use / Sourcing Usage
+  - [x] Material Type
+- [x] New input field For 'Others'
+- [x] Add 'UNIFORM' to Sourcing Category
+- [x] If Sticker label is selected, show the ff. on sourcing usage:
+  - takeout packaging 
+  - marketing collaterals
+  - merchandise
+  - other => new field
+- If uniform is selected,
+  - [x] Show Uniform Type
+  - [x] Add options for uniform type
+    - apron
+    - cap
+    - chef's jacket
+    - short sleeve shirt
+    - long sleeve shirt
+    - long sleeve polo shirt
+    - short sleeve polo shirt
+    - 3/4 sleeve shirt
+    - name plate
+    - footwear
+    - others => new field
+  - [x] If apron, cap, chef's jacket or shirt is selected, material types should be the ff:
+    - cotton
+    - linen
+    - denim
+    - others
+- [x] If "Others" is selected in Sourcing Category, hide the ff:
+  - Packaging Use
+  - Beverage Type
+  - Material Type
+- [x] Add all these select logic to edit page
+- [x] Update the detail, approve, and tag page to show all information
+
+### Item Masters
+  - [x] add file reference link
+  - [x] remove upload of files
+  - [x] hide accumulated dep, qty on hand, tax agency and mpn
+  - [x] prevent bulk approval on item master if one of the item effective date has expired
+### Menu Master File
+  - [x] Show costing and ingredients to accounting manager
+### RND 
+  - [x] Show ingredients on approval phase
+
+
 ## ✅ TODOS:
 
 - [x] Show the SRP of the menu on the front end

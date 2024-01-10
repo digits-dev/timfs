@@ -108,6 +108,25 @@
                                 <td><input value="{{ $item->full_item_description ?: '' }}" title="{{ $item->full_item_description }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
                             </tr>
                             @endif
+                            <tr>
+                                <th>
+                                    Display Photo
+                                    @if ($item->image_filename)
+                                    <a href="{{ asset('img/item-master/' . $item->image_filename) }}" download="{{ $item->image_filename }}" class="btn btn-primary pull-right">
+                                        <i class="fa fa-download"></i>
+                                    </a>
+                                    @endif
+                                </th>
+                                <td><input value="{{ $item->image_filename }}" type="text" name="filename_1" id="filename_1" class="form-control" readonly /></td>
+                            </tr>
+                            <tr>
+                                <th>File Reference Link</th>
+                                <td>
+                                    <div class="form-control">
+                                        <a href="{{ $item->file_link }}" target="_blank" class="">{{ $item->file_link }}</a>
+                                    </div>
+                                </td>
+                            </tr>
                             @if (CRUDBooster::myColumnView()->brand_description)
                             <tr>
                                 <th><span class="required-star">*</span>  Brand Description</th>
@@ -167,20 +186,6 @@
                                 <th><span class="required-star">*</span>  Purchase Description</th>
                                 <td>
                                     <input type="text" value="{{ $item->purchase_description }}" class="form-control" name="purchase_description" id="purchase_description" readonly>
-                                </td>
-                            </tr>
-                            @endif
-                            @if ($item->tasteless_code)
-                            <tr>
-                                <th>Accumulated Depreciation</th>
-                                <td>
-                                    <input type="text" value="{{ $item->accumulated_depreciation }}" class="form-control" name="accumulated_depreciation" id="accumulated_depreciation" readonly>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Quantity On Hand</th>
-                                <td>
-                                    <input type="text" value="{{ $item->quantity_on_hand }}" class="form-control" name="quantity_on_hand" id="quantity_on_hand" readonly>
                                 </td>
                             </tr>
                             @endif
@@ -280,30 +285,16 @@
                                 <td>
                                     <input value="{{ $item->landed_cost }}" type="number" step="any" class="form-control" name="landed_cost" id="landed_cost" required readonly>
                                 </td>
-                                <tr>
-                                    <th><span class="required-star">*</span> Preferred Vendor</th>
-                                    <td>
-                                        <select name="suppliers_id" id="suppliers_id" class="form-control" required disabled>
-                                            <option value="" selected>{{ $supplier }}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                @endif
-                                @if ($item->tasteless_code)
-                                <tr>
-                                    <th>Tax Agency</th>
-                                    <td>
-                                        <input value="{{ $item->tax_agency }}" type="number" step="any" class="form-control" name="tax_agency" id="tax_agency" readonly>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>MPN</th>
-                                    <td>
-                                        <input value="{{ $item->mpn }}" type="number" step="any" class="form-control" name="mpn" id="mpn" readonly>
-                                    </td>
-                                </tr>
-                                @endif
                             </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Preferred Vendor</th>
+                                <td>
+                                    <select name="suppliers_id" id="suppliers_id" class="form-control" required disabled>
+                                        <option value="" selected>{{ $supplier }}</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            @endif
                             <tr>
                                 <th><span class="required-star">*</span> Reorder Pt (Min)</th>
                                 <td>
@@ -435,7 +426,7 @@
                 @if ($item->image_filename)
                 <div class="col-md-6">
                     <div class="photo-section">
-                        <h3 class="text-center text-bold">ITEM PHOTO</h3>
+                        <h3 class="text-center text-bold">DISPLAY PHOTO</h3>
                         <img src="{{ asset('/img/item-master/' . $item->image_filename) }}" alt="Item Photo">
                     </div>
                 </div>

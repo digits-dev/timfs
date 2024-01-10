@@ -81,7 +81,7 @@
         <h3 class="text-center text-bold">Item Masterfile</h3>
     </div>
     <div class="panel-body">
-        <form action="{{ $table == 'item_master_approvals' ? route('item_mater_approvals_submit_edit') : route('item_maters_submit_add_or_edit') }}" enctype="multipart/form-data" method="POST" class="form-main" autocomplete="off">
+        <form id="main-form" action="{{ $table == 'item_master_approvals' ? route('item_mater_approvals_submit_edit') : route('item_maters_submit_add_or_edit') }}" enctype="multipart/form-data" method="POST" class="form-main" autocomplete="off">
             <h3 class="text-center text-bold">ITEM DETAILS</h3>
             @csrf
             <input value="{{ $item->tasteless_code }}" name="tasteless_code" type="text" class="tasteless_code hide">
@@ -99,12 +99,16 @@
                             </tr>
                             @endif
                             <tr>
-                                <th><span class="required-star">{{ $item->tasteless_code && !$item->image_filename ? '*' : '' }}</span> Item Photo</th>
+                                <th><span class="required-star">*</span> Item Description</th>
+                                <td><input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">{{ $item->tasteless_code && !$item->image_filename ? '*' : '' }}</span> Display Photo</th>
                                 <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ $item->tasteless_code && !$item->image_filename ? 'required' : '' }} ></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span> Item Description</th>
-                                <td><input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                                <th>File Reference Link</th>
+                                <td><input type="text" value="{{ $item->file_link ?: '' }}" name="file_link" id="file_link" class="form-control"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span>  Brand Description</th>
@@ -164,20 +168,6 @@
                                     <input type="text" value="{{ $item->purchase_description }}" class="form-control" name="purchase_description" id="purchase_description" readonly>
                                 </td>
                             </tr>
-                            @if ($item->tasteless_code)
-                            <tr>
-                                <th>Accumulated Depreciation</th>
-                                <td>
-                                    <input type="text" value="{{ $item->accumulated_depreciation }}" class="form-control" name="accumulated_depreciation" id="accumulated_depreciation">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Quantity On Hand</th>
-                                <td>
-                                    <input type="text" value="{{ $item->quantity_on_hand }}" class="form-control" name="quantity_on_hand" id="quantity_on_hand">
-                                </td>
-                            </tr>
-                            @endif
                             <tr>
                                 <th><span class="required-star">*</span> Fulfillment Type</th>
                                 <td>
@@ -265,28 +255,14 @@
                                 <td>
                                     <input value="{{ $item->landed_cost }}" type="number" step="any" class="form-control" name="landed_cost" id="landed_cost" required>
                                 </td>
-                                <tr>
-                                    <th><span class="required-star">*</span> Preferred Vendor</th>
-                                    <td>
-                                        <select name="suppliers_id" id="suppliers_id" class="form-control" required>
-                                            <option value="" disabled selected>None selected...</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                @if ($item->tasteless_code)
-                                <tr>
-                                    <th>Tax Agency</th>
-                                    <td>
-                                        <input value="{{ $item->tax_agency }}" type="number" step="any" class="form-control" name="tax_agency" id="tax_agency">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>MPN</th>
-                                    <td>
-                                        <input value="{{ $item->mpn }}" type="number" step="any" class="form-control" name="mpn" id="mpn">
-                                    </td>
-                                </tr>
-                                @endif
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Preferred Vendor</th>
+                                <td>
+                                    <select name="suppliers_id" id="suppliers_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                    </select>
+                                </td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Reorder Pt (Min)</th>
@@ -418,7 +394,7 @@
                 @if ($item->image_filename)
                 <div class="col-md-6">
                     <div class="photo-section">
-                        <h3 class="text-center text-bold">ITEM PHOTO</h3>
+                        <h3 class="text-center text-bold">DISPLAY PHOTO</h3>
                         <img src="{{ asset('/img/item-master/' . $item->image_filename) }}" alt="Item Photo">
                     </div>
                 </div>
@@ -437,15 +413,11 @@
     const allSubcategories = {!! json_encode($subcategories) !!};
     const today = new Date();
 
-    // Calculate tomorrow's date
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-
     // Format the date in YYYY-MM-DD for the input's value attribute
-    const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
+    const todayFormatted = today.toISOString().split('T')[0];
 
     // Set the minimum attribute for the input element
-    $('#ttp_price_effective_date').attr('min', tomorrowFormatted);
+    $('#ttp_price_effective_date').attr('min', todayFormatted);
     getAllBrands();
     getAllSuppliers();
     function setBrand(brands) {
@@ -493,24 +465,6 @@
                 console.log(response);
             }
         });
-        // let brands = JSON.parse(localStorage.getItem('brands'));
-        // if (!brands) {
-        //     $.ajax({
-        //         url: "{{ route('getAjaxSubmaster', ['table' => 'brands']) }}",
-        //         _token: "{{ csrf_token() }}",
-        //         type: 'GET',
-        //         success: function(response) {
-        //             localStorage.setItem('brands', response);
-        //             brands = JSON.parse(localStorage.getItem('brands'));
-        //             setBrand(brands)
-        //         },
-        //         error: function(response) {
-        //             console.log(response);
-        //         }
-        //     });
-        // } else {
-        //     setBrand(brands);
-        // }
     }
 
     function getAllSuppliers() {
@@ -527,24 +481,6 @@
                     console.log(response);
                 }
             });
-        // let suppliers = JSON.parse(localStorage.getItem('suppliers'));
-        // if (!suppliers) {
-        //     $.ajax({
-        //         url: "{{ route('getAjaxSubmaster', ['table' => 'suppliers']) }}",
-        //         _token: "{{ csrf_token() }}",
-        //         type: 'GET',
-        //         success: function(response) {
-        //             localStorage.setItem('suppliers', response);
-        //             suppliers = JSON.parse(localStorage.getItem('suppliers'));
-        //             setSupplier(suppliers);
-        //         },
-        //         error: function(response) {
-        //             console.log(response);
-        //         }
-        //     });
-        // } else {
-        //     setSupplier(suppliers);
-        // }
         
     }
 
@@ -658,13 +594,13 @@
         const otherOptions = $(`.segmentation_select option.${className}`).attr('disabled', false);
     });
 
-    $('#tax_codes_id').on('change', function() {        
-        $('#purchase_price').val("");
-        $('#ttp').val("");
-        $('#ttp_percentage').val("");
-        $('#landed_cost').val("");
-        $('#price').val("");
-    });
+    // $('#tax_codes_id').on('change', function() {        
+    //     $('#purchase_price').val("");
+    //     $('#ttp').val("");
+    //     $('#ttp_percentage').val("");
+    //     $('#landed_cost').val("");
+    //     $('#price').val("");
+    // });
 
     $('#full_item_description').on('input', function() {
         const text = $(this).val();
@@ -704,6 +640,18 @@
             event.preventDefault();
             return;
         }
+    });
+
+    $('#main-form').on('submit', function() {
+        Swal.fire({
+            title: 'Loading...',
+            html: 'Please wait...',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
     });
 
     disableSelected();

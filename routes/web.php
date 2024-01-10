@@ -140,22 +140,29 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/for_approval_rnd_menu/edit/return-item', [AdminRndMenuItemsForApprovalController::class, 'returnRNDMenu'])->name('return_rnd_menu');
     Route::post('/admin/approved_rnd_menu/edit/add-pos-update', [AdminRndMenuItemsApprovedController::class, 'addPosUpdate'])->name('add_pos_update');
 
-    //new items (new ingredients and packagings)
+    //ITEM SOURCING: new items (new ingredients and packagings)
     Route::get('/admin/delete-new-items/{table}/{id}', [AdminNewIngredientsController::class, 'deleteNewItem']);
 
     Route::post('/admin/new_ingredients/search-new-ingredients', [AdminNewIngredientsController::class, 'searchNewIngredients'])->name('search_new_ingredient');
     Route::get('/admin/new_ingredients/get-tag/{id}', [AdminNewIngredientsController::class, 'getTag']);
-    Route::post('/admin/new_ingredients/tag-new-ingredient', [AdminNewIngredientsController::class, 'tagNewIngredient'])->name('tag_new_ingredient');
+    Route::post('/admin/new_ingredients/tag-new-ingredient/{id}', [AdminNewIngredientsController::class, 'tagNewIngredient'])->name('tag_new_ingredient');
     Route::post('/admin/new_ingredients/search-item-for-tagging', [AdminNewIngredientsController::class, 'searchItemForTagging'])->name('search_item_for_tagging');
     Route::post('/admin/new_ingredients/submit-edit', [AdminNewIngredientsController::class, 'submitEditNewIngredient'])->name('submit_edit_new_ingredient');
+    Route::get('/admin/new_ingredients/suggest-existing-ingredients', [AdminNewIngredientsController::class, 'suggestExistingIngredients'])->name('suggest_existing_ingredients');
 
     Route::post('/admin/new_ingredients/add-new-items-comments', [AdminNewIngredientsController::class, 'addNewItemsComments'])->name('add_new_items_comments');
     Route::post('/admin/new_ingredients/delete-new-items-comments', [AdminNewIngredientsController::class, 'deleteNewItemsComments'])->name('delete_new_items_comments');
+    Route::get('/admin/new_ingredients/approve-or-reject/{id}', [AdminNewIngredientsController::class, 'approveOrReject']);
+    Route::post('/admin/new_ingredients/approve-or-reject/', [AdminNewIngredientsController::class, 'submitApproveOrReject'])->name('new_ingredients_submit_approve_or_reject');
+    Route::post('/admin/new_ingredients/submit-sourcing-status/{id}', [AdminNewIngredientsController::class, 'submitSourcingStatus'])->name('new_ingredients_submit_sourcing_status');
     
     Route::post('/admin/new_packagings/search-new-packagings', [AdminNewPackagingsController::class, 'searchNewPackagings'])->name('search_new_packaging');
+    Route::get('/admin/new_packagings/approve-or-reject/{id}', [AdminNewPackagingsController::class, 'approveOrReject']);
+    Route::post('/admin/new_packagings/approve-or-reject', [AdminNewPackagingsController::class, 'submitApproveOrReject'])->name('new_packagings_submit_approve_or_reject');
     Route::get('/admin/new_packagings/get-tag/{id}', [AdminNewPackagingsController::class, 'getTag']);
-    Route::post('/admin/new_packagings/tag-new-packagings', [AdminNewpackagingsController::class, 'tagNewPackagings'])->name('tag_new_packaging');
+    Route::post('/admin/new_packagings/tag-new-packaging/{id}', [AdminNewPackagingsController::class, 'tagNewPackagings'])->name('tag_new_packaging');
     Route::post('/admin/new_packagings/submit-edit', [AdminNewpackagingsController::class, 'submitEditNewPackaging'])->name('submit_edit_new_packaging');
+    Route::post('/admin/new_packagings/submit-sourcing-status/{id}', [AdminNewpackagingsController::class, 'submitSourcingStatus'])->name('new_packagings_submit_sourcing_status');
     
     // batching ingredients
     Route::post('/admin/batching_ingredients/edit-batching-ingredient', [AdminBatchingIngredientsController::class, 'editBatchingIngredient'])->name('edit_batching_ingredient');

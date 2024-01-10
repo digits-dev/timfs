@@ -11,6 +11,7 @@
 	use App\HistoryLandedCost;
 	use App\HistoryPurchasePrice;
 	use App\HistoryTtp;
+	use App\SalesPriceChangeHistory;
 	use Illuminate\Http\Request;
 	use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Schema;
@@ -50,7 +51,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			//----added by cris 20200630
 			$this->col[] = ["label" => "Action Type", "name" => "action_type"];
-			$this->col[] = ["label" => "Item Photo", "name" => "image_filename","visible" =>  true];
+			$this->col[] = ["label" => "Display Photo", "name" => "image_filename","visible" =>  true];
 			$this->col[] = ["label" => "Approval Status", "name" => "approval_status"];
 			$this->col[] = ["label" => "Tasteless Code", "name" => "tasteless_code"];
 			$this->col[] = ["label" => "Description", "name" => "full_item_description", "visible" => CRUDBooster::myColumnView()->full_item_description ? true : false];
@@ -349,8 +350,8 @@
 	        */
 	        $this->button_selected = array();
 			if (in_array(CRUDBooster::myPrivilegeName(), $this->approver) || CRUDBooster::isSuperadmin()) {
-	        	$this->button_selected[] = ['label'=>'APPROVE','icon'=>'fa fa-check','name'=>'approve'];
-				$this->button_selected[] = ['label'=>'REJECT','icon'=>'fa fa-times','name'=>'reject'];
+	        	$this->button_selected[] = ['label'=>'APPROVE','icon'=>'fa fa-thumbs-up','name'=>'approve'];
+				$this->button_selected[] = ['label'=>'REJECT','icon'=>'fa fa-thumbs-down','name'=>'reject'];
 			}
 	                
 	        /* 
@@ -519,6 +520,29 @@
 	    |
 	    */
 	    public function actionButtonSelected($id_selected,$button_name) {
+
+			if ($button_name == 'approve') {
+				foreach ($id_selected as $id) {
+					$item = DB::table('item_master_approvals')
+						->where('id', $id)
+						->first();
+
+					if ($item->approval_status != 202) {
+						continue;
+					}
+					$item_description = $item->full_item_description;
+					$tasteless_code = $item->tasteless_code;
+					$differences = self::getUpdatedDetails($id);
+					$paired_differences = $differences['paired_differences'] ?? [];
+	
+					if (array_key_exists('ttp_price_effective_date', $paired_differences)) {
+						if ($paired_differences['ttp_price_effective_date']['new'] < date('Y-m-d') && $item->ttp_price_effective_date) {
+							return CRUDBooster::redirect(CRUDBooster::mainPath(), "Item: \"$tasteless_code - $item_description\" sales price effective date has expired.", 'danger');
+						}
+					}
+				}
+			}
+
 
 			return self::approve_or_reject($id_selected, $button_name);
 	    }
@@ -818,6 +842,12 @@
 					$differences = self::getUpdatedDetails($id);
 					$paired_differences = $differences['paired_differences'] ?? [];
 
+					if (array_key_exists('ttp_price_effective_date', $paired_differences)) {
+						if ($paired_differences['ttp_price_effective_date']['new'] < date('Y-m-d') && $paired_differences['ttp_price_effective_date']['new']) {
+							continue;
+						}
+					}
+
 					ItemMasterApproval::where('id', $id)->update([
 						'approval_status' => '200',
 						'tasteless_code' => $tasteless_code,
@@ -839,6 +869,25 @@
 					$details_of_item = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
 					$new_values = $differences['new_values'];
 					$old_values = $differences['old_values'];
+					if ($old_values && $new_values) {
+						if ((float) $old_values->ttp != (float) $new_values->ttp_price_change ||
+							(float) $old_values->ttp != (float) $new_values->ttp ||
+							$old_values->ttp_price_effective_date != $new_values->ttp_price_effective_date
+						) {
+							$sales_price_change_history = [
+								'tasteless_code' => $tasteless_code,
+								'sales_price' => $old_values->ttp,
+								'sales_price_change' => $new_values->ttp_price_change,
+								'effective_date' => $new_values->ttp_price_effective_date,
+								'status' => 'APPROVED',
+								'created_by' => $new_values->updated_by,
+								'created_at' => $new_values->updated_at,
+								'approved_at' => $time_stamp,
+								'approved_by' => $action_by,
+							];
+							SalesPriceChangeHistory::insert($sales_price_change_history);
+						}
+					}
 
 					if ($paired_differences || !$old_values) {
 						foreach ($paired_differences  as $column_name => $paired_difference) {
@@ -923,6 +972,7 @@
 			if ($action == 'approve') {
 				$message_type = 'success';
 				$message = '✔️ Item successfully approved.';
+				self::updateSalesPrice();
 			} else if ($action == 'reject') {
 				$message_type = 'success';
 				$message = '✖️ Item successfully rejected.';
@@ -985,5 +1035,23 @@
 				'new_values' => $item_for_approval,
 			];
 			
+		}
+
+		public function updateSalesPrice() {
+			$items = ItemMaster::where('ttp_price_effective_date', date('Y-m-d'))->get();
+            
+			foreach($items as $item){
+				DB::table('item_masters')->where('tasteless_code', $item->tasteless_code)->update([
+					'ttp' => DB::raw('`ttp_price_change`'),
+					'ttp_percentage' => DB::raw('ttp_percentage_price_change'),
+					'ttp_price_effective_date' => null,
+				]);
+
+				DB::table('item_master_approvals')->where('tasteless_code', $item->tasteless_code)->update([
+					'ttp' => DB::raw('ttp_price_change'),
+					'ttp_percentage' => DB::raw('ttp_percentage_price_change'),
+					'ttp_price_effective_date' => null,
+				]);
+			}
 		}
 	}
