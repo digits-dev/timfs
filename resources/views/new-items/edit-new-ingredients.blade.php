@@ -227,7 +227,7 @@
                                 <td>
                                     <select name="new_ingredient_terms_id" id="new_ingredient_terms_id" class="form-control" required>
                                         @foreach ($new_ingredient_terms as $new_ingredient_term)
-                                        <option value="{{$new_ingredient_term->id}}" {{ $item->new_ingredient_term_id == $new_ingredient_uom->id ? 'selected' : '' }}>{{$new_ingredient_term->description}}</option>
+                                        <option value="{{$new_ingredient_term->id}}" {{ $item->new_ingredient_terms_id == $new_ingredient_term->id ? 'selected' : '' }}>{{$new_ingredient_term->description}}</option>
                                         @endforeach
                                     </select>
                                 </td>
