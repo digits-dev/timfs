@@ -7,6 +7,9 @@
 	use CRUDBooster;
 
 	class AdminPackagingPaperTypesController extends \crocodicstudio\crudbooster\controllers\CBController {
+		public function __construct() {
+			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+		}
 
 	    public function cbInit() {
 
