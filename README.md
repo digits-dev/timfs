@@ -493,9 +493,10 @@
 - **Marketing Encoder:** marketingencoder@tasteless.ph
 - **Marketing Manager:** marketingmanager@tasteless.ph
 - **Sales Accounting:** salesaccounting@tasteless.ph
+- **Accounting Manager:** accountingmanager@tasteless.ph
 - **Purchasing Encoder:** purchasingencoder@tasteless.ph
 - **Purchasing Manager:** purchasingmanager@tasteless.ph
-- pw: qwerty
+- **Sourcing Approver:** 	sourcingapprover@tasteless.ph
 
 ## 🖋️ Author:
 
