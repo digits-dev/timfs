@@ -88,6 +88,10 @@
                                 <td>{{(float) $item->ttp}}</td>
                             </tr>
                             <tr>
+                                <th>Target Date</th>
+                                <td>{{$item->target_date}}</td>
+                            </tr>
+                            <tr>
                                 <th>Segmentations</th>
                                 <td>
                                     @foreach ($segmentations as $segmentation)
