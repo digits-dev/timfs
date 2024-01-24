@@ -63,6 +63,7 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         array_push($header, 'POS UPDATE DATE');
         array_push($header, 'CREATED DATE');
         array_push($header, 'UPDATED DATE');
+        array_push($header, 'STATUS');
 
         return $header;
     } 
@@ -119,6 +120,7 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         array_push($data_items, $data_menu_item->pos_update);
         array_push($data_items, $data_menu_item->created_at);
         array_push($data_items, $data_menu_item->updated_at);
+        array_push($data_items, $data_menu_item->status);
 
         return $data_items;
     }
@@ -131,7 +133,6 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         $group_choices = MenuChoiceGroup::where('status','ACTIVE')->orderBy('menu_choice_group_column_description','ASC')->get();
 
         $menu_items = MenuItem::query()
-        ->where('menu_items.status', 'ACTIVE')
         ->whereNotNull('tasteless_menu_code')
         ->leftJoin('menu_product_types','menu_items.menu_product_types_id','=','menu_product_types.id')
         ->leftJoin('menu_types','menu_items.menu_types_id','=','menu_types.id')
@@ -175,6 +176,8 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         foreach($prices as $price){
             $menu_items->addSelect('menu_items.'.$price->menu_price_column_name);
         }
+
+        $menu_items->addSelect('menu_items.status');
 
         if (in_array(CRUDBooster::myPrivilegeName(), ['Chef', 'Chef Assistant'])) {
             $menu_ids = (new AdminMenuItemsController)->getMyMenuIds();
