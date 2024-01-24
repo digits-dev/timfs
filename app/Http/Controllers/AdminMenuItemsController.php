@@ -457,10 +457,10 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-			if (CRUDBooster::myPrivilegeName() == 'Chef' || CRUDBooster::myPrivilegeName() == 'Chef Assistant') {
-				$menu_ids = self::getMyMenuIds();
-				$query->whereIn('menu_items.id', $menu_ids);
-			}
+			// if (CRUDBooster::myPrivilegeName() == 'Chef' || CRUDBooster::myPrivilegeName() == 'Chef Assistant') {
+			// 	$menu_ids = self::getMyMenuIds();
+			// 	$query->whereIn('menu_items.id', $menu_ids);
+			// }
 
 			$query->whereNotNull('menu_items.tasteless_menu_code');
 	    }
@@ -1070,6 +1070,12 @@
 
 			if ($to_edit == 'ingredients') {
 				if (!in_array($to_edit, self::$to_edit[$my_privilege] ?? []) && !$is_superadmin)
+					CRUDBooster::redirect(
+						CRUDBooster::mainPath(),
+						trans('crudbooster.denied_access')
+					);
+
+				if (!in_array($id, self::getMyMenuIds()) && !$is_superadmin)
 					CRUDBooster::redirect(
 						CRUDBooster::mainPath(),
 						trans('crudbooster.denied_access')
