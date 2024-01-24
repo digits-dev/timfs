@@ -149,6 +149,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/new_ingredients/search-item-for-tagging', [AdminNewIngredientsController::class, 'searchItemForTagging'])->name('search_item_for_tagging');
     Route::post('/admin/new_ingredients/submit-edit', [AdminNewIngredientsController::class, 'submitEditNewIngredient'])->name('submit_edit_new_ingredient');
     Route::get('/admin/new_ingredients/suggest-existing-ingredients', [AdminNewIngredientsController::class, 'suggestExistingIngredients'])->name('suggest_existing_ingredients');
+    Route::post('/admin/new_ingredients/export', [AdminNewIngredientsController::class, 'exportData'])->name('new_ingredients.export');
 
     Route::post('/admin/new_ingredients/add-new-items-comments', [AdminNewIngredientsController::class, 'addNewItemsComments'])->name('add_new_items_comments');
     Route::post('/admin/new_ingredients/delete-new-items-comments', [AdminNewIngredientsController::class, 'deleteNewItemsComments'])->name('delete_new_items_comments');
@@ -163,6 +164,8 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/new_packagings/tag-new-packaging/{id}', [AdminNewPackagingsController::class, 'tagNewPackagings'])->name('tag_new_packaging');
     Route::post('/admin/new_packagings/submit-edit', [AdminNewpackagingsController::class, 'submitEditNewPackaging'])->name('submit_edit_new_packaging');
     Route::post('/admin/new_packagings/submit-sourcing-status/{id}', [AdminNewpackagingsController::class, 'submitSourcingStatus'])->name('new_packagings_submit_sourcing_status');
+    Route::post('/admin/new_packagings/export', [AdminNewpackagingsController::class, 'exportData'])->name('new_packagings.export');
+
     
     // batching ingredients
     Route::post('/admin/batching_ingredients/edit-batching-ingredient', [AdminBatchingIngredientsController::class, 'editBatchingIngredient'])->name('edit_batching_ingredient');

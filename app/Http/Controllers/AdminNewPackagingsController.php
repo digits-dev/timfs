@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
-	use Session;
+use App\Exports\NewPackagingExport;
+use Session;
 	use Illuminate\Http\Request;
 	use Illuminate\Support\Facades\Request as Input;
 	use Illuminate\Support\Facades\Schema;
@@ -9,6 +10,7 @@
 	use Intervention\Image\Facades\Image;
 	use Spatie\ImageOptimizer\OptimizerChainFactory;
 	use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 	class AdminNewPackagingsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -260,6 +262,14 @@
 	        | 
 	        */
 	        $this->index_button = array();
+			if(CRUDBooster::getCurrentMethod() == 'getIndex') {
+				$this->index_button[] = [
+					"title"=>"Export Data",
+					"label"=>"Export Data",
+					'url'=>"javascript:showExport()",
+					'icon'=>'fa fa-download'
+				];
+			}
 
 
 
@@ -333,6 +343,10 @@
 					function(){location.href=`$admin_path/delete-new-items/new_packagings/` + dbId}
 				);
 			});
+
+			function showExport() {
+				$('#modal-export').modal('show');
+			}
 			";
 
 
@@ -356,7 +370,34 @@
 	        | $this->post_index_html = "<p>test</p>";
 	        |
 	        */
-	        $this->post_index_html = null;
+	        $this->post_index_html = "
+			<div class='modal fade' tabindex='-1' role='dialog' id='modal-export'>
+				<div class='modal-dialog'>
+					<div class='modal-content'>
+						<div class='modal-header'>
+							<button class='close' aria-label='Close' type='button' data-dismiss='modal'>
+								<span aria-hidden='true'>×</span></button>
+							<h4 class='modal-title'><i class='fa fa-download'></i> Export Data</h4>
+						</div>
+
+						<form method='post' target='_blank' action=".CRUDBooster::mainpath("export").">
+                        <input type='hidden' name='_token' value=".csrf_token().">
+                        ".CRUDBooster::getUrlParameters()."
+                        <div class='modal-body'>
+                            <div class='form-group'>
+                                <label>File Name</label>
+                                <input type='text' name='filename' class='form-control' required value='Export ".CRUDBooster::getCurrentModule()->name ." - ".date('Y-m-d H:i:s')."'/>
+                            </div>
+						</div>
+						<div class='modal-footer' align='right'>
+                            <button class='btn btn-default' type='button' data-dismiss='modal'>Close</button>
+                            <button class='btn btn-primary btn-submit' type='submit'>Submit</button>
+                        </div>
+                    </form>
+					</div>
+				</div>
+			</div>
+			";
 	        
 	        
 	        
@@ -1208,6 +1249,11 @@
 				]);
 
 			return CRUDBooster::redirect(CRUDBooster::mainPath(), 'Sourcing status updated successfully.', 'success');
+		}
+
+		public function exportData(Request $request) {
+			$filename = $request->get('filename');
+			return Excel::download(new NewPackagingExport, $filename.'.xlsx');
 		}
 
 	}
