@@ -462,7 +462,7 @@
 				$query->whereIn('menu_items.id', $menu_ids);
 			}
 
-			$query->where('menu_items.status', 'ACTIVE')->whereNotNull('menu_items.tasteless_menu_code');
+			$query->whereNotNull('menu_items.tasteless_menu_code');
 	    }
 
 	    /*
