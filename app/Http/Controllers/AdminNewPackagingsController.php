@@ -447,6 +447,10 @@
 						ELSE 9
 					END ASC					
 				");
+
+			if(in_array(CRUDBooster::myPrivilegeName(), ['Purchasing Manager', 'Purchasing Encoder'])){
+				$query->where('item_approval_statuses.status_description', 'APPROVED');
+			}
 	    }
 
 	    /*

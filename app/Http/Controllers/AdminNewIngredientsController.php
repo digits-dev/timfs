@@ -427,7 +427,12 @@
 						ELSE 9
 					END ASC				
 				");
-	    }
+
+			if(in_array(CRUDBooster::myPrivilegeName(), ['Purchasing Manager', 'Purchasing Encoder'])){
+				$query->where('item_approval_statuses.status_description', 'APPROVED');
+			}
+
+		}
 
 	    /*
 	    | ---------------------------------------------------------------------- 
@@ -1311,10 +1316,9 @@
 		}
 
 		public function getMyRequestors() {
-			$my_id = CRUDBooster::myId();
 			$my_requestor_ids = DB::table('item_sourcing_matrices')
 				->where('status', 'ACTIVE')
-				->where(DB::raw("FIND_IN_SET($my_id, approver_ids)"), '>', 0)
+				->where('approver_ids', CRUDBooster::myId())
 				->pluck('requestor_id')
 				->toArray();
 
