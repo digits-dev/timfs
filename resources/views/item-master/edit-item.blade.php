@@ -436,6 +436,21 @@
         $('#brands_id').trigger('change');
     }
 
+    function checkLandedCost(){
+        const supplierCost = parseFloat($('#purchase_price').val());
+        const landedCost = parseFloat($('#landed_cost').val());
+        return landedCost >= supplierCost;
+    }
+    function checkCommiMargin(){
+        const fulfillmentType = $('#fulfillment_type_id :selected').text();
+        const CommiMargin = parseFloat($('#ttp_percentage').val());
+        if (fulfillmentType == 'DELIVERY-COMMI'){
+            return CommiMargin >= 0.05;
+        }
+        return true;
+    }
+
+
     function setSupplier(suppliers) {
         suppliers.forEach(supplier => {
             const option = $(document.createElement('option'))
@@ -618,21 +633,32 @@
 
     $('#save-btn').on('click', function() {
         const segmentations = getSelectedSegmentations();
+        console.log(checkLandedCost(), checkCommiMargin());
+        const isValid = checkLandedCost() && checkCommiMargin();
         $('#segmentations').val(JSON.stringify(segmentations));
-        Swal.fire({
-            title: 'Do you want to save this item?',
-            html:  `Doing so will push this item to <span class="label label-info">ITEM FOR APPROVAL</span>.`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Save',
-            returnFocus: false,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $('#sumit-form-btn').click();
-            }
-        });
+        console.log(isValid);
+        if (isValid) {
+            Swal.fire({
+                title: 'Do you want to save this item?',
+                html:  `Doing so will push this item to <span class="label label-info">ITEM FOR APPROVAL</span>.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Save',
+                returnFocus: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#sumit-form-btn').click();
+                }
+            });
+        } else{
+            Swal.fire({
+                icon: "error",
+                title: "Invalid Input!",
+                text: "Check landed cost, supplier cost value, and commi margin.",
+            });
+        }
     });
 
     $('form input').on('keyup keypress', function(event) {
