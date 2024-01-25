@@ -510,7 +510,7 @@
     }
 
     function updateCommiMargin() {
-        const salesPrice = parseFloat($('#ttp').val() || 0);
+        const salesPrice = parseFloat($('#ttp_price_change').val() || $('#ttp').val() || 0);
         const landedCost = parseFloat($('#landed_cost').val() || 0);
         if (!landedCost || !salesPrice) return;
         const commiMargin = math.round((salesPrice - landedCost) / salesPrice, 2);
