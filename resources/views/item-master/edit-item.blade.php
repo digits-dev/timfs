@@ -439,7 +439,7 @@
     function checkLandedCost(){
         const supplierCost = parseFloat($('#purchase_price').val());
         const landedCost = parseFloat($('#landed_cost').val());
-        return landedCost >= supplierCost;
+        return landedCost >= math.floor(supplierCost, 2);
     }
     function checkCommiMargin(){
         const fulfillmentType = $('#fulfillment_type_id :selected').text();
