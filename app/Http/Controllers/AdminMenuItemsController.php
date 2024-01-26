@@ -223,22 +223,25 @@
                         "url"=>route('add_non_trade_item')
 					];
 				}
-                // if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), self::$to_update_menu)){
-                //     $this->index_button[] = [
-                //         "title"=>"Upload New Menu Items",
-                //         "label"=>"Upload New Menu Items",
-                //         "icon"=>"fa fa-upload",
-                //         "color"=>"success",
-                //         "url"=>route('menu-items.view')];
+				// if (strtolower(CRUDBooster::myName()) == 'fillinor gunio') {
+					
+				// 	if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), self::$to_update_menu)){
+				// 		$this->index_button[] = [
+				// 			"title"=>"Upload New Menu Items",
+				// 			"label"=>"Upload New Menu Items",
+				// 			"icon"=>"fa fa-upload",
+				// 			"color"=>"success",
+				// 			"url"=>route('menu-items.view')];
+				// 	}
+				// 	if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), self::$to_update_menu)){
+				// 		$this->index_button[] = [
+				// 			"title"=>"Update Menu Items",
+				// 			"label"=>"Update Menu Items",
+				// 			"icon"=>"fa fa-upload",
+				// 			"color"=>"success",
+				// 			"url"=>route('menu-items.update-view')];
+				// 	}
 				// }
-				// if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), self::$to_update_menu)){
-                //     $this->index_button[] = [
-                //         "title"=>"Update Menu Items",
-                //         "label"=>"Update Menu Items",
-                //         "icon"=>"fa fa-upload",
-                //         "color"=>"success",
-                //         "url"=>route('menu-items.update-view')];
-                // }
 				$this->index_button[] = [
 					'label'=>'Export Menu Items',
 					'url'=>"javascript:showMenuItemExport()",
