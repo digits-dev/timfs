@@ -47,14 +47,24 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
 
 
         if(is_null($row["menu_code"])){
-            $next_id = MenuItem::select('id')->orderBy('id','DESC')->first();
-            $next_code = intval($next_id->id) + 1;
-            if($row["main_category"] == "PROMO"){
-                $code = '5'.str_pad($next_code, 6, "0", STR_PAD_LEFT);
-            }
-            else{
-                $code = '6'.str_pad($next_code, 6, "0", STR_PAD_LEFT);
-            }
+            // $next_id = MenuItem::select('id')->orderBy('id','DESC')->first();
+            // $next_code = intval($next_id->id) + 1;
+            // if($row["main_category"] == "PROMO"){
+            //     $code = '5'.str_pad($next_code, 6, "0", STR_PAD_LEFT);
+            // }
+            // else{
+            //     $code = '6'.str_pad($next_code, 6, "0", STR_PAD_LEFT);
+            // }
+
+            if($row['menu_type'] == "PROMO"){
+				$code = (int) DB::table('menu_items')->where('tasteless_menu_code','like',"5%")
+				->select('tasteless_menu_code')
+				->max('tasteless_menu_code') + 1;
+			}else{
+				$code = (int) DB::table('menu_items')->where('tasteless_menu_code','like',"6%")
+				->select('tasteless_menu_code')
+				->max('tasteless_menu_code') + 1;
+			}
         }
 
         foreach($segmentations as $segment){
@@ -82,6 +92,7 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
         }
 
         $data_array_menu = [
+            'tasteless_menu_code' => $code,
             'action_type' => "Create",
             'menu_item_description' => strtoupper($row["menu_description"]),
             'pos_old_item_description' => strtoupper($row["pos_old_description"]),

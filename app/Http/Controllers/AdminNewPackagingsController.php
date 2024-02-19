@@ -689,6 +689,7 @@ use Maatwebsite\Excel\Facades\Excel;
 				->where('new_packagings.id', $id)
 				->select(
 					'*',
+					'uoms.uom_description',
 					'new_packagings.created_at as created_at',
 					'new_packagings.id as new_packagings_id',
 					'creator.name as creator_name',
