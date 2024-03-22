@@ -23,6 +23,7 @@ use App\Http\Controllers\AdminNewPackagingsController;
 use App\Http\Controllers\AdminBatchingIngredientsController;
 use App\Http\Controllers\AdminItemMastersController;
 use App\Http\Controllers\AdminItemApprovalController;
+use App\Http\Controllers\AdminSalesPriceChangeHistoriesController;
 
 Route::get('/', function () {
     return redirect('admin/login');
@@ -177,6 +178,9 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/item_master_approvals/submit-edit', [AdminItemApprovalController::class, 'submitEdit'])->name('item_mater_approvals_submit_edit');
     Route::get('/admin/item_approval/approve_or_reject/{id}', [AdminItemApprovalController::class, 'getApproveOrReject']);
     Route::get('/admin/item_masters/get/{table}', [AdminItemMastersController::class, 'getAjaxSubmaster'])->name('getAjaxSubmaster');
+
+    //sales price change history
+    Route::post('/admin/sales_price_change_histories/export-history', [AdminSalesPriceChangeHistoriesController::class, 'exportDataHistory'])->name('sales_price_change_histories_export_data');
 });
 
 Route::get('/item_masters/api/get-items/{secret_key}', [AdminItemMastersController::class, 'getUpdatedItems'])->name('get_updated_items');
