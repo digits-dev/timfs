@@ -13,6 +13,10 @@
         display: block;
         margin: 0 auto;
     }
+
+    th {
+        min-width: 200px;
+    }
 </style>
 @endpush
 @section('content')
