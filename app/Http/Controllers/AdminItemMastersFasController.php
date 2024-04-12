@@ -1,13 +1,41 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
+	use App\Models\ItemMastersFa;
+	use App\Models\ItemMastersFasApprovals;
+	use App\Models\FaCoaCategories;
 	use App\Models\FaSubCategories;
+	use Illuminate\Support\Facades\Input;
+	use Illuminate\Support\Facades\Log;
+	use Illuminate\Support\Facades\Redirect;
+	use Carbon\Carbon;
+	use Illuminate\Support\Facades\Schema;
+	use Illuminate\Support\Facades\Storage;
+	use Intervention\Image\Facades\Image;
+	use Spatie\ImageOptimizer\OptimizerChainFactory;
+	use Illuminate\Support\Str;
 
-	class AdminFaCoaSubCategoriesController extends \crocodicstudio\crudbooster\controllers\CBController {
-
+	class AdminItemMastersFasController extends \crocodicstudio\crudbooster\controllers\CBController {
+		public function __construct() {
+			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+			$this->diffData = [];
+			$this->requestor = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
+			$this->approver = ['Purchasing Manager', 'Manager (Purchaser)'];
+			$this->to_notify = DB::table('cms_users')
+				->where(function($sub_query) {
+					$sub_query
+						->where('cms_users.id_cms_privileges', '1')
+						->orWhere('cms_privileges.name', 'Purchasing Manager');
+				})
+				->where('cms_users.status', 'ACTIVE')
+				->leftJoin('cms_privileges', 'cms_privileges.id', '=', 'cms_users.id_cms_privileges')
+				->pluck('cms_users.id')
+				->toArray();
+		}
+	    
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -26,43 +54,27 @@
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "fa_sub_categories";
+			$this->table = "item_masters_fas";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Coa Id","name"=>"coa_id","join"=>"fa_coa_categories,description"];
-			$this->col[] = ["label"=>"Description","name"=>"description"];
-			$this->col[] = ["label"=>"Status","name"=>"status"];
-			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
-			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
-			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
-			$this->col[] = ["label"=>"Updated At","name"=>"updated_at"];
+			$this->col[] = ["label" => "Display Photo", "name" => "image_filename","visible" =>  true];
+			$this->col[] = ["label"=>"Tasteless Code","name"=>"tasteless_code"];
+			$this->col[] = ["label"=>"Item Description","name"=>"item_description","visible" =>  false];
+			$this->col[] = ["label"=>"Coa","name"=>"categories_id","join"=>"categories,id"];
+			$this->col[] = ["label"=>"Sub categories","name"=>"subcategories_id","join"=>"subcategories,id"];
+			$this->col[] = ["label"=>"Cost","name"=>"cost"];
+			$this->col[] = ["label" => "Created Date", "name" => "created_at", "visible" => CRUDBooster::myColumnView()->create_date ? true : false];
+			$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->create_by ? true : false];
+			$this->col[] = ["label" => "Updated Date", "name" => "updated_at", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
+			$this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->update_by ? true : false];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Coa Categories','name'=>'coa_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'fa_coa_categories,description'];
-			$this->form[] = ['label'=>'Description','name'=>'description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
-			if(in_array(CRUDBooster::getCurrentMethod(),['getEdit','postEditSave','getDetail'])) {
-				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
-			}
-			if(CRUDBooster::getCurrentMethod() == 'getDetail'){
-				$this->form[] = ["label"=>"Created By","name"=>"created_by",'type'=>'select',"datatable"=>"cms_users,name"];
-				$this->form[] = ['label'=>'Created Date','name'=>'created_at', 'type'=>'datetime'];
-				$this->form[] = ["label"=>"Updated By","name"=>"updated_by",'type'=>'select',"datatable"=>"cms_users,name"];
-				$this->form[] = ['label'=>'Updated Date','name'=>'updated_at', 'type'=>'datetime'];
-			}
-			# END FORM DO NOT REMOVE THIS LINE
 
-			# OLD START FORM
-			//$this->form = [];
-			//$this->form[] = ["label"=>"Coa Id","name"=>"coa_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"coa,id"];
-			//$this->form[] = ["label"=>"Description","name"=>"description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			# OLD END FORM
+			# END FORM DO NOT REMOVE THIS LINE
 
 			/* 
 	        | ---------------------------------------------------------------------- 
@@ -91,7 +103,16 @@
 	        | 
 	        */
 	        $this->addaction = array();
-
+			$my_privilege = CRUDBooster::myPrivilegeName();
+			if (in_array($my_privilege, $this->requestor) || CRUDBooster::isSuperAdmin()) {
+				$this->addaction[] = [
+					'title'=>'Edit',
+					'url'=>CRUDBooster::mainpath('edit/[id]'),
+					'icon'=>'fa fa-pencil',
+					'color' => ' ',
+					"showIf"=>"[status_of_approval] != '202'",
+				];
+			}
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -248,7 +269,8 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-	        //Your code here
+	        $query->leftJoin('item_masters_fas_approvals', 'item_masters_fas.tasteless_code', '=', 'item_masters_fas_approvals.tasteless_code')
+				->addSelect('item_masters_fas_approvals.approval_status as status_of_approval');
 	            
 	    }
 
@@ -270,8 +292,7 @@
 	    |
 	    */
 	    public function hook_before_add(&$postdata) {        
-	        $postdata["created_by"]=CRUDBooster::myId();
-			$postdata["created_at"]=date('Y-m-d H:i:s');
+	        //Your code here
 
 	    }
 
@@ -296,7 +317,7 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-	        $postdata["updated_by"]=CRUDBooster::myId();
+	        //Your code here
 
 	    }
 
@@ -336,12 +357,146 @@
 
 	    }
 
-		public function getCategories(Request $request){
-			$data = Request::all();	
-			$id = $data['id'];
-			$subcategories = FaSubCategories::detail($id);
-			return($subcategories);
+		public function getAdd(){
+			if (!CRUDBooster::isCreate())
+				CRUDBooster::redirect(
+				CRUDBooster::adminPath(),
+				trans('crudbooster.denied_access')
+			);
+
+			return self::getEdit(null, 'add');
 		}
 
+		public function getEdit($id, $action = 'edit', $approval_id = null) {
+			if ($action == 'edit') {
+				if (!CRUDBooster::isUpdate())
+					CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+			}
+			$data = [];
+			$data['action'] = $action;
+			$data['from'] = 'item_masters FA';
+
+			if ($id) {
+				$tasteless_code = ItemMasterFa::where('id', $id)->first()->tasteless_code;
+				$data['item'] = self::getItemDetails($tasteless_code);
+				if ($data['item']->approval_status == 202) {
+					return redirect(CRUDBooster::mainpath())->with([
+						'message_type' => 'danger',
+						'message' => '✖️ You cannot edit a pending item...',
+					]);
+				}
+			}
+
+			$submaster_details = self::getSubmasters();
+
+			$data = array_merge($data, $submaster_details);
+			
+			return $this->view('item-master-fa/add-edit', $data);
+		}
+
+		public function getSubmasters() {
+
+			$data = [];
+
+			$data['coa'] = DB::table('fa_coa_categories')
+				->where('status', 'ACTIVE')
+				->orderBy('description')
+				->get()
+				->toArray();
+
+			$data['sub_categories'] = DB::table('fa_sub_categories')
+				->where('status', 'ACTIVE')
+				->orderBy('description')
+				->get()
+				->toArray();
+
+			return $data;
+		}
+
+		public function submitAddOrEdit(Request $request) {
+			$input = $request->all();
+			if ($input['item_photo']) {
+				$filename_filler = $input['tasteless_code'] ?? 'new_item';
+				$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
+	
+				$img_file = $input['item_photo'];
+				$filename = date('Y-m-d') . "-$filename_filler-$random_string." . $img_file->getClientOriginalExtension();
+				$image = Image::make($img_file);
+				
+				$image->resize(1024, 768, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
+	
+				// Save the resized image to the public folder
+				$image->save(public_path('img/item-master-fa/' . $filename));
+				// Optimize the uploaded image
+				$optimizerChain = OptimizerChainFactory::create();
+				$optimizerChain->optimize(public_path('img/item-master-fa/' . $filename));
+			}
+
+		
+			$tasteless_code = $input['tasteless_code'];
+			$time_stamp = date('Y-m-d H:i:s');
+			$action_by = CRUDBooster::myId();
+			$my_privilege_id = CRUDBooster::myPrivilegeId();
+		
+
+			$data = $request->all();
+
+			unset(
+				$data['_token'], 
+				$data['item_photo'], 
+				$data['item_masters_approvals_id'],
+			);
+
+			$data['item_description'] = $data['item_description'];
+			$data['tasteless_code'] = $tasteless_code;
+			if ($filename) $data['image_filename'] = $filename;
+
+			$data['approval_status'] = 202;
+			
+			$is_existing = ItemMastersFasApprovals::where('tasteless_code', $tasteless_code)->exists();
+
+			if ($is_existing && $tasteless_code) {
+				$data['updated_by'] = $action_by;
+				$data['updated_at'] = $time_stamp;
+			} else {
+				$data['created_by'] = $action_by;
+				$data['created_at'] = $time_stamp;
+			}
+
+			if (!$tasteless_code && !$input['item_masters_approvals_id']) {
+				$data['action_type'] = 'CREATE';
+				$inserted_id = ItemMastersFasApprovals::insertGetId($data);
+			} else if ($tasteless_code) {
+				$data['action_type'] = 'UPDATE';
+				$item_to_be_updated = ItemMastersFasApprovals::where('tasteless_code', $tasteless_code);
+				
+				$item_to_be_updated->update($data);
+				$inserted_id = $item_to_be_updated->first()->id;
+			} else {
+				$data['action_type'] = 'CREATE';
+				ItemMastersFasApprovals::where('id', $input['item_masters_approvals_id'])->update($data);
+			}
+
+			$notif_config = [
+				'content' => 'An item has been added to pending for approval.',
+				'id_cms_users' => $this->to_notify,
+				'to' => CRUDBooster::adminPath("item_approval/approve_or_reject/" . ($input['item_masters_approvals_id'] ?? $inserted_id)),
+			];
+
+			// CRUDBooster::sendNotification($notif_config);
+
+			return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => '✔️ Item added to Pending Items...',
+				])->send();
+			
+		}
 
 	}

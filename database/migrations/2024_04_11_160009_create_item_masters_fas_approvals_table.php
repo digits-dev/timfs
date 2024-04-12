@@ -21,6 +21,7 @@ class CreateItemMastersFasApprovalsTable extends Migration
             $table->integer('categories_id', false, true)->length(10)->unsigned()->nullable();
             $table->integer('subcategories_id', false, true)->length(10)->unsigned()->nullable();
             $table->decimal('cost', 18, 2)->nullable();
+            $table->text('image_filename')->nullable();
             $table->tinyInteger('approval_status', false, true)->length(3)->unsigned()->nullable();
             $table->integer('approved_by', false, true)->length(10)->unsigned()->nullable();
             $table->timestamp('approved_at')->nullable();

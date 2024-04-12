@@ -1,0 +1,219 @@
+@push('head')
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<link rel="stylesheet" href="{{asset('css/edit-rnd-menu.css')}}">
+<link rel="stylesheet" href="{{asset('css/custom.css')}}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js" integrity="sha512-jVMFsAksn8aljb9IJ+3OCAq38dJpquMBjgEuz7Q5Oqu5xenfin/jxdbKw4P5eKjUF4xiG/GPT5CvCX3Io54gyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+    table, tbody, td, th {
+        border: 1px solid black !important;
+        padding-left: 50px;
+    }
+
+    th {
+        width: 35%;
+    }
+
+    .photo-section {
+        max-width: 400px;
+        margin: 0 auto; 
+    }
+
+    .photo-section img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .swal2-html-container {
+        line-height: 3rem !important;
+    }
+
+
+    .select2-container--default .select2-selection--single {
+        border-radius: 0px !important
+    }
+
+    .select2-container .select2-selection--single {
+        height: 35px;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #3190c7 !important;
+        border-color: #367fa9 !important;
+        color: #fff !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #fff !important;
+    }
+
+    .select2-container--default .select2-selection--multiple{
+        border-radius: 0px !important;
+        width: 100% !important;
+    }
+
+    .select2-container .select2-selection--single .select2-selection__rendered{
+        padding: 0 !important;
+        margin-top: -2px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__clear{
+        margin-right: 10px !important;
+        padding: 0 !important;
+    }
+    
+</style>
+@endpush
+@extends('crudbooster::admin_template')
+@section('content')
+
+
+<p class="noprint">
+    <a title='Return' href="{{ CRUDBooster::mainPath() }}">
+        <i class='fa fa-chevron-circle-left '></i> &nbsp; {{trans("crudbooster.form_back_to_list",['module'=>CRUDBooster::getCurrentModule()->name])}}
+    </a>
+</p>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="text-center text-bold">Item Masterfile FA</h3>
+    </div>
+    <div class="panel-body">
+        <form id="main-form" action="{{ $table == 'item_masters_fas_approvals' ? route('item_mater_fa_approvals_submit_edit') : route('item_maters_fa_submit_add_or_edit') }}" enctype="multipart/form-data" method="POST" class="form-main" autocomplete="off">
+            @csrf
+            <input value="{{ $item->tasteless_code }}" name="tasteless_code" type="text" class="tasteless_code hide">
+            @if ($item_masters_approvals_id)
+            <input type="text" name="item_masters_approvals_id" value="{{ $item_masters_approvals_id }}" class="hide">
+            @endif
+            <div class="row col-md-offset-3">
+                <div class="col-md-8">
+                    <table class="table-responsive table">
+                        <tbody>
+                            @if ($item->tasteless_code)
+                            <tr>
+                                <th>Tasteless Code</th>
+                                <td><input value="{{ $item->tasteless_code}}" type="text" name="tasteless_code" id="tasteless_code" class="form-control" readonly></td>
+                            </tr>
+                            @endif
+                            <tr>
+                                <th><span class="required-star">*</span> Item Description</th>
+                                <td><input value="{{ $item->item_description ?: '' }}" type="text" name="item_description" id="item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">{{ $item->tasteless_code && !$item->image_filename ? '*' : '' }}</span> Display Photo</th>
+                                <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ $item->tasteless_code && !$item->image_filename ? 'required' : '' }} ></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Coa</th>
+                                <td>
+                                    <select name="categories_id" id="categories_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($coa as $account)
+                                        <option value="{{ $account->id }}" {{ $account->id == $item->categories_id ? 'selected' : '' }}>{{ $account->description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Sub category</th>
+                                <td>
+                                    <select selected data-placeholder="Select Sub Category" class="form-control sub_category_id" name="subcategories_id" id="sub_category_id" required style="width:100%"> 
+                                    
+                                    </select>
+                                </td>  
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Cost</th>
+                                <td>
+                                    <input value="{{ $item->cost }}" type="number" step="any" class="form-control" name="cost" id="cost" required>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+               
+            </div>
+            
+                
+            </div>
+            <button id="sumit-form-btn" class="btn btn-primary hide" type="submit">submit</button>
+        </form>
+        <div class="panel-footer">
+            <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
+            <button class="btn btn-primary pull-right _action="save" id="save-btn"><i class="fa fa-save"></i> Save</button>
+        </div>
+    </div>
+  
+</div>
+
+<script type="application/javascript">
+    $(`#categories_id,#sub_category_id`).select2({
+        width: '100%',
+        height: '100%',
+        placeholder: 'None selected...'
+    });
+    $('#sub_category_id').attr('disabled', true);
+    $('#categories_id').change(function(){
+        const id =  $(this).val();
+        $.ajax({ 
+            type: 'POST',
+            url: '{{ route("fetch-categories") }}',
+            data: {
+                'id': id
+            },
+            success: function(result) {
+                var i;
+                var showData = [];
+                showData[0] = '<option value="">Choose Sub Category</option>';
+                for (i = 0; i < result.length; ++i) {
+                    var j = i + 1;
+                    showData[j] = `<option value='${result[i].id}'>${result[i].description}</option>`;
+                }
+                $('#sub_category_id').attr('disabled', false);
+                $('#sub_category_id').html(showData); 
+                $('#sub_category_id').val('').trigger('change');   
+
+            }
+        });
+    });
+
+    $('#save-btn').on('click', function() {
+        Swal.fire({
+            title: 'Do you want to save this item?',
+            html:  `Doing so will push this item to <span class="label label-info">ITEM FA FOR APPROVAL</span>.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Save',
+            returnFocus: false,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#sumit-form-btn').click();
+            }
+        });
+    });
+
+    $('form input').on('keyup keypress', function(event) {
+        if (event.keyCode == 13) {
+            event.preventDefault();
+            return;
+        }
+    });
+
+    $('#main-form').on('submit', function() {
+        Swal.fire({
+            title: 'Loading...',
+            html: 'Please wait...',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+        });
+    });
+</script>
+@endsection

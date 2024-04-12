@@ -54,5 +54,41 @@ class FaMenusSeeder extends Seeder
             ]
         );
 
+        DB::table('cms_menus')->updateOrInsert(
+            [
+                'name'              => 'Item Masterfile FA',
+            ],
+            [
+                'name'              => 'Item Masterfile FA',
+                'type'              => 'Route',
+                'path'              => 'AdminItemMastersFasControllerGetIndex',
+                'color'             => NULL,
+                'icon'              => 'fa fa-circle-o',
+                'parent_id'         => 1,
+                'is_active'         => 1,
+                'is_dashboard'      => 0,
+                'id_cms_privileges' => 1,
+                'sorting'           => 13
+            ]
+        );
+
+        DB::table('cms_menus')->updateOrInsert(
+            [
+                'name'              => 'Item FA For Approval',
+            ],
+            [
+                'name'              => 'Item FA For Approval',
+                'type'              => 'Route',
+                'path'              => 'AdminItemMastersFasApprovalControllerGetIndex',
+                'color'             => NULL,
+                'icon'              => 'fa fa-thumbs-o-up',
+                'parent_id'         => 38,
+                'is_active'         => 1,
+                'is_dashboard'      => 0,
+                'id_cms_privileges' => 1,
+                'sorting'           => 6
+            ]
+        );
+
     }
 }

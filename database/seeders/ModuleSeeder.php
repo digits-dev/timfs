@@ -32,6 +32,24 @@ class ModuleSeeder extends Seeder
                 'controller'   => 'AdminFaCoaSubCategoriesController',
                 'is_protected' => 0,
                 'is_active'    => 0
+            ],
+            [
+                'name'         => 'Item Masterfile FA',
+                'icon'         => 'fa fa-bookmark-o',
+                'path'         => 'item_masters_fas',
+                'table_name'   => 'item_masters_fas',
+                'controller'   => 'AdminItemMastersFasController',
+                'is_protected' => 0,
+                'is_active'    => 0
+            ],
+            [
+                'name'         => 'Item FA For Approval',
+                'icon'         => 'fa fa-thumbs-o-up',
+                'path'         => 'item_masters_fas_approval',
+                'table_name'   => 'item_masters_fas_approval',
+                'controller'   => 'AdminItemMastersFasApprovalController',
+                'is_protected' => 0,
+                'is_active'    => 0
             ]
         ];
 
