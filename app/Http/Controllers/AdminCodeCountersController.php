@@ -54,7 +54,7 @@
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Type','name'=>'type','type'=>'select','validation'=>'required|min:1|max:25','width'=>'col-sm-4','dataenum'=>'ITEM MASTER;MENU MASTER;SUBMASTER'];
+			$this->form[] = ['label'=>'Type','name'=>'type','type'=>'select','validation'=>'required|min:1|max:25','width'=>'col-sm-4','dataenum'=>'ITEM MASTER;MENU MASTER;SUBMASTER;ASSET MASTERFILE'];
 			$this->form[] = ['label'=>'Code 1','name'=>'code_1','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];
 			$this->form[] = ['label'=>'Code 2','name'=>'code_2','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];
 			$this->form[] = ['label'=>'Code 3','name'=>'code_3','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];

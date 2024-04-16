@@ -189,7 +189,9 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/item_masters_fas/approve-or-reject', [AdminItemMastersFasApprovalController::class, 'approveOrReject'])->name('item_maters_fa_approve_or_reject');
     Route::post('/admin/item_masters_fas_approval/submit-edit', [AdminItemMastersFasApprovalController::class, 'submitEdit'])->name('item_mater_fa_approvals_submit_edit');
     Route::get('/admin/item_masters_fas_approval/approve_or_reject/{id}', [AdminItemMastersFasApprovalController::class, 'getApproveOrReject']);
-     Route::post('/admin/fa_coa_sub_categories/sub-categories', [AdminFaCoaSubCategoriesController::class, 'getCategories'])->name('fetch-categories');
+    Route::post('/admin/fa_coa_sub_categories/sub-categories', [AdminFaCoaSubCategoriesController::class, 'getCategories'])->name('fetch-categories');
+    //FA Export
+    Route::post('admin/item_masters_fas/item-export','AdminItemMastersFasController@exportItems')->name('export-items');
 });
 
 Route::get('/item_masters/api/get-items/{secret_key}', [AdminItemMastersController::class, 'getUpdatedItems'])->name('get_updated_items');

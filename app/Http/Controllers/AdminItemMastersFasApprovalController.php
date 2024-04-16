@@ -1,9 +1,17 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
+	use App\Models\ItemMastersFa;
+	use App\Models\ItemMastersFasApprovals;
+	use App\Models\FaCoaCategories;
+	use App\Models\FaSubCategories;
+	use Illuminate\Support\Facades\Input;
+	use Illuminate\Support\Facades\Log;
+	use Illuminate\Support\Facades\Redirect;
+	use App\CodeCounter;
 
 	class AdminItemMastersFasApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
 		public function __construct() {
@@ -22,8 +30,8 @@
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
-			$this->button_add = true;
-			$this->button_edit = true;
+			$this->button_add = false;
+			$this->button_edit = false;
 			$this->button_delete = false;
 			$this->button_detail = true;
 			$this->button_show = true;
@@ -40,9 +48,16 @@
 			$this->col[] = ["label" => "Approval Status", "name" => "approval_status"];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"tasteless_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
-			$this->col[] = ["label"=>"Coa","name"=>"categories_id","join"=>"fa_coa_categories,description"];
+			$this->col[] = ["label"=>"COA","name"=>"categories_id","join"=>"fa_coa_categories,description"];
 			$this->col[] = ["label"=>"Sub category","name"=>"subcategories_id","join"=>"fa_sub_categories,description"];
 			$this->col[] = ["label"=>"Cost","name"=>"cost"];
+			$this->col[] = ["label"=>"UPC Code","name"=>"upc_code"];
+			$this->col[] = ["label"=>"Supplier Item Code","name"=>"supplier_item_code"];
+			$this->col[] = ["label"=>"Brand Name","name"=>"brand_id"];
+			$this->col[] = ["label"=>"Vendor Name","name"=>"vendor_id"];
+			$this->col[] = ["label"=>"Model","name"=>"model"];
+			$this->col[] = ["label"=>"Size","name"=>"size"];
+			$this->col[] = ["label"=>"Color","name"=>"color"];
 			$this->col[] = ["label" => "Created Date", "name" => "created_at", "visible" => CRUDBooster::myColumnView()->create_date ? true : false];
 			$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->create_by ? true : false];
 			$this->col[] = ["label" => "Updated Date", "name" => "updated_at", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
@@ -116,7 +131,10 @@
 	        | 
 	        */
 	        $this->button_selected = array();
-
+			if (in_array(CRUDBooster::myPrivilegeName(), $this->approver) || CRUDBooster::isSuperadmin()) {
+	        	$this->button_selected[] = ['label'=>'APPROVE','icon'=>'fa fa-thumbs-up','name'=>'approve'];
+				$this->button_selected[] = ['label'=>'REJECT','icon'=>'fa fa-thumbs-down','name'=>'reject'];
+			}
 	                
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -162,7 +180,35 @@
 	        |
 	        */
 	        $this->index_statistic = array();
-
+			if (in_array(CRUDBooster::myPrivilegeName(), $this->approver) || CRUDBooster::isSuperAdmin()) {
+				$pending_count = DB::table('item_masters_fas_approvals')
+					->where('approval_status', '202')
+					->count();
+				$approved_count = DB::table('item_masters_fas_approvals')
+					->where('approval_status', '200')
+					->count();
+				$rejected_count = DB::table('item_masters_fas_approvals')
+					->where('approval_status', '400')
+					->count();
+				$this->index_statistic[] = [
+					'label' => 'Pending Items',
+					'count' => $pending_count,
+					'icon' => 'fa fa-hourglass-half',
+					'color' => 'orange',
+				];
+				$this->index_statistic[] = [
+					'label' => 'Approved Items',
+					'count' => $approved_count,
+					'icon' => 'fa fa-thumbs-up',
+					'color' => 'green',
+				];
+				$this->index_statistic[] = [
+					'label' => 'Rejected Items',
+					'count' => $rejected_count,
+					'icon' => 'fa fa-thumbs-down',
+					'color' => 'red',
+				];
+			}
 
 
 	        /*
@@ -247,7 +293,30 @@
 	    |
 	    */
 	    public function actionButtonSelected($id_selected,$button_name) {
-	        //Your code here
+	        if ($button_name == 'approve') {
+				foreach ($id_selected as $id) {
+					$item = DB::table('item_masters_fas_approvals')
+						->where('id', $id)
+						->first();
+
+					if ($item->approval_status != 202) {
+						continue;
+					}
+					$item_description = $item->full_item_description;
+					$tasteless_code = $item->tasteless_code;
+					$differences = self::getUpdatedDetails($id);
+					$paired_differences = $differences['paired_differences'] ?? [];
+	
+					if (array_key_exists('ttp_price_effective_date', $paired_differences)) {
+						if ($paired_differences['ttp_price_effective_date']['new'] < date('Y-m-d') && $item->ttp_price_effective_date) {
+							return CRUDBooster::redirect(CRUDBooster::mainPath(), "Item: \"$tasteless_code - $item_description\" sales price effective date has expired.", 'danger');
+						}
+					}
+				}
+			}
+
+
+			return self::approve_or_reject($id_selected, $button_name);
 	            
 	    }
 
@@ -302,7 +371,7 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	if ($column_index == 3 && $column_value) {
-				$column_value = '<image class="item-master-image" src="'. asset("img/item-master-fa/$column_value") . '" data-action="zoom"/>';
+				$column_value = '<image class="item-master-image" src="'. asset("img/item-master-fa/$column_value") . '" data-action="zoom" width="100" height="100"/>';
 			}
 
 			else if ($column_index == 4) {
@@ -424,6 +493,10 @@
 			return $this->view('item-master-fa/add-edit', $data);
 		}
 
+		public function submitEdit(Request $request) {
+			return $this->main_controller->submitAddOrEdit($request);
+		}
+
 		public function getApproveOrReject($id) {
 			$my_privilege = CRUDBooster::myPrivilegeName();
 			$to_approve = in_array($my_privilege, $this->approver) || CRUDBooster::isSuperAdmin();
@@ -457,9 +530,9 @@
 			$time_stamp = date('Y-m-d H:i:s');
 
 			if (!is_array($item_ids)) $item_ids = [$item_ids];
-
+	
 			foreach ($item_ids as $id) {
-				$item = DB::table('item_master_approvals')
+				$item = DB::table('item_masters_fas_approvals')
 					->where('id', $id)
 					->first();
 
@@ -468,39 +541,31 @@
 				if ($item->approval_status != '202') {
 					continue;
 				}
-
+		
 				$tasteless_code = $item->tasteless_code;
 				if (!$tasteless_code) {
-					$groups_id = $item->groups_id;
-					$group = Group::find($groups_id);
-					$tasteless_code = $this->main_controller->getTastelessCode($group);
+					$tasteless_code = CodeCounter::where('id', 4)->where('type', 'ASSET MASTERFILE')->value('code_1');
+					CodeCounter::where('type', 'ASSET MASTERFILE')->where('id', 4)->increment('code_1');
 					$item->tasteless_code = $tasteless_code;
 				}
 
 				if ($action == 'approve') {
 					$differences = self::getUpdatedDetails($id);
 					$paired_differences = $differences['paired_differences'] ?? [];
-
-					if (array_key_exists('ttp_price_effective_date', $paired_differences)) {
-						if ($paired_differences['ttp_price_effective_date']['new'] < date('Y-m-d') && $paired_differences['ttp_price_effective_date']['new']) {
-							continue;
-						}
-					}
-
-					ItemMasterApproval::where('id', $id)->update([
+					ItemMastersFasApprovals::where('id', $id)->update([
 						'approval_status' => '200',
 						'tasteless_code' => $tasteless_code,
-						'approved_by_1' => $action_by,
-						'approved_at_1' => $time_stamp,
+						'approved_by' => $action_by,
+						'approved_at' => $time_stamp,
 					]);
 
-					$item = DB::table('item_master_approvals')
+					$item = DB::table('item_masters_fas_approvals')
 						->where('id', $id)
 						->first();
 
 					unset($item->id);
 
-					$inserted_item = ItemMaster::updateOrCreate(
+					$inserted_item = ItemMastersFa::updateOrCreate(
 						['tasteless_code' => $item->tasteless_code],
 						(array) $item,
 					);
@@ -508,48 +573,22 @@
 					$details_of_item = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
 					$new_values = $differences['new_values'];
 					$old_values = $differences['old_values'];
-					if ($old_values && $new_values) {
-						if ((float) $old_values->ttp != (float) $new_values->ttp_price_change ||
-							(float) $old_values->ttp != (float) $new_values->ttp ||
-							$old_values->ttp_price_effective_date != $new_values->ttp_price_effective_date
-						) {
-							$sales_price_change_history = [
-								'tasteless_code' => $tasteless_code,
-								'sales_price' => $old_values->ttp,
-								'sales_price_change' => $new_values->ttp_price_change,
-								'effective_date' => $new_values->ttp_price_effective_date,
-								'status' => 'APPROVED',
-								'created_by' => $new_values->updated_by,
-								'created_at' => $new_values->updated_at,
-								'approved_at' => $time_stamp,
-								'approved_by' => $action_by,
-							];
-							SalesPriceChangeHistory::insert($sales_price_change_history);
-						}
-					}
-
 					if ($paired_differences || !$old_values) {
 						foreach ($paired_differences  as $column_name => $paired_difference) {
 							$details_of_item .= "<tr><td>".$column_name."</td><td>".$paired_difference['current']."</td><td>".$paired_difference['new']."</td></tr>";
 						}
-	
 						$details_of_item .= '</tbody></table>';
 
 						if (!$old_values) $details_of_item = 'NEW ITEM';
-	
-						DB::table('history_item_masterfile')->insert([
+
+						DB::table('history_assets_masterfiles')->insert([
 							'tasteless_code' =>	$inserted_item->tasteless_code,
 							'item_id' => $old_values->id ?? $inserted_item->id,
-							'brand_id' => $inserted_item->brands_id,
-							'group_id' => $inserted_item->groups_id,
+							'brand_id' => $inserted_item->brand_id,
 							'action' => $inserted_item->action_type,
-							'brand_id' => $inserted_item->brands_id,
-							'ttp' => $inserted_item->ttp,
-							'ttp_percentage' => $inserted_item->ttp_percentage,
-							'old_ttp' => $old_values->ttp,
-							'old_ttp_percentage' => $old_values->ttp_percentage,
-							'purchase_price' => $inserted_item->purchase_price,
-							'old_purchase_price' => $old_values->purchase_price,
+							'brand_id' => $inserted_item->brand_id,
+							'cost' => $inserted_item->cost,
+							'old_cost' => $old_values->cost,
 							'details' => $details_of_item,
 							'created_by' => $inserted_item->created_by,
 							'updated_by' => $inserted_item->updated_by,
@@ -557,43 +596,8 @@
 						]);
 					}
 
-					if (array_key_exists('ttp', $paired_differences) || !$old_values) {
-						DB::table('history_ttps')
-							->insert([
-								'tasteless_code' => $inserted_item->tasteless_code,
-								'item_id' => $old_values->id ?? $inserted_item->id,
-								'brand_id' => $inserted_item->brands_id,
-								'ttp' => $inserted_item->ttp,
-								'ttp_percentage' => $inserted_item->ttp_percentage,
-								'created_at' => $time_stamp,
-							]);
-					}
-
-					if (array_key_exists('purchase_price', $paired_differences) || !$old_values) {
-						DB::table('history_purchase_prices')
-							->insert([
-								'tasteless_code' => $inserted_item->tasteless_code,
-								'item_id' => $old_values->id ?? $inserted_item->id,
-								'brand_id' => $inserted_item->brands_id,
-								'purchase_price' => $inserted_item->purchase_price,
-								'currencies_id' => $inserted_item->currencies_id,
-								'created_at' => $time_stamp
-							]);
-					}
-
-					if (array_key_exists('landed_cost', $paired_differences) || !$old_values) {
-						DB::table('history_landed_costs')
-							->insert([
-								'tasteless_code' => $inserted_item->tasteless_code,
-								'item_id' => $old_values->id ?? $inserted_item->id,
-								'brand_id' => $inserted_item->brands_id,
-								'landed_cost' => $inserted_item->landed_cost,
-								'created_at' => $time_stamp
-							]);
-					}
-
 				} else if ($action == 'reject') {
-					ItemMasterApproval::where('id', $id)->update([
+					ItemMastersFasApprovals::where('id', $id)->update([
 						'approval_status' => '400'
 					]);
 				} 
@@ -604,14 +608,13 @@
 					'to' => CRUDBooster::mainPath("detail/$item_id"),
 				];
 	
-				CRUDBooster::sendNotification($notif_config);
+				// CRUDBooster::sendNotification($notif_config);
 					
 			}
 
 			if ($action == 'approve') {
 				$message_type = 'success';
 				$message = '✔️ Item successfully approved.';
-				self::updateSalesPrice();
 			} else if ($action == 'reject') {
 				$message_type = 'success';
 				$message = '✖️ Item successfully rejected.';
@@ -622,5 +625,49 @@
 				$message, 
 				$message_type
 			)->send();
+		}
+
+		public function getUpdatedDetails($item_master_approvals_id) {
+			$item_for_approval = DB::table('item_masters_fas_approvals')
+				->where('id', $item_master_approvals_id)
+				->get()
+				->first();
+
+			if ($item_for_approval->tasteless_code) {
+				$submaster_details = $this->main_controller->getSubmasters();
+				$current_item = DB::table('item_masters_fas')
+					->where('tasteless_code', $item_for_approval->tasteless_code)
+					->get()
+					->first();
+	
+				$differences = array_udiff_assoc(
+					(array) $item_for_approval,
+					(array) $current_item,
+					function ($a, $b) {
+						if (is_numeric($a) && is_numeric($b)) {
+							return (float) $a !== (float) $b;
+						} else {
+							return $a != $b;
+						}
+					}
+				);
+	
+				$paired_differences = [];
+				foreach ($differences as $key => $difference) {
+					$paired_differences[$key] = [];
+					$paired_differences[$key]['current'] = $current_item->{$key};
+					$paired_differences[$key]['new'] = $difference;
+				
+				}
+			}
+
+
+			return [
+				'differences' => $differences,
+				'paired_differences' => $paired_differences,
+				'old_values' => $current_item,
+				'new_values' => $item_for_approval,
+			];
+			
 		}
 	}

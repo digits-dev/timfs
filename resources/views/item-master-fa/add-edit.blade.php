@@ -79,7 +79,7 @@
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="text-center text-bold">Item Masterfile FA</h3>
+        <h3 class="text-center text-bold">Asset Masterfile</h3>
     </div>
     <div class="panel-body">
         <form id="main-form" action="{{ $table == 'item_masters_fas_approvals' ? route('item_mater_fa_approvals_submit_edit') : route('item_maters_fa_submit_add_or_edit') }}" enctype="multipart/form-data" method="POST" class="form-main" autocomplete="off">
@@ -88,8 +88,8 @@
             @if ($item_masters_approvals_id)
             <input type="text" name="item_masters_approvals_id" value="{{ $item_masters_approvals_id }}" class="hide">
             @endif
-            <div class="row col-md-offset-3">
-                <div class="col-md-8">
+            <div class="row">
+                <div class="col-md-6">
                     <table class="table-responsive table">
                         <tbody>
                             @if ($item->tasteless_code)
@@ -99,6 +99,10 @@
                             </tr>
                             @endif
                             <tr>
+                                <th><span class="required-star">*</span> Upc Code</th>
+                                <td><input value="{{ $item->upc_code ?: '' }}" type="text" name="upc_code" id="upc_code" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr>
+                            <tr>
                                 <th><span class="required-star">*</span> Item Description</th>
                                 <td><input value="{{ $item->item_description ?: '' }}" type="text" name="item_description" id="item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
@@ -107,7 +111,7 @@
                                 <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ $item->tasteless_code && !$item->image_filename ? 'required' : '' }} ></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">*</span>  Coa</th>
+                                <th><span class="required-star">*</span>  COA</th>
                                 <td>
                                     <select name="categories_id" id="categories_id" class="form-control" required>
                                         <option value="" disabled selected>None selected...</option>
@@ -134,7 +138,36 @@
                         </tbody>
                     </table>
                 </div>
-               
+                <div class="col-md-6">
+                    <table class="table-responsive table">
+                        <tbody>
+                            <tr>
+                                <th><span class="required-star">*</span> Supplier Item Code</th>
+                                <td><input value="{{ $item->supplier_item_code ?: '' }}" type="text" name="supplier_item_code" id="supplier_item_code" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Brand Name</th>
+                                <td><input value="{{ $item->brand_id ?: '' }}" type="text" name="brand_id" id="brand_id" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Vendor Name</th>
+                                <td><input value="{{ $item->vendor_id ?: '' }}" type="text" name="vendor_id" id="vendor_id" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Model</th>
+                                <td><input value="{{ $item->model ?: '' }}" type="text" name="model" id="model" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Size</th>
+                                <td><input value="{{ $item->size ?: '' }}" type="text" name="size" id="size" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Color</th>
+                                <td><input value="{{ $item->color ?: '' }}" type="text" name="color" id="color" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             
                 
@@ -215,5 +248,18 @@
             },
         });
     });
+
+    $('#cost').on('input', function() {
+        restrictDecimals($(this), 2);
+    });
+
+    function restrictDecimals(jqueryElement, number) {
+        const [int, dec] = jqueryElement.val().split('.');
+        number = parseInt(number);
+        if (dec && dec.length > number) {
+            const value = `${int}.${dec.slice(0,number)}`
+            jqueryElement.val(value);
+        }
+    }
 </script>
 @endsection

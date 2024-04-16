@@ -47,13 +47,13 @@
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
 			$this->button_add = true;
-			$this->button_edit = true;
+			$this->button_edit = false;
 			$this->button_delete = false;
 			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
-			$this->button_export = false;
+			$this->button_export = true;
 			$this->table = "item_masters_fas";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
@@ -62,9 +62,16 @@
 			$this->col[] = ["label" => "Display Photo", "name" => "image_filename","visible" =>  true];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"tasteless_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description","visible" =>  false];
-			$this->col[] = ["label"=>"Coa","name"=>"categories_id","join"=>"categories,id"];
-			$this->col[] = ["label"=>"Sub categories","name"=>"subcategories_id","join"=>"subcategories,id"];
+			$this->col[] = ["label"=>"COA","name"=>"categories_id","join"=>"fa_coa_categories,description"];
+			$this->col[] = ["label"=>"Sub category","name"=>"subcategories_id","join"=>"fa_sub_categories,description"];
 			$this->col[] = ["label"=>"Cost","name"=>"cost"];
+			$this->col[] = ["label"=>"UPC Code","name"=>"upc_code"];
+			$this->col[] = ["label"=>"Supplier Item Code","name"=>"supplier_item_code"];
+			$this->col[] = ["label"=>"Brand Name","name"=>"brand_id"];
+			$this->col[] = ["label"=>"Vendor Name","name"=>"vendor_id"];
+			$this->col[] = ["label"=>"Model","name"=>"model"];
+			$this->col[] = ["label"=>"Size","name"=>"size"];
+			$this->col[] = ["label"=>"Color","name"=>"color"];
 			$this->col[] = ["label" => "Created Date", "name" => "created_at", "visible" => CRUDBooster::myColumnView()->create_date ? true : false];
 			$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->create_by ? true : false];
 			$this->col[] = ["label" => "Updated Date", "name" => "updated_at", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
@@ -183,7 +190,12 @@
 	        |
 	        */
 	        $this->script_js = NULL;
+			$this->script_js = "
+				function showItemExport() {
+					$('#modal-items-export').modal('show');
+				}
 
+			";
 
             /*
 	        | ---------------------------------------------------------------------- 
@@ -206,7 +218,34 @@
 	        |
 	        */
 	        $this->post_index_html = null;
-	        
+			$this->post_index_html = "
+				<div class='modal fade' tabindex='-1' role='dialog' id='modal-items-export'>
+					<div class='modal-dialog'>
+						<div class='modal-content'>
+							<div class='modal-header'>
+								<button class='close' aria-label='Close' type='button' data-dismiss='modal'>
+									<span aria-hidden='true'>×</span></button>
+								<h4 class='modal-title'><i class='fa fa-download'></i> Export Items</h4>
+							</div>
+
+							<form method='post' target='_blank' action=".CRUDBooster::mainpath("item-export").">
+							<input type='hidden' name='_token' value=".csrf_token().">
+							".CRUDBooster::getUrlParameters()."
+							<div class='modal-body'>
+								<div class='form-group'>
+									<label>File Name</label>
+									<input type='text' name='filename' class='form-control' required value='Export Items - ".date('Y-m-d H:i:s')."'/>
+								</div>
+							</div>
+							<div class='modal-footer' align='right'>
+								<button class='btn btn-default' type='button' data-dismiss='modal'>Close</button>
+								<button class='btn btn-primary btn-submit' type='submit'>Submit</button>
+							</div>
+						</form>
+						</div>
+					</div>
+				</div>
+			";
 	        
 	        
 	        /*
@@ -281,7 +320,9 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code here
+	    	if ($column_index == 2 && $column_value) {
+				$column_value = '<image class="item-master-image" src="'. asset("img/item-master-fa/$column_value") . '" data-action="zoom" width="100" height="100"/>';
+			}
 	    }
 
 	    /*
@@ -292,7 +333,7 @@
 	    |
 	    */
 	    public function hook_before_add(&$postdata) {        
-	        //Your code here
+			
 
 	    }
 
@@ -378,9 +419,9 @@
 			$data = [];
 			$data['action'] = $action;
 			$data['from'] = 'item_masters FA';
-
+			$data['page_title'] = 'Asset Masterfile';
 			if ($id) {
-				$tasteless_code = ItemMasterFa::where('id', $id)->first()->tasteless_code;
+				$tasteless_code = ItemMastersFa::where('id', $id)->first()->tasteless_code;
 				$data['item'] = self::getItemDetails($tasteless_code);
 				if ($data['item']->approval_status == 202) {
 					return redirect(CRUDBooster::mainpath())->with([
@@ -499,4 +540,12 @@
 			
 		}
 
+		public function getItemDetails($tasteless_code) {
+			$item = DB::table('item_masters_fas')
+				->where('tasteless_code', $tasteless_code)
+				->get()
+				->first();
+
+			return $item;
+		}
 	}

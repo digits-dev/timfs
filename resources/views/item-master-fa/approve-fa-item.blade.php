@@ -86,8 +86,8 @@
             <input type="text" class="hide" id="action-selected" name="action">
             <input type="text" class="hide" value="{{ $item->id }}" id="item_master_approvals_id" name="item_master_approvals_id">
             @csrf
-            <div class="row col-md-offset-3">
-                <div class="col-md-8">
+            <div class="row">
+                <div class="col-md-6">
                     <table class="table-responsive table">
                         <tbody>
                             @if ($item->tasteless_code)
@@ -97,8 +97,12 @@
                             </tr>
                             @endif
                             <tr>
+                                <th><span class="required-star">*</span> Supplier Item Code</th>
+                                <td><input value="{{ $item->supplier_item_code ?: '' }}" type="text" name="supplier_item_code" id="supplier_item_code" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
+                            </tr>
+                            <tr>
                                 <th><span class="required-star">*</span> Item Description</th>
-                                <td><input value="{{ $item->item_description ? : '' }}" type="text" name="item_description" id="item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                                <td><input value="{{ $item->item_description ? : '' }}" type="text" name="item_description" id="item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
                             </tr>
                             <tr>
                                 <th>
@@ -114,7 +118,7 @@
                             <tr>
                                 <th><span class="required-star">*</span>  Coa</th>
                                 <td>
-                                    <select name="categories_id" id="categories_id" class="form-control" required>
+                                    <select name="categories_id" id="categories_id" class="form-control" disabled>
                                         <option value="" disabled selected>None selected...</option>
                                         @foreach ($coa as $account)
                                         <option value="{{ $account->id }}" {{ $account->id == $item->categories_id ? 'selected' : '' }}>{{ $account->description }}</option>
@@ -125,7 +129,7 @@
                             <tr>
                                 <th><span class="required-star">*</span>  Sub category</th>
                                 <td>
-                                    <select selected data-placeholder="Select Sub Category" class="form-control sub_category_id" name="subcategories_id" id="sub_category_id" required style="width:100%"> 
+                                    <select selected data-placeholder="Select Sub Category" class="form-control sub_category_id" name="subcategories_id" id="sub_category_id" disabled style="width:100%"> 
                                         @foreach ($sub_categories as $sub)
                                         <option value="{{ $sub->id }}" {{ $sub->id == $item->subcategories_id ? 'selected' : '' }}>{{ $sub->description }}</option>
                                         @endforeach
@@ -135,23 +139,55 @@
                             <tr>
                                 <th><span class="required-star">*</span> Cost</th>
                                 <td>
-                                    <input value="{{ $item->cost }}" type="number" step="any" class="form-control" name="cost" id="cost" required>
+                                    <input value="{{ $item->cost }}" type="number" step="any" class="form-control" name="cost" id="cost" readonly>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    @if ($item->image_filename)
-                    <div class="col-md-6">
-                        <div class="photo-section">
-                            <h3 class="text-center text-bold">DISPLAY PHOTO</h3>
-                            <img src="{{ asset('/img/item-master-fa/' . $item->image_filename) }}" alt="Item Photo">
-                        </div>
-                    </div>
-                    @endif
+                 
                 </div>
+                <div class="col-md-6">
+                    <table class="table-responsive table">
+                        <tbody>
+                            <tr>
+                                <th><span class="required-star">*</span> Supplier Item Code</th>
+                                <td><input value="{{ $item->supplier_item_code ?: '' }}" type="text" name="supplier_item_code" id="supplier_item_code" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Brand Name</th>
+                                <td><input value="{{ $item->brand_id ?: '' }}" type="text" name="brand_id" id="brand_id" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Vendor Name</th>
+                                <td><input value="{{ $item->vendor_id ?: '' }}" type="text" name="vendor_id" id="vendor_id" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Model</th>
+                                <td><input value="{{ $item->model ?: '' }}" type="text" name="model" id="model" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Size</th>
+                                <td><input value="{{ $item->size ?: '' }}" type="text" name="size" id="size" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Color</th>
+                                <td><input value="{{ $item->color ?: '' }}" type="text" name="color" id="color" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                @if ($item->image_filename)
+                <div class="col-md-12">
+                    <div class="photo-section">
+                        <h3 class="text-center text-bold">DISPLAY PHOTO</h3>
+                        <img src="{{ asset('/img/item-master-fa/' . $item->image_filename) }}" alt="Item Photo">
+                    </div>
+                </div>
+                @endif
                 <button id="sumit-form-btn" class="btn btn-primary hide" type="submit">submit</button>
-            </form>
-        </div>
+       
+            </div>
+        </form>
     </div>
     <div class="panel-footer">
         <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>

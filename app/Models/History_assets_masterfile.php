@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ItemMastersFasApprovals extends Model
+class history_assets_masterfile extends Model
 {
     use HasFactory;
-    protected $table = 'item_masters_fas_approvals';
+    protected $table = 'history_assets_masterfiles';
 }
