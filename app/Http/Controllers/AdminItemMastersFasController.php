@@ -454,6 +454,11 @@
 				->get()
 				->toArray();
 
+			$data['currencies'] = DB::table('currencies')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
 			return $data;
 		}
 
@@ -547,5 +552,30 @@
 				->first();
 
 			return $item;
+		}
+
+		public function getUpdatedItems($secret_key) {
+			if ($secret_key != config('api.secret_key')) {
+				return response([
+					'message' => 'Error: Bad Request',
+				], 404);
+			}
+
+			$created_items = DB::table('item_masters_fas')
+				->where('action_type', 'CREATE')
+				->whereBetween(DB::raw('DATE(approved_at)'), [date('Y-m-d',strtotime("-1 days")), date('Y-m-d')])
+				->get()
+				->toArray();
+
+			$updated_items = DB::table('item_masters_fas')
+				->where('action_type', 'UPDATE')
+				->whereBetween(DB::raw('DATE(approved_at)'), [date('Y-m-d',strtotime("-1 days")), date('Y-m-d')])
+				->get()
+				->toArray();
+
+			return response()->json([
+				'created_items' => $created_items,
+				'updated_items' => $updated_items,
+			]);
 		}
 	}

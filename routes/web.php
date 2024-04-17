@@ -195,3 +195,4 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
 });
 
 Route::get('/item_masters/api/get-items/{secret_key}', [AdminItemMastersController::class, 'getUpdatedItems'])->name('get_updated_items');
+Route::get('/item_masters_fas/api/get-items/{secret_key}', [AdminItemMastersFasController::class, 'getUpdatedItems'])->name('get_updated_items');
