@@ -211,9 +211,9 @@
                                 <th><span class="required-star">*</span> Brand Name</th>
                                 <td><input value="{{ $item->brand_id ?: '' }}" type="text" name="brand_id" id="brand_id" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
-                            <tr class="first-vendor">
-                                <th><span class="required-star">*</span> Vendor Name</th>
-                                <td><input value="{{ $item->vendor_id ?: '' }}" type="text" name="vendor_id" id="vendor_id" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            <tr class="tr-vendor">
+                                <th><span class="required-star">*</span> Vendor 1 Name</th>
+                                <td><input value="{{ $item->vendor_id ?: '' }}" type="text" name="vendor_id" id="vendor1_id" class="form-control vendor" required oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
                             <tr class="tr-new-vendor">
                                 <td style="text-align:center">
@@ -359,20 +359,52 @@
         var deleteRow = $('#countRow').val();
         var rowCount = $('#item-sourcing-options tr').length - 1 - deleteRow;
         var rowCountVendor = $('#second_div tr').length - 5;
-        console.log(rowCountVendor);
         if(rowCountVendor > 5){
             $('#add-Row').prop("disabled", true);
             $('#display_error').html("<span id='notif' class='label label-danger'> More than 5 Vendors not allowed!</span>")
         }else{
+            $('#add-Row').prop("disabled", false);
+            $('#display_error').html("");
             var newrow =
-            `<tr>
-                <th><span class="required-star">*</span> Vendor ${rowCountVendor} Name</th>
-                <td><input value="{{ $item->vendor_id ?: '' }}" type="text" name="vendor${rowCountVendor}_id" id="vendor_id" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+            `<tr class="tr-vendor">
+                <th><span class="required-star">*</span> <span class="vendor-name"> Vendor ${rowCountVendor} Name </span></th>
+                <td>
+                    <div style="display:flex;align-content: flex-center;">
+                        <input value="{{ $item->vendor_id ?: '' }}" type="text" name="vendor${rowCountVendor}_id" id="vendor_id" class="form-control vendor" required oninput="this.value = this.value.toUpperCase()">
+                        <button id="deleteRow" name="removeRow" class="btn btn-danger removeRow" style="margin-left:5px"><i class="glyphicon glyphicon-trash"></i></button> 
+                    </div>
+                </td>
             </tr>`;
             $('#second_div tbody tr.tr-new-vendor').before(newrow);
         }
-     
-
     });
+
+    $(document).on('click', '.removeRow', function() {
+        if ($('#second_div tbody tr').length != 1) { 
+            tableRow--;
+            $(this).closest('tr').remove();
+            resetVendorSequence();
+            var rowCount = $('#second_div tbody tr').length-5;
+            if(rowCount > 5){
+                $('#add-Row').prop("disabled", true)
+            }else{
+                $('#add-Row').prop("disabled", false)
+                $('#display_error').html("");
+            }
+            return false;
+        }
+    });
+
+    function resetVendorSequence(){
+        const trVendor = $('.tr-vendor').get();
+        const inputVendor = $('.vendor').get();
+        trVendor.forEach((tr,key) => {
+            $(tr).find('th').find('span.vendor-name').text(`Vendor ${key + 1} Name`);
+        });
+
+        inputVendor.forEach((input,key) => {
+            $(input).attr('name', `vendor${key + 1}_id`);
+        });
+    }
 </script>
 @endsection
