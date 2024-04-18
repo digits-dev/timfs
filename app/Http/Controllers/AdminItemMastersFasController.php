@@ -8,6 +8,7 @@
 	use App\Models\ItemMastersFasApprovals;
 	use App\Models\FaCoaCategories;
 	use App\Models\FaSubCategories;
+	use App\Models\BrandsAssets;
 	use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
 	use Illuminate\Support\Facades\Redirect;
@@ -17,7 +18,7 @@
 	use Intervention\Image\Facades\Image;
 	use Spatie\ImageOptimizer\OptimizerChainFactory;
 	use Illuminate\Support\Str;
-
+	
 	class AdminItemMastersFasController extends \crocodicstudio\crudbooster\controllers\CBController {
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
@@ -61,14 +62,14 @@
 			$this->col = [];
 			$this->col[] = ["label" => "Display Photo", "name" => "image_filename","visible" =>  true];
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"tasteless_code"];
-			$this->col[] = ["label"=>"Item Description","name"=>"item_description","visible" =>  false];
+			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
 			$this->col[] = ["label"=>"COA","name"=>"categories_id","join"=>"fa_coa_categories,description"];
 			$this->col[] = ["label"=>"Sub category","name"=>"subcategories_id","join"=>"fa_sub_categories,description"];
 			$this->col[] = ["label"=>"Cost","name"=>"cost"];
 			$this->col[] = ["label"=>"UPC Code","name"=>"upc_code"];
 			$this->col[] = ["label"=>"Supplier Item Code","name"=>"supplier_item_code"];
 			$this->col[] = ["label"=>"Brand Name","name"=>"brand_id"];
-			$this->col[] = ["label"=>"Vendor Name","name"=>"vendor_id"];
+			$this->col[] = ["label"=>"Vendor 1 Name","name"=>"vendor1_id"];
 			$this->col[] = ["label"=>"Model","name"=>"model"];
 			$this->col[] = ["label"=>"Size","name"=>"size"];
 			$this->col[] = ["label"=>"Color","name"=>"color"];
@@ -398,6 +399,43 @@
 
 	    }
 
+		public function getDetail($id) {
+			if (!CRUDBooster::isRead())
+					CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+			
+			$submaster_details = self::getSubmasters();
+			$data = [];
+			$data['page_title'] = 'Asset Masterfile';
+			$item = DB::table('item_masters_fas')
+				->where('id', $id)
+				->get()
+				->first();
+
+			$data['item'] = $item;
+
+			$data['brand'] = DB::table('brands')
+				->where('id', $item->brands_id)
+				->pluck('brand_description')
+				->first();
+
+			$data['supplier'] = DB::table('suppliers')
+				->where('id', $item->suppliers_id)
+				->pluck('last_name')
+				->first();
+
+			$data['subcategory'] = DB::table('subcategories')
+				->where('id', $item->subcategories_id)
+				->pluck('subcategory_description')
+				->first();
+
+			$data = array_merge($data, $submaster_details);
+
+			return $this->view('item-master-fa/detail-item-fa', $data);
+		}
+
 		public function getAdd(){
 			if (!CRUDBooster::isCreate())
 				CRUDBooster::redirect(
@@ -458,6 +496,11 @@
 				->where('status', 'ACTIVE')
 				->get()
 				->toArray();
+			
+			$data['brands'] = DB::table('brands_assets')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
 
 			return $data;
 		}
@@ -490,7 +533,6 @@
 			$action_by = CRUDBooster::myId();
 			$my_privilege_id = CRUDBooster::myPrivilegeId();
 		
-
 			$data = $request->all();
 
 			unset(
@@ -498,8 +540,8 @@
 				$data['item_photo'], 
 				$data['item_masters_approvals_id'],
 			);
-
-			$data['item_description'] = $data['item_description'];
+			$brandCode = BrandsAssets::where('id',$data['brand_id'])->first()->brand_code;
+			$data['item_description'] = $brandCode. " " .$data['item_description'];
 			$data['tasteless_code'] = $tasteless_code;
 			if ($filename) $data['image_filename'] = $filename;
 

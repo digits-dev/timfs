@@ -54,7 +54,7 @@
 			$this->col[] = ["label"=>"UPC Code","name"=>"upc_code"];
 			$this->col[] = ["label"=>"Supplier Item Code","name"=>"supplier_item_code"];
 			$this->col[] = ["label"=>"Brand Name","name"=>"brand_id"];
-			$this->col[] = ["label"=>"Vendor Name","name"=>"vendor_id"];
+			$this->col[] = ["label"=>"Vendor 1 Name","name"=>"vendor1_id"];
 			$this->col[] = ["label"=>"Model","name"=>"model"];
 			$this->col[] = ["label"=>"Size","name"=>"size"];
 			$this->col[] = ["label"=>"Color","name"=>"color"];
@@ -457,6 +457,43 @@
 	        //Your code here
 
 	    }
+
+		public function getDetail($id) {
+			if (!CRUDBooster::isRead())
+					CRUDBooster::redirect(
+					CRUDBooster::adminPath(),
+					trans('crudbooster.denied_access')
+				);
+			
+			$submaster_details = $this->main_controller->getSubmasters();
+			$data = [];
+			$data['page_title'] = 'Asset Masterfile';
+			$item = DB::table('item_masters_fas')
+				->where('id', $id)
+				->get()
+				->first();
+
+			$data['item'] = $item;
+
+			$data['brand'] = DB::table('brands')
+				->where('id', $item->brands_id)
+				->pluck('brand_description')
+				->first();
+
+			$data['supplier'] = DB::table('suppliers')
+				->where('id', $item->suppliers_id)
+				->pluck('last_name')
+				->first();
+
+			$data['subcategory'] = DB::table('subcategories')
+				->where('id', $item->subcategories_id)
+				->pluck('subcategory_description')
+				->first();
+
+			$data = array_merge($data, $submaster_details);
+
+			return $this->view('item-master-fa/detail-item-fa', $data);
+		}
 
 		public function getEdit($id) {
 			$my_privilege = CRUDBooster::myPrivilegeName();

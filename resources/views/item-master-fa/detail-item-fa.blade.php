@@ -79,7 +79,7 @@
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="text-center text-bold">Item Masterfile FA for approval</h3>
+        <h3 class="text-center text-bold">Assets Masterfile Detail</h3>
     </div>
     <div class="panel-body">
         <form id="main-form" action="{{ route('item_maters_fa_approve_or_reject') }}" enctype="multipart/form-data" method="POST" class="form-main" autocomplete="off">
@@ -239,32 +239,6 @@
 </div>
 
 <script type="application/javascript">
-    $(`#categories_id,#sub_category_id`).select2({
-        width: '100%',
-        height: '100%',
-        placeholder: 'None selected...'
-    });
-
-    $('.action-btn').on('click', function() {
-        const action = $(this).attr('_action');
-        console.log($('#sales_price_effective_date'))
-        $('#action-selected').val(action);
-        Swal.fire({
-            title: `Do you want to ${action} this item?`,
-            html:  action == 'approve' ? `🟢 Doing so will update the Item Masterfile.`
-                : `🔴 Doing so will turn the status of this item to <span class="label label-danger">REJECTED</span>.`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Save',
-            returnFocus: false,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $('#sumit-form-btn').click();
-            }
-        });
-    });
     
 </script>
 @endsection

@@ -209,21 +209,53 @@
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Brand Name</th>
-                                <td><input value="{{ $item->brand_id ?: '' }}" type="text" name="brand_id" id="brand_id" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                                <td>
+                                    <select name="brand_id" id="brand_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($brands as $brand)
+                                         <option value="{{ $brand->id }}" {{ $brand->id == $item->brand_id ? 'selected' : '' }}>{{ $brand->brand_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
                             </tr>
                             <tr class="tr-vendor">
-                                <th><span class="required-star">*</span> Vendor 1 Name</th>
-                                <td><input value="{{ $item->vendor_id ?: '' }}" type="text" name="vendor_id" id="vendor1_id" class="form-control vendor" required oninput="this.value = this.value.toUpperCase()"></td>
+                                <th><span class="required-star">*</span> Vendor 1 Name  <button class="red-tooltip" data-toggle="tooltip" data-placement="right" id="add-Row" name="add-Row" title="Add Vendor"><div class="iconPlus" id="bigplus"></div></button>
+                                    <div id="display_error" style="text-align:left"></div></th>
+                                <td><input value="{{ $item->vendor1_id ?: '' }}" type="text" name="vendor1_id" id="vendor_id" class="form-control vendor" required oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
-                            <tr class="tr-new-vendor">
+                            @if($item->vendor2_id)
+                                <tr class="tr-vendor">
+                                    <th><span class="required-star">*</span> Vendor 2 Name </th>
+                                    <td><input value="{{ $item->vendor2_id ?: '' }}" type="text" name="vendor2_id" id="vendor_id" class="form-control vendor" required oninput="this.value = this.value.toUpperCase()"></td>
+                                </tr>
+                            @endif
+                            @if($item->vendor3_id)
+                                <tr class="tr-vendor">
+                                    <th><span class="required-star">*</span> Vendor 3 Name </th>
+                                    <td><input value="{{ $item->vendor3_id ?: '' }}" type="text" name="vendor3_id" id="vendor_id" class="form-control vendor" required oninput="this.value = this.value.toUpperCase()"></td>
+                                </tr>
+                            @endif
+                            @if($item->vendor4_id)
+                                <tr class="tr-vendor">
+                                    <th><span class="required-star">*</span> Vendor 4 Name </th>
+                                    <td><input value="{{ $item->vendor4_id ?: '' }}" type="text" name="vendor4_id" id="vendor_id" class="form-control vendor" required oninput="this.value = this.value.toUpperCase()"></td>
+                                </tr>
+                            @endif
+                            @if($item->vendor5_id)
+                                <tr class="tr-vendor">
+                                    <th><span class="required-star">*</span> Vendor 5 Name </th>
+                                    <td><input value="{{ $item->vendor5_id ?: '' }}" type="text" name="vendor5_id" id="vendor_id" class="form-control vendor" required oninput="this.value = this.value.toUpperCase()"></td>
+                                </tr>
+                            @endif
+                            {{-- <tr class="tr-new-vendor">
                                 <td style="text-align:center">
                                     <button class="red-tooltip" data-toggle="tooltip" data-placement="right" id="add-Row" name="add-Row" title="Add Vendor"><div class="iconPlus" id="bigplus"></div></button>
                                     <div id="display_error" style="text-align:left"></div>
                                 </td>
-                            </tr>
-                            <tr>
-                                <th><span class="required-star">*</span> Model</th>
-                                <td><input value="{{ $item->model ?: '' }}" type="text" name="model" id="model" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr> --}}
+                            <tr class="tr-new-vendor">
+                                <th> Model</th>
+                                <td><input value="{{ $item->model ?: '' }}" type="text" name="model" id="model" class="form-control" oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Measurement</th>
@@ -251,7 +283,7 @@
 </div>
 
 <script type="application/javascript">
-    $(`#categories_id,#sub_category_id,#currency_id`).select2({
+    $(`#categories_id,#sub_category_id,#currency_id,#brand_id`).select2({
         width: '100%',
         height: '100%',
         placeholder: 'None selected...'
@@ -358,7 +390,7 @@
         tableRow++;
         var deleteRow = $('#countRow').val();
         var rowCount = $('#item-sourcing-options tr').length - 1 - deleteRow;
-        var rowCountVendor = $('#second_div tr').length - 5;
+        var rowCountVendor = $('#second_div tr').length - 4;
         if(rowCountVendor > 5){
             $('#add-Row').prop("disabled", true);
             $('#display_error').html("<span id='notif' class='label label-danger'> More than 5 Vendors not allowed!</span>")
