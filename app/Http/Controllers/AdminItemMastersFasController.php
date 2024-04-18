@@ -258,7 +258,7 @@
 	        |
 	        */
 	        $this->load_js = array();
-	        
+			$this->load_js[] = asset("js/zoom.js");
 	        
 	        
 	        /*
@@ -269,8 +269,12 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = NULL;
-	        
+			$this->style_css = "
+			.item-master-image {
+				max-width: 100px;
+			}
+			
+			";
 	        
 	        
 	        /*
@@ -282,7 +286,7 @@
 	        |
 	        */
 	        $this->load_css = array();
-	        
+	        $this->load_css[] = asset("css/zoom.css");
 	        
 	    }
 
