@@ -6,7 +6,9 @@
 	use CRUDBooster;
 
 	class AdminFaCoaCategoriesController extends \crocodicstudio\crudbooster\controllers\CBController {
-
+		public function __construct() {
+			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+		}
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -293,6 +295,7 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        $postdata["updated_by"]=CRUDBooster::myId();
+			$postdata["updated_at"] = date('Y-m-d H:i:s');
 
 	    }
 
