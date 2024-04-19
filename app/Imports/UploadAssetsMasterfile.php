@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\ItemMastersFa;
 use App\Models\ItemMastersFasApprovals;
 use App\CodeCounter;
-class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadingRow
+class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadingRow, WithValidation
 {
     public function __construct() {
      
@@ -135,7 +135,7 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
             },
             '*.currency_exist' => function($attribute, $value, $onFailure) {
                 if ($value['check'] === false) {
-                    $onFailure('Brand not exist in Brand Submaster!');
+                    $onFailure('Currency not exist in Brand Submaster!');
                 }
             },
         ];
