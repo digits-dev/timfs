@@ -64,7 +64,7 @@ class FaMenusSeeder extends Seeder
                 'path'              => 'AdminItemMastersFasControllerGetIndex',
                 'color'             => NULL,
                 'icon'              => 'fa fa-circle-o',
-                'parent_id'         => 1,
+                'parent_id'         => 0,
                 'is_active'         => 1,
                 'is_dashboard'      => 0,
                 'id_cms_privileges' => 1,
@@ -87,6 +87,24 @@ class FaMenusSeeder extends Seeder
                 'is_dashboard'      => 0,
                 'id_cms_privileges' => 1,
                 'sorting'           => 6
+            ]
+        );
+
+        DB::table('cms_menus')->updateOrInsert(
+            [
+                'name'              => 'Brands Assets',
+            ],
+            [
+                'name'              => 'Brands Assets',
+                'type'              => 'Route',
+                'path'              => 'AdminBrandsAssetsControllerGetIndex',
+                'color'             => NULL,
+                'icon'              => 'fa fa-thumbs-o-up',
+                'parent_id'         => 1,
+                'is_active'         => 1,
+                'is_dashboard'      => 0,
+                'id_cms_privileges' => 1,
+                'sorting'           => 3
             ]
         );
 

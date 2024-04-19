@@ -50,6 +50,15 @@ class ModuleSeeder extends Seeder
                 'controller'   => 'AdminItemMastersFasApprovalController',
                 'is_protected' => 0,
                 'is_active'    => 0
+            ],
+            [
+                'name'         => 'Brands Assets',
+                'icon'         => 'fa fa-circle-o',
+                'path'         => 'brands_assets',
+                'table_name'   => 'brands_assets',
+                'controller'   => 'AdminBrandsAssetsController',
+                'is_protected' => 0,
+                'is_active'    => 0
             ]
         ];
 
