@@ -506,6 +506,11 @@
 				->get()
 				->toArray();
 
+			$data['sku_statuses'] = DB::table('sku_statuses')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
 			return $data;
 		}
 
@@ -546,6 +551,7 @@
 			);
 			$brandCode = BrandsAssets::where('id',$data['brand_id'])->first()->brand_code;
 			$data['item_description'] = $brandCode. " " .$data['item_description'];
+			$data['sku_statuses_id'] = $input['sku_statuses_id'] ?? 1;
 			$data['tasteless_code'] = $tasteless_code;
 			if ($filename) $data['image_filename'] = $filename;
 

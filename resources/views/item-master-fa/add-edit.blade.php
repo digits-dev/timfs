@@ -265,6 +265,19 @@
                                 <th><span class="required-star">*</span> Color</th>
                                 <td><input value="{{ $item->color ?: '' }}" type="text" name="color" id="color" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
+                            @if ($item->tasteless_code)
+                                <tr>
+                                    <th><span class="required-star">*</span> SKU Status</th>
+                                    <td>
+                                        <select name="sku_statuses_id" id="sku_statuses_id" class="form-control" required>
+                                            <option value="" disabled selected>None selected...</option>
+                                            @foreach ($sku_statuses as $sku_status)
+                                            <option value="{{ $sku_status->id }}" {{ $sku_status->id == $item->sku_statuses_id ? 'selected' : '' }}>{{ $sku_status->sku_status_description }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -283,7 +296,7 @@
 </div>
 
 <script type="application/javascript">
-    $(`#categories_id,#sub_category_id,#currency_id,#brand_id`).select2({
+    $(`#categories_id,#sub_category_id,#currency_id,#brand_id,#sku_statuses_id`).select2({
         width: '100%',
         height: '100%',
         placeholder: 'None selected...'
