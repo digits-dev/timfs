@@ -59,6 +59,15 @@ class ModuleSeeder extends Seeder
                 'controller'   => 'AdminBrandsAssetsController',
                 'is_protected' => 0,
                 'is_active'    => 0
+            ],
+            [
+                'name'         => 'History Assets Masterfile',
+                'icon'         => 'fa fa-history',
+                'path'         => 'history_assets_masterfiles',
+                'table_name'   => 'history_assets_masterfiles',
+                'controller'   => 'AdminHistoryAssetsMasterfilesController',
+                'is_protected' => 0,
+                'is_active'    => 0
             ]
         ];
 
