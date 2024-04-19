@@ -24,7 +24,9 @@ use App\Http\Controllers\AdminBatchingIngredientsController;
 use App\Http\Controllers\AdminItemMastersController;
 use App\Http\Controllers\AdminItemApprovalController;
 use App\Http\Controllers\AdminSalesPriceChangeHistoriesController;
-
+use App\Http\Controllers\AdminItemMastersFasController;
+use App\Http\Controllers\AdminItemMastersFasApprovalController;
+use App\Http\Controllers\AdminFaCoaSubCategoriesController;
 Route::get('/', function () {
     return redirect('admin/login');
     //return view('welcome');
@@ -181,6 +183,16 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
 
     //sales price change history
     Route::post('/admin/sales_price_change_histories/export-history', [AdminSalesPriceChangeHistoriesController::class, 'exportDataHistory'])->name('sales_price_change_histories_export_data');
+
+    //item master FA
+    Route::post('/admin/item_masters_fas/submit-add-or-edit', [AdminItemMastersFasController::class, 'submitAddOrEdit'])->name('item_maters_fa_submit_add_or_edit');
+    Route::post('/admin/item_masters_fas/approve-or-reject', [AdminItemMastersFasApprovalController::class, 'approveOrReject'])->name('item_maters_fa_approve_or_reject');
+    Route::post('/admin/item_masters_fas_approval/submit-edit', [AdminItemMastersFasApprovalController::class, 'submitEdit'])->name('item_mater_fa_approvals_submit_edit');
+    Route::get('/admin/item_masters_fas_approval/approve_or_reject/{id}', [AdminItemMastersFasApprovalController::class, 'getApproveOrReject']);
+    Route::post('/admin/fa_coa_sub_categories/sub-categories', [AdminFaCoaSubCategoriesController::class, 'getCategories'])->name('fetch-categories');
+    //FA Export
+    Route::post('admin/item_masters_fas/item-export','AdminItemMastersFasController@exportItems')->name('export-items');
 });
 
 Route::get('/item_masters/api/get-items/{secret_key}', [AdminItemMastersController::class, 'getUpdatedItems'])->name('get_updated_items');
+Route::get('/item_masters_fas/api/get-items/{secret_key}', [AdminItemMastersFasController::class, 'getUpdatedItems'])->name('get_updated_items');

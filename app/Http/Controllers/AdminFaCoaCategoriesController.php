@@ -5,68 +5,44 @@
 	use DB;
 	use CRUDBooster;
 
-	class AdminCodeCountersController extends \crocodicstudio\crudbooster\controllers\CBController {
+	class AdminFaCoaCategoriesController extends \crocodicstudio\crudbooster\controllers\CBController {
 
-		public function __construct() {
-			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
-		}
-		
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
-			$this->title_field = "type";
+			$this->title_field = "id";
 			$this->limit = "20";
-			$this->orderby = "type,asc";
+			$this->orderby = "id,desc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
 			$this->button_add = true;
 			$this->button_edit = true;
-			$this->button_delete = true;
+			$this->button_delete = false;
 			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
-			$this->button_import = true;
-			$this->button_export = true;
-			$this->table = "code_counters";
+			$this->button_import = false;
+			$this->button_export = false;
+			$this->table = "fa_coa_categories";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Type","name"=>"type"];
-			$this->col[] = ["label"=>"Code 1","name"=>"code_1"];
-			$this->col[] = ["label"=>"Code 2","name"=>"code_2"];
-			$this->col[] = ["label"=>"Code 3","name"=>"code_3"];
-			$this->col[] = ["label"=>"Code 4","name"=>"code_4"];
-			$this->col[] = ["label"=>"Code 5","name"=>"code_5"];
-			$this->col[] = ["label"=>"Code 6","name"=>"code_6"];
-			$this->col[] = ["label"=>"Code 7","name"=>"code_7"];
-			$this->col[] = ["label"=>"Code 8","name"=>"code_8"];
-			$this->col[] = ["label"=>"Code 9","name"=>"code_9"];
-
+			$this->col[] = ["label"=>"Description","name"=>"description"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
-			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
+			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
 			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
-			$this->col[] = ["label"=>"Updated Date","name"=>"updated_at"];
+			$this->col[] = ["label"=>"Updated At","name"=>"updated_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Type','name'=>'type','type'=>'select','validation'=>'required|min:1|max:25','width'=>'col-sm-4','dataenum'=>'ITEM MASTER;MENU MASTER;SUBMASTER;ASSET MASTERFILE'];
-			$this->form[] = ['label'=>'Code 1','name'=>'code_1','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];
-			$this->form[] = ['label'=>'Code 2','name'=>'code_2','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];
-			$this->form[] = ['label'=>'Code 3','name'=>'code_3','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];
-			$this->form[] = ['label'=>'Code 4','name'=>'code_4','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];
-			$this->form[] = ['label'=>'Code 5','name'=>'code_5','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];
-			$this->form[] = ['label'=>'Code 6','name'=>'code_6','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];
-			$this->form[] = ['label'=>'Code 7','name'=>'code_7','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];
-			$this->form[] = ['label'=>'Code 8','name'=>'code_8','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];
-			$this->form[] = ['label'=>'Code 9','name'=>'code_9','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];
-			
+			$this->form[] = ['label'=>'Description','name'=>'description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
 			if(in_array(CRUDBooster::getCurrentMethod(),['getEdit','postEditSave','getDetail'])) {
-				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'ACTIVE;INACTIVE'];
+				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
 			}
 			if(CRUDBooster::getCurrentMethod() == 'getDetail'){
 				$this->form[] = ["label"=>"Created By","name"=>"created_by",'type'=>'select',"datatable"=>"cms_users,name"];
@@ -75,6 +51,14 @@
 				$this->form[] = ['label'=>'Updated Date','name'=>'updated_at', 'type'=>'datetime'];
 			}
 			# END FORM DO NOT REMOVE THIS LINE
+
+			# OLD START FORM
+			//$this->form = [];
+			//$this->form[] = ["label"=>"Description","name"=>"description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			# OLD END FORM
 
 			/* 
 	        | ---------------------------------------------------------------------- 
@@ -126,7 +110,7 @@
 	        | @type    = warning,success,danger,info        
 	        | 
 	        */
-	        $this->alert = array();
+	        $this->alert        = array();
 	                
 
 	        
@@ -221,13 +205,7 @@
 	        |
 	        */
 	        $this->style_css = NULL;
-			$this->style_css = "
-			input[type=number]::-webkit-inner-spin-button, 
-			input[type=number]::-webkit-outer-spin-button { 
-				-webkit-appearance: none; 
-				margin: 0;
-			}
-			";
+	        
 	        
 	        
 	        /*
@@ -288,8 +266,9 @@
 	    |
 	    */
 	    public function hook_before_add(&$postdata) {        
-	        //Your code here
-			$postdata["created_by"]=CRUDBooster::myId();
+	        $postdata["created_by"]=CRUDBooster::myId();
+			$postdata["created_at"]=date('Y-m-d H:i:s');
+
 	    }
 
 	    /* 
@@ -313,8 +292,8 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-	        //Your code here
-			$postdata["updated_by"]=CRUDBooster::myId();
+	        $postdata["updated_by"]=CRUDBooster::myId();
+
 	    }
 
 	    /* 
@@ -352,6 +331,10 @@
 	        //Your code here
 
 	    }
+
+
+
+	    //By the way, you can still create your own method in here... :) 
 
 
 	}
