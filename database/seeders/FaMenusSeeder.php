@@ -108,5 +108,23 @@ class FaMenusSeeder extends Seeder
             ]
         );
 
+        DB::table('cms_menus')->updateOrInsert(
+            [
+                'name'              => 'History Assets Masterfile',
+            ],
+            [
+                'name'              => 'History Assets Masterfile',
+                'type'              => 'Route',
+                'path'              => 'AdminHistoryAssetsMasterfilesControllerGetIndex',
+                'color'             => NULL,
+                'icon'              => 'fa fa-history',
+                'parent_id'         => 30,
+                'is_active'         => 1,
+                'is_dashboard'      => 0,
+                'id_cms_privileges' => 1,
+                'sorting'           => 3
+            ]
+        );
+
     }
 }
