@@ -18,6 +18,12 @@
 	use Intervention\Image\Facades\Image;
 	use Spatie\ImageOptimizer\OptimizerChainFactory;
 	use Illuminate\Support\Str;
+	use App\Imports\UploadAssetsMasterfile;
+	use PhpOffice\PhpSpreadsheet\Spreadsheet;
+	use PhpOffice\PhpSpreadsheet\Reader\Exception;
+	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+	use PhpOffice\PhpSpreadsheet\IOFactory;
+	use Maatwebsite\Excel\Facades\Excel;
 	
 	class AdminItemMastersFasController extends \crocodicstudio\crudbooster\controllers\CBController {
 		public function __construct() {
@@ -68,7 +74,7 @@
 			$this->col[] = ["label"=>"Cost","name"=>"cost"];
 			$this->col[] = ["label"=>"UPC Code","name"=>"upc_code"];
 			$this->col[] = ["label"=>"Supplier Item Code","name"=>"supplier_item_code"];
-			$this->col[] = ["label"=>"Brand Name","name"=>"brand_id"];
+			$this->col[] = ["label"=>"Brand Name","name"=>"brand_id","join"=>"brands_assets,brand_description"];
 			$this->col[] = ["label"=>"Vendor 1 Name","name"=>"vendor1_id"];
 			$this->col[] = ["label"=>"Model","name"=>"model"];
 			$this->col[] = ["label"=>"Size","name"=>"size"];
@@ -157,7 +163,12 @@
 	        | 
 	        */
 	        $this->index_button = array();
-
+			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
+				if(CRUDBooster::isSuperadmin()){
+				    $this->index_button[] = ["title"=>"Upload","label"=>"Upload","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('upload-assets')];
+				}
+			
+			}
 
 
 	        /* 
@@ -629,5 +640,83 @@
 				'created_items' => $created_items,
 				'updated_items' => $updated_items,
 			]);
+		}
+
+		public function uploadAssets() {
+			$data['page_title']= 'Upload';
+			return view('upload.upload_assets_masterfile', $data)->render();
+		}
+
+		public function assetsUploadSave(Request $request) {
+			$data = $request->all();	
+			$file = $data['import_file'];
+			$path_excel = $file->store('temp');
+			$path = storage_path('app').'/'.$path_excel;
+
+			try {
+				Excel::import(new UploadAssetsMasterfile, $path);	
+			    CRUDBooster::redirect(CRUDBooster::adminpath('item_masters_fas'), trans("Upload Successfully!"), 'success');
+			} catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+				$failures = $e->failures();
+				$error = [];
+				foreach ($failures as $failure) {
+					$line = $failure->row();
+					foreach ($failure->errors() as $err) {
+						$error[] = $err . " on line: " . $line; 
+					}
+				}
+				$errors = collect($error)->unique()->toArray();
+			}
+			CRUDBooster::redirect(CRUDBooster::adminpath('item_masters_fas'), $errors[0], 'danger');
+		}
+
+		function uploadAssetsTemplate() {
+			$arrHeader = [
+				"upc_code"         	 => "UPC CODE",
+				"item_description"   => "ITEM DESCRIPTION",
+				"coa"                => "COA",
+				"sub_category"       => "SUB CATEGORY",
+				"cost"               => "COST",
+				"currency"           => "CURRENCY",
+				"supplier_item_code" => "SUPPLIER ITEM CODE",
+				"brand_name"         => "BRAND NAME",
+				"vendor1_id"         => "VENDOR 1 NAME",
+				"vendor2_id"         => "VENDOR 2 NAME",
+				"vendor3_id"         => "VENDOR 3 NAME",
+				"vendor4_id"         => "VENDOR 4 NAME",
+				"vendor5_id"         => "VENDOR 5 NAME",
+				"model"              => "MODEL",
+				"measurement"        => "MEASUREMENT",
+				"color"              => "COLOR"
+			];
+	
+			$arrData = [
+				"upc_code"         	 => "UPC CODE",
+				"item_description"   => "4 BURNER OVEN",
+				"coa"                => "COMMERCIAL OVENS",
+				"sub_category"       => "CONVECTION OVEN",
+				"cost"               => "1000",
+				"currency"           => "PHP",
+				"supplier_item_code" => "CODE",
+				"brand_name"         => "BRAND NAME",
+				"vendor1_id"         => "VENDOR 1 NAME",
+				"vendor2_id"         => "VENDOR 2 NAME",
+				"vendor3_id"         => "VENDOR 3 NAME",
+				"vendor4_id"         => "VENDOR 4 NAME",
+				"vendor5_id"         => "VENDOR 5 NAME",
+				"model"              => "LG",
+				"measurement"        => "12mm",
+				"color"              => "BLACK"
+			];
+	
+			$spreadsheet = new Spreadsheet();
+			$spreadsheet->getActiveSheet()->fromArray(array_values($arrHeader), null, 'A1');
+			$spreadsheet->getActiveSheet()->fromArray($arrData, null, 'A2');
+			$filename = "assets-masterfile".date('Y-m-d');
+			header('Content-Type: application/vnd.ms-excel');
+			header('Content-Disposition: attachment;filename="'.$filename.'.xlsx"');
+			header('Cache-Control: max-age=0');
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
 		}
 	}
