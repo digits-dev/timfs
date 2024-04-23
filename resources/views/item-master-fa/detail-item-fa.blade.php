@@ -97,6 +97,10 @@
                             </tr>
                             @endif
                             <tr>
+                                <th><span class="required-star">*</span> UPC Code</th>
+                                <td><input value="{{ $item->upc_code ?: '' }}" type="text" name="upc_code" id="upc_code" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
+                            </tr>
+                            <tr>
                                 <th><span class="required-star">*</span> Item Description</th>
                                 <td><input value="{{ $item->item_description ? : '' }}" type="text" name="item_description" id="item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
                             </tr>
@@ -230,11 +234,6 @@
        
             </div>
         </form>
-    </div>
-    <div class="panel-footer">
-        <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-        <button _action="approve" class="btn btn-success pull-right action-btn" id="approve-btn"><i class="fa fa-thumbs-up"></i> Approve</button>
-        <button _action="reject" class="btn btn-danger pull-right action-btn" id="reject-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-down"></i> Reject</button>
     </div>
 </div>
 

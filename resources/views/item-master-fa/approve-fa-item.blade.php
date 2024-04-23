@@ -79,7 +79,7 @@
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="text-center text-bold">Item Masterfile FA for approval</h3>
+        <h3 class="text-center text-bold">Asset Masterfile for approval</h3>
     </div>
     <div class="panel-body">
         <form id="main-form" action="{{ route('item_maters_fa_approve_or_reject') }}" enctype="multipart/form-data" method="POST" class="form-main" autocomplete="off">
@@ -96,6 +96,10 @@
                                 <td><input value="{{ $item->tasteless_code}}" type="text" name="tasteless_code" id="tasteless_code" class="form-control" readonly></td>
                             </tr>
                             @endif
+                            <tr>
+                                <th><span class="required-star">*</span> UPC Code</th>
+                                <td><input value="{{ $item->upc_code ?: '' }}" type="text" name="upc_code" id="upc_code" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
+                            </tr>
                             <tr>
                                 <th><span class="required-star">*</span> Item Description</th>
                                 <td><input value="{{ $item->item_description ? : '' }}" type="text" name="item_description" id="item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>

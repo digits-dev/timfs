@@ -56,10 +56,10 @@ class FaMenusSeeder extends Seeder
 
         DB::table('cms_menus')->updateOrInsert(
             [
-                'name'              => 'Item Masterfile FA',
+                'name'              => 'Asset Masterfile',
             ],
             [
-                'name'              => 'Item Masterfile FA',
+                'name'              => 'Asset Masterfile',
                 'type'              => 'Route',
                 'path'              => 'AdminItemMastersFasControllerGetIndex',
                 'color'             => NULL,
@@ -74,10 +74,10 @@ class FaMenusSeeder extends Seeder
 
         DB::table('cms_menus')->updateOrInsert(
             [
-                'name'              => 'Item FA For Approval',
+                'name'              => 'Asset Masterfile For Approval',
             ],
             [
-                'name'              => 'Item FA For Approval',
+                'name'              => 'Asset Masterfile For Approval',
                 'type'              => 'Route',
                 'path'              => 'AdminItemMastersFasApprovalControllerGetIndex',
                 'color'             => NULL,
