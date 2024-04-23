@@ -30,11 +30,15 @@ class ItemMastersFa extends Model
         'subcategories_id',
         'cost',
         'currency_id',
+        'image_filename',
         'approval_status',
         'sku_statuses_id',
         'created_by',
-        'created_at'
-      
+        'created_at',
+        'approved_by',
+        'approved_at',
+        'updated_by',
+        'updated_at'
     ];
 
     public static function boot()
