@@ -50,7 +50,8 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
                 'model'               => $row['model'],
                 'size'                => $row['measurement'],
                 'color'               => $row['color'],
-                'approval_status'     => 202,
+                //'approval_status'     => 202,
+                'approval_status'     => 200,
                 'sku_statuses_id'     => 1,
                 'created_by'          => CRUDBooster::myId(),
                 'created_at'          => date('Y-m-d H:i:s')
