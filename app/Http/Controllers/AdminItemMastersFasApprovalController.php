@@ -584,8 +584,8 @@
 		
 				$tasteless_code = $item->tasteless_code;
 				if (!$tasteless_code) {
-					$tasteless_code = CodeCounter::where('id', 4)->where('type', 'ASSET MASTERFILE')->value('code_1');
-					CodeCounter::where('type', 'ASSET MASTERFILE')->where('id', 4)->increment('code_1');
+					$tasteless_code = CodeCounter::where('id', 1)->where('type', ' ')->value('code_9');
+					CodeCounter::where('type', 'ITEM MASTER')->where('id', 1)->increment('code_9');
 					$item->tasteless_code = $tasteless_code;
 				}
 

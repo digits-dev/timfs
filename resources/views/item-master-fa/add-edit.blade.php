@@ -150,7 +150,7 @@
                             </tr>
                             @endif
                             <tr>
-                                <th><span class="required-star">*</span> Upc Code</th>
+                                <th><span class="required-star">*</span> UPC Code</th>
                                 <td><input value="{{ $item->upc_code ?: '' }}" type="text" name="upc_code" id="upc_code" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
                             <tr>
@@ -158,7 +158,7 @@
                                 <td><input value="{{ $item->item_description ?: '' }}" type="text" name="item_description" id="item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
                             <tr>
-                                <th><span class="required-star">{{ $item->tasteless_code && !$item->image_filename ? '*' : '' }}</span> Display Photo</th>
+                                <th><span class="required-star"><span class="required-star">*</span> {{ $item->tasteless_code && !$item->image_filename ? '*' : '' }}</span> Display Photo</th>
                                 <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ !$item->tasteless_code && !$item->image_filename ? 'required' : '' }} ></td>
                             </tr>
                             <tr>
