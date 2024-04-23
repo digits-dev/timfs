@@ -192,6 +192,11 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/fa_coa_sub_categories/sub-categories', [AdminFaCoaSubCategoriesController::class, 'getCategories'])->name('fetch-categories');
     //FA Export
     Route::post('admin/item_masters_fas/item-export','AdminItemMastersFasController@exportItems')->name('export-items');
+    //Upload Assets
+    Route::get('/admin/item_masters_fas/upload-assets', [AdminItemMastersFasController::class, 'uploadAssets']);
+    Route::post('/admin/item_masters_fas/assets-upload-save',[AdminItemMastersFasController::class, 'assetsUploadSave'])->name('assets-upload-save');
+    Route::get('/admin/item_masters_fas/upload-assets-template',[AdminItemMastersFasController::class, 'uploadAssetsTemplate']);
+ 
 });
 
 Route::get('/item_masters/api/get-items/{secret_key}', [AdminItemMastersController::class, 'getUpdatedItems'])->name('get_updated_items');

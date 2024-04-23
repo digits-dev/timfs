@@ -53,7 +53,7 @@
 			$this->col[] = ["label"=>"Cost","name"=>"cost"];
 			$this->col[] = ["label"=>"UPC Code","name"=>"upc_code"];
 			$this->col[] = ["label"=>"Supplier Item Code","name"=>"supplier_item_code"];
-			$this->col[] = ["label"=>"Brand Name","name"=>"brand_id"];
+			$this->col[] = ["label"=>"Brand Name","name"=>"brand_id","join"=>"brands_assets,brand_description"];
 			$this->col[] = ["label"=>"Vendor 1 Name","name"=>"vendor1_id"];
 			$this->col[] = ["label"=>"Model","name"=>"model"];
 			$this->col[] = ["label"=>"Size","name"=>"size"];
