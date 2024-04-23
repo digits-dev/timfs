@@ -34,7 +34,7 @@ class ModuleSeeder extends Seeder
                 'is_active'    => 0
             ],
             [
-                'name'         => 'Item Masterfile FA',
+                'name'         => 'Asset Masterfile',
                 'icon'         => 'fa fa-bookmark-o',
                 'path'         => 'item_masters_fas',
                 'table_name'   => 'item_masters_fas',
@@ -43,10 +43,10 @@ class ModuleSeeder extends Seeder
                 'is_active'    => 0
             ],
             [
-                'name'         => 'Item FA For Approval',
+                'name'         => 'Asset Masterfile For Approval',
                 'icon'         => 'fa fa-thumbs-o-up',
-                'path'         => 'item_masters_fas_approval',
-                'table_name'   => 'item_masters_fas_approval',
+                'path'         => 'item_masters_fas_approvals',
+                'table_name'   => 'item_masters_fas_approvals',
                 'controller'   => 'AdminItemMastersFasApprovalController',
                 'is_protected' => 0,
                 'is_active'    => 0
