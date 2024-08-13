@@ -424,27 +424,7 @@
 			$submaster_details = self::getSubmasters();
 			$data = [];
 			$data['page_title'] = 'Asset Masterfile';
-			$item = DB::table('item_masters_fas')
-				->where('id', $id)
-				->get()
-				->first();
-
-			$data['item'] = $item;
-
-			$data['brand'] = DB::table('brands')
-				->where('id', $item->brands_id)
-				->pluck('brand_description')
-				->first();
-
-			$data['supplier'] = DB::table('suppliers')
-				->where('id', $item->suppliers_id)
-				->pluck('last_name')
-				->first();
-
-			$data['subcategory'] = DB::table('subcategories')
-				->where('id', $item->subcategories_id)
-				->pluck('subcategory_description')
-				->first();
+			$data['item'] = ItemMastersFa::getItemById($id);
 
 			$data = array_merge($data, $submaster_details);
 
@@ -474,8 +454,8 @@
 			$data['from'] = 'item_masters FA';
 			$data['page_title'] = 'Asset Masterfile';
 			if ($id) {
-				$tasteless_code = ItemMastersFa::where('id', $id)->first()->tasteless_code;
-				$data['item'] = self::getItemDetails($tasteless_code);
+				$tasteless_code = ItemMastersFa::getItemById($id)->tasteless_code;
+				$data['item'] = ItemMastersFa::getItemByTastelessCode($tasteless_code);
 				if ($data['item']->approval_status == 202) {
 					return redirect(CRUDBooster::mainpath())->with([
 						'message_type' => 'danger',
@@ -606,15 +586,6 @@
 					'message' => '✔️ Item added to Pending Items...',
 				])->send();
 			
-		}
-
-		public function getItemDetails($tasteless_code) {
-			$item = DB::table('item_masters_fas')
-				->where('tasteless_code', $tasteless_code)
-				->get()
-				->first();
-
-			return $item;
 		}
 
 		public function getUpdatedItems($secret_key) {

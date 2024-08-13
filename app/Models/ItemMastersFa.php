@@ -41,6 +41,26 @@ class ItemMastersFa extends Model
         'updated_at'
     ];
 
+    public function scopeGetItemByTastelessCode($query,$tasteless_code) {
+        return $query->where('tasteless_code', $tasteless_code)->first();
+    }
+
+    public function scopeGetItemById($query,$id) {
+        return $query->where('id', $id)->first();
+    }
+
+    public function scopeGetItemDetails($query,$id) {
+        return $query->where('item_masters_fas.id', $id)
+        ->leftJoin('brands_assets','item_masters_fas.brand_id','=','brands_assets.id')
+        // ->join('suppliers','item_masters_fas.suppliers_id','=','suppliers.id')
+        // ->join('subcategories','item_masters_fas.subcategories_id','=','subcategories.id')
+        ->select('item_masters_fas.*',
+            'brands_assets.brand_description',
+            // 'suppliers.last_name',
+            // 'subcategories.subcategory_description'
+        )->get();
+    }
+
     public static function boot()
     {
        parent::boot();

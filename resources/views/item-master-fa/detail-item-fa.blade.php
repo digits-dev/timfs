@@ -168,11 +168,12 @@
                             <tr>
                                 <th><span class="required-star">*</span> Brand Name</th>
                                 <td>
-                                    <select selected data-placeholder="Choose" class="form-control brand_id" name="brand_id" id="brand_id" disabled style="width:100%"> 
+                                    <input value="{{ $item->brand_description ?: '' }}" type="text" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly>
+                                    {{-- <select selected data-placeholder="Choose" class="form-control brand_id" name="brand_id" id="brand_id" disabled style="width:100%"> 
                                         @foreach ($brands as $brand)
                                         <option value="{{ $brand->id }}" {{ $brand->id == $item->brand_id ? 'selected' : '' }}>{{ $brand->brand_description }}</option>
                                         @endforeach
-                                    </select>
+                                    </select> --}}
                                 </td>
                             </tr>
                             @if($item->vendor1_id)
