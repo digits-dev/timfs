@@ -334,7 +334,7 @@
 	        */
 	        $this->addaction = array();
 			$my_privilege = CRUDBooster::myPrivilegeName();
-			if (in_array($my_privilege, $this->requestor) || CRUDBooster::isSuperAdmin()) {
+			if (in_array($my_privilege, $this->requestor) || CRUDBooster::isSuperAdmin() || in_array($my_privilege, $this->approver)) {
 				$this->addaction[] = [
 					'title'=>'Edit',
 					'url'=>CRUDBooster::mainpath('edit/[id]'),
