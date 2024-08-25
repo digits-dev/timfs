@@ -57,6 +57,32 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
                 'created_at'          => date('Y-m-d H:i:s')
             ]); 
 
+            ItemMastersFasApprovals::create([
+                'action_type'         => 'CREATE',
+                'tasteless_code'      => $tasteless_code,
+                'item_description'    => $brand->brand_code ." ". $row['item_description'],
+                'upc_code'            => $row['upc_code'],
+                'supplier_item_code'  => $row['supplier_item_code'],
+                'brand_id'            => $brand->id,
+                'categories_id'       => $coa->id,
+                'subcategories_id'    => $sub_category->id,
+                'vendor1_id'          => $row['vendor1_name'],
+                'vendor2_id'          => $row['vendor2_name'],
+                'vendor3_id'          => $row['vendor3_name'],
+                'vendor4_id'          => $row['vendor4_name'],
+                'vendor5_id'          => $row['vendor5_name'],
+                'cost'                => $row['cost'],
+                'currency_id'         => $currency->id,
+                'model'               => $row['model'],
+                'size'                => $row['measurement'],
+                'color'               => $row['color'],
+                //'approval_status'     => 202,
+                'approval_status'     => 200,
+                'sku_statuses_id'     => 1,
+                'created_by'          => CRUDBooster::myId(),
+                'created_at'          => date('Y-m-d H:i:s')
+            ]); 
+
             CodeCounter::where('type', 'ASSET MASTERFILE')->where('id', 4)->increment('code_1');
         }
     }
