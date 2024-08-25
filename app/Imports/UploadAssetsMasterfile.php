@@ -59,6 +59,7 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
 
             ItemMastersFasApprovals::create([
                 'action_type'         => 'CREATE',
+                'tasteless_code'      => $tasteless_code,
                 'item_description'    => $brand->brand_code ." ". $row['item_description'],
                 'upc_code'            => $row['upc_code'],
                 'supplier_item_code'  => $row['supplier_item_code'],
