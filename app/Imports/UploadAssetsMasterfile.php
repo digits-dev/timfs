@@ -29,7 +29,7 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
             $sub_category   = DB::table('fa_sub_categories')->where(DB::raw('LOWER(TRIM(description))'),strtolower(trim($row['sub_category'])))->first();
             $currency   = DB::table('currencies')->where(DB::raw('LOWER(TRIM(currency_code))'),strtolower(trim($row['currency'])))->first();
             
-            $tasteless_code = CodeCounter::where('id', 4)->where('type', 'ASSET MASTERFILE')->value('code_1');
+            $tasteless_code = CodeCounter::where('id', 1)->where('type', 'ITEM MASTER')->value('code_9');
 					
             ItemMastersFa::create([
                 'action_type'         => 'CREATE',
@@ -83,7 +83,7 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
                 'created_at'          => date('Y-m-d H:i:s')
             ]); 
 
-            CodeCounter::where('type', 'ASSET MASTERFILE')->where('id', 4)->increment('code_1');
+            CodeCounter::where('type', 'ITEM MASTER')->where('id', 1)->increment('code_9');
         }
     }
 
