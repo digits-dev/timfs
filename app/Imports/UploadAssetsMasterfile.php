@@ -53,6 +53,7 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
                 //'approval_status'     => 202,
                 'approval_status'     => 200,
                 'sku_statuses_id'     => 1,
+                'approved_at'         => date('Y-m-d H:i:s'),
                 'created_by'          => CRUDBooster::myId(),
                 'created_at'          => date('Y-m-d H:i:s')
             ]); 
@@ -80,6 +81,7 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
                 'approval_status'     => 200,
                 'sku_statuses_id'     => 1,
                 'created_by'          => CRUDBooster::myId(),
+                'approved_at'         => date('Y-m-d H:i:s'),
                 'created_at'          => date('Y-m-d H:i:s')
             ]); 
 
@@ -115,17 +117,17 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
         }
 
         //BRANDS
-        $data['brand_exist']['check'] = false;
-        $checkRowDb = DB::table('brands_assets')->select(DB::raw("LOWER(TRIM(brand_description)) AS brand_description"))->get()->toArray();
-        $checkRowDbColumn = array_column($checkRowDb, 'brand_description');
+        // $data['brand_exist']['check'] = false;
+        // $checkRowDb = DB::table('brands_assets')->select(DB::raw("LOWER(TRIM(brand_description)) AS brand_description"))->get()->toArray();
+        // $checkRowDbColumn = array_column($checkRowDb, 'brand_description');
     
-        if(!empty($data['brand_name'])){
-            if(in_array(strtolower(trim($data['brand_name'])), $checkRowDbColumn)){
-                $data['brand_exist']['check'] = true;
-            }
-        }else{
-            $data['brand_exist']['check'] = true;
-        }
+        // if(!empty($data['brand_name'])){
+        //     if(in_array(strtolower(trim($data['brand_name'])), $checkRowDbColumn)){
+        //         $data['brand_exist']['check'] = true;
+        //     }
+        // }else{
+        //     $data['brand_exist']['check'] = true;
+        // }
 
          //CURRENCY
          $data['currency_exist']['check'] = false;
@@ -155,11 +157,11 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
                     $onFailure('Sub Category not exist in Sub Category Submaster!');
                 }
             },
-            '*.brand_exist' => function($attribute, $value, $onFailure) {
-                if ($value['check'] === false) {
-                    $onFailure('Brand not exist in Brand Submaster!');
-                }
-            },
+            // '*.brand_exist' => function($attribute, $value, $onFailure) {
+            //     if ($value['check'] === false) {
+            //         $onFailure('Brand not exist in Brand Submaster!');
+            //     }
+            // },
             '*.currency_exist' => function($attribute, $value, $onFailure) {
                 if ($value['check'] === false) {
                     $onFailure('Currency not exist in Brand Submaster!');
