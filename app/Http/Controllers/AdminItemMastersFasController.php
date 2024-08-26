@@ -19,6 +19,7 @@
 	use Spatie\ImageOptimizer\OptimizerChainFactory;
 	use Illuminate\Support\Str;
 	use App\Imports\UploadAssetsMasterfile;
+	use App\Imports\UpdateAssetsMasterfile;
 	use PhpOffice\PhpSpreadsheet\Spreadsheet;
 	use PhpOffice\PhpSpreadsheet\Reader\Exception;
 	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -625,7 +626,11 @@
 			$path = storage_path('app').'/'.$path_excel;
 
 			try {
-				Excel::import(new UploadAssetsMasterfile, $path);	
+				if($request->upload_type == "create"){
+					Excel::import(new UploadAssetsMasterfile, $path);	
+				}else{
+					Excel::import(new UpdateAssetsMasterfile, $path);
+				}
 			    CRUDBooster::redirect(CRUDBooster::adminpath('item_masters_fas'), trans("Upload Successfully!"), 'success');
 			} catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
 				$failures = $e->failures();

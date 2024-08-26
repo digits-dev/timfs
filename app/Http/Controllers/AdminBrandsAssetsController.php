@@ -4,6 +4,21 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
+	use Illuminate\Support\Facades\Input;
+	use Illuminate\Support\Facades\Log;
+	use Illuminate\Support\Facades\Redirect;
+	use Carbon\Carbon;
+	use Illuminate\Support\Facades\Schema;
+	use Illuminate\Support\Facades\Storage;
+	use Intervention\Image\Facades\Image;
+	use Spatie\ImageOptimizer\OptimizerChainFactory;
+	use Illuminate\Support\Str;
+	use App\Imports\UploadBrands;
+	use PhpOffice\PhpSpreadsheet\Spreadsheet;
+	use PhpOffice\PhpSpreadsheet\Reader\Exception;
+	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+	use PhpOffice\PhpSpreadsheet\IOFactory;
+	use Maatwebsite\Excel\Facades\Excel;
 
 	class AdminBrandsAssetsController extends \crocodicstudio\crudbooster\controllers\CBController {
 		public function __construct() {
@@ -129,7 +144,12 @@
 	        | 
 	        */
 	        $this->index_button = array();
-
+			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
+				if(CRUDBooster::isSuperadmin()){
+				    $this->index_button[] = ["title"=>"Upload","label"=>"Upload","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('upload-brands')];
+				}
+			
+			}
 
 
 	        /* 
@@ -337,9 +357,33 @@
 
 	    }
 
+		public function uploadBrand() {
+			$data['page_title']= 'Upload';
+			return view('upload.brand-upload', $data)->render();
+		}
 
+		public function brandUploadSave(Request $request) {
+			$data = Request::all();	
+			$file = $data['import_file'];
+			$path_excel = $file->store('temp');
+			$path = storage_path('app').'/'.$path_excel;
 
-	    //By the way, you can still create your own method in here... :) 
+			try {
+				Excel::import(new UploadBrands, $path);	
+			    CRUDBooster::redirect(CRUDBooster::adminpath('brands_assets'), trans("Upload Successfully!"), 'success');
+			} catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+				$failures = $e->failures();
+				$error = [];
+				foreach ($failures as $failure) {
+					$line = $failure->row();
+					foreach ($failure->errors() as $err) {
+						$error[] = $err . " on line: " . $line; 
+					}
+				}
+				$errors = collect($error)->unique()->toArray();
+			}
+			CRUDBooster::redirect(CRUDBooster::adminpath('brands_assets'), $errors[0], 'danger');
+		}
 
 
 	}

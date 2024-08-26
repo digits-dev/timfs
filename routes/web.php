@@ -27,6 +27,7 @@ use App\Http\Controllers\AdminSalesPriceChangeHistoriesController;
 use App\Http\Controllers\AdminItemMastersFasController;
 use App\Http\Controllers\AdminItemMastersFasApprovalController;
 use App\Http\Controllers\AdminFaCoaSubCategoriesController;
+use App\Http\Controllers\AdminBrandsAssetsController;
 Route::get('/', function () {
     return redirect('admin/login');
     //return view('welcome');
@@ -196,7 +197,10 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/item_masters_fas/upload-assets', [AdminItemMastersFasController::class, 'uploadAssets']);
     Route::post('/admin/item_masters_fas/assets-upload-save',[AdminItemMastersFasController::class, 'assetsUploadSave'])->name('assets-upload-save');
     Route::get('/admin/item_masters_fas/upload-assets-template',[AdminItemMastersFasController::class, 'uploadAssetsTemplate']);
- 
+    //submaster assets upload
+    Route::get('/admin/brands_assets/upload-brands', [AdminBrandsAssetsController::class, 'uploadBrand']);
+    Route::post('/admin/brands_assets/brand-upload-save',[AdminBrandsAssetsController::class, 'brandUploadSave'])->name('brand-upload-save');
+
 });
 
 Route::get('/item_masters/api/get-items/{secret_key}', [AdminItemMastersController::class, 'getUpdatedItems'])->name('get_updated_items');
