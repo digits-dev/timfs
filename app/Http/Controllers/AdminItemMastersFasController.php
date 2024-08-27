@@ -9,6 +9,7 @@
 	use App\Models\FaCoaCategories;
 	use App\Models\FaSubCategories;
 	use App\Models\BrandsAssets;
+	use App\Exports\ItemAssetsExport;
 	use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
 	use Illuminate\Support\Facades\Redirect;
@@ -30,7 +31,7 @@
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
 			$this->diffData = [];
-			$this->requestor = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder'];
+			$this->requestor = ['Purchasing Staff', 'Purchasing Encoder', 'Encoder', 'Supervisor (Purchaser)'];
 			$this->approver = ['Purchasing Manager', 'Manager (Purchaser)'];
 			$this->to_notify = DB::table('cms_users')
 				->where(function($sub_query) {
@@ -61,7 +62,7 @@
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
-			$this->button_export = true;
+			$this->button_export = false;
 			$this->table = "item_masters_fas";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
@@ -165,6 +166,7 @@
 	        */
 	        $this->index_button = array();
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
+				$this->index_button[] = ['label' => 'Export Items', "url" => "javascript:showItemExport()", "icon" => "fa fa-download"];
 				if(CRUDBooster::isSuperadmin()){
 				    $this->index_button[] = ["title"=>"Upload","label"=>"Upload","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('upload-assets')];
 				}
@@ -247,7 +249,7 @@
 							<div class='modal-body'>
 								<div class='form-group'>
 									<label>File Name</label>
-									<input type='text' name='filename' class='form-control' required value='Export Items - ".date('Y-m-d H:i:s')."'/>
+									<input type='text' name='filename' class='form-control' required value='Export Assets Items - ".date('Y-m-d H:i:s')."'/>
 								</div>
 							</div>
 							<div class='modal-footer' align='right'>
@@ -694,5 +696,10 @@
 			header('Cache-Control: max-age=0');
 			$writer = new Xlsx($spreadsheet);
 			$writer->save('php://output');
+		}
+
+		public function exportItems(Request $request) {
+			$filename = $request->input('filename');
+			return Excel::download(new ItemAssetsExport, $filename.'.xlsx');
 		}
 	}
