@@ -29,11 +29,13 @@ class UpdateAssetsMasterfile implements ToCollection, WithHeadingRow
             ItemMastersFa::where(['tasteless_code'=>$row['tasteless_code']])
             ->update([
                 'item_description'            => $row['item_description'],
+                'approved_at'                 => date('Y-m-d H:i:s')
             ]); 
 
             ItemMastersFasApprovals::where(['tasteless_code'=>$row['tasteless_code']])
             ->update([
                 'item_description'            => $row['item_description'],
+                'approved_at'                 => date('Y-m-d H:i:s')
             ]);
         }
     }
