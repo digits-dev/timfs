@@ -28,12 +28,12 @@ class UpdateAssetsMasterfile implements ToCollection, WithHeadingRow
         			
             ItemMastersFa::where(['tasteless_code'=>$row['tasteless_code']])
             ->update([
-                'brand_id'            => $brand->id,
+                'item_description'            => $row['item_description'],
             ]); 
 
             ItemMastersFasApprovals::where(['tasteless_code'=>$row['tasteless_code']])
             ->update([
-                'brand_id'            => $brand->id,
+                'item_description'            => $row['item_description'],
             ]);
         }
     }
