@@ -441,15 +441,31 @@
         const landedCost = parseFloat($('#landed_cost').val());
         return landedCost >= math.floor(supplierCost, 2);
     }
+
+    // new logic --------------------------
     function checkCommiMargin(){
         const fulfillmentType = $('#fulfillment_type_id :selected').text();
         const CommiMargin = parseFloat($('#ttp_percentage').val());
-        if (fulfillmentType == 'DELIVERY-COMMI'){
-            return CommiMargin >= 0.05;
+
+        if (isNaN(CommiMargin) || CommiMargin < 0) {
+            return false;
+        }
+
+        if (fulfillmentType == 'DELIVERY-COMMI') {
+            return CommiMargin >= 0;
         }
         return true;
     }
 
+    //old logic -----------------------------
+    // function checkCommiMargin(){
+    //     const fulfillmentType = $('#fulfillment_type_id :selected').text();
+    //     const CommiMargin = parseFloat($('#ttp_percentage').val());
+    //     if (fulfillmentType == 'DELIVERY-COMMI'){
+    //         return CommiMargin >= 0.05;
+    //     }
+    //     return true;
+    // }
 
     function setSupplier(suppliers) {
         suppliers.forEach(supplier => {
