@@ -1,10 +1,11 @@
 <?php namespace App\Http\Controllers;
 
-use Session;
-use Request;
-use DB;
-use CRUDbooster;
 use Excel;
+use CRUDbooster;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 //use App\Channel;
 
 class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CBController {
@@ -41,13 +42,14 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 			$this->form[] = array("label"=>"Email","name"=>"email",'required'=>true,'width'=>'col-sm-4','type'=>'email','validation'=>'required|email|unique:cms_users,email,'.CRUDBooster::getCurrentId());		
 			$this->form[] = array("label"=>"Photo","name"=>"photo","type"=>"upload",'width'=>'col-sm-4',"help"=>"Recommended resolution is 200x200px",'validation'=>'image|max:1000');											
 			$this->form[] = array("label"=>"Privilege","name"=>"id_cms_privileges","type"=>"select",'width'=>'col-sm-4',"datatable"=>"cms_privileges,name",'required'=>true);	
-			$this->form[] = array("label"=>"Password","name"=>"password","type"=>"password",'width'=>'col-sm-4',"help"=>"Please leave empty if not changed");
-			if(in_array(CRUDBooster::getCurrentMethod(), ['getEdit','postEditSave'])) {
+			// $this->form[] = array("label"=>"Password","name"=>"password","type"=>"password",'width'=>'col-sm-4',"help"=>"Please leave empty if not changed");
+			if(in_array(CRUDBooster::getCurrentMethod(), ['getAdd','getEdit','postEditSave','postAddSave'])) {
 				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'ACTIVE;INACTIVE'];
+				$this->form[] = ["label"=>"Password","name"=>"password","type"=>"password",'width'=>'col-sm-4',"help"=>"Please leave empty if not changed"];
 			}
 		}
 
-		if(in_array(CRUDBooster::getCurrentMethod(), ['getEdit','postEditSave','getProfile','getDetail']) && CRUDBooster::isUpdate() && !CRUDBooster::isSuperadmin()) {
+		if(in_array(CRUDBooster::getCurrentMethod(), ['getAdd','postAddSave','getEdit','postEditSave','getProfile','getDetail']) && CRUDBooster::isUpdate() && !CRUDBooster::isSuperadmin()) {
 			$this->form[] = array("label"=>"First Name","name"=>"first_name",'required'=>true, 'readonly'=>true,'validation'=>'required|min:2', 'width'=>'col-sm-4');
 			$this->form[] = array("label"=>"Last Name","name"=>"last_name",'required'=>true, 'readonly'=>true,'validation'=>'required|min:2', 'width'=>'col-sm-4');
 			$this->form[] = array("label"=>"Email","name"=>"email",'required'=>true, 'readonly'=>true,'width'=>'col-sm-4','type'=>'email','validation'=>'required|email|unique:cms_users,email,'.CRUDBooster::getCurrentId());		
@@ -121,5 +123,87 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 				$sheet->row(2, array('John', 'Doe', 'johndoe@digits.ph','Requestor'));
 			});
 		})->download('csv');
+	}
+
+	//view change password
+	public function changePasswordView()
+	{
+		return view('users.change-password');
+	}
+
+	//change password
+	public function changePass(Request $request)
+	{
+		$user_id = $request->input('user_id');
+		$currentPass = $request->input('current_password');
+		$newPass = $request->input('password');
+		$hashNewPass = bcrypt($newPass);
+
+		// Get user info to validate current password
+		$getUserInfo = DB::table('cms_users')
+			->where('id', $user_id)
+			->first();
+
+		// Validate if current password matches
+		if (!Hash::check($currentPass, $getUserInfo->password)) {
+			return response()->json(['currentPassMatch' => false, 'message' => 'Current password did not match!']);
+		}
+
+		$passwordLogsHistory = DB::table('password_history')
+			->where('user_id', $user_id)
+			->pluck('password');
+
+		$isPasswordUsed = false;
+
+		foreach ($passwordLogsHistory as $storedHash) {
+			if (Hash::check($newPass, $storedHash)) {
+				$isPasswordUsed = true;
+				break; // Exit the loop match found
+			}
+		}
+
+		if ($isPasswordUsed) {
+			return response()->json(['passwordExists' => true]);   
+		}
+
+		$affected = DB::table('cms_users')
+			->where('id', $user_id)
+			->update([
+				'password' => $hashNewPass,
+				'last_password_update' => now(),
+				'waive_count' => 0
+			]);
+
+		DB::table('password_history')->insert([
+			'user_id' => $user_id,
+			'password' => $hashNewPass,
+			'created_at' => now(),
+		]);
+
+		if ($affected) {
+			return response()->json(['success' => true]);
+		}
+
+		return response()->json(['success' => false], 404);
+	}
+
+	//waive change password
+	public function waiveChangePass(Request $request)
+	{
+		$user_id = $request->input('user_id');
+		$waive = $request->input('waive');
+
+		$affected = DB::table('cms_users')
+			->where('id', $user_id)
+			->update([
+				'waive_count' => $waive,
+				'last_password_update' => now()
+			]);
+		Session::put('check-user',false);
+		if ($affected) {
+			return response()->json(['success' => true]);
+		}
+
+		return response()->json(['success' => false], 404);
 	}
 }

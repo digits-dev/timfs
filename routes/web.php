@@ -28,12 +28,22 @@ use App\Http\Controllers\AdminItemMastersFasController;
 use App\Http\Controllers\AdminItemMastersFasApprovalController;
 use App\Http\Controllers\AdminFaCoaSubCategoriesController;
 use App\Http\Controllers\AdminBrandsAssetsController;
+use App\Http\Controllers\SystemUpdateController;
+
 Route::get('/', function () {
     return redirect('admin/login');
     //return view('welcome');
 });
 
-Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CBBackend']], function() {
+Route::group(['middleware' => ['web'], 'prefix' => config('crudbooster.ADMIN_PATH')], function () {
+    Route::group(['prefix' => 'users'], function () {
+        Route::get('view-change-password', 'AdminCmsUsersController@changePasswordView')->name('show-change-password');
+        Route::post('change-password','AdminCmsUsersController@changePass');
+        Route::post('waive-change-password', 'AdminCmsUsersController@waiveChangePass');
+    });
+});
+
+Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CBBackend','check.user']], function() {
     
     //menu items
     Route::get('/admin/menu_items/upload-view','AdminMenuItemsController@uploadView')->name('menu-items.view');
