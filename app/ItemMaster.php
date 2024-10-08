@@ -30,10 +30,10 @@ class ItemMaster extends Model
         ->leftjoin('categories','item_masters.categories_id','categories.id')
         ->leftjoin('groups','item_masters.groups_id','groups.id')
         ->select(
-            'item_master.tasteless_code as itemcode',
-            'item_master.tasteless_code as barcode',
-            'item_master.item_description',
-            'item_master.item_description as item_pos_receipt_description',
+            'item_masters.tasteless_code as itemcode',
+            'item_masters.tasteless_code as barcode',
+            'item_masters.item_description',
+            'item_masters.item_description as item_pos_receipt_description',
             'groups.group_description as department',
             'categories.category_description as category',
             DB::raw("(select '') as subcategory"),
@@ -53,8 +53,8 @@ class ItemMaster extends Model
 
     public function scopeGetUpdatedItems($query){
         return $query->select(
-            'item_master.tasteless_code as barcode',
-            'item_master.item_description',
+            'item_masters.tasteless_code as barcode',
+            'item_masters.item_description',
             'item_masters.ttp as selling_price'
         );
     }
