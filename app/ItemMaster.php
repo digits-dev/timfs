@@ -28,6 +28,7 @@ class ItemMaster extends Model
     public function scopeGetItems($query){
         return $query->leftjoin('brands','item_masters.brands_id','brands.id')
         ->leftjoin('categories','item_masters.categories_id','categories.id')
+        ->leftjoin('subcategories','item_masters.subcategories_id','subcategories.id')
         ->leftjoin('groups','item_masters.groups_id','groups.id')
         ->select(
             'item_masters.tasteless_code as itemcode',
@@ -36,8 +37,8 @@ class ItemMaster extends Model
             'item_masters.full_item_description as item_pos_receipt_description',
             'groups.group_description as department',
             'categories.category_description as category',
-            DB::raw("(select '') as subcategory"),
-            DB::raw("(select '') as brand"),
+            'subcategories.subcategory_description as subcategory',
+            'brands.brand_description as brand',
             DB::raw("(select '') as color"),
             DB::raw("(select '') as size"),
             DB::raw("(select '') as supplier"),
