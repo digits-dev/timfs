@@ -4,82 +4,72 @@ namespace App\Http\Controllers;
 
 use App\ItemMaster;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ItemMasterController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
+    public function getItems(Request $request){
+        try{
+            $request->validate([
+                'datefrom' => ['required', 'date_format:Y-m-d H:i:s', 'before:dateto'],
+                'dateto'   => ['required', 'date_format:Y-m-d H:i:s', 'after:datefrom'],
+            ], [
+                'datefrom.before' => 'The datefrom must be before the dateto.',
+                'dateto.after'    => 'The dateto must be after the datefrom.',
+            ]);
+
+            $data = ItemMaster::getItems()
+            ->whereBetween('item_masters.approved_at_1', [$request->datefrom, $request->dateto])
+            ->whereNotNull('item_masters.tasteless_code')
+            ->where('item_masters.action_type','like', '%Create%')
+            ->orderBy('item_masters.tasteless_code','ASC')->paginate(50);
+
+            return response()->json([
+                'api_status' => 1,
+                'api_message' => 'success',
+                'records' => $data,
+                'http_status' => 200
+            ],200);
+        }
+        catch(ValidationException $ex){
+            return response()->json([
+                'api_status' => 0,
+                'api_message' => 'Validation failed',
+                'errors' => $ex->errors(),
+                'http_status' => 401
+            ], 401);
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+    public function getUpdatedItems(Request $request){
+        try{
+            $request->validate([
+                'datefrom' => ['required', 'date_format:Y-m-d H:i:s', 'before:dateto'],
+                'dateto'   => ['required', 'date_format:Y-m-d H:i:s', 'after:datefrom'],
+            ], [
+                'datefrom.before' => 'The datefrom must be before the dateto.',
+                'dateto.after'    => 'The dateto must be after the datefrom.',
+            ]);
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+            $data = ItemMaster::getUpdatedItems()
+            ->whereBetween('item_masters.updated_at', [$request->datefrom, $request->dateto])
+            ->whereNotNull('item_masters.tasteless_code')
+            ->orderBy('item_masters.tasteless_code','ASC')->paginate(50);
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\ItemMaster  $itemMaster
-     * @return \Illuminate\Http\Response
-     */
-    public function show(ItemMaster $itemMaster)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\ItemMaster  $itemMaster
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(ItemMaster $itemMaster)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\ItemMaster  $itemMaster
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, ItemMaster $itemMaster)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\ItemMaster  $itemMaster
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(ItemMaster $itemMaster)
-    {
-        //
+            return response()->json([
+                'api_status' => 1,
+                'api_message' => 'success',
+                'records' => $data,
+                'http_status' => 200
+            ],200);
+        }
+        catch(ValidationException $ex){
+            return response()->json([
+                'api_status' => 0,
+                'api_message' => 'Validation failed',
+                'errors' => $ex->errors(),
+                'http_status' => 401
+            ], 401);
+        }
     }
 }
