@@ -20,6 +20,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::middleware(['middleware' => ['authapi']], function(){
-    Route::get('/kwik-pos-items', [ItemMasterController::class, 'getItems']);
-    Route::get('/kwik-pos-updated-items', [ItemMasterController::class, 'getUpdatedItems']);
+    Route::get('kwik-pos-items', [ItemMasterController::class, 'getItems']);
+    Route::get('kwik-pos-updated-items', [ItemMasterController::class, 'getUpdatedItems']);
 });
