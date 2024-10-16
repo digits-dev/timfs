@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\ItemMaster;
+use App\MenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -18,11 +18,13 @@ class ItemMasterController extends Controller
                 'dateto.after'    => 'The dateto must be after the datefrom.',
             ]);
 
-            $data = ItemMaster::getItems()
-            ->whereBetween('item_masters.approved_at_1', [$request->datefrom, $request->dateto])
-            ->whereNotNull('item_masters.tasteless_code')
-            ->where('item_masters.action_type','like', '%Create%')
-            ->orderBy('item_masters.tasteless_code','ASC')->paginate(50);
+            $data = MenuItem::getItems()
+            ->whereBetween('menu_items.approved_at', [$request->datefrom, $request->dateto])
+            ->whereNotNull('menu_items.tasteless_menu_code')
+            // ->where('menu_items.action_type','like', '%Create%')
+            ->orderBy('menu_items.tasteless_menu_code','ASC')->paginate(50);
+
+            unset($data['links']);
 
             return response()->json([
                 'api_status' => 1,
@@ -51,10 +53,12 @@ class ItemMasterController extends Controller
                 'dateto.after'    => 'The dateto must be after the datefrom.',
             ]);
 
-            $data = ItemMaster::getUpdatedItems()
-            ->whereBetween('item_masters.updated_at', [$request->datefrom, $request->dateto])
-            ->whereNotNull('item_masters.tasteless_code')
-            ->orderBy('item_masters.tasteless_code','ASC')->paginate(50);
+            $data = MenuItem::getUpdatedItems()
+            ->whereBetween('menu_items.updated_at', [$request->datefrom, $request->dateto])
+            ->whereNotNull('menu_items.tasteless_menu_code')
+            ->orderBy('menu_items.tasteless_menu_code','ASC')->paginate(50);
+
+            unset($data['links']);
 
             return response()->json([
                 'api_status' => 1,
