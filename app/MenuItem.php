@@ -49,7 +49,13 @@ class MenuItem extends Model
             'menu_items.menu_price_dlv as selling_price_deliver',
             DB::raw("(select '') as unit"),
             DB::raw("(select '') as calories"),
-            DB::raw("(select '') as nutrifacts")
+            DB::raw("(select '') as nutrifacts"),
+            DB::raw("
+            CASE
+                WHEN status = 'ACTIVE' THEN 'Y'
+                WHEN status = 'INACTIVE' THEN 'F'
+                ELSE 'F'
+            END as with_button")
         );
     }
 
