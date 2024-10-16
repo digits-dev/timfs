@@ -26,11 +26,9 @@ class MenuItem extends Model
     ];
 
     public function scopeGetItems($query){
-        return $query->leftjoin('brands','menu_items.brands_id','brands.id')
-        ->leftjoin('menu_categories','menu_items.menu_categories_id','menu_categories.id')
+        return $query->leftjoin('menu_categories','menu_items.menu_categories_id','menu_categories.id')
         ->leftjoin('menu_subcategories','menu_items.menu_subcategories_id','menu_subcategories.id')
         ->leftjoin('menu_types','menu_items.menu_types_id','menu_types.id')
-        ->leftjoin('groups','menu_items.groups_id','groups.id')
         ->select(
             'menu_items.tasteless_menu_code as itemcode',
             'menu_items.tasteless_menu_code as barcode',
