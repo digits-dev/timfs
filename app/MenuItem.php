@@ -61,6 +61,12 @@ class MenuItem extends Model
             'menu_items.menu_price_take as selling_price_takeout',
             'menu_items.menu_price_dlv as selling_price_deliver',
             'menu_items.status as item_status',
+            DB::raw("
+            CASE
+                WHEN status = 'ACTIVE' THEN 'Y'
+                WHEN status = 'INACTIVE' THEN 'F'
+                ELSE 'F'
+            END as with_button")
         );
     }
 
