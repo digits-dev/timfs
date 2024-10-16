@@ -37,7 +37,7 @@ class MenuItem extends Model
             'menu_categories.category_description as department',
             'menu_subcategories.subcategory_description as category',
             DB::raw("(select '') as subcategory"),
-            'brands.brand_description as brand',
+             DB::raw("(select '') as brand"),
             DB::raw("(select '') as color"),
             DB::raw("(select '') as size"),
             DB::raw("(select '') as supplier"),
