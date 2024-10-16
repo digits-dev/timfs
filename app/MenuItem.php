@@ -59,7 +59,8 @@ class MenuItem extends Model
             'menu_items.menu_item_description as item_description',
             'menu_items.menu_price_dine as selling_price_dine',
             'menu_items.menu_price_take as selling_price_takeout',
-            'menu_items.menu_price_dlv as selling_price_deliver'
+            'menu_items.menu_price_dlv as selling_price_deliver',
+            'menu_items.status as item_status',
         );
     }
 

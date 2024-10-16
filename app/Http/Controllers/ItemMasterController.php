@@ -54,11 +54,12 @@ class ItemMasterController extends Controller
                 'dateto.after'    => 'The dateto must be after the datefrom.',
             ]);
 
-            $data = MenuItem::getUpdatedItems()
+            $items = MenuItem::getUpdatedItems()
             ->whereBetween('menu_items.updated_at', [$request->datefrom, $request->dateto])
             ->whereNotNull('menu_items.tasteless_menu_code')
             ->orderBy('menu_items.tasteless_menu_code','ASC')->paginate(50);
-
+            
+            $data = $items->toArray();
             unset($data['links']);
 
             return response()->json([
