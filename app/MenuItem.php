@@ -34,6 +34,7 @@ class MenuItem extends Model
             'menu_items.tasteless_menu_code as barcode',
             'menu_items.menu_item_description as item_description',
             'menu_items.menu_item_description as item_pos_receipt_description',
+            'menu_items.original_concept as group',
             'menu_categories.category_description as department',
             'menu_subcategories.subcategory_description as category',
             DB::raw("(select '') as subcategory"),
@@ -60,20 +61,25 @@ class MenuItem extends Model
     }
 
     public function scopeGetUpdatedItems($query){
-        return $query->select(
-            'menu_items.tasteless_menu_code as barcode',
-            'menu_items.menu_item_description as item_description',
-            'menu_items.menu_price_dine as selling_price_dine',
-            'menu_items.menu_price_take as selling_price_takeout',
-            'menu_items.menu_price_dlv as selling_price_deliver',
-            'menu_items.status as item_status',
-            DB::raw("
-            CASE
-                WHEN status = 'ACTIVE' THEN 'Y'
-                WHEN status = 'INACTIVE' THEN 'F'
-                ELSE 'F'
-            END as with_button")
-        );
+        return $query->leftjoin('menu_categories','menu_items.menu_categories_id','menu_categories.id')
+            ->leftjoin('menu_subcategories','menu_items.menu_subcategories_id','menu_subcategories.id')
+            ->select(
+                'menu_items.tasteless_menu_code as barcode',
+                'menu_items.menu_item_description as item_description',
+                'menu_items.original_concept as group',
+                'menu_categories.category_description as department',
+                'menu_subcategories.subcategory_description as category',
+                'menu_items.menu_price_dine as selling_price_dine',
+                'menu_items.menu_price_take as selling_price_takeout',
+                'menu_items.menu_price_dlv as selling_price_deliver',
+                'menu_items.status as item_status',
+                DB::raw("
+                CASE
+                    WHEN status = 'ACTIVE' THEN 'Y'
+                    WHEN status = 'INACTIVE' THEN 'F'
+                    ELSE 'F'
+                END as with_button")
+            );
     }
 
     public static function boot()
