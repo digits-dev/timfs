@@ -53,8 +53,8 @@ class MenuItem extends Model
             DB::raw("(select '') as nutrifacts"),
             DB::raw("
             CASE
-                WHEN status = 'ACTIVE' THEN 'Y'
-                WHEN status = 'INACTIVE' THEN 'F'
+                WHEN menu_items.status = 'ACTIVE' THEN 'Y'
+                WHEN menu_items.status = 'INACTIVE' THEN 'F'
                 ELSE 'F'
             END as with_button")
         );
@@ -75,8 +75,8 @@ class MenuItem extends Model
                 'menu_items.status as item_status',
                 DB::raw("
                 CASE
-                    WHEN status = 'ACTIVE' THEN 'Y'
-                    WHEN status = 'INACTIVE' THEN 'F'
+                    WHEN menu_items.status = 'ACTIVE' THEN 'Y'
+                    WHEN menu_items.status = 'INACTIVE' THEN 'F'
                     ELSE 'F'
                 END as with_button")
             );
