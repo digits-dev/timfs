@@ -19,7 +19,7 @@ class ItemMasterController extends Controller
             ]);
 
             $data = MenuItem::getItems()
-            ->whereBetween('menu_items.updated_at', [$request->datefrom, $request->dateto])
+            ->whereBetween('menu_items.created_at', [$request->datefrom, $request->dateto])
             ->whereNotNull('menu_items.tasteless_menu_code')
             ->where('menu_items.approval_status','1')
             ->where('menu_items.action_type','like', '%Create%')
