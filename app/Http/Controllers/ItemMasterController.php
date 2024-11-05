@@ -22,7 +22,7 @@ class ItemMasterController extends Controller
             ->whereBetween('menu_items.created_at', [$request->datefrom, $request->dateto])
             ->whereNotNull('menu_items.tasteless_menu_code')
             ->where('menu_items.approval_status','1')
-            ->where('menu_items.action_type','like', '%Create%')
+            ->whereIn('menu_items.action_type',['Create',''])
             ->orderBy('menu_items.tasteless_menu_code','ASC')->paginate(50);
 
             unset($data['links']);
