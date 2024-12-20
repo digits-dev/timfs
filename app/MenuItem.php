@@ -25,21 +25,27 @@ class MenuItem extends Model
         'created_by'
     ];
 
+    private static function getSegmentationChecks()
+    {
+        $segmentationColumns = DB::table('information_schema.columns')
+            ->select('COLUMN_NAME')
+            ->where('TABLE_SCHEMA', env('DB_DATABASE')) // Your database name
+            ->where('TABLE_NAME', 'menu_items') // Your table name
+            ->where('COLUMN_NAME', 'LIKE', 'segmentation%')
+            ->pluck('COLUMN_NAME')
+            ->toArray();
+
+        return collect($segmentationColumns)
+            ->map(function ($column) {
+                return "IF(`menu_items`.`{$column}` = 1, '{$column}', NULL)";
+            })
+            ->implode(', ');
+    }
+
+
     public function scopeGetItems($query){
 
-        $segmentationColumns = DB::table('information_schema.columns')
-        ->select('COLUMN_NAME')
-        ->where('TABLE_SCHEMA', env('DB_DATABASE')) // Your database name
-        ->where('TABLE_NAME', 'menu_items') // Your table name
-        ->where('COLUMN_NAME', 'LIKE', 'segmentation%')
-        ->pluck('COLUMN_NAME')
-        ->toArray();
-    
-        $segmentationChecks = collect($segmentationColumns)
-        ->map(function ($column) {
-            return "IF(`menu_items`.`{$column}` = 1, '{$column}', NULL)";
-        })
-        ->implode(', ');
+        $segmentationChecks = self::getSegmentationChecks();
 
         return $query->leftjoin('menu_categories','menu_items.menu_categories_id','menu_categories.id')
         ->leftjoin('menu_subcategories','menu_items.menu_subcategories_id','menu_subcategories.id')
@@ -52,8 +58,7 @@ class MenuItem extends Model
             DB::raw("(SELECT GROUP_CONCAT(menu_segmentations.menu_segment_column_description SEPARATOR ', ')
             FROM menu_segmentations
             WHERE FIND_IN_SET(menu_segmentations.menu_segment_column_name, CONCAT_WS(',', {$segmentationChecks}))
-           ) AS group"
-            ),
+            ) AS `group`"),
             'menu_categories.category_description as department',
             'menu_subcategories.subcategory_description as category',
             DB::raw("(select '') as subcategory"),
@@ -80,12 +85,19 @@ class MenuItem extends Model
     }
 
     public function scopeGetUpdatedItems($query){
+
+        $segmentationChecks = self::getSegmentationChecks();
+
         return $query->leftjoin('menu_categories','menu_items.menu_categories_id','menu_categories.id')
             ->leftjoin('menu_subcategories','menu_items.menu_subcategories_id','menu_subcategories.id')
             ->select(
                 'menu_items.tasteless_menu_code as barcode',
                 'menu_items.menu_item_description as item_description',
-                'menu_items.original_concept as group',
+                DB::raw("(SELECT GROUP_CONCAT(menu_segmentations.menu_segment_column_description SEPARATOR ', ')
+                FROM menu_segmentations
+                WHERE FIND_IN_SET(menu_segmentations.menu_segment_column_name, CONCAT_WS(',', {$segmentationChecks}))
+               ) AS `group`"
+                ),
                 'menu_categories.category_description as department',
                 'menu_subcategories.subcategory_description as category',
                 'menu_items.menu_price_dine as selling_price_dine',
