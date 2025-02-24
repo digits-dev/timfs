@@ -633,6 +633,7 @@
 			
 			$data = [];
 			$data['page_title'] = 'Edit Menu Data';
+			$data['email'] = DB::table('cms_users')->where('id', CRUDBooster::myID())->value('email');	
 			$data['row'] = DB::table('menu_items')->where('id',$id)->first();
 			// Menu Old Codes
 			$data['old_codes'] = DB::table('menu_old_code_masters')
