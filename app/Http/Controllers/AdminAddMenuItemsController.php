@@ -631,9 +631,15 @@
 
 		public function getEdit($id, $table = 'menu_items', $rnd_menu_items_id = null, $comments = null) {
 			
+			$menuDescriptionEditors = [
+				20 //MARKETING ENCODER
+			];
+
 			$data = [];
 			$data['page_title'] = 'Edit Menu Data';
-			$data['email'] = DB::table('cms_users')->where('id', CRUDBooster::myID())->value('email');	
+			$data['privilege'] = DB::table('cms_users')->where('id', CRUDBooster::myID())->value('id_cms_privileges');	
+			$data['menuDescriptionEditors'] = $menuDescriptionEditors;
+
 			$data['row'] = DB::table('menu_items')->where('id',$id)->first();
 			// Menu Old Codes
 			$data['old_codes'] = DB::table('menu_old_code_masters')

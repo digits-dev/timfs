@@ -159,7 +159,7 @@
                             required 
                             value="{{ $row->menu_item_description }}" 
                             oninput="this.value = this.value.toUpperCase()" 
-                            @if($table == 'menu_items'  && $email !== 'jhonkennethligbos_encoder@tasteless.ph') 
+                            @if($table == 'menu_items' && !in_array($privilege, $menuDescriptionEditors)) 
                                 readonly 
                             @endif
                         >
