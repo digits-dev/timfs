@@ -315,11 +315,11 @@
 			//replenishment adding data in segmentation table
 		    DB::connection('mysql_trs')->table('segmentation')->insert($segments);
 			//reimbursement adding data in segmentation table
-			DB::connection('mysql_trm')->table('segmentation')->insert($segments);
+			// DB::connection('mysql_trm')->table('segmentation')->insert($segments);
 			
 		    //disconnect connection
 			DB::disconnect('mysql_trs');
-			DB::disconnect('mysql_trm');
+			// DB::disconnect('mysql_trm');
 
 	    }
 
