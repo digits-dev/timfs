@@ -904,6 +904,7 @@
 				->max('tasteless_menu_code') + 1;
 
 			$data = [
+				'action_type' => 'Create',
 				'tasteless_menu_code' => $tasteless_menu_code,
 				'menu_item_description' => $menu_item_description,
 				'menu_product_types_name' => $request->get('menu_product_type'),
@@ -916,6 +917,9 @@
 				'menu_price_dlv' => $request->get('menu_price_dlv'),
 				'original_concept' => implode(',', $original_concept_name),
 				'segmentations_id' => $original_concept_ids,
+				'approval_status' => 1,
+				'approved_by' => 1,
+				'approved_at' => now(),
 				'created_at' => $time_stamp,
 				'created_by' => $action_by,
 			];
