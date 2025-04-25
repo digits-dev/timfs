@@ -20,6 +20,7 @@ class ItemExport implements FromQuery, WithHeadings, WithMapping
         $header = [
             'Tasteless Code',
             'Co. Last Name',
+            'Vendor Type',
             'Supplier Item Code',
             'Full Item Description',
             'Brand Code',
@@ -78,6 +79,7 @@ class ItemExport implements FromQuery, WithHeadings, WithMapping
         $item_mapping = [
             $data_item->tasteless_code, 
             $data_item->last_name,
+            $data_item->vendor_type_description,
             $data_item->supplier_item_code,
             $data_item->full_item_description,
             $data_item->brand_code,
@@ -134,6 +136,7 @@ class ItemExport implements FromQuery, WithHeadings, WithMapping
         $items = ItemMaster::query()
         ->whereNotNull('tasteless_code')
         ->leftJoin('suppliers','item_masters.suppliers_id','=','suppliers.id')
+        ->leftJoin('vendor_types', 'suppliers.vendor_types_id', '=', 'vendor_types.id')
         ->leftJoin('trademarks','item_masters.trademarks_id','=','trademarks.id')
         ->leftJoin('classifications','item_masters.classifications_id','=','classifications.id')
         ->leftJoin('brands','item_masters.brands_id','=','brands.id')
@@ -143,7 +146,7 @@ class ItemExport implements FromQuery, WithHeadings, WithMapping
         ->leftJoin('colors','item_masters.colors_id','=','colors.id')
         ->leftJoin('currencies','item_masters.currencies_id','=','currencies.id')
         ->leftJoin('sku_statuses','item_masters.sku_statuses_id','=','sku_statuses.id')
-        ->leftJoin('vendor_types','item_masters.vendor_types_id','=','vendor_types.id')
+        // ->leftJoin('vendor_types','item_masters.vendor_types_id','=','vendor_types.id')
         ->leftJoin('packagings','item_masters.packagings_id','=','packagings.id')
         ->leftJoin('fulfillment_methods','item_masters.fulfillment_type_id','=','fulfillment_methods.id')
         ->leftJoin('uoms','item_masters.uoms_id','=','uoms.id')
@@ -155,6 +158,7 @@ class ItemExport implements FromQuery, WithHeadings, WithMapping
         ->select(
             'item_masters.tasteless_code', 
             'suppliers.last_name',
+            'vendor_types.vendor_type_description',
             'item_masters.supplier_item_code',
             'item_masters.full_item_description',
             'brands.brand_code',
