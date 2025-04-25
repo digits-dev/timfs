@@ -39,7 +39,8 @@
 			$this->col = [];
             $this->col[] = ["label" => "Action Type", "name" => "action_type"];
             $this->col[] = ["label" => "Approval Status", "name" => "approval_status"];
-            $this->col[] = ["label" => "Vendor", "name" => "last_name", "visible" => true];
+			$this->col[] = ["label"=>"Vendor","name"=>"last_name","visible"=>true];
+			$this->col[] = ["label"=>"Vendor Type","name"=>"vendor_types_id", "join"=>"vendor_types,vendor_type_description"];
             $this->col[] = ["label" => "Card ID", "name" => "card_id"];
             $this->col[] = ["label" => "Currency", "name" => "currencies_id", "join" => "currencies,currency_code"];
             $this->col[] = ["label" => "Balance", "name" => "balance"];
@@ -78,6 +79,7 @@
             $this->form[] = ['label'=>'Card ID','name'=>'card_id','type'=>'text','validation'=>'required|min:6|max:9','width'=>'col-sm-4'];
     		$this->form[] = ['label' => 'Card Status', 'name' => 'card_status', 'type' => 'select', 'validation' => 'required', 'width' => 'col-sm-4', 'dataenum' => 'ACTIVE;NON-ACTIVE'];//, 'help' => 'If Active = N, If Inactive = Y'
             $this->form[] = ['label' => 'Currency', 'name' => 'currencies_id', 'type' => 'select2', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-4', 'datatable' => 'currencies,currency_code', 'datatable_where' => "status = 'ACTIVE'"];
+			$this->form[] = ['label' => 'Vendor Type', 'name' => 'vendor_types_id', 'type' => 'select2', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-4', 'datatable' => 'vendor_types,vendor_type_description', 'datatable_where' => "status = 'ACTIVE'"];
             $this->form[] = ['label' => 'Balance', 'name' => 'balance', 'type' => 'number', 'validation' => 'integer|min:0', 'width' => 'col-sm-4'];
             $this->form[] = ['label' => 'Balance Total', 'name' => 'balance_total', 'type' => 'number', 'validation' => 'integer|min:0', 'width' => 'col-sm-4'];
             $this->form[] = ['label' => 'Balance (PHP)', 'name' => 'balance_php', 'type' => 'number', 'validation' => 'integer|min:0', 'width' => 'col-sm-4'];
@@ -310,6 +312,7 @@
 								'card_status' 					=> $item_info['card_status'],
 								'last_name' 					=> $item_info['last_name'],
 								'currencies_id' 				=> $item_info['currencies_id'],
+								'vendor_types_id' 				=> $item_info['vendor_types_id'],
 								'balance'						=> $item_info['balance'],
 								'balance_total'					=> $item_info['balance_total'],
 								'balance_php'					=> $item_info['balance_php'],
@@ -380,6 +383,7 @@
 								'card_status' 					=> $item_info['card_status'],
 								'last_name' 					=> $item_info['last_name'],
 								'currencies_id' 				=> $item_info['currencies_id'],
+								'vendor_types_id' 				=> $item_info['vendor_types_id'],
 								'balance'						=> $item_info['balance'],
 								'balance_total'					=> $item_info['balance_total'],
 								'balance_php'					=> $item_info['balance_php'],
@@ -518,7 +522,7 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 			//Your code here
-			if($column_index == 3){
+			if($column_index == 2){
 				switch ($column_value) {
 					case 1:
 						$column_value = '<span stye="display: block;" class="label label-info">Approved</span><br>';

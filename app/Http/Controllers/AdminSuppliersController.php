@@ -3,11 +3,11 @@
 	use Session;
     use Illuminate\Http\Request;
     use Excel;
-	use DB;
-	use CRUDBooster;
+	use crocodicstudio\crudbooster\helpers\CRUDBooster;
 	use App\Supplier;
 	use App\SupplierApproval;
 	use App\ApprovalWorkflowSetting;
+	use Illuminate\Support\Facades\DB;
 
 	class AdminSuppliersController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -41,6 +41,7 @@
 			$this->col[] = ["label"=>"Card ID","name"=>"card_id"];
 			$this->col[] = ["label"=>"Card Status","name"=>"card_status"];
 			$this->col[] = ["label"=>"Vendor","name"=>"last_name","visible"=>true];
+			$this->col[] = ["label"=>"Vendor Type","name"=>"vendor_types_id", "join"=>"vendor_types,vendor_type_description"];
 			$this->col[] = ["label"=>"Currency","name"=>"currencies_id", "join"=>"currencies,currency_code"];
 
 			$this->col[] = ["label"=>"First Name","name"=>"first_name1"];
@@ -65,6 +66,7 @@
 			$this->form = [];
             $this->form[] = ['label' => 'Card Status', 'name' => 'card_status', 'type' => 'select', 'validation' => 'required', 'width' => 'col-sm-4', 'dataenum' => 'ACTIVE;NON-ACTIVE'];//, 'help' => 'If Active = N, If Inactive = Y'
             $this->form[] = ['label' => 'Vendor', 'name' => 'last_name', 'type' => 'text', 'validation' => 'required|min:2|max:100', 'width' => 'col-sm-4'];
+			$this->form[] = ['label' => 'Vendor Type', 'name' => 'vendor_types_id', 'type' => 'select2', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-4', 'datatable' => 'vendor_types,vendor_type_description', 'datatable_where' => "status = 'ACTIVE'"];
             if (CRUDBooster::getCurrentMethod() == 'getDetail') {
                 $this->form[] = ['label' => 'Card ID', 'name' => 'card_id', 'type' => 'text', 'validation' => 'required|min:6|max:9', 'width' => 'col-sm-4'];
             }
@@ -383,6 +385,7 @@
 				'first_name' 					=> $postdata['first_name'],
 				//'card_id' 					=> $postdata['card_id'],
 				'card_status' 					=> $postdata['card_status'],
+				'vendor_types_id' 				=> $postdata['vendor_types_id'],
 				'currencies_id' 				=> $postdata['currencies_id'],
 				'address1_line1' 				=> $postdata['address1_line1'],
 				'address1_line2' 				=> $postdata['address1_line2'],
