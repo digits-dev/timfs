@@ -84,6 +84,7 @@
 			$this->col[] = ["label" => "Display Photo", "name" => "image_filename","visible" =>  true];
     		$this->col[] = ["label" => "Tasteless Code", "name" => "tasteless_code","visible" =>  false];
     		$this->col[] = ["label" => "Preferred Vendor", "name" => "suppliers_id", "join" => "suppliers,last_name", "visible" => CRUDBooster::myColumnView()->supplier ? true : false];
+			$this->col[] = ["label" => "Vendor Type","callback" => function($row) {return $row->vendor_type_description_alias ?? '-';}];
     		$this->col[] = ["label" => "Item", "name" => "tasteless_code", "visible" =>  true];
     		$this->col[] = ["label" => "Description", "name" => "full_item_description", "visible" => CRUDBooster::myColumnView()->full_item_description ? true : false];
     		$this->col[] = ["label"=>"Brand Description","name"=>"brands_id","join"=>"brands,brand_description","visible" => CRUDBooster::myColumnView()->brand_description ? true : false];
@@ -662,7 +663,10 @@
 			$query
 				->leftJoin('item_master_approvals', 'item_masters.tasteless_code', '=', 'item_master_approvals.tasteless_code')
 				->addSelect('item_master_approvals.approval_status as status_of_approval');
-				// ->orderByRaw(DB::raw('COALESCE(item_masters.updated_at, item_masters.created_at) desc'));
+				
+			$query->leftJoin('suppliers as s1', 'item_masters.suppliers_id', '=', 's1.id');
+			$query->leftJoin('vendor_types as vt', 's1.vendor_types_id', '=', 'vt.id');
+			$query->addSelect('vt.vendor_type_description as vendor_type_description_alias');
 	    }
 
 	    /*
