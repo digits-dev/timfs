@@ -29,7 +29,7 @@ use App\Http\Controllers\AdminItemMastersFasApprovalController;
 use App\Http\Controllers\AdminFaCoaSubCategoriesController;
 use App\Http\Controllers\AdminBrandsAssetsController;
 use App\Http\Controllers\SystemUpdateController;
-
+use App\Http\Controllers\ProductionItems\AdminProductionItemsController;
 Route::get('/', function () {
     return redirect('admin/login');
     //return view('welcome');
@@ -211,6 +211,8 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/brands_assets/upload-brands', [AdminBrandsAssetsController::class, 'uploadBrand']);
     Route::post('/admin/brands_assets/brand-upload-save',[AdminBrandsAssetsController::class, 'brandUploadSave'])->name('brand-upload-save');
 
+    //PRODUCTION ITEMS
+    Route::get('/admin/production_items/add-production-items', [AdminProductionItemsController::class, 'addProductionItems'])->name('add-production-items');
 });
 
 Route::get('/item_masters/api/get-items/{secret_key}', [AdminItemMastersController::class, 'getUpdatedItems'])->name('get_updated_items');
