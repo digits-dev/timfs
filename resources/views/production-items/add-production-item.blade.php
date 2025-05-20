@@ -93,14 +93,26 @@
     }
     .tr-border {
         border: 1px solid #989797 !important;
-        border-radius: 10px; /* Smooth rounded corners */
-        margin-bottom: 15px; /* Space between rows */
+        border-radius: 10px;
+        margin-bottom: 15px;
         padding: 15px;
         background-color: #f9f9f9;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Optional subtle shadow */
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
-        justify-content: center
+        justify-content: center;
+        gap: 5px; /* Add spacing between fields */
+    }
+
+    @media (max-width: 768px) {
+        .ingredient-table td {
+            min-width: 100%;
+        }
+
+        .ingredient-label {
+            font-size: 16px;
+        }
     }
 
     @keyframes slideInRight {
@@ -246,7 +258,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row" style="margin-top: 10px; margin-bottom: 10px">
                 <div class="col-md-3">
                     <div class="form-group">
                         <div class="input-group">
@@ -346,31 +358,34 @@
 
         function generateRowHtml(rowId) {
             return `
-                 <tr class="tr-border slide-in-right" style="width: 100%; padding-top:5px">
-                    <td style="width: 30%; padding: 8px;">
+                 <tr class="tr-border slide-in-right" style="width: 100%; padding-top:5px;">
+                    <td class="packaging" style="width: 30%">
                         <div style="position: relative;">
                             <label>Packaging</label>
-                            <input type="text" placeholder="Search Item ..." class="form-control rounded itemDesc" id="itemDesc${rowId}" data-id="${rowId}" name="item_description[]" required maxlength="100">
+                            <input type="text" placeholder="Search Item ..." class="form-control rounded packaging" id="itemDesc${rowId}" data-id="${rowId}" name="item_description[]" required maxlength="100">
                             <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${rowId}" id="ui-id-2${rowId}" style="display: none;"></ul>
                             <div id="display-error${rowId}"></div>
                         </div>
                     </td>
-                    <td style="width: 20%; padding: 8px;">
+                    <td style="width: 20%">
                         <div style="position: relative;">
                             <label>Quantity</label>
                             <input type="text" class="form-control rounded quantity-input" id="quantity${rowId}" name="quantity[]" readonly style="background-color: #eee;">
                         </div>
                     </td>
-                    <td style="width: 20%; padding: 8px;">
+                    <td style="width: 20%">
                         <div style="position: relative;">
                             <label>Cost</label>
                             <input type="text" class="form-control rounded cost-input" id="cost${rowId}" name="cost[]" readonly style="background-color: #eee;">
                         </div>
                     </td>
                     <td style="width: 10%;">
-                        <button id="deleteRow${rowId}" name="removeRow" data-id="${rowId}" class="btn btn-danger removeRow" style="margin-top: 20px;">
-                            <i class="glyphicon glyphicon-trash"></i>
-                        </button>
+                        <div style="position: relative;">
+                            <label>Action</label><br>
+                            <button id="deleteRow${rowId}" name="removeRow" data-id="${rowId}" class="btn btn-danger removeRow">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `;
