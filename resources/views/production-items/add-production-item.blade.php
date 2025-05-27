@@ -3,6 +3,7 @@
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="{{asset('css/production-item/custom-item.css')}}">
 <style>
     input::placeholder{
@@ -10,6 +11,23 @@
     }
     select {
         border-radius: 0px 5px 5px 0px !important; 
+    }
+    .swal2-popup, .swal2-modal, .swal2-icon-warning .swal2-show {
+        font-size: 1.6rem !important;
+    }
+    .ui-autocomplete {
+        max-height: 400px; /* Adjust height as needed */
+        overflow-y: auto;  /* Enables vertical scroll */
+        overflow-x: hidden; /* Optional: hide horizontal scroll */
+        z-index: 10000 !important; /* Ensure it appears above other elements */
+        width: auto;
+    }
+
+    .ui-state-focus {
+        background: none !important;
+        background-color: #367fa9 !important;
+        border: 1px solid #fff !important;
+        color: #fff !important;
     }
     
     .panel-heading{
@@ -94,15 +112,14 @@
     .tr-border {
         border: 1px solid #989797 !important;
         border-radius: 10px;
-        margin-bottom: 15px;
-        padding: 15px;
+        padding: 25px;
         background-color: #f9f9f9;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         display: flex;
         flex-wrap: wrap;
-        align-items: center;
         justify-content: center;
-        gap: 5px; /* Add spacing between fields */
+        margin-top: 6px;
+        gap: 5px; 
     }
 
     @media (max-width: 768px) {
@@ -153,189 +170,198 @@
         <div class="panel-heading">
             <i class="fa fa-dollar"></i><strong> Production Item</strong>
         </div>
+        <form method="POST" id="ProductionItems" enctype="multipart/form-data">
+            <div class="panel-body">
+                <div class="row" style="margin-top:20px">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="description"><i class="fa fa-file"></i></span>
+                                <label class="description float-label">Description</label>
+                                <input type="text" class="form-control rounded" placeholder="description" aria-describedby="basic-addon1" />
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="panel-body">
-            <div class="row" style="margin-top:20px">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon1"><i class="fa fa-file"></i></span>
-                            <label class="description float-label">Description</label>
-                            <input type="text" class="form-control rounded" placeholder="description" aria-describedby="basic-addon1" />
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="production_category"><i class="fa fa-check"></i></span>
+                                <label class="production_category float-label">Production Category</label>
+                                <select class="form-control select" id="production_category" name="production_category" required>
+                                    <option value="">Select Category</option>
+                                    @foreach($productionCategories as $category)
+                                        <option value="{{ $category->id }}" {{ old('production_category') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->category_description }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon1"><i class="fa fa-check"></i></span>
+                                <label class="production_location float-label">Production Location</label>
+                                <select class="form-control select" id="production_location" name="production_location" required>
+                                    <option value="">Select Location</option>
+                                    @foreach($productionLocations as $location)
+                                        <option value="{{ $location->id }}" {{ old('production_location') == $location->id ? 'selected' : '' }}>
+                                            {{ $location->production_location_description }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon1"><i class="fa fa-check"></i></span>
-                            <label class="production_category float-label">Production Category</label>
-                            <select class="form-control select" id="production_category" name="production_category" required>
-                                <option value="">Select Category</option>
-                                @foreach($productionCategories as $category)
-                                    <option value="{{ $category->id }}" {{ old('production_category') == $category->id ? 'selected' : '' }}>
-                                        {{ $category->category_description }}
-                                    </option>
-                                @endforeach
-                            </select>
+                <div class="row" style="margin-top: 15px; margin-bottom: 5px">
+                    <div class="col-md-12">
+                        <label class="ingredient-label">Ingredients</label>
+                        <div class="ingredient-box" style="margin-bottom: 5px">
+                            <table class="ingredient-table w-100" style="width: 100%;">
+                                <tbody id="ingredient-tbody">
+                                    <!-- Rows injected by JS -->
+                                </tbody>
+                            </table>
+                            <div class="no-data-available text-center py-2" style="display: none;">
+                                <i class="fa fa-table"></i> <span>No ingredients currently save</span>
+                            </div>
+                        </div>
+                        <a class="btn btn-primary" id="add-Row"><i class="fa fa-plus"></i> Add New Ingredients</a>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
+                                <label class="labor_cost float-label">Labor Cost</label>
+                                <input type="text" class="form-control rounded" name="labor_cost" id="labor_cost" placeholder="Labor cost" aria-describedby="basic-addon1" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
+                                <label class="gas_cost float-label">Gas Cost</label>
+                                <input type="text" class="form-control rounded" name="gas_cost" id="gas_cost" placeholder="Gas cost" aria-describedby="basic-addon1" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
+                                <label class="storage_cost float-label">Storage Cost</label>
+                                <input type="text" class="form-control rounded" name="storage_cost" id="storage_cost" placeholder="Storage cost" aria-describedby="basic-addon1" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
+                                <label class="storage_multiplier float-label">Storage Multiplier</label>
+                                <input type="text" class="form-control rounded" name="storage_multiplier" id="storage_multiplier" placeholder="Storage multiplier" aria-describedby="basic-addon1" />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon1"><i class="fa fa-check"></i></span>
-                            <label class="production_location float-label">Production Location</label>
-                            <select class="form-control select" id="production_location" name="production_location" required>
-                                <option value="">Select Location</option>
-                                @foreach($productionLocations as $location)
-                                    <option value="{{ $location->id }}" {{ old('production_location') == $location->id ? 'selected' : '' }}>
-                                        {{ $location->production_location_description }}
-                                    </option>
-                                @endforeach
-                            </select>
+                <div class="row" style="margin-top: 10px; margin-bottom: 10px">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
+                                <label class="total_storage_cost float-label">Total Storage Cost</label>
+                                <input type="text" class="form-control rounded" name="total_storage_cost" id="total_storage_cost" placeholder="Total storage cost" aria-describedby="basic-addon1" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon1"><i class="fa fa-check"></i></span>
+                                <label class="production_location float-label">Storage Location</label>
+                                <select class="form-control select" class="form-control rounded" name="storage_location" id="storage_location" required>
+                                    <option value="">Select Location</option>
+                                    @foreach($storageLocations as $location)
+                                        <option value="{{ $location->id }}" {{ old('storage_location') == $location->id ? 'selected' : '' }}>
+                                            {{ $location->storage_location_description }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
+                                <label class="depreciation float-label">Depreciation</label>
+                                <input type="text" class="form-control rounded" name="depreciation" id="depreciation" placeholder="Depreciation" aria-describedby="basic-addon1" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1" style="font-size: 15px"> % </span>
+                                <label class="raw_mast_provision float-label">Raw Mast Provision</label>
+                                <input type="text" class="form-control rounded" name="raw_mast_provision" id="raw_mast_provision" value="5" placeholder="Raw mass provision" aria-describedby="basic-addon1" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
+                                <label class="markup_percentage float-label">Mark Up %</label>
+                                <input type="text" class="form-control rounded" name="markup_percentage" id="markup_percentage" placeholder="Mark up percentage" aria-describedby="basic-addon1" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon2" style="font-size: 20px"> ₱ </span>
+                                <label class="final_value_vatex float-label" style="background-color: #EEEEEE !important; border-radius:5px;">Final Value(VATEX)</label>
+                                <input type="text" class="form-control rounded" name="final_value_vatex" id="final_value_vatex" placeholder="Final value vatex" aria-describedby="basic-addon1" readonly />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon3" style="font-size: 20px"> ₱ </span>
+                                <label class="final_value_vatinc float-label" style="background-color: #EEEEEE !important; border-radius:5px">Final Value(VATINC)</label>
+                                <input type="text" class="form-control rounded" name="final_value_vatinc" id="final_value_vatinc" placeholder="Fina value vatinc" aria-describedby="basic-addon1" readonly />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row" style="margin-top: 15px; margin-bottom: 5px">
-                <div class="col-md-12">
-                    <label class="ingredient-label">Ingredients</label>
-                    <div class="ingredient-box" style="margin-bottom: 5px">
-                        <table class="ingredient-table w-100" style="width: 100%;">
-                            <tbody id="ingredient-tbody">
-                                <!-- Rows injected by JS -->
-                            </tbody>
-                        </table>
-                        <div class="no-data-available text-center py-2" style="display: none;">
-                            <i class="fa fa-table"></i> <span>No ingredients currently save</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" id="add-Row"><i class="fa fa-plus"></i> Add New Ingredients</button>
-                </div>
+            <div class="panel-footer">
+                <button type="submit" class="btn btn-success">+ Save data</button>
+                <a href="#" class="btn btn-link">← Back</a>
             </div>
-            <hr>
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
-                            <label class="labor_cost float-label">Labor Cost</label>
-                            <input type="text" class="form-control rounded" placeholder="Labor cost" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
-                            <label class="gas_cost float-label">Gas Cost</label>
-                            <input type="text" class="form-control rounded" placeholder="Gas cost" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <div class="input-group">
-                           <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
-                            <label class="storage_cost float-label">Storage Cost</label>
-                            <input type="text" class="form-control rounded" placeholder="Storage cost" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <div class="input-group">
-                           <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
-                            <label class="storage_multiplier float-label">Storage Multiplier</label>
-                            <input type="text" class="form-control rounded" placeholder="Storage multiplier" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row" style="margin-top: 10px; margin-bottom: 10px">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
-                            <label class="total_storage_cost float-label">Total Storage Cost</label>
-                            <input type="text" class="form-control rounded" placeholder="Total storage cost" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
-                            <label class="storage_location float-label">Storage Location</label>
-                            <input type="text" class="form-control rounded" placeholder="Storage location" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <div class="input-group">
-                           <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
-                            <label class="depreciation float-label">Depreciation</label>
-                            <input type="text" class="form-control rounded" placeholder="Depreciation" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <div class="input-group">
-                           <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
-                            <label class="raw_mass_provision float-label">Raw Mass Provision</label>
-                            <input type="text" class="form-control rounded" placeholder="Raw mass provision" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
-                            <label class="mark_up_percentage float-label">Mark Up Percentage</label>
-                            <input type="text" class="form-control rounded" placeholder="Mark up percentage" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
-                            <label class="final_value_vatex float-label">Final Value(VATEX)</label>
-                            <input type="text" class="form-control rounded" placeholder="Final value vatex" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <div class="input-group">
-                           <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
-                            <label class="final_value_vatinc float-label">Final Value(VATINC)</label>
-                            <input type="text" class="form-control rounded" placeholder="Fina value vatinc" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="panel-footer">
-            <button type="submit" class="btn btn-success">+ Save data</button>
-            <a href="#" class="btn btn-link">← Back</a>
-        </div>
+        </form>
     </div>
 
 @push('bottom')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
      
     $(document).ready(function() {
@@ -346,37 +372,42 @@
             height: '100%',
             placeholder: 'None selected...'
         });
-        var tableRow = 1;
+        let tableRow = 0;
         $("#add-Row").click(function () {
             // if (!validateFields()) return;
             tableRow++;
 
             const newRowHtml = generateRowHtml(tableRow);
              $(newRowHtml).appendTo('#ingredient-tbody');
+
+            initAutocomplete(`#itemDesc${tableRow}`, tableRow);
             showNoData();
         });
 
         function generateRowHtml(rowId) {
             return `
-                 <tr class="tr-border slide-in-right" style="width: 100%; padding-top:5px;">
+                 <tr class="tr-border slide-in-right ingredient-row" style="width: 100%; padding-top:10px;">
                     <td class="packaging" style="width: 30%">
                         <div style="position: relative;">
                             <label>Packaging</label>
-                            <input type="text" placeholder="Search Item ..." class="form-control rounded packaging" id="itemDesc${rowId}" data-id="${rowId}" name="item_description[]" required maxlength="100">
-                            <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${rowId}" id="ui-id-2${rowId}" style="display: none;"></ul>
-                            <div id="display-error${rowId}"></div>
+                            <input type="hidden" name="ingredients[${rowId}][description]" id="tasteless_code${rowId}">
+                            <input type="text" placeholder="Search Item ..." class="form-control rounded ingredient-input" id="itemDesc${rowId}" data-id="${rowId}" name="ingredients[${rowId}][description]" required maxlength="100">
+                            <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${rowId}" id="ui-id-2${rowId}" style="display: none; top: 60px; width: 100%; color:red; padding:5px">
+                                <li class="text-center">Loading...</li>
+                            </ul>
+                            <span class="error" id="display-error${rowId}"></span>
                         </div>
                     </td>
                     <td style="width: 20%">
                         <div style="position: relative;">
                             <label>Quantity</label>
-                            <input type="text" class="form-control rounded quantity-input" id="quantity${rowId}" name="quantity[]" readonly style="background-color: #eee;">
+                            <input type="text" class="form-control rounded  ingredient-quantity" id="quantity${rowId}" name="ingredients[${rowId}][quantity]" value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;">
                         </div>
                     </td>
                     <td style="width: 20%">
                         <div style="position: relative;">
                             <label>Cost</label>
-                            <input type="text" class="form-control rounded cost-input" id="cost${rowId}" name="cost[]" readonly style="background-color: #eee;">
+                            <input type="text" class="form-control rounded cost-input" id="cost${rowId}" name="ingredients[${rowId}][cost]" readonly style="background-color: #eee;">
                         </div>
                     </td>
                     <td style="width: 10%;">
@@ -389,6 +420,47 @@
                     </td>
                 </tr>
             `;
+        }
+
+        function initAutocomplete(selector, rowId) {
+            const token = $("#token").val();
+
+            $(selector).autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "{{ route('item-search') }}",
+                        type: "POST",
+                        dataType: "json",
+                        data: { "_token": token, "search": request.term },
+                        success: function (data) {
+                            if (data.status_no == 1) {
+                                $(`#ui-id-2${rowId}`).hide();
+                                response($.map(data.items, item => ({
+                                    label: item.item_description,
+                                    value: item.item_description,
+                                    ...item
+                                })));
+                            } else {
+                                $('.ui-menu-item').remove();
+                                $('.addedLi').remove();
+                                const $ui = $(`#ui-id-2${rowId}`).html(`<i class="fa fa-exclamation"></i> ${data.message}`);
+                                $ui.toggle($('#itemDesc' + rowId).val().length > 0);
+                            }
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    const id = $(this).data("id");
+                    $(`#tasteless_code${id}`).val(ui.item.tasteless_code);
+                    $(`#itemDesc${id}`).val(ui.item.item_description);
+                    $(`#itemDesc${id}`).attr('data-cost', Number(ui.item.cost).toFixed(2));
+                    $(`#cost${id}`).val(Number(ui.item.cost).toFixed(2)).attr('readonly', true);
+                    calculateFinalValues();
+                    return false;
+                },
+                minLength: 1,
+                autoFocus: true
+            });
         }
 
         function validateFields() {
@@ -433,18 +505,74 @@
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,
+                confirmButtonColor: "#367fa9"
             }).then((result) => {
                 if (result.isConfirmed) {
                     $row.addClass('slide-out-right');
-
                     // Remove row after animation ends
                     $row.on('animationend', function () {
                         $row.remove();
+                        calculateFinalValues();
                         showNoData(); // Update no data message
                     });
                 }
             });
         });
+
+        // Calculate total storage cost
+        function calculateTotalStorage() {
+            const storageCost = parseFloat($('#storage_cost').val()) || 0;
+            const storageMultiplier = parseFloat($('#storage_multiplier').val()) || 0;
+            const totalStorage = storageCost * storageMultiplier;
+            $('#total_storage_cost').val(totalStorage.toFixed(2));
+        }
+
+        $('#storage_cost, #storage_multiplier').on('input', calculateTotalStorage);
+
+        // Calculate final values
+        function calculateFinalValues() {
+            let ingredientsCost = 0;
+            
+            // Calculate ingredients cost
+            $('.ingredient-row').each(function() {
+                const $row = $(this);
+                const selectedOption = $row.find('.ingredient-input');
+                const cost = parseFloat(selectedOption.data('cost')) || 0;
+                const quantity = parseFloat($row.find('.ingredient-quantity').val()) || 0;
+                
+                ingredientsCost += cost * quantity;
+            });
+            console.log(ingredientsCost)
+            const laborCost = parseFloat($('#labor_cost').val()) || 0;
+            const gasCost = parseFloat($('#gas_cost').val()) || 0;
+            const totalStorageCost = parseFloat($('#total_storage_cost').val()) || 0;
+            const depreciation = parseFloat($('#depreciation').val()) || 0;
+            const rawMastProvision = parseFloat($('#raw_mast_provision').val()) || 0;
+            const markupPercentage = parseFloat($('#markup_percentage').val()) || 0;
+            
+            const totalCost = ingredientsCost + laborCost + gasCost + totalStorageCost + depreciation;
+            const costWithProvision = totalCost * (1 + (rawMastProvision / 100));
+            const finalCost = costWithProvision * (1 + (markupPercentage / 100));
+            
+            // Round up to whole number
+            const finalValueVatex = Math.ceil(finalCost);
+            const finalValueVatinc = Math.ceil(finalCost * 1.12); // Assuming 12% VAT
+            
+            $('#final_value_vatex').val(finalValueVatex.toFixed(2));
+            $('#final_value_vatinc').val(finalValueVatinc.toFixed(2));
+        }
+
+         // Recalculate on any input change
+        $(document).on('input', '.ingredient-quantity', calculateFinalValues);
+        $(document).on('change', '.ingredient-input', calculateFinalValues);
+        $('#labor_cost, #gas_cost, #storage_cost, #storage_multiplier, #depreciation, #raw_mast_provision, #markup_percentage').on('input', function() {
+            calculateTotalStorage();
+            calculateFinalValues();
+        });
+
+        // Initial calculations
+        calculateTotalStorage();
+        calculateFinalValues();
      
     });
 </script>

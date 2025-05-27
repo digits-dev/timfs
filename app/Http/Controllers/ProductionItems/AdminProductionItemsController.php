@@ -315,4 +315,44 @@
 			return $this->view('production-items/add-production-item', $data);
 		}
 
+		public function itemSearch(Request $request){
+			$searchTerm = $request->input('search');
+
+			if (!$searchTerm) {
+				return response()->json([
+					'status_no' => 0,
+					'message' => 'No search term provided.',
+					'items' => null
+				]);
+			}
+
+			$items = ItemMaster::where('full_item_description', 'LIKE', '%' . $searchTerm . '%')
+				->orWhere('tasteless_code', 'LIKE', '%' . $searchTerm . '%')
+				->take(100)
+				->get();
+
+			if ($items->isEmpty()) {
+				return response()->json([
+					'status_no' => 0,
+					'message' => 'Item not found.',
+					'items' => null
+				]);
+			}
+
+			$formattedItems = $items->map(function ($item) {
+				return [
+					'id' => $item->id,
+					'tasteless_code' => $item->tasteless_code,
+					'item_description' => $item->full_item_description,
+					'cost' => $item->landed_cost
+				];
+			});
+
+			return response()->json([
+				'status_no' => 1,
+				'items' => $formattedItems
+			]);
+		}
+
+
 	}

@@ -213,6 +213,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
 
     //PRODUCTION ITEMS
     Route::get('/admin/production_items/add-production-items', [AdminProductionItemsController::class, 'addProductionItems'])->name('add-production-items');
+    Route::post('/admin/production_items/item-search',[AdminProductionItemsController::class, 'itemSearch'])->name('item-search');
 });
 
 Route::get('/item_masters/api/get-items/{secret_key}', [AdminItemMastersController::class, 'getUpdatedItems'])->name('get_updated_items');
