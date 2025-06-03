@@ -213,10 +213,9 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/brands_assets/upload-brands', [AdminBrandsAssetsController::class, 'uploadBrand']);
     Route::post('/admin/brands_assets/brand-upload-save',[AdminBrandsAssetsController::class, 'brandUploadSave'])->name('brand-upload-save');
 
-    //PRODUCTION ITEMS
-    Route::get('/admin/production_items/add-production-items', [AdminProductionItemsController::class, 'addProductionItems'])->name('add-production-items');
+    //PRODUCTION ITEMS 
     Route::post('/admin/production_items/item-search',[AdminProductionItemsController::class, 'itemSearch'])->name('item-search');
-    Route::post('/admin/production_items/add-production-items', [AdminProductionItemsController::class, 'addProductionItemsToDB'])->name('add-production-items-to-db');
+    Route::post('/admin/production_items/add-production-items-to-db', [AdminProductionItemsController::class, 'addProductionItemsToDB'])->name('add-production-items-to-db');
     Route::get('/admin/production_locations/add-production-location', [AdminProductionLocationsController::class, 'addProductionItems'])->name('add-production-location');
     Route::post('/admin/production_locations/add-production-location', [AdminProductionLocationsController::class, 'addProductionItemsToDB'])->name('add-production-location-to-db');
     

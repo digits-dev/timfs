@@ -85,18 +85,7 @@ class AdminProductionLocationsController extends \crocodicstudio\crudbooster\con
 	        | @icon  = Icon from Awesome.
 	        | 
 	        */
-	        $this->index_button = array();
-			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
-				if (CRUDBooster::isSuperadmin() || in_array($my_privilege, self::$requestor)) {
-					$this->index_button[] = [
-						"title"=>"Add Production Location",
-                        "label"=>"Add Production Location",
-                        "icon"=>"fa fa-plus",
-                        "color"=>"success",
-                        "url"=>route('add-production-location')
-					];
-				}
-			}
+	       
 
 
 	        /* 

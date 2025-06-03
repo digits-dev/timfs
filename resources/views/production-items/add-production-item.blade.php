@@ -213,9 +213,9 @@
                                 <span class="input-group-addon" id="production_category"><i class="fa fa-check"></i></span>
                                 <label class="production_category float-label">Production Category</label>
                                 <select class="form-control select" id="production_category" name="production_category" required>
-                                    <option value="">Select Category</option>
-                                    @foreach($productionCategories as $category)
-                                        <option value="{{ $category->id }}" {{ old('production_category') == $category->id ? 'selected' : '' }}>
+                                    <option value=""  selected>Select Category</option>
+                                    @foreach($production_category as $category)
+                                        <option value="{{ $category->id }}" {{ old('production_category', $item->production_category) == $category->id ? 'selected' : '' }}>
                                             {{ $category->category_description }}
                                         </option>
                                     @endforeach
@@ -231,8 +231,8 @@
                                 <label class="production_location float-label">Production Location</label>
                                 <select class="form-control select" id="production_location" name="production_location" required>
                                     <option value="">Select Location</option>
-                                    @foreach($productionLocations as $location)
-                                        <option value="{{ $location->id }}" {{ old('production_location') == $location->id ? 'selected' : '' }}>
+                                    @foreach($production_location as $location)
+                                        <option value="{{ $location->id }}" {{ old('production_location', $item->production_location) == $location->id ? 'selected' : '' }}>
                                             {{ $location->production_location_description }}
                                         </option>
                                     @endforeach
@@ -315,8 +315,8 @@
                                 <label class="production_location float-label">Storage Location</label>
                                 <select class="form-control select" class="form-control rounded" name="storage_location" id="storage_location" required>
                                     <option value="">Select Location</option>
-                                    @foreach($storageLocations as $location)
-                                        <option value="{{ $location->id }}" {{ old('storage_location') == $location->id ? 'selected' : '' }}>
+                                    @foreach($storage_location as $location)
+                                        <option value="{{ $location->id }}" {{ old('storage_location', $item->storage_location) == $location->id ? 'selected' : '' }}>
                                             {{ $location->storage_location_description }}
                                         </option>
                                     @endforeach
@@ -394,8 +394,7 @@
         $('body').addClass('sidebar-collapse');
         $(`.select`).select2({
             width: '100%',
-            height: '100%',
-            placeholder: 'None selected...'
+            height: '100%' 
         });
         let tableRow = 0;
         $("#add-Row").click(function () {

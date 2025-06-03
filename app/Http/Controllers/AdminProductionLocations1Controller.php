@@ -1,21 +1,12 @@
-<?php namespace App\Http\Controllers\ProductionItems;
+<?php namespace App\Http\Controllers;
 
 	use Session;
-	use Illuminate\Http\Request;
+	use Request;
 	use DB;
 	use CRUDBooster;
-	use App\Models\ProductionItems\ProductionItemCategory;
-	use App\Models\ProductionItems\ProductionItemStorageLocation;
-	use App\Models\ProductionItems\ProductionLocation;
-	use App\ItemMaster;
-use App\Models\ProductionItems\ProductionItems;
 
-	class AdminProductionItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
-		static $requestor = [1];
-		static $approver = [1];
-		public function __construct() {
-			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
-		}
+	class AdminProductionLocations1Controller extends \crocodicstudio\crudbooster\controllers\CBController {
+
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -34,23 +25,37 @@ use App\Models\ProductionItems\ProductionItems;
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "production_items";
+			$this->table = "production_locations";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Reference Number","name"=>"reference_number"];
-			$this->col[] = ["label"=>"Description","name"=>"description"];
-			$this->col[] = ["label"=>"Production Category","name"=>"production_category","join"=>"production_item_categories,category_description" ];
-			$this->col[] = ["label"=>"Production Location","name"=>"production_location","join"=>"production_locations,production_location_description"];
-			$this->col[] = ["label"=>"Depreciation","name"=>"depreciation"];
-			$this->col[] = ["label"=>"Final Value Vatex","name"=>"final_value_vatex"];
-			$this->col[] = ["label"=>"Final Value Vatinc","name"=>"final_value_vatinc"];
+
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
-			$this->form = [];
-			# END FORM DO NOT REMOVE THIS LINE
+		$this->form = [];
+		$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+		$this->form[] = ["label"=>"Production Location Description","name"=>"production_location_description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+		$this->form[] = ["label"=>"Status","name"=>"status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+		$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+
+			# END FORM DO NOT REMOVE THIS LINE     
+
+			/* 
+	        | ---------------------------------------------------------------------- 
+	        | Sub Module
+	        | ----------------------------------------------------------------------     
+			| @label          = Label of action 
+			| @path           = Path of sub module
+			| @foreign_key 	  = foreign key of sub table/module
+			| @button_color   = Bootstrap Class (primary,success,warning,danger)
+			| @button_icon    = Font Awesome Class  
+			| @parent_columns = Sparate with comma, e.g : name,created_at
+	        | 
+	        */
+	        $this->sub_module = array();
+
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -64,18 +69,33 @@ use App\Models\ProductionItems\ProductionItems;
 	        | 
 	        */
 	        $this->addaction = array();
-			$my_privilege = CRUDBooster::myPrivilegeId();
-
-			$this->addaction[] = [
-				'title'=>'Edit',
-				'url'=>CRUDBooster::mainpath('edit/[id]'),
-				'icon'=>'fa fa-pencil',
-				'color' => ' ',
-				"showIf"=>"[status_of_approval] != '202'",
-			];
-		
 
 
+	        /* 
+	        | ---------------------------------------------------------------------- 
+	        | Add More Button Selected
+	        | ----------------------------------------------------------------------     
+	        | @label       = Label of action 
+	        | @icon 	   = Icon from fontawesome
+	        | @name 	   = Name of button 
+	        | Then about the action, you should code at actionButtonSelected method 
+	        | 
+	        */
+	        $this->button_selected = array();
+
+	                
+	        /* 
+	        | ---------------------------------------------------------------------- 
+	        | Add alert message to this module at overheader
+	        | ----------------------------------------------------------------------     
+	        | @message = Text of message 
+	        | @type    = warning,success,danger,info        
+	        | 
+	        */
+	        $this->alert        = array();
+	                
+
+	        
 	        /* 
 	        | ---------------------------------------------------------------------- 
 	        | Add more button to header button 
@@ -85,7 +105,8 @@ use App\Models\ProductionItems\ProductionItems;
 	        | @icon  = Icon from Awesome.
 	        | 
 	        */
-	         
+	        $this->index_button = array();
+
 
 
 	        /* 
@@ -292,200 +313,9 @@ use App\Models\ProductionItems\ProductionItems;
 
 	    }
 
- 
 
 
-
-		public function addProductionItemsToDB(Request $request){
-			  
-			 
- 			$validated = $request->validate([ 
-				'description' => 'nullable|string',
-				'production_category' => 'nullable|integer',
-				'production_location' => 'nullable|integer',
-				'packaging_id' => 'nullable|integer',
-				'labor_cost' => 'required|numeric|max:99999999.99',
-				'gas_cost' => 'required|numeric|max:99999999.99',
-				'storage_cost' => 'required|numeric|max:99999999.99',
-				'storage_multiplier' => 'required|numeric|max:99999999.99',
-				'total_storage_cost' => 'required|numeric|max:99999999.99',
-				'storage_location' => 'nullable|integer',
-				'depreciation' => 'required|numeric|max:99999999.99',
-				'raw_mast_provision' => 'required|numeric|max:99999999.99',
-				'markup_percentage' => 'required|numeric|max:99999999.99',
-				'final_value_vatex' => 'required|numeric|max:99999999.99',
-				'final_value_vatinc' => 'required|numeric|max:99999999.99', 
-			]);
- 
-			$data = $validated;
-			$data['reference_number'] = rand();
-			$data['created_by'] = CRUDBooster::myId();
-			$data['updated_by'] = CRUDBooster::myId();
- 
-			 
-			$production_items_toDB = new ProductionItems();
-			
-			$production_items_toDB->reference_number = $data['reference_number'];
-			$production_items_toDB->description = $data['description'];
-			$production_items_toDB->ingredients = json_encode($request->only(['ingredients']));
-			$production_items_toDB->production_category =$data['production_category']; 
-			$production_items_toDB->production_location = $data['production_location'];
-			$production_items_toDB->packaging_id = $data['packaging_id'];
-			$production_items_toDB->labor_cost = $data['labor_cost'];
-			$production_items_toDB->gas_cost = $data['gas_cost'];
-			$production_items_toDB->storage_cost = $data['storage_cost'];
-			$production_items_toDB->storage_multiplier = $data['storage_multiplier'];
-			$production_items_toDB->total_storage_cost = $data['total_storage_cost'];
-			$production_items_toDB->storage_location = $data['storage_location'];
-			$production_items_toDB->depreciation = $data['depreciation'];
-			$production_items_toDB->raw_mast_provision = $data['raw_mast_provision'];
-			$production_items_toDB->markup_percentage = $data['markup_percentage'];
-			$production_items_toDB->final_value_vatex = $data['final_value_vatex'];
-			$production_items_toDB->final_value_vatinc = $data['final_value_vatinc'];
-			$production_items_toDB->created_by = $data['created_by'];
-			$production_items_toDB->updated_by = $data['updated_by'];
- 
-
-			$production_items_toDB->save();
-
-			 //return redirect()->back()->with('success', 'Production item saved successfully!');
-			 return redirect(CRUDBooster::mainpath())
-				->with([
-					'message_type' => 'success',
-					'message' => '✔️ Item added to Pending Items...',
-				])->send();
-		}
-
-
-
-
-
-	 	public function getAdd() {
-			if (!CRUDBooster::isCreate())
-				CRUDBooster::redirect(
-				CRUDBooster::adminPath(),
-				trans('crudbooster.denied_access')
-			);
-
-			return self::getEdit(null, 'add');
-		}
-
-		public function getEdit($id, $action = 'edit', $approval_id = null) {
-			if ($action == 'edit') {
-				if (!CRUDBooster::isUpdate())
-					CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-			}
-				 
-				$data = []; 
-				/*
-				$data['production_category'] = ProductionItemCategory::active();
-				$data['storage_location'] = ProductionItemStorageLocation::active();
-				$data['production_location'] = ProductionLocation::active();
-				*/
-
-
-			if ($id) { 
-				$data['item'] = self::getItemDetails($id);
-				/*
-				if ($data['item']->approval_status == 202) {
-					return redirect(CRUDBooster::mainpath())->with([
-						'message_type' => 'danger',
-						'message' => '✖️ You cannot edit a pending item...',
-					]);
-				}
-			 	*/  
-			} 
-			
-				$costings = self::costing();
-
-				
-			 	$data = array_merge($data, $costings);
-				
-				 
-	 
-				return $this->view('production-items/add-production-item',   $data);
-	}
-
-
-	public function getItemDetails($id) {
-			$item = DB::table('production_items')
-				->where('id', $id)
-				->get()
-				->first();
-
-			return $item;
-		}
-
-
-	public function costing() {
-
-			$data = [];
-
-			$data['production_category'] = DB::table('production_item_categories')
-				->where('status', 'ACTIVE') 
-				->get()
-				->toArray();
-			$data['storage_location'] = DB::table('production_item_storage_locations')
-				->where('status', 'ACTIVE') 
-				->get()
-				->toArray();
-			$data['production_location'] = DB::table('production_locations')
-				->where('status', 'ACTIVE') 
-				->get()
-				->toArray();
-				
- 
-
-			return $data;
-		}
-
-
-
-
-
-
-
-		public function itemSearch(Request $request){
-			$searchTerm = $request->input('search');
-
-			if (!$searchTerm) {
-				return response()->json([
-					'status_no' => 0,
-					'message' => 'No search term provided.',
-					'items' => null
-				]);
-			}
-
-			$items = ItemMaster::where('full_item_description', 'LIKE', '%' . $searchTerm . '%')
-				->orWhere('tasteless_code', 'LIKE', '%' . $searchTerm . '%')
-				->take(100)
-				->get();
-
-			if ($items->isEmpty()) {
-				return response()->json([
-					'status_no' => 0,
-					'message' => 'Item not found.',
-					'items' => null
-				]);
-			}
-
-			$formattedItems = $items->map(function ($item) {
-				return [
-					'id' => $item->id,
-					'tasteless_code' => $item->tasteless_code,
-					'item_description' => $item->full_item_description,
-					'cost' => $item->landed_cost
-				];
-			});
-
-			return response()->json([
-				'status_no' => 1,
-				'items' => $formattedItems
-			]);
-		}
+	    //By the way, you can still create your own method in here... :) 
 
 
 	}

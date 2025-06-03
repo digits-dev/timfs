@@ -846,7 +846,7 @@
 			$submaster_details = self::getSubmasters();
 
 			$data = array_merge($data, $submaster_details);
-			
+ 
 			return $this->view('item-master/edit-item', $data);
 		}
 
