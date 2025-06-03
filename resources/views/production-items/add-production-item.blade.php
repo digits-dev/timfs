@@ -5,6 +5,10 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="{{asset('css/production-item/custom-item.css')}}">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
 <style>
     input::placeholder{
         font-style: italic;
@@ -168,17 +172,36 @@
 @section('content')
     <div class="panel panel-default">
         <div class="panel-heading">
-            <i class="fa fa-dollar"></i><strong> Production Item</strong>
+            <i class="fa fa-dollar"></i><strong> Production Item ss</strong>
         </div>
-        <form method="POST" id="ProductionItems" enctype="multipart/form-data">
-            <div class="panel-body">
+        @if ($errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let firstError =   @json($errors->first());
+                if(firstError.indexOf("99999999.99")  >= 0)
+                {
+                    firstError = "please check value must be equal!";
+                }
+
+                Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: firstError,
+                confirmButtonText: 'OK'
+                });
+            });
+        </script>
+        @endif
+        <form action="{{ route('add-production-items-to-db') }}" method="POST" id="ProductionItems" enctype="multipart/form-data">
+         @csrf   
+        <div class="panel-body">
                 <div class="row" style="margin-top:20px">
                     <div class="col-md-4">
                         <div class="form-group">
                             <div class="input-group">
                                 <span class="input-group-addon" id="description"><i class="fa fa-file"></i></span>
                                 <label class="description float-label">Description</label>
-                                <input type="text" class="form-control rounded" placeholder="description" aria-describedby="basic-addon1" />
+                                <input type="text" class="form-control rounded" name="description"  placeholder="description" aria-describedby="basic-addon1" />
                             </div>
                         </div>
                     </div>
@@ -224,7 +247,7 @@
                         <label class="ingredient-label">Ingredients</label>
                         <div class="ingredient-box" style="margin-bottom: 5px">
                             <table class="ingredient-table w-100" style="width: 100%;">
-                                <tbody id="ingredient-tbody">
+                                <tbody id="ingredient-tbody" name="ingredient-added">
                                     <!-- Rows injected by JS -->
                                 </tbody>
                             </table>
@@ -351,19 +374,21 @@
                     </div>
                 </div>
             </div>
-
-            <div class="panel-footer">
-                <button type="submit" class="btn btn-success">+ Save data</button>
-                <a href="#" class="btn btn-link">← Back</a>
+ 
+                <button type="submit" id="sumit-form-button" class="btn btn-success  hide">+ Save data</button>
+            </form>
+         
+             <div class="panel-footer">
+                <button id="save-datas" class="btn btn-success">+ Save datas</button>
+                <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-link'>← Back</a>
             </div>
-        </form>
     </div>
 
 @push('bottom')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
-     
+    
     $(document).ready(function() {
         showNoData();
         $('body').addClass('sidebar-collapse');
@@ -443,7 +468,7 @@
                             } else {
                                 $('.ui-menu-item').remove();
                                 $('.addedLi').remove();
-                                const $ui = $(`#ui-id-2${rowId}`).html(`<i class="fa fa-exclamation"></i> ${data.message}`);
+                                const $ui = $(`#ui-id-2${rowId}`).html(`<i class="fa fa-exclamation fa-bounce "></i> ${data.message}`);
                                 $ui.toggle($('#itemDesc' + rowId).val().length > 0);
                             }
                         }
@@ -498,6 +523,7 @@
 
         $(document).on("click", ".removeRow", function (e) {
             const $row = $(this).closest('.tr-border');
+           // console.log($(this).closest('.tr-border').html());
             e.preventDefault();
             Swal.fire({
                 title: "Are you sure?",
@@ -519,8 +545,28 @@
             });
         });
 
+        //to save data and list to Production Items List module
+           $('#save-datas').on('click', function() {
+           Swal.fire({
+                title: 'Do you want to save this production items?',
+                html:  `Doing so will push this item for <span class="label label-info">ITEM FOR APPROVAL</span>.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Save',
+                returnFocus: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#sumit-form-button').click();
+                }
+            });
+        });
+
+
+
         // Calculate total storage cost
-        function calculateTotalStorage() {
+        function calculateTotalStorage() { 
             const storageCost = parseFloat($('#storage_cost').val()) || 0;
             const storageMultiplier = parseFloat($('#storage_multiplier').val()) || 0;
             const totalStorage = storageCost * storageMultiplier;
@@ -561,6 +607,22 @@
             $('#final_value_vatex').val(finalValueVatex.toFixed(2));
             $('#final_value_vatinc').val(finalValueVatinc.toFixed(2));
         }
+
+
+      
+
+
+        $('#ProductionItems').on('submit', function() {
+        Swal.fire({
+            title: 'Loading...',
+            html: 'Please wait...',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+            });
+        });
 
          // Recalculate on any input change
         $(document).on('input', '.ingredient-quantity', calculateFinalValues);

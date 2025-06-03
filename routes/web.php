@@ -30,6 +30,8 @@ use App\Http\Controllers\AdminFaCoaSubCategoriesController;
 use App\Http\Controllers\AdminBrandsAssetsController;
 use App\Http\Controllers\SystemUpdateController;
 use App\Http\Controllers\ProductionItems\AdminProductionItemsController;
+use App\Http\Controllers\ProductionItems\AdminProductionLocationsController;
+
 Route::get('/', function () {
     return redirect('admin/login');
     //return view('welcome');
@@ -214,6 +216,10 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     //PRODUCTION ITEMS
     Route::get('/admin/production_items/add-production-items', [AdminProductionItemsController::class, 'addProductionItems'])->name('add-production-items');
     Route::post('/admin/production_items/item-search',[AdminProductionItemsController::class, 'itemSearch'])->name('item-search');
+    Route::post('/admin/production_items/add-production-items', [AdminProductionItemsController::class, 'addProductionItemsToDB'])->name('add-production-items-to-db');
+    Route::get('/admin/production_locations/add-production-location', [AdminProductionLocationsController::class, 'addProductionItems'])->name('add-production-location');
+    Route::post('/admin/production_locations/add-production-location', [AdminProductionLocationsController::class, 'addProductionItemsToDB'])->name('add-production-location-to-db');
+    
 });
 
 Route::get('/item_masters/api/get-items/{secret_key}', [AdminItemMastersController::class, 'getUpdatedItems'])->name('get_updated_items');
