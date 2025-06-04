@@ -391,17 +391,22 @@
 <script>
     
     $(document).ready(function() {
-        showNoData();
+        
+        retrieve_ingredients();
+        showNoData(); 
+         let tableRow = 0;
+        
+
         $('body').addClass('sidebar-collapse');
         $(`.select`).select2({
             width: '100%',
             height: '100%' 
         });
-        let tableRow = 0;
+       
         $("#add-Row").click(function () {
             // if (!validateFields()) return;
             tableRow++;
-            
+            console.log( tableRow + " dd-Row");
             const newRowHtml = generateRowHtml(tableRow,"","","");
              $(newRowHtml).appendTo('#ingredient-tbody');
 
@@ -416,20 +421,28 @@
         {
             let itemId = {{ $item->id }}+"";  // add lang "" for Add function hindi maging  `let itemId =` var pag walang $item->id sa response
             //Update Function retrieve Ingredients
-            $.ajax({
-                url: `/admin/production_items/get-data/${itemId}`,
-                type: "GET",
-                dataType: "json",
-                    success: function(data) {
-                            const obj = JSON.parse(data.ingredients); 
-                            $.each(obj.ingredients, function(index) {
-                            const newRowHtml = generateRowHtml(index, obj.ingredients[index].description, obj.ingredients[index].quantity, obj.ingredients[index].cost);
-                                $(newRowHtml).appendTo('#ingredient-tbody');
-                            });
-                    }
-            });   
+            if(itemId != "")
+            {
+                $.ajax({
+                    url: `/admin/production_items/get-data/${itemId}`,
+                    type: "GET",
+                    dataType: "json",
+                        success: function(data) {
+                                const obj = JSON.parse(data.ingredients); 
+                                $.each(obj.ingredients, function(index) {
+                                    tableRow = index;
+                                    console.log( tableRow + " retrieve_ingredients");
+                                    const newRowHtml = generateRowHtml(index, obj.ingredients[index].description, obj.ingredients[index].quantity, obj.ingredients[index].cost);
+                                    $(newRowHtml).appendTo('#ingredient-tbody');
+                                    initAutocomplete(`#itemDesc${index}`, index);
+                                    showNoData();    
+                                });
+                        }
+                }); 
+            }
+              
         }
-          
+  
         function initAutocomplete(selector, rowId) {
             const token = $("#token").val();
             console.log(rowId + " Jasper");
@@ -662,7 +675,6 @@
         // Initial calculations
         calculateTotalStorage();
         calculateFinalValues();
-        retrieve_ingredients();
         
     });
 </script>
