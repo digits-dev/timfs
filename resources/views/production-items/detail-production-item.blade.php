@@ -125,47 +125,8 @@
         margin-top: 6px;
         gap: 5px; 
     }
-
-    @media (max-width: 768px) {
-        .ingredient-table td {
-            min-width: 100%;
-        }
-
-        .ingredient-label {
-            font-size: 16px;
-        }
-    }
-
-    @keyframes slideInRight {
-        from {
-            opacity: 0;
-            transform: translateX(-100%);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    .slide-in-right {
-        animation: slideInRight 0.2s ease-out forwards;
-    }
-
-    @keyframes slideOutRight {
-        from {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        to {
-            opacity: 0;
-            transform: translateX(-100%);
-        }
-    }
-
-    .slide-out-right {
-        animation: slideOutRight 0.2s ease-in forwards;
-    }
-
+ 
+ 
 </style>
 @endpush
 @extends('crudbooster::admin_template')
@@ -255,8 +216,7 @@
                             <div class="no-data-available text-center py-2" style="display: none;">
                                 <i class="fa fa-table"></i> <span>No ingredients currently save</span>
                             </div>
-                        </div>
-                        <a class="btn btn-primary" id="add-Row"><i class="fa fa-plus"></i> Add New Ingredients</a>
+                        </div> 
                     </div>
                 </div>
                 <hr>
@@ -379,9 +339,8 @@
                 <button type="submit" id="sumit-form-button" class="btn btn-success  hide">+ Save data</button>
             </form>
          
-             <div class="panel-footer">
-                <button id="save-datas" class="btn btn-success">+ Save datas</button>
-                <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-link'>← Back</a>
+             <div class="panel-footer"> 
+                <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-info'>← Back</a>
             </div>
     </div>
 
@@ -403,19 +362,7 @@
             height: '100%' 
         });
        
-        $("#add-Row").click(function () {
-            // if (!validateFields()) return;
-            tableRow++;
-            console.log( tableRow + " dd-Row");
-            const newRowHtml = generateRowHtml(tableRow,"","","");
-             $(newRowHtml).appendTo('#ingredient-tbody');
-
-
-               
-
-            initAutocomplete(`#itemDesc${tableRow}`, tableRow);
-            showNoData();
-        });
+       
 
         function retrieve_ingredients()
         {
@@ -436,7 +383,8 @@
                                     const newRowHtml = generateRowHtml(index, obj.ingredients[index].description, obj.ingredients[index].quantity, obj.ingredients[index].cost);
                                     $(newRowHtml).appendTo('#ingredient-tbody');
                                     initAutocomplete(`#itemDesc${index}`, index);
-                                    showNoData();    
+                                    showNoData(); 
+                                     $('#ProductionItems').find('input, select, textarea, button').prop('disabled', true);     
                                 });
                         }
                 }); 
@@ -503,7 +451,7 @@
                     <td style="width: 20%">
                         <div style="position: relative;">
                             <label>Quantity</label>
-                            <input type="text" class="form-control rounded  ingredient-quantity" id="quantity${rowId}" name="ingredients[${rowId}][quantity]" value="${Quantity}"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;" required>
+                            <input type="text" class="form-control rounded  ingredient-quantity" id="quantity${rowId}" name="ingredients[${rowId}][quantity]" value="${Quantity}"  value="1" min="0" max="9999999999" step="any"  onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;" required>
                         </div>
                     </td>
                     <td style="width: 20%">
@@ -511,15 +459,7 @@
                             <label>Cost</label>
                             <input type="text" class="form-control rounded cost-input" id="cost${rowId}" name="ingredients[${rowId}][cost]" value="${Cost}" readonly style="background-color: #eee;" required>
                         </div>
-                    </td>
-                    <td style="width: 10%;">
-                        <div style="position: relative;">
-                            <label>Action</label><br>
-                            <button id="deleteRow${rowId}" name="removeRow" data-id="${rowId}" class="btn btn-danger removeRow">
-                                <i class="glyphicon glyphicon-trash"></i>
-                            </button>
-                        </div>
-                    </td>
+                    </td> 
                 </tr>
             `;
         }
@@ -559,53 +499,9 @@
                 $('.no-data-available').hide();
             }
         }
+ 
 
-        $(document).on("click", ".removeRow", function (e) {
-            const $row = $(this).closest('.tr-border');
-           // console.log($(this).closest('.tr-border').html());
-            e.preventDefault();
-            Swal.fire({
-                title: "Are you sure?",
-                text: "This row will be removed.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Save',
-                returnFocus: false,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $row.addClass('slide-out-right');
-                    // Remove row after animation ends
-                    $row.on('animationend', function () {
-                        $row.remove();
-                        calculateFinalValues();
-                        showNoData(); // Update no data message
-                    });
-                }
-            });
-        });
-
-        //to save data and list to Production Items List module
-           $('#save-datas').on('click', function() {
-           Swal.fire({
-                title: 'Do you want to save this production items?',
-                html:  `Doing so will push this item for <span class="label label-info">ITEM FOR APPROVAL</span>.`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Save',
-                returnFocus: false,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $('#sumit-form-button').click();
-                }
-            });
-        });
-
-        
-
+          
         // Calculate total storage cost
         function calculateTotalStorage() { 
             const storageCost = parseFloat($('#storage_cost').val()) || 0;
@@ -652,18 +548,7 @@
       
 
 
-        $('#ProductionItems').on('submit', function() {
-        Swal.fire({
-            title: 'Loading...',
-            html: 'Please wait...',
-            allowEscapeKey: false,
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading()
-            },
-            });
-        });
-
+    
          // Recalculate on any input change
         $(document).on('input', '.ingredient-quantity', calculateFinalValues);
         $(document).on('change', '.ingredient-input', calculateFinalValues);
@@ -675,7 +560,7 @@
         // Initial calculations
         calculateTotalStorage();
         calculateFinalValues();
-        
+        $('#ProductionItems').find('input, select, textarea, button').prop('disabled', true);
     });
 </script>
 @endpush

@@ -8,6 +8,7 @@
 	use App\Models\ProductionItems\ProductionItemStorageLocation;
 	use App\Models\ProductionItems\ProductionLocation;
 	use App\ItemMaster;
+use App\Models\ProductionItems\ProductionItemLines;
 use App\Models\ProductionItems\ProductionItems;
 
 	class AdminProductionItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
@@ -354,7 +355,6 @@ use App\Models\ProductionItems\ProductionItems;
 				
 				$production_items_toDB->reference_number = $data['reference_number'];
 				$production_items_toDB->description = $data['description'];
-				$production_items_toDB->ingredients = json_encode($request->only(['ingredients']));
 				$production_items_toDB->production_category =$data['production_category']; 
 				$production_items_toDB->production_location = $data['production_location'];
 				$production_items_toDB->packaging_id = $data['packaging_id'];
@@ -373,17 +373,48 @@ use App\Models\ProductionItems\ProductionItems;
 				$production_items_toDB->updated_by = $data['updated_by'];
 			}
 
+				$ingredients = $request->input('ingredients'); // get the array
+				
+				//loop each ingredients and save sa DB
+				foreach ($ingredients as $ingredient) {
+					self::ingredientSearchToItemMaster($ingredient['description'], $production_items_toDB->reference_number, $ingredient['quantity']);
+				}
 
-			$production_items_toDB->save();
+
+
+				$production_items_toDB->save();
 
 			 //return redirect()->back()->with('success', 'Production item saved successfully!');
 			 return redirect(CRUDBooster::mainpath())
 				->with([
-					'message_type' => 'success',
-					'message' => $message,
+						'message_type' => 'success',
+						'message' => $message,
 				])->send();
+			
 		}
 
+		public function ingredientSearchToItemMaster($description, $reference_number, $quantity)
+		{ 
+			$item = DB::table('item_masters')
+				->where('full_item_description', $description)
+				->first();
+
+			if (!$item) { 
+				return null;
+			}
+
+			$production_items_toDB = new ProductionItemLines();
+
+			$production_items_toDB->production_item_id = $reference_number;
+			$production_items_toDB->item_code = $item->tasteless_code;  
+			$production_items_toDB->description = $description;
+			$production_items_toDB->quantity = $quantity;
+			$production_items_toDB->landed_cost = $item->landed_cost;
+			$production_items_toDB->is_alternative = 1;
+ 
+			$production_items_toDB->save();
+ 
+		}
 
 
 
@@ -436,6 +467,49 @@ use App\Models\ProductionItems\ProductionItems;
 	 
 				return $this->view('production-items/add-production-item',   $data);
 	}
+
+	
+	public function getDetail($id)
+	{
+		 
+				if ($action == 'edit') {
+					if (!CRUDBooster::isUpdate())
+						CRUDBooster::redirect(
+						CRUDBooster::adminPath(),
+						trans('crudbooster.denied_access')
+					);
+				}
+				self::ingredientsSearch($id);
+				$data = []; 
+				/*
+				$data['production_category'] = ProductionItemCategory::active();
+				$data['storage_location'] = ProductionItemStorageLocation::active();
+				$data['production_location'] = ProductionLocation::active();
+				*/
+
+ 
+				$data['item'] = self::getItemDetails($id);
+				/*
+				if ($data['item']->approval_status == 202) {
+					return redirect(CRUDBooster::mainpath())->with([
+						'message_type' => 'danger',
+						'message' => '✖️ You cannot edit a pending item...',
+					]);
+				}
+			 	*/  
+			 
+			
+				$costings = self::costing();
+
+				
+			 	$data = array_merge($data, $costings);
+			 
+	 
+				return $this->view('production-items/detail-production-item',   $data); 
+	}
+
+
+	
 
 
 	public function ingredientsSearch($id)
