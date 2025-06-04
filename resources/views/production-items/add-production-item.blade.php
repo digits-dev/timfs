@@ -195,13 +195,14 @@
         <form action="{{ route('add-production-items-to-db') }}" method="POST" id="ProductionItems" enctype="multipart/form-data">
          @csrf   
         <div class="panel-body">
+                <input name="id" value="{{$item->id}}" class="hide"/>
                 <div class="row" style="margin-top:20px">
                     <div class="col-md-4">
                         <div class="form-group">
                             <div class="input-group">
                                 <span class="input-group-addon" id="description"><i class="fa fa-file"></i></span>
                                 <label class="description float-label">Description</label>
-                                <input type="text" class="form-control rounded" name="description"  placeholder="description" aria-describedby="basic-addon1" />
+                                <input type="text" value="{{$item->description}}" class="form-control rounded" name="description"  placeholder="description" aria-describedby="basic-addon1" />
                             </div>
                         </div>
                     </div>
@@ -265,7 +266,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
                                 <label class="labor_cost float-label">Labor Cost</label>
-                                <input type="text" class="form-control rounded" name="labor_cost" id="labor_cost" placeholder="Labor cost" aria-describedby="basic-addon1" />
+                                <input type="text" value="{{$item->labor_cost}}" class="form-control rounded" name="labor_cost" id="labor_cost" placeholder="Labor cost" aria-describedby="basic-addon1" />
                             </div>
                         </div>
                     </div>
@@ -274,7 +275,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
                                 <label class="gas_cost float-label">Gas Cost</label>
-                                <input type="text" class="form-control rounded" name="gas_cost" id="gas_cost" placeholder="Gas cost" aria-describedby="basic-addon1" />
+                                <input type="text" value="{{$item->gas_cost}}" class="form-control rounded" name="gas_cost" id="gas_cost" placeholder="Gas cost" aria-describedby="basic-addon1" />
                             </div>
                         </div>
                     </div>
@@ -283,7 +284,7 @@
                             <div class="input-group">
                             <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
                                 <label class="storage_cost float-label">Storage Cost</label>
-                                <input type="text" class="form-control rounded" name="storage_cost" id="storage_cost" placeholder="Storage cost" aria-describedby="basic-addon1" />
+                                <input type="text" value="{{$item->storage_cost}}" class="form-control rounded" name="storage_cost" id="storage_cost" placeholder="Storage cost" aria-describedby="basic-addon1" />
                             </div>
                         </div>
                     </div>
@@ -292,7 +293,7 @@
                             <div class="input-group">
                             <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
                                 <label class="storage_multiplier float-label">Storage Multiplier</label>
-                                <input type="text" class="form-control rounded" name="storage_multiplier" id="storage_multiplier" placeholder="Storage multiplier" aria-describedby="basic-addon1" />
+                                <input type="text" value="{{$item->storage_multiplier}}"  class="form-control rounded" name="storage_multiplier" id="storage_multiplier" placeholder="Storage multiplier" aria-describedby="basic-addon1" />
                             </div>
                         </div>
                     </div>
@@ -304,7 +305,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
                                 <label class="total_storage_cost float-label">Total Storage Cost</label>
-                                <input type="text" class="form-control rounded" name="total_storage_cost" id="total_storage_cost" placeholder="Total storage cost" aria-describedby="basic-addon1" />
+                                <input type="text" value="{{$item->total_storage_cost}}"  class="form-control rounded" name="total_storage_cost" id="total_storage_cost" placeholder="Total storage cost" aria-describedby="basic-addon1" />
                             </div>
                         </div>
                     </div>
@@ -329,7 +330,7 @@
                             <div class="input-group">
                             <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
                                 <label class="depreciation float-label">Depreciation</label>
-                                <input type="text" class="form-control rounded" name="depreciation" id="depreciation" placeholder="Depreciation" aria-describedby="basic-addon1" />
+                                <input type="text" value="{{$item->depreciation}}"  class="form-control rounded" name="depreciation" id="depreciation" placeholder="Depreciation" aria-describedby="basic-addon1" />
                             </div>
                         </div>
                     </div>
@@ -338,7 +339,7 @@
                             <div class="input-group">
                             <span class="input-group-addon" id="basic-addon1" style="font-size: 15px"> % </span>
                                 <label class="raw_mast_provision float-label">Raw Mast Provision</label>
-                                <input type="text" class="form-control rounded" name="raw_mast_provision" id="raw_mast_provision" value="5" placeholder="Raw mass provision" aria-describedby="basic-addon1" />
+                                <input type="text"  value="{{$item->raw_mast_provision}}" class="form-control rounded" name="raw_mast_provision" id="raw_mast_provision" value="5" placeholder="Raw mass provision" aria-describedby="basic-addon1" />
                             </div>
                         </div>
                     </div>
@@ -350,7 +351,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon" id="basic-addon1" style="font-size: 20px"> ₱ </span>
                                 <label class="markup_percentage float-label">Mark Up %</label>
-                                <input type="text" class="form-control rounded" name="markup_percentage" id="markup_percentage" placeholder="Mark up percentage" aria-describedby="basic-addon1" />
+                                <input type="text"  value="{{$item->markup_percentage}}" class="form-control rounded" name="markup_percentage" id="markup_percentage" placeholder="Mark up percentage" aria-describedby="basic-addon1" />
                             </div>
                         </div>
                     </div>
@@ -359,7 +360,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon" id="basic-addon2" style="font-size: 20px"> ₱ </span>
                                 <label class="final_value_vatex float-label" style="background-color: #EEEEEE !important; border-radius:5px;">Final Value(VATEX)</label>
-                                <input type="text" class="form-control rounded" name="final_value_vatex" id="final_value_vatex" placeholder="Final value vatex" aria-describedby="basic-addon1" readonly />
+                                <input type="text" value="{{$item->final_value_vatex}}" class="form-control rounded" name="final_value_vatex" id="final_value_vatex" placeholder="Final value vatex" aria-describedby="basic-addon1" readonly />
                             </div>
                         </div>
                     </div>
@@ -368,7 +369,7 @@
                             <div class="input-group">
                             <span class="input-group-addon" id="basic-addon3" style="font-size: 20px"> ₱ </span>
                                 <label class="final_value_vatinc float-label" style="background-color: #EEEEEE !important; border-radius:5px">Final Value(VATINC)</label>
-                                <input type="text" class="form-control rounded" name="final_value_vatinc" id="final_value_vatinc" placeholder="Fina value vatinc" aria-describedby="basic-addon1" readonly />
+                                <input type="text"  value="{{$item->final_value_vatinc}}" class="form-control rounded" name="final_value_vatinc" id="final_value_vatinc" placeholder="Fina value vatinc" aria-describedby="basic-addon1" readonly />
                             </div>
                         </div>
                     </div>
@@ -400,55 +401,38 @@
         $("#add-Row").click(function () {
             // if (!validateFields()) return;
             tableRow++;
-
-            const newRowHtml = generateRowHtml(tableRow);
+            
+            const newRowHtml = generateRowHtml(tableRow,"","","");
              $(newRowHtml).appendTo('#ingredient-tbody');
+
+
+               
 
             initAutocomplete(`#itemDesc${tableRow}`, tableRow);
             showNoData();
         });
 
-        function generateRowHtml(rowId) {
-            return `
-                 <tr class="tr-border slide-in-right ingredient-row" style="width: 100%; padding-top:10px;">
-                    <td class="packaging" style="width: 30%">
-                        <div style="position: relative;">
-                            <label>Packaging</label>
-                            <input type="hidden" name="ingredients[${rowId}][description]" id="tasteless_code${rowId}">
-                            <input type="text" placeholder="Search Item ..." class="form-control rounded ingredient-input" id="itemDesc${rowId}" data-id="${rowId}" name="ingredients[${rowId}][description]" required maxlength="100">
-                            <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${rowId}" id="ui-id-2${rowId}" style="display: none; top: 60px; width: 100%; color:red; padding:5px">
-                                <li class="text-center">Loading...</li>
-                            </ul>
-                            <span class="error" id="display-error${rowId}"></span>
-                        </div>
-                    </td>
-                    <td style="width: 20%">
-                        <div style="position: relative;">
-                            <label>Quantity</label>
-                            <input type="text" class="form-control rounded  ingredient-quantity" id="quantity${rowId}" name="ingredients[${rowId}][quantity]" value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;">
-                        </div>
-                    </td>
-                    <td style="width: 20%">
-                        <div style="position: relative;">
-                            <label>Cost</label>
-                            <input type="text" class="form-control rounded cost-input" id="cost${rowId}" name="ingredients[${rowId}][cost]" readonly style="background-color: #eee;">
-                        </div>
-                    </td>
-                    <td style="width: 10%;">
-                        <div style="position: relative;">
-                            <label>Action</label><br>
-                            <button id="deleteRow${rowId}" name="removeRow" data-id="${rowId}" class="btn btn-danger removeRow">
-                                <i class="glyphicon glyphicon-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
+        function retrieve_ingredients()
+        {
+            let itemId = {{ $item->id }}+"";  // add lang "" for Add function hindi maging  `let itemId =` var pag walang $item->id sa response
+            //Update Function retrieve Ingredients
+            $.ajax({
+                url: `/admin/production_items/get-data/${itemId}`,
+                type: "GET",
+                dataType: "json",
+                    success: function(data) {
+                            const obj = JSON.parse(data.ingredients); 
+                            $.each(obj.ingredients, function(index) {
+                            const newRowHtml = generateRowHtml(index, obj.ingredients[index].description, obj.ingredients[index].quantity, obj.ingredients[index].cost);
+                                $(newRowHtml).appendTo('#ingredient-tbody');
+                            });
+                    }
+            });   
         }
-
+          
         function initAutocomplete(selector, rowId) {
             const token = $("#token").val();
-
+            console.log(rowId + " Jasper");
             $(selector).autocomplete({
                 source: function (request, response) {
                     $.ajax({
@@ -486,6 +470,49 @@
                 autoFocus: true
             });
         }
+
+
+
+          function generateRowHtml(rowId, Packaging, Quantity, Cost) {
+            return `
+                 <tr class="tr-border slide-in-right ingredient-row" style="width: 100%; padding-top:10px;">
+                    <td class="packaging" style="width: 30%">
+                        <div style="position: relative;">
+                            <label>Packaging</label>
+                            <input type="hidden" name="ingredients[${rowId}][description]" id="tasteless_code${rowId}">
+                            <input type="text" placeholder="Search Item ..." class="form-control rounded ingredient-input" id="itemDesc${rowId}" data-id="${rowId}" value="${Packaging}" name="ingredients[${rowId}][description]" required maxlength="100">
+                            <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${rowId}" id="ui-id-2${rowId}" style="display: none; top: 60px; width: 100%; color:red; padding:5px">
+                                <li class="text-center">Loading...</li>
+                            </ul>
+                            <span class="error" id="display-error${rowId}"></span>
+                        </div>
+                    </td>
+                    <td style="width: 20%">
+                        <div style="position: relative;">
+                            <label>Quantity</label>
+                            <input type="text" class="form-control rounded  ingredient-quantity" id="quantity${rowId}" name="ingredients[${rowId}][quantity]" value="${Quantity}"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;">
+                        </div>
+                    </td>
+                    <td style="width: 20%">
+                        <div style="position: relative;">
+                            <label>Cost</label>
+                            <input type="text" class="form-control rounded cost-input" id="cost${rowId}" name="ingredients[${rowId}][cost]" value="${Cost}" readonly style="background-color: #eee;">
+                        </div>
+                    </td>
+                    <td style="width: 10%;">
+                        <div style="position: relative;">
+                            <label>Action</label><br>
+                            <button id="deleteRow${rowId}" name="removeRow" data-id="${rowId}" class="btn btn-danger removeRow">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+
+
 
         function validateFields() {
             let isValid = true;
@@ -528,9 +555,11 @@
                 title: "Are you sure?",
                 text: "This row will be removed.",
                 icon: "warning",
-                buttons: true,
-                dangerMode: true,
-                confirmButtonColor: "#367fa9"
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Save',
+                returnFocus: false,
             }).then((result) => {
                 if (result.isConfirmed) {
                     $row.addClass('slide-out-right');
@@ -562,7 +591,7 @@
             });
         });
 
-
+        
 
         // Calculate total storage cost
         function calculateTotalStorage() { 
@@ -586,8 +615,7 @@
                 const quantity = parseFloat($row.find('.ingredient-quantity').val()) || 0;
                 
                 ingredientsCost += cost * quantity;
-            });
-            console.log(ingredientsCost)
+            }); 
             const laborCost = parseFloat($('#labor_cost').val()) || 0;
             const gasCost = parseFloat($('#gas_cost').val()) || 0;
             const totalStorageCost = parseFloat($('#total_storage_cost').val()) || 0;
@@ -634,7 +662,8 @@
         // Initial calculations
         calculateTotalStorage();
         calculateFinalValues();
-     
+        retrieve_ingredients();
+        
     });
 </script>
 @endpush

@@ -215,6 +215,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
 
     //PRODUCTION ITEMS 
     Route::post('/admin/production_items/item-search',[AdminProductionItemsController::class, 'itemSearch'])->name('item-search');
+    Route::get('/admin/production_items/get-data/{id}',[AdminProductionItemsController::class, 'ingredientsSearch'])->name('ingredients-search');
     Route::post('/admin/production_items/add-production-items-to-db', [AdminProductionItemsController::class, 'addProductionItemsToDB'])->name('add-production-items-to-db');
     Route::get('/admin/production_locations/add-production-location', [AdminProductionLocationsController::class, 'addProductionItems'])->name('add-production-location');
     Route::post('/admin/production_locations/add-production-location', [AdminProductionLocationsController::class, 'addProductionItemsToDB'])->name('add-production-location-to-db');

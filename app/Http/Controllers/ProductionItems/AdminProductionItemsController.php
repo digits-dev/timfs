@@ -297,54 +297,82 @@ use App\Models\ProductionItems\ProductionItems;
 
 
 		public function addProductionItemsToDB(Request $request){
-			  
-			 
- 			$validated = $request->validate([ 
-				'description' => 'nullable|string',
-				'production_category' => 'nullable|integer',
-				'production_location' => 'nullable|integer',
-				'packaging_id' => 'nullable|integer',
-				'labor_cost' => 'required|numeric|max:99999999.99',
-				'gas_cost' => 'required|numeric|max:99999999.99',
-				'storage_cost' => 'required|numeric|max:99999999.99',
-				'storage_multiplier' => 'required|numeric|max:99999999.99',
-				'total_storage_cost' => 'required|numeric|max:99999999.99',
-				'storage_location' => 'nullable|integer',
-				'depreciation' => 'required|numeric|max:99999999.99',
-				'raw_mast_provision' => 'required|numeric|max:99999999.99',
-				'markup_percentage' => 'required|numeric|max:99999999.99',
-				'final_value_vatex' => 'required|numeric|max:99999999.99',
-				'final_value_vatinc' => 'required|numeric|max:99999999.99', 
-			]);
- 
-			$data = $validated;
-			$data['reference_number'] = rand();
-			$data['created_by'] = CRUDBooster::myId();
-			$data['updated_by'] = CRUDBooster::myId();
- 
-			 
-			$production_items_toDB = new ProductionItems();
+			$message = '';
+			$time_stamp_now = date('Y-m-d H:i:s');
+			 if($request['id']){
+				/*
+				$message = "✔️ Item updated successfully...";
+				$productlocation = ProductionLocation::findOrFail($request['id']);
+				$time_stamp = $time_stamp_now;
+				$productlocation->production_location_description = $request['production_location_description'];
+				$productlocation->status = 'ACTIVE'; 
+				$productlocation->updated_by = CRUDBooster::myId(); 
+				$productlocation->updated_at = $time_stamp;
+				*/
+				 
+
+				$message = "✔️ Item updated successfully...";
+				$production_items_toDB =  ProductionItems::findOrFail($request['id']);
+				$production_items_toDB->fill($request->all());
+				$production_items_toDB->ingredients = json_encode($request->only(['ingredients']));
+				$production_items_toDB->updated_at = $time_stamp_now;
+				$production_items_toDB->updated_by = CRUDBooster::myId();
+
+
+		 
+			}
 			
-			$production_items_toDB->reference_number = $data['reference_number'];
-			$production_items_toDB->description = $data['description'];
-			$production_items_toDB->ingredients = json_encode($request->only(['ingredients']));
-			$production_items_toDB->production_category =$data['production_category']; 
-			$production_items_toDB->production_location = $data['production_location'];
-			$production_items_toDB->packaging_id = $data['packaging_id'];
-			$production_items_toDB->labor_cost = $data['labor_cost'];
-			$production_items_toDB->gas_cost = $data['gas_cost'];
-			$production_items_toDB->storage_cost = $data['storage_cost'];
-			$production_items_toDB->storage_multiplier = $data['storage_multiplier'];
-			$production_items_toDB->total_storage_cost = $data['total_storage_cost'];
-			$production_items_toDB->storage_location = $data['storage_location'];
-			$production_items_toDB->depreciation = $data['depreciation'];
-			$production_items_toDB->raw_mast_provision = $data['raw_mast_provision'];
-			$production_items_toDB->markup_percentage = $data['markup_percentage'];
-			$production_items_toDB->final_value_vatex = $data['final_value_vatex'];
-			$production_items_toDB->final_value_vatinc = $data['final_value_vatinc'];
-			$production_items_toDB->created_by = $data['created_by'];
-			$production_items_toDB->updated_by = $data['updated_by'];
+			 else
+
+			{ 
+				$message = "✔️ Item Added successfully...";
+				$validated = $request->validate([ 
+					'description' => 'nullable|string',
+					'production_category' => 'nullable|integer',
+					'production_location' => 'nullable|integer',
+					'packaging_id' => 'nullable|integer',
+					'labor_cost' => 'required|numeric|max:99999999.99',
+					'gas_cost' => 'required|numeric|max:99999999.99',
+					'storage_cost' => 'required|numeric|max:99999999.99',
+					'storage_multiplier' => 'required|numeric|max:99999999.99',
+					'total_storage_cost' => 'required|numeric|max:99999999.99',
+					'storage_location' => 'nullable|integer',
+					'depreciation' => 'required|numeric|max:99999999.99',
+					'raw_mast_provision' => 'required|numeric|max:99999999.99',
+					'markup_percentage' => 'required|numeric|max:99999999.99',
+					'final_value_vatex' => 'required|numeric|max:99999999.99',
+					'final_value_vatinc' => 'required|numeric|max:99999999.99', 
+				]);
+	
+				$data = $validated;
+				$data['reference_number'] = rand();
+				$data['created_by'] = CRUDBooster::myId();
+				$data['updated_by'] = CRUDBooster::myId();
  
+			 
+				$production_items_toDB = new ProductionItems();
+				
+				$production_items_toDB->reference_number = $data['reference_number'];
+				$production_items_toDB->description = $data['description'];
+				$production_items_toDB->ingredients = json_encode($request->only(['ingredients']));
+				$production_items_toDB->production_category =$data['production_category']; 
+				$production_items_toDB->production_location = $data['production_location'];
+				$production_items_toDB->packaging_id = $data['packaging_id'];
+				$production_items_toDB->labor_cost = $data['labor_cost'];
+				$production_items_toDB->gas_cost = $data['gas_cost'];
+				$production_items_toDB->storage_cost = $data['storage_cost'];
+				$production_items_toDB->storage_multiplier = $data['storage_multiplier'];
+				$production_items_toDB->total_storage_cost = $data['total_storage_cost'];
+				$production_items_toDB->storage_location = $data['storage_location'];
+				$production_items_toDB->depreciation = $data['depreciation'];
+				$production_items_toDB->raw_mast_provision = $data['raw_mast_provision'];
+				$production_items_toDB->markup_percentage = $data['markup_percentage'];
+				$production_items_toDB->final_value_vatex = $data['final_value_vatex'];
+				$production_items_toDB->final_value_vatinc = $data['final_value_vatinc'];
+				$production_items_toDB->created_by = $data['created_by'];
+				$production_items_toDB->updated_by = $data['updated_by'];
+			}
+
 
 			$production_items_toDB->save();
 
@@ -352,7 +380,7 @@ use App\Models\ProductionItems\ProductionItems;
 			 return redirect(CRUDBooster::mainpath())
 				->with([
 					'message_type' => 'success',
-					'message' => '✔️ Item added to Pending Items...',
+					'message' => $message,
 				])->send();
 		}
 
@@ -371,14 +399,15 @@ use App\Models\ProductionItems\ProductionItems;
 		}
 
 		public function getEdit($id, $action = 'edit', $approval_id = null) {
-			if ($action == 'edit') {
-				if (!CRUDBooster::isUpdate())
-					CRUDBooster::redirect(
-					CRUDBooster::adminPath(),
-					trans('crudbooster.denied_access')
-				);
-			}
-				 
+			
+				if ($action == 'edit') {
+					if (!CRUDBooster::isUpdate())
+						CRUDBooster::redirect(
+						CRUDBooster::adminPath(),
+						trans('crudbooster.denied_access')
+					);
+				}
+				self::ingredientsSearch($id);
 				$data = []; 
 				/*
 				$data['production_category'] = ProductionItemCategory::active();
@@ -403,12 +432,24 @@ use App\Models\ProductionItems\ProductionItems;
 
 				
 			 	$data = array_merge($data, $costings);
-				
-				 
+			 
 	 
 				return $this->view('production-items/add-production-item',   $data);
 	}
 
+
+	public function ingredientsSearch($id)
+	{
+			$item = DB::table('production_items')
+				->where('id', $id)
+				->get()
+				->first();
+				
+
+			return response()->json([
+ 				'ingredients' => $item->ingredients
+			]);
+	}
 
 	public function getItemDetails($id) {
 			$item = DB::table('production_items')
