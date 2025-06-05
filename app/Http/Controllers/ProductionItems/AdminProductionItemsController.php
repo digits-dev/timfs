@@ -300,6 +300,7 @@ use App\Models\ProductionItems\ProductionItems;
 		public function addProductionItemsToDB(Request $request){
 			$message = '';
 			$time_stamp_now = date('Y-m-d H:i:s');
+			
 			 if($request['id']){
 				/*
 				$message = "✔️ Item updated successfully...";
@@ -438,7 +439,7 @@ use App\Models\ProductionItems\ProductionItems;
 						trans('crudbooster.denied_access')
 					);
 				}
-				self::ingredientsSearch($id);
+				
 				$data = []; 
 				/*
 				$data['production_category'] = ProductionItemCategory::active();
@@ -448,7 +449,7 @@ use App\Models\ProductionItems\ProductionItems;
 
 
 			if ($id) { 
-				$data['item'] = self::getItemDetails($id);
+				$data['item'] = self::getItemDetails($id); 
 				/*
 				if ($data['item']->approval_status == 202) {
 					return redirect(CRUDBooster::mainpath())->with([
@@ -463,8 +464,8 @@ use App\Models\ProductionItems\ProductionItems;
 
 				
 			 	$data = array_merge($data, $costings);
-			 
-	 
+
+				 
 				return $this->view('production-items/add-production-item',   $data);
 	}
 
@@ -479,7 +480,7 @@ use App\Models\ProductionItems\ProductionItems;
 						trans('crudbooster.denied_access')
 					);
 				}
-				self::ingredientsSearch($id);
+				
 				$data = []; 
 				/*
 				$data['production_category'] = ProductionItemCategory::active();
@@ -514,14 +515,15 @@ use App\Models\ProductionItems\ProductionItems;
 
 	public function ingredientsSearch($id)
 	{
-			$item = DB::table('production_items')
-				->where('id', $id)
-				->get()
-				->first();
-				
+		$item = DB::table('production_item_lines')
+			->join('production_items', 'production_items.reference_number', '=', 'production_item_lines.production_item_id')
+			->where('production_items.id', $id)
+			->select('production_item_lines.*') 
+			->get();
+	
 
 			return response()->json([
- 				'ingredients' => $item->ingredients
+ 				'ingredients' => $item 
 			]);
 	}
 

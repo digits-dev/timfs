@@ -429,11 +429,18 @@
                     type: "GET",
                     dataType: "json",
                         success: function(data) {
-                                const obj = JSON.parse(data.ingredients); 
-                                $.each(obj.ingredients, function(index) {
+                                 const obj =  data.ingredients; 
+                                 console.log(obj[0].description);
+
+                                $.each(obj, function(index) {
+
+                                    //assign tableRow for ajax search
                                     tableRow = index;
                                     console.log( tableRow + " retrieve_ingredients");
-                                    const newRowHtml = generateRowHtml(index, obj.ingredients[index].description, obj.ingredients[index].quantity, obj.ingredients[index].cost);
+
+
+                                    //append retrieve ingredients from array base on reference
+                                    const newRowHtml = generateRowHtml(index, obj[index].description, obj[index].quantity, obj[index].landed_cost);
                                     $(newRowHtml).appendTo('#ingredient-tbody');
                                     initAutocomplete(`#itemDesc${index}`, index);
                                     showNoData();    
