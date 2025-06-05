@@ -36,8 +36,7 @@ protected $table = 'production_items';
 
     protected $fillable = [
         'reference_number',
-        'description',
-        'ingredients',
+        'description', 
         'production_category',
         'production_location',
         'packaging_id',

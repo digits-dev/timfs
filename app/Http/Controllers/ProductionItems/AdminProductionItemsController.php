@@ -301,6 +301,9 @@ use App\Models\ProductionItems\ProductionItems;
 			$message = '';
 			$time_stamp_now = date('Y-m-d H:i:s');
 			
+			
+
+
 			 if($request['id']){
 				/*
 				$message = "✔️ Item updated successfully...";
@@ -311,17 +314,17 @@ use App\Models\ProductionItems\ProductionItems;
 				$productlocation->updated_by = CRUDBooster::myId(); 
 				$productlocation->updated_at = $time_stamp;
 				*/
-				 
+
 
 				$message = "✔️ Item updated successfully...";
 				$production_items_toDB =  ProductionItems::findOrFail($request['id']);
-				$production_items_toDB->fill($request->all());
-				$production_items_toDB->ingredients = json_encode($request->only(['ingredients']));
+				$production_items_toDB->fill($request->all()); 
 				$production_items_toDB->updated_at = $time_stamp_now;
 				$production_items_toDB->updated_by = CRUDBooster::myId();
 
-
-		 
+				//delete old ingredients to db for new add
+				DB::table('production_item_lines')->where('production_item_id', $production_items_toDB->reference_number)->delete();
+ 
 			}
 			
 			 else
