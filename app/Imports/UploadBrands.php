@@ -29,6 +29,7 @@ class Uploadbrands implements ToCollection, SkipsEmptyRows, WithHeadingRow
                 'brand_description'    => $row['brand_description'] 
             ],
             [
+                'brand_code'           => $row['brand_code'],
                 'brand_description'    => $row['brand_description'],
                 'item_cost'            => $row['item_cost'],
                 'status'               => $row['status'],
