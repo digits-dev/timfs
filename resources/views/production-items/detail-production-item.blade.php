@@ -62,7 +62,7 @@
     .ingredient-label{
         position: absolute;
         background: #fff;
-        top: -14px;
+        top: 2px;
         left: 45px;
         padding-left: 5px;
         padding-right: 5px;
@@ -134,25 +134,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <i class="fa fa-dollar"></i><strong> Production Item ss</strong>
-        </div>
-        @if ($errors->any())
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                let firstError =   @json($errors->first());
-                if(firstError.indexOf("99999999.99")  >= 0)
-                {
-                    firstError = "please check value must be equal!";
-                }
-
-                Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: firstError,
-                confirmButtonText: 'OK'
-                });
-            });
-        </script>
-        @endif
+        </div> 
         <form action="{{ route('add-production-items-to-db') }}" method="POST" id="ProductionItems" enctype="multipart/form-data">
          @csrf   
         <div class="panel-body">
@@ -204,9 +186,19 @@
                     </div>
                 </div>
 
-                <div class="row" style="margin-top: 15px; margin-bottom: 5px">
+                <div class="row"> 
                     <div class="col-md-12">
-                        <label class="ingredient-label">Ingredients</label>
+                        <label class="ingredient-label">
+                            <label class="package-name float-label hide">Package name</label>
+                            <input type="hidden" id="tasteless_code-pack">
+                            <input type="text" class="hide"  name="packaging_id" id="packageid" >
+                            <input type="text" placeholder="Search Item ..." class="form-control rounded ingredient-input" id="itemDesc-pack" value="{{$item->packaging_id}}" required maxlength="100">
+                            <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-2-pack" style="display: none; top: 60px; width: 100%; color:red; padding:5px">
+                                <li class="text-center">Loading...</li>
+                            </ul>
+                        </label>
+                      <label class="collapse-butn btn collapsed" data-toggle="collapse" id="colbtn" aria-expanded="false" aria-controls="collapseTwo"></label>
+                          
                         <div class="ingredient-box" style="margin-bottom: 5px">
                             <table class="ingredient-table w-100" style="width: 100%;">
                                 <tbody id="ingredient-tbody" name="ingredient-added">
@@ -216,7 +208,8 @@
                             <div class="no-data-available text-center py-2" style="display: none;">
                                 <i class="fa fa-table"></i> <span>No ingredients currently save</span>
                             </div>
-                        </div> 
+                        </div>
+                        
                     </div>
                 </div>
                 <hr>
@@ -335,8 +328,7 @@
                     </div>
                 </div>
             </div>
- 
-                <button type="submit" id="sumit-form-button" class="btn btn-success  hide">+ Save data</button>
+  
             </form>
          
              <div class="panel-footer"> 
@@ -350,224 +342,92 @@
 <script>
     
     $(document).ready(function() {
-        
-        retrieve_ingredients();
-        showNoData(); 
-         let tableRow = 0;
-        
-
+       
+        retrieve_ingredients();  
         $('body').addClass('sidebar-collapse');
-        $(`.select`).select2({
-            width: '100%',
-            height: '100%' 
-        });
-       
-       
-
-         function retrieve_ingredients()
+        function retrieve_ingredients()
         {
-            let itemId = {{ $item->id }}+"";  // add lang "" for Add function hindi maging  `let itemId =` var pag walang $item->id sa response
-            
+            let itemId = "{{ $item->id }}";
+            $.ajax({
+                url: `/admin/production_items/get-data/${itemId}`,
+                type: "GET",
+                dataType: "json",
+                    success: function(data) {
+                                const obj =  data.ingredients; 
+                               // console.log(obj[0].description);
+
+                            $.each(obj, function(index) {
+
+                                //assign tableRow for ajax search
+                                tableRow = index;
+                                //console.log( tableRow + " retrieve_ingredients");
+
+                                console.log(obj[index]);
+                                //append retrieve ingredients from array base on reference
+                                const newRowHtml = generateRowHtml(index, obj[index].description, obj[index].quantity, obj[index].landed_cost,  obj[index].item_code);
+                                $(newRowHtml).appendTo('#ingredient-tbody');
+                                  
+                                 
+                               
+                            });
+                             $('#ProductionItems').find('input, select, textarea, button').prop('disabled', true);
+                    }
+            }); 
+           
             //Update Function retrieve Ingredients
-            if(itemId != "")
-            {
-                $.ajax({
-                    url: `/admin/production_items/get-data/${itemId}`,
-                    type: "GET",
-                    dataType: "json",
-                        success: function(data) {
-                                 const obj =  data.ingredients; 
-                                 console.log(obj[0].description);
-
-                                $.each(obj, function(index) {
-
-                                    //assign tableRow for ajax search
-                                    tableRow = index;
-                                    console.log( tableRow + " retrieve_ingredients");
-
-
-                                    //append retrieve ingredients from array base on reference
-                                    const newRowHtml = generateRowHtml(index, obj[index].description, obj[index].quantity, obj[index].landed_cost);
-                                    $(newRowHtml).appendTo('#ingredient-tbody');
-                                    initAutocomplete(`#itemDesc${index}`, index);
-                                    showNoData();    
-                                     $('#ProductionItems').find('input, select, textarea, button').prop('disabled', true);
-                                });
-                        }
-                }); 
-            }
-              
-        }
-  
-        function initAutocomplete(selector, rowId) {
-            const token = $("#token").val(); 
-            $(selector).autocomplete({
-                source: function (request, response) {
-                    $.ajax({
-                        url: "{{ route('item-search') }}",
-                        type: "POST",
-                        dataType: "json",
-                        data: { "_token": token, "search": request.term },
-                        success: function (data) {
-                            if (data.status_no == 1) {
-                                $(`#ui-id-2${rowId}`).hide();
-                                response($.map(data.items, item => ({
-                                    label: item.item_description,
-                                    value: item.item_description,
-                                    ...item
-                                })));
-                            } else {
-                                $('.ui-menu-item').remove();
-                                $('.addedLi').remove();
-                                const $ui = $(`#ui-id-2${rowId}`).html(`<i class="fa fa-exclamation fa-bounce "></i> ${data.message}`);
-                                $ui.toggle($('#itemDesc' + rowId).val().length > 0);
-                            }
-                        }
-                    });
-                },
-                select: function (event, ui) {
-                    const id = $(this).data("id");
-                    $(`#tasteless_code${id}`).val(ui.item.tasteless_code);
-                    $(`#itemDesc${id}`).val(ui.item.item_description);
-                    $(`#itemDesc${id}`).attr('data-cost', Number(ui.item.cost).toFixed(2));
-                    $(`#cost${id}`).val(Number(ui.item.cost).toFixed(2)).attr('readonly', true);
-                    calculateFinalValues();
-                    return false;
-                },
-                minLength: 1,
-                autoFocus: true
-            });
+            
+                
+             
         }
 
 
+         
+        
 
-          function generateRowHtml(rowId, Packaging, Quantity, Cost) {
+
+          function generateRowHtml(rowId, Packaging, Quantity, Cost, Item_code) {
             return `
-                 <tr class="tr-border slide-in-right ingredient-row" style="width: 100%; padding-top:10px;">
-                    <td class="packaging" style="width: 30%">
-                        <div style="position: relative;">
-                            <label>Packaging</label>
-                            <input type="hidden" name="ingredients[${rowId}][description]" id="tasteless_code${rowId}">
-                            <input type="text" placeholder="Search Item ..." class="form-control rounded ingredient-input" id="itemDesc${rowId}" data-id="${rowId}" value="${Packaging}" name="ingredients[${rowId}][description]" required maxlength="100">
-                            <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${rowId}" id="ui-id-2${rowId}" style="display: none; top: 60px; width: 100%; color:red; padding:5px">
-                                <li class="text-center">Loading...</li>
-                            </ul>
-                            <span class="error" id="display-error${rowId}"></span>
-                        </div>
-                    </td>
-                    <td style="width: 20%">
-                        <div style="position: relative;">
-                            <label>Quantity</label>
-                            <input type="text" class="form-control rounded  ingredient-quantity" id="quantity${rowId}" name="ingredients[${rowId}][quantity]" value="${Quantity}"  value="1" min="0" max="9999999999" step="any"  onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;" required>
-                        </div>
-                    </td>
-                    <td style="width: 20%">
-                        <div style="position: relative;">
-                            <label>Cost</label>
-                            <input type="text" class="form-control rounded cost-input" id="cost${rowId}" name="ingredients[${rowId}][cost]" value="${Cost}" readonly style="background-color: #eee;" required>
-                        </div>
-                    </td> 
-                </tr>
+                <tr class="tr-border slide-in-right ingredient-row" style="width: 100%; padding-top:10px;">
+                <td class="packaging" style="width: 30%">
+                    <div style="position: relative;">
+                        <label>Ingredient</label>
+                        <input type="hidden" name="ingredients[${rowId}][description]" value="${Item_code}" id="tasteless_code${rowId}">
+                        <input type="text" placeholder="Search Item ..." class="form-control rounded ingredient-input" id="itemDesc${rowId}" data-id="${rowId}" value="${Packaging}" name="ingredients[${rowId}][description]" required maxlength="100">
+                        <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${rowId}" id="ui-id-2${rowId}" style="display: none; top: 60px; width: 100%; color:red; padding:5px">
+                            <li class="text-center">Loading...</li>
+                        </ul>
+                        <span class="error" id="display-error${rowId}"></span>
+                    </div>
+                </td>
+                <td style="width: 20%">
+                    <div style="position: relative;">
+                        <label>Quantity</label>
+                        <input type="text" class="form-control rounded ingredient-quantity" id="quantity${rowId}" name="ingredients[${rowId}][quantity]" value="${Quantity}" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;" required>
+                    </div>
+                </td>
+                <td style="width: 20%">
+                    <div style="position: relative;">
+                        <label>Cost</label>
+                        <input type="text" class="form-control rounded cost-input" id="cost${rowId}" name="ingredients[${rowId}][cost]" value="${Cost}" readonly style="background-color: #eee;" required>
+                    </div>
+                </td>
+                <td style="width: 10%;">
+                    <div style="position: relative;">
+                        <label>Action</label><br>
+                        <button id="deleteRow${rowId}" name="removeRow" data-id="${rowId}" class="btn btn-danger removeRow">
+                            <i class="glyphicon glyphicon-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
             `;
         }
 
 
-
-
-        function validateFields() {
-            let isValid = true;
-
-            $(".itemDesc, .digits_code").each(function () {
-                const val = $(this).val();
-                if (!val) {
-                    showError("Please fill all Fields!");
-                    isValid = false;
-                    return false; // break out of loop
-                }
-            });
-
-            return isValid;
-        }
-
-        function showError(message) {
-            swal({
-                type: "error",
-                title: message,
-                icon: "error",
-                confirmButtonColor: "#367fa9",
-            });
-        }
-
-        function showNoData() {
-            const hasRows = $('.ingredient-table tbody tr').length;
-            if (hasRows === 0) {
-                $('.no-data-available').show();
-            } else {
-                $('.no-data-available').hide();
-            }
-        }
  
-
-          
-        // Calculate total storage cost
-        function calculateTotalStorage() { 
-            const storageCost = parseFloat($('#storage_cost').val()) || 0;
-            const storageMultiplier = parseFloat($('#storage_multiplier').val()) || 0;
-            const totalStorage = storageCost * storageMultiplier;
-            $('#total_storage_cost').val(totalStorage.toFixed(2));
-        }
-
-        $('#storage_cost, #storage_multiplier').on('input', calculateTotalStorage);
-
-        // Calculate final values
-        function calculateFinalValues() {
-            let ingredientsCost = 0;
-            
-            // Calculate ingredients cost
-            $('.ingredient-row').each(function() {
-                const $row = $(this);
-                const selectedOption = $row.find('.ingredient-input');
-                const cost = parseFloat(selectedOption.data('cost')) || 0;
-                const quantity = parseFloat($row.find('.ingredient-quantity').val()) || 0;
-                
-                ingredientsCost += cost * quantity;
-            }); 
-            const laborCost = parseFloat($('#labor_cost').val()) || 0;
-            const gasCost = parseFloat($('#gas_cost').val()) || 0;
-            const totalStorageCost = parseFloat($('#total_storage_cost').val()) || 0;
-            const depreciation = parseFloat($('#depreciation').val()) || 0;
-            const rawMastProvision = parseFloat($('#raw_mast_provision').val()) || 0;
-            const markupPercentage = parseFloat($('#markup_percentage').val()) || 0;
-            
-            const totalCost = ingredientsCost + laborCost + gasCost + totalStorageCost + depreciation;
-            const costWithProvision = totalCost * (1 + (rawMastProvision / 100));
-            const finalCost = costWithProvision * (1 + (markupPercentage / 100));
-            
-            // Round up to whole number
-            const finalValueVatex = Math.ceil(finalCost);
-            const finalValueVatinc = Math.ceil(finalCost * 1.12); // Assuming 12% VAT
-            
-            $('#final_value_vatex').val(finalValueVatex.toFixed(2));
-            $('#final_value_vatinc').val(finalValueVatinc.toFixed(2));
-        }
-
-
-      
-
-
-    
-         // Recalculate on any input change
-        $(document).on('input', '.ingredient-quantity', calculateFinalValues);
-        $(document).on('change', '.ingredient-input', calculateFinalValues);
-        $('#labor_cost, #gas_cost, #storage_cost, #storage_multiplier, #depreciation, #raw_mast_provision, #markup_percentage').on('input', function() {
-            calculateTotalStorage();
-            calculateFinalValues();
-        });
-
-        // Initial calculations
-        calculateTotalStorage();
-        calculateFinalValues();
-        $('#ProductionItems').find('input, select, textarea, button').prop('disabled', true);
+ 
+          $('#ProductionItems').find('input, select, textarea, button').prop('disabled', true);
+        
     });
 </script>
 @endpush

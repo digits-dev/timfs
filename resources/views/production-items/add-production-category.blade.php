@@ -187,19 +187,19 @@
             });
         </script>
         @endif
-        <form action="{{route('add-production-location-to-db')}}" method="POST" id="ProductionItems" enctype="multipart/form-data">
+        <form action="{{route('add-production-category-to-db')}}" method="POST" id="ProductionItems" enctype="multipart/form-data">
          @csrf   
 
                 <div class="panel-body">
                      <input name="id" value="{{$location->id}}" class="hide"/>
                       <div style="display:flex; align-items:center; gap:12px;">
-                          <label style="min-width:120px; margin-bottom:0;">Product location description</label>
-                          <input style="width:50%;" type="text" style="flex:1;" value="{{$location->production_location_description}}" class="form-control"   name="production_location_description" required />
+                          <label style="min-width:120px; margin-bottom:0;">Product category description</label>
+                          <input style="width:50%;" type="text" style="flex:1;" value="{{$location->category_description}}" class="form-control"   name="production_category_description" required />
                       </div>
                 </div>
  
                 <button type="submit" id="sumit-form-button" class="btn btn-success  hide">+ Save data</button>
-            </form>
+        </form>
          
              <div class="panel-footer">
                 <button id="save-datas" class="btn btn-success">+ Save datas</button>
@@ -217,8 +217,8 @@
         //to save data and list to Production Items List module
            $('#save-datas').on('click', function() {
            Swal.fire({
-                title: 'Do you want to save this production location?',
-                html:  `Doing so will create new production location.`,
+                 title: 'Do you want to save this production category?',
+                html:  `Doing so will save new production category.`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',

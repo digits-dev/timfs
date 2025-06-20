@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class NewPackaging extends Model
 {
     use HasFactory;
+    protected $table = 'new_packagings';
 
     public function getExportDetails($id = null) {
         if (isset($id)) {

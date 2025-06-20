@@ -1132,6 +1132,7 @@
 		}
 
 		public function exportItems(Request $request) {
+			//dd($request);
 			$filename = $request->input('filename');
 			return Excel::download(new ItemExport, $filename.'.xlsx');
 		}
