@@ -670,6 +670,7 @@ use App\NewPackaging;
 
 
 	public function addProductionItemsToDB(Request $request){
+		dd($request);
 		$message = '';
 		$time_stamp_now = date('Y-m-d H:i:s');
 			
@@ -1064,9 +1065,9 @@ use App\NewPackaging;
 			$data['production_location'] = DB::table('production_locations')
 				->where('status', 'ACTIVE') 
 				->get()
-				->toArray();
-				
- 
+				->toArray(); 
+	
+		
 
 			return $data;
 		}
@@ -1087,11 +1088,20 @@ use App\NewPackaging;
 					'items' => null
 				]);
 			} 
+ 
 
-			$items = ItemMaster::whereNotIn('tasteless_code', $existing)
+			$items = ItemMaster::select(
+				'id',
+				'tasteless_code',
+				'full_item_description',
+				'ttp',
+				'packaging_size') 
+			->whereNotIn('tasteless_code', $existing)
 			->whereRaw('(tasteless_code LIKE ? OR full_item_description LIKE ?)', ["%{$searchTerm}%", "%{$searchTerm}%"])
 			->take(50)
 			->get();
+
+
 
 
 
@@ -1109,10 +1119,11 @@ use App\NewPackaging;
 					'id' => $item->id,
 					'tasteless_code' => $item->tasteless_code,
 					'item_description' => $item->full_item_description,
-					'cost' => $item->landed_cost, 
+					'cost' => $item->ttp, 
+					'packaging_size' => $item->packaging_size, 
 				];
 			});
-
+			
 			return response()->json([
 				'status_no' => 1,
 				'items' => $formattedItems,
@@ -1156,8 +1167,14 @@ use App\NewPackaging;
 				
 			$unionquery = $query1->unionAll($query2)->get();
 			*/
+			
  
-			$query1 = NewPackaging::select('id', 'nwp_code as tasteless_code', 'item_description')
+
+			$query1 = NewPackaging::select('id',
+				'nwp_code as tasteless_code',
+				'item_description as full_item_description',
+				'ttp',
+				'packaging_size')
 				->whereNotIn('nwp_code', $existing)
 				->where(function($q) use ($searchTerm) {
 					$q->where('item_description', 'LIKE', '%' . $searchTerm . '%')
@@ -1165,7 +1182,11 @@ use App\NewPackaging;
 				})
 				->take(100);
 
-			$query2 = ItemMaster::select('id', 'tasteless_code', 'full_item_description as item_description')
+			$query2 = ItemMaster::select('id',
+				'tasteless_code',
+				'full_item_description',
+				'ttp',
+				'packaging_size')
 				->whereNotIn('tasteless_code', $existing)
 				->where(function($q) use ($searchTerm) {
 					$q->where('full_item_description', 'LIKE', '%' . $searchTerm . '%')
@@ -1179,6 +1200,10 @@ use App\NewPackaging;
 
 
 
+
+
+
+
 			if ($unionquery->isEmpty()) {
 				return response()->json([
 					'status_no' => 0,
@@ -1186,11 +1211,21 @@ use App\NewPackaging;
 					'items' => null
 				]);
 			}
- 
+			
+			$formattedItems = $unionquery->map(function ($items) {
+				return [
+					'id' => $items->id,
+					'tasteless_code' => $items->tasteless_code,
+					'item_description' => $items->full_item_description,
+					'cost' => $items->ttp, 
+					'packaging_size' => $items->packaging_size,  
+				];
+			});
+			
 
 			return response()->json([
 				'status_no' => 1,
-				'items' => $unionquery,
+				'items' => $formattedItems,
 				'values' => $existing
 			]);
 		}
