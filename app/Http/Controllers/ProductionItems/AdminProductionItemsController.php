@@ -670,7 +670,7 @@ use App\NewPackaging;
 
 
 	public function addProductionItemsToDB(Request $request){
-		dd($request);
+	 
 		$message = '';
 		$time_stamp_now = date('Y-m-d H:i:s');
 			
@@ -679,7 +679,7 @@ use App\NewPackaging;
 				'description' => 'required|string',
 				'production_category' => 'required|integer',
 				'production_location' => 'required|integer', 
-				'packaging_id' => 'required',
+				//'packaging_id' => 'required',
 				'labor_cost' => 'required|numeric|max:99999999.99',
 				'gas_cost' => 'required|numeric|max:99999999.99',
 				'storage_cost' => 'required|numeric|max:99999999.99',
@@ -847,23 +847,31 @@ use App\NewPackaging;
 			]);
 		}
 
-			$ingredients = $request->input('ingredients'); // get the array
-			if(count($ingredients) > 0)
-			{
-				foreach ($ingredients as $ingredient) {
-					self::ingredientSearchToItemMaster($ingredient['description'], $production_items_toDB->reference_number, $ingredient['quantity']);
+			$ingredients = $request->input('produtionlines'); // get the array
+			 
+			 
+
+			if (count($ingredients) > 0) {
+				foreach ($ingredients as $parentCode => $ingredientGroup) {
+					 
+					foreach ($ingredientGroup as $key => $ingredient) { 
+						self::ingredientSearchToItemMaster(
+						 
+							$production_items_toDB->reference_number,
+							$ingredient['tasteless_code'],
+							$ingredient['description'],
+							$ingredient['quantity'],
+							$ingredient['yield'],
+							$ingredient['cost'],
+							$parentCode
+						);
+					}
 				}
 			}
-			//loop each ingredients and save sa DB 	production_item_lines table
-			
-					
-				
-				$production_items_toDB->save();
-			
-			
-			
 
-			//return redirect()->back()->with('success', 'Production item saved successfully!');
+			//loop each ingredients and save sa DB 	production_item_lines table
+			 $production_items_toDB->save();
+			 //return redirect()->back()->with('success', 'Production item saved successfully!');
 			return redirect(CRUDBooster::mainpath())
 			->with([
 					'message_type' => 'success',
@@ -872,23 +880,19 @@ use App\NewPackaging;
 		
 	}
 
-		public function ingredientSearchToItemMaster($description, $reference_number, $quantity)
+		public function ingredientSearchToItemMaster($reference_number, $tasteless_code, $description, $quantity, $yield, $landed_cost, $packaging_id)
 		{ 
-			$item = DB::table('item_masters')
-				->where('full_item_description', $description)
-				->first();
-
-			if (!$item) { 
-				return null;
-			}
+			
 
 			$production_items_toDB = new ProductionItemLines();
 
 			$production_items_toDB->production_item_id = $reference_number;
-			$production_items_toDB->item_code = $item->tasteless_code;  
+			$production_items_toDB->item_code = $tasteless_code;  
 			$production_items_toDB->description = $description;
 			$production_items_toDB->quantity = $quantity;
-			$production_items_toDB->landed_cost = $item->landed_cost;
+			$production_items_toDB->landed_cost = $landed_cost;
+			$production_items_toDB->yield = $yield;
+			$production_items_toDB->packaging_id = $packaging_id;
 			$production_items_toDB->is_alternative = 1;
  
 			$production_items_toDB->save();
@@ -939,11 +943,12 @@ use App\NewPackaging;
 			 	*/  
 			} 
 			
-				$costings = self::costing();
+				$costings = self::costing(self::getItemDetails($id)->reference_number);
+				 
+			 
 
-				
-			 	$data = array_merge($data, $costings);
-
+			 	 $data = array_merge($data, $costings);
+			 	 //dd($data);
 				 
 				return $this->view('production-items/add-production-item',   $data);
 	}
@@ -979,11 +984,11 @@ use App\NewPackaging;
 			 	*/  
 			 
 			
-				$costings = self::costing();
+				$costings = self::costing(self::getItemDetails($id)->reference_number);
 
 				
 			 	$data = array_merge($data, $costings);
-			 
+				
 	 
 				return $this->view('production-items/detail-production-item',   $data); 
 	}
@@ -1013,45 +1018,22 @@ use App\NewPackaging;
 
 
 	public function getItemDetails($id) {
-			$item = DB::table('production_items')
-				->leftJoin('new_packagings', 'new_packagings.nwp_code', '=', 'production_items.packaging_id')
-				->leftJoin('item_masters', 'item_masters.tasteless_code', '=', 'production_items.packaging_id')
+			$item = DB::table('production_items') 
 				->select(
-					'production_items.packaging_id as code_name',
-					'production_items.id',
-					'production_items.reference_number',
-					'production_items.description',
-					'production_items.production_category',
-					'production_items.production_location',
-					 DB::raw('CASE when new_packagings.item_description is not null THEN new_packagings.item_description ELSE item_masters.full_item_description end as packaging_id'),
-					'production_items.labor_cost',
-					'production_items.gas_cost',
-					'production_items.utilities',
-					'production_items.storage_cost',
-					'production_items.storage_multiplier',
-					'production_items.total_storage_cost',
-					'production_items.storage_location',
-					'production_items.depreciation',
-					'production_items.raw_mast_provision',
-					'production_items.markup_percentage',
-					'production_items.final_value_vatex',
-					'production_items.final_value_vatinc',
-					'production_items.created_by',
-					'production_items.updated_by',
-					'production_items.created_at',
-					'production_items.updated_at'
+					 '*'
 				)
 				->where('production_items.id', $id)
 				->limit(1)
 				->first();
 
 
-			return $item;
+
+ 			return $item;
 		}
 
 
-	public function costing() {
-
+	public function costing($ref) {
+	 
 			$data = [];
 
 			$data['production_category'] = DB::table('production_item_categories')
@@ -1066,7 +1048,14 @@ use App\NewPackaging;
 				->where('status', 'ACTIVE') 
 				->get()
 				->toArray(); 
-	
+			$data['production_item_lines'] = DB::table('production_item_lines')
+			->select('production_item_lines.*', 'item_masters.ttp', 'item_masters.packaging_size')
+			->join('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
+			->where('production_item_lines.production_item_id', $ref)
+			->get()
+			->toArray();
+
+		 	 
 		
 
 			return $data;

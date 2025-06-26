@@ -18,9 +18,10 @@ class ProductionItemLines extends Model
         'description',
         'quantity',
         'landed_cost',
+        'yield',
+        'ingredient_qty',
         'is_alternative',
         'created_at',	
-        'updated_at'	
-
+        'updated_at'
     ];
 }

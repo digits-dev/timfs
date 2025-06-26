@@ -363,8 +363,8 @@
 <script>
     
     $(document).ready(function() {
-       
-        retrieve_ingredients();
+        //console.log(@json($production_item_lines));
+        
         is_noingredient = false;
          
         showNoData(); 
@@ -372,6 +372,73 @@
         
         let click_raw = false;
         
+        const production_item_lines = @json($production_item_lines);
+
+        production_item_lines.forEach(item => {
+            
+            if (item.item_code == item.packaging_id) {
+                
+                tableRow++;
+                const newRowHtml = generateRowingredientHtml(
+                    tableRow,
+                    item.item_code,
+                    item.description,
+                    item.ttp,
+                    item.quantity,
+                    item.yield,
+                    item.packaging_size,
+                    item.landed_cost
+                );
+                $(newRowHtml).appendTo('#ingredient-tbody');
+                initAutocomplete(`#itemDesc${tableRow}`, tableRow);
+                showNoData();
+             }    
+        });
+
+         
+       
+
+        $(document).ready(function() {
+        $('[id*="quantity"], [id*="tasteless_code"]').each(function() {
+            const eventInput = new Event('input', { bubbles: true });
+            const eventChange = new Event('change', { bubbles: true }); 
+            this.dispatchEvent(eventInput);
+            this.dispatchEvent(eventChange);
+        });
+        });
+
+
+
+
+
+
+         production_item_lines.forEach(item => {
+            
+            if (item.item_code != item.packaging_id) { 
+                tableRow++;
+                const matchingInputElement = $(`input[value="${item.packaging_id}"]`);
+                const matchingInputId = matchingInputElement.attr('id');
+                const matchingInput = matchingInputId ? matchingInputId.split("tasteless_code")[1] : ' wala pre ';
+                
+                const newRowHtml = Sub_gen_ingredient_row(
+                    tableRow,
+                    item.item_code,
+                    item.description,
+                    item.ttp,
+                    item.quantity,
+                    item.yield,
+                    item.packaging_size,
+                    item.landed_cost
+                );
+               // console.log(`.sub-ingredient${oldindex}`);
+                $(newRowHtml).appendTo(`.sub-ingredient${matchingInput}`); 
+                initAutocomplete(`#itemDesc${tableRow}`, tableRow); 
+             }    
+        });
+
+
+
+
 
         $('body').addClass('sidebar-collapse');
         $(`.select`).select2({
@@ -382,12 +449,8 @@
         $("#add-Row").click(function () { 
             tableRow++;
             console.log( tableRow + " dd-Row");
-            const newRowHtml = generateRowHtml(tableRow,"","","");
+            const newRowHtml = generateRowHtml(tableRow, "", "", "", "", "", "", "");
              $(newRowHtml).appendTo('#package-tbody');
-
-
-               
-
             PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
             showNoData();
         });
@@ -395,7 +458,7 @@
          $("#add-Row-ingredient").click(function () { 
             tableRow++;
             console.log( tableRow + " dd-Row");
-            const newRowHtml = generateRowingredientHtml(tableRow,"","","");
+            const newRowHtml = generateRowingredientHtml(tableRow, "", "", "", "", "", "", "");
             $(newRowHtml).appendTo('#ingredient-tbody'); 
             initAutocomplete(`#itemDesc${tableRow}`, tableRow); 
             showNoData();
@@ -422,35 +485,8 @@
             PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
         });
 
-        function retrieve_ingredients()
-        {
-            let itemId = "{{ $item->id }}";
-            $.ajax({
-                url: `/admin/production_items/get-data/${itemId}`,
-                type: "GET",
-                dataType: "json",
-                    success: function(data) {
-                                const obj =  data.ingredients; 
-                               // console.log(obj[0].description);
-
-                            $.each(obj, function(index) {
-
-                                //assign tableRow for ajax search
-                                tableRow = index;
-                                //console.log( tableRow + " retrieve_ingredients");
-
-                                console.log(obj[index]);
-                                //append retrieve ingredients from array base on reference
-                                const newRowHtml = generateRowHtml(index, obj[index].description, obj[index].quantity, obj[index].landed_cost,  obj[index].item_code);
-                                $(newRowHtml).appendTo('#ingredient-tbody');
-                                initAutocomplete(`#itemDesc${index}`, index);
-                                
-                                showNoData();    
-                            });
-                    }
-            });  
-        }
-
+        
+       
 
         function PackagingSearchInit(selector, rowId) {
            const token = $("#token").val();   
@@ -502,7 +538,7 @@
                   const curid = $(this).attr("id"); 
                   var id = curid.split("itemDesc")[1];
                     console.log(id);
-                    $(`#tasteless_code${id}`).val(ui.item.tasteless_code);
+                    $(`#tasteless_code${id}`).val(ui.item.tasteless_code).trigger('change');
                     $(`#itemDesc${id}`).val(ui.item.item_description); 
                     $(`#ttp${id}`).val(Number(ui.item.cost).toFixed(2)).attr('readonly', true);
                     $(`#pack-size${id}`).val(ui.item.packaging_size);  
@@ -518,7 +554,7 @@
         }
     
 
-        
+       
         function initAutocomplete(selector, rowId) {
             const token = $("#token").val();   
             console.log(rowId + 'pogi');
@@ -569,14 +605,15 @@
                 select: function (event, ui) {
                   const curid = $(this).attr("id"); 
                   var id = curid.split("itemDesc")[1];
-                    console.log(id);
-                    $(`#tasteless_code${id}`).val(ui.item.tasteless_code);
+                    
+                    $(`#tasteless_code${id}`).val(ui.item.tasteless_code).trigger('change');
                     $(`#itemDesc${id}`).val(ui.item.item_description); 
                     $(`#ttp${id}`).val(Number(ui.item.cost).toFixed(2)).attr('readonly', true);
                     $(`#pack-size${id}`).val(ui.item.packaging_size); 
                      $(`#quantity${rowId}`).val('1').trigger('change'); 
                     //packaging_size
-                   
+                  
+
                     calculateFinalValues();
                     return false;
                 },
@@ -588,16 +625,16 @@
 
 
 
-            function Sub_gen_ingredient_row(rowId, Packaging, Quantity, Cost, Item_code)
+            function Sub_gen_ingredient_row(rowId, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost)
           {
             return `  
-                <div class="substitute-packaging" id="ingredient-entry${rowId}">
+                <div class="substitute-packaging" id="ingredient-entry${rowId}" >
                 <div class="packaging-inputs">
-                        <label class="packaging-label">
+                       <label class="packaging-label">
                             <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
-                                <input value="" type="text" id="tasteless_code${rowId}" class="packaging form-control hidden" required/>
-                                <input value="" type="text" id="itemDesc${rowId}" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                                <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" name="produtionlines[${rowId}][][tasteless_code]"  class="packaging form-control hidden" required/>
+                                <input value="${itemDesc}" type="text" id="itemDesc${rowId}" name="produtionlines[${rowId}][][description]" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
                                 <div class="item-list">
                                       <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"  id="ui-id-2${rowId}" style="display: none;  width: 120px; color:red; padding:5px;">
                                 <li class="text-center">Loading...</li>
@@ -609,16 +646,16 @@
                         </label>
                         <label>
                             <span class="required-star">*</span> Preparation Qty
-                            <input value="" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any"/>
+                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any"/>
                         </label> 
                        
                         <label class="label-wide">
                             <span class="required-star">*</span> Yield %
-                            <input value="" class="form-control yield" id="yield${rowId}" type="number" required>
+                            <input value="${yiel}" class="form-control yield" id="yield${rowId}" type="number" required>
                         </label>
                         <label class="label-wide">
                             <span class="required-star">*</span> TTP <span class="date-updated"></span>
-                            <input value="" class="form-control ttp" id="ttp${rowId}" type="number" readonly required>
+                            <input value="${ttp}" class="form-control ttp" id="ttp${rowId}" type="number" readonly required>
                         </label>
                         
                         <label>
@@ -627,22 +664,22 @@
                         </label>
                         <label>
                             <span class="required-star">*</span> Packaging Size
-                           <input value="" class="form-control pack-quantity" id="pack-size${rowId}" type="number" readonly required>
+                           <input value="${packsize}" class="form-control pack-quantity" id="pack-size${rowId}" type="number" readonly required>
                         </label>
                         <label>
                             <span class="required-star">*</span> Ingredient Cost
-                            <input value="" id="cost${rowId}" class="form-control cost" type="text" readonly required>
+                            <input value="${cost}" id="cost${rowId}" class="form-control cost" type="text" readonly required>
                         </label>
                 </div>
                 <div class="actions">
-                    <button class="btn btn-info set-primary" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
+                    <button class="btn btn-info set-primary" id="set-primary${rowId}" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
                     <button class="btn btn-danger delete-sub" title="Delete Ingredient" type="button"> <i class="fa fa-minus" ></i></button>
                 </div>
             </div> 
             `;
           }
 
-          function generateRowingredientHtml(rowId, Packaging, Quantity, Cost, Item_code) {
+          function generateRowingredientHtml(rowId, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost) {
             return ` 
             
                 <div class="packaging-wrapper" id="ingredient-entry${rowId}">
@@ -651,8 +688,8 @@
                         <label class="packaging-label">
                             <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
-                                <input value="" type="text" id="tasteless_code${rowId}" class="packaging form-control hidden" required/>
-                                <input value="" type="text" id="itemDesc${rowId}" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                                <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" name="produtionlines[${rowId}][][tasteless_code]"  class="packaging form-control hidden" required/>
+                                <input value="${itemDesc}" type="text" id="itemDesc${rowId}" name="produtionlines[${rowId}][][description]" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
                                 <div class="item-list">
                                       <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"  id="ui-id-2${rowId}" style="display: none;  width: 120px; color:red; padding:5px;">
                                 <li class="text-center">Loading...</li>
@@ -664,16 +701,16 @@
                         </label>
                         <label>
                             <span class="required-star">*</span> Preparation Qty
-                            <input value="" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any"/>
+                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any"/>
                         </label> 
                        
                         <label class="label-wide">
                             <span class="required-star">*</span> Yield %
-                            <input value="" class="form-control yield" id="yield${rowId}" type="number" required>
+                            <input value="${yiel}" class="form-control yield" id="yield${rowId}" type="number" required>
                         </label>
                         <label class="label-wide">
                             <span class="required-star">*</span> TTP <span class="date-updated"></span>
-                            <input value="" class="form-control ttp" id="ttp${rowId}" type="number" readonly required>
+                            <input value="${ttp}" class="form-control ttp" id="ttp${rowId}" type="number" readonly required>
                         </label>
                         
                         <label>
@@ -682,11 +719,11 @@
                         </label>
                         <label>
                             <span class="required-star">*</span> Packaging Size
-                           <input value="" class="form-control pack-quantity" id="pack-size${rowId}" type="number" readonly required>
+                           <input value="${packsize}" class="form-control pack-quantity" id="pack-size${rowId}" type="number" readonly required>
                         </label>
                         <label>
                             <span class="required-star">*</span> Ingredient Cost
-                            <input value="" id="cost${rowId}" class="form-control cost" type="text" readonly required>
+                            <input value="${cost}" id="cost${rowId}" class="form-control cost" type="text" readonly required>
                         </label>
                     </div>
                     <div class="actions">
@@ -716,8 +753,8 @@
                       <label class="packaging-label">
                             <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
-                                <input value="" type="text" id="tasteless_code${rowId}" class="packaging form-control hidden" required/>
-                                <input value="" type="text" id="itemDesc${rowId}" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                                <input value="" type="text" id="tasteless_code${rowId}"     class="packaging form-control hidden" required/>
+                                <input value="" type="text" id="itemDesc${rowId}"      class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
                                 <div class="item-list">
                                       <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"  id="ui-id-2${rowId}" style="display: none;  width: 120px; color:red; padding:5px;">
                                 <li class="text-center">Loading...</li>
@@ -749,7 +786,7 @@
                         </label>
                 </div>
                 <div class="actions">
-                    <button class="btn btn-info set-primary" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
+                    <button class="btn btn-info set-primary" id="set-primary${rowId}" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
                     <button class="btn btn-danger delete-sub" title="Delete Ingredient" type="button"> <i class="fa fa-minus" ></i></button>
                 </div>
             </div> 
@@ -758,14 +795,15 @@
 
           function generateRowHtml(rowId, Packaging, Quantity, Cost, Item_code) {
             return `  
+                 
                 <div class="packaging-wrapper" id="packaging-entry${rowId}">
                 <div class="packaging-entry" isExisting="true">
                     <div class="packaging-inputs">
                         <label class="packaging-label">
                             <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
-                                <input value="" type="text" id="tasteless_code${rowId}" class="packaging form-control  hidden" required/>
-                                <input value="" type="text" id="itemDesc${rowId}" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                                <input value="" type="text" id="tasteless_code${rowId}"   class="packaging form-control  hidden" required/>
+                                <input value="" type="text" id="itemDesc${rowId}"   class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
                                 <div class="item-list">
                                 </div>
                                 <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${rowId}" id="ui-id-2${rowId}" style="display: none; top: 75px; width: 9%; color:red; padding:5px; left: 15px;">
@@ -807,8 +845,7 @@
                 <div  class="add-sub-btn-pack" title="Add Substitute Packaging">
                     <i class="fa fa-plus"></i>
                 </div> 
-            </div>
-                <br>
+            </div> 
             `;
         }
 
@@ -931,7 +968,7 @@
            
         });
 
-         
+        /* 
         $('#ProductionItems').on('submit', function() {
         Swal.fire({
             title: 'Loading...',
@@ -943,7 +980,7 @@
             },
             });
         });
-
+        */
          // Recalculate on any input change
         $(document).on('input', '.ingredient-quantity', calculateFinalValues);
         $(document).on('change', '.ingredient-input', calculateFinalValues);
@@ -951,7 +988,7 @@
                   
                 var id = $(this).attr('id');
                 var lastChar = id.split("quantity")[1] || id.split("yield")[1];
-                 console.log(lastChar);
+                console.log(lastChar);
                 const yieldInput = $(`#yield${lastChar}`).val() || 0;
                 console.log(yieldInput);
 
@@ -998,6 +1035,89 @@
 
 
              
+       $(document).on('click', '[id*="set-primary"]', function() {
+            const $sub = $(this).closest('.substitute-packaging');
+            $sub.siblings().css('background', '#fff');
+            $sub.css('background', '#ffe662');
+
+            const wrapperId = $(this).closest('.packaging-wrapper').attr('id') || '';
+            const id = wrapperId.replace(/\D/g, '');  // just keep digits
+
+            const clickedId = $(this).attr('id').replace(/\D/g, '');
+
+            const newPrimary = $(`#tasteless_code${clickedId}`).val();
+
+            $(`#tasteless_code${id}`).val(newPrimary).trigger('change');
+        });
+
+
+     
+
+
+     
+       
+
+
+
+        function updateparents(id)
+        {
+            // parennt_code = $(`tasteless_code${id}`).val()
+            // $(`tasteless_code${id}`).attr('name', `produtionlines[${parennt_code}][tasteless_code]`);
+            // $(`#itemDesc${id}`).attr('name', `produtionlines[${parennt_code}][description]`);
+            var ids = $(id).attr('id');
+            var lastChar = ids.split("tasteless_code")[1];
+             parennt_code = $(id).val();
+             console.log( parennt_code);
+        }
+
+
+        //this logic is for updating subparent base on closest tasteless_code id from packaging-wrapper
+       $(document).on('input change', 'input[id^="tasteless_code"]', function() {
+            const $wrapper = $(this).closest('.packaging-wrapper');
+
+            // Get current parent id from packaging-wrapper tasteless_code input
+            const parentid = $wrapper.find('input[id^="tasteless_code"]').val();
+
+            // Get old parentid stored on this input (or initialize)
+            const oldParentId = $(this).data('oldParentId') || null;
+
+            // Update this input's stored parentid
+            $(this).data('oldParentId', parentid);
+
+            // Update this input's name attribute
+            var idsub = $(this).attr('id');
+            var lastCharsub = idsub.split("tasteless_code")[1]; 
+            $(this).attr('name', `produtionlines[${parentid}][${lastCharsub}][tasteless_code]`); 
+            $(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][description]`); 
+            $(`#quantity${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][quantity]`);
+            $(`#yield${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][yield]`); 
+            $(`#cost${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][cost]`);
+
+            // If parentid changed (or oldParentId is null first time), update all sub inputs
+            if (parentid !== oldParentId) {
+                $wrapper.find('[class^="sub-ingredient"], [class^="sub-pack"]').find('input').each(function() {
+                    var subId = $(this).attr('id') || '';
+                    var subLastChar = subId.split("tasteless_code")[1] || '';
+                    if (subLastChar) {
+                        const ids =  subId.split("tasteless_code")[1]
+                        
+                        $(this).attr('name', `produtionlines[${parentid}][${subLastChar}][tasteless_code]`); 
+                        $(`#itemDesc${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][description]`); 
+                        $(`#quantity${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][quantity]`);
+                        $(`#yield${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][yield]`); 
+                        $(`#cost${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][cost]`); 
+
+                    }
+                });
+            }
+        });
+
+
+
+
+
+
+
         $('#ingredient_cost, #packaging_cost, #labor_cost, #gas_cost, #storage_cost, #storage_multiplier, #depreciation, #raw_mast_provision, #markup_percentage').on('input', function() {
             calculateTotalStorage();
             calculateFinalValues();
@@ -1008,14 +1128,15 @@
             click_raw = true;
         });
         
-        
-    });
 
 
 
 
 
-    //Added code
+
+
+
+        //Added code
 
 
 
@@ -1027,11 +1148,7 @@
             let sibling = entry.prev();
             while (sibling.length && sibling.is('br')) {
                 sibling = sibling.prev();
-            }
-
-            if (!sibling.length) return;
-
-            
+            } 
             $(sibling).animate(
                 {
                     top: `+=${entry.outerHeight()}`,
@@ -1237,6 +1354,10 @@
             //for primary button tsaka na to
             console.log('setted primary');
         });
+        
+    });
+
+ 
       
 </script>
 @endpush
