@@ -84,216 +84,214 @@
 
 
 
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="" class="control-label">Description</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                           <input type="text" value="{{$item->description}}" class="form-control rounded" name="description" placeholder="description" aria-describedby="basic-addon1" required />
-                       </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Packaging Cost</label>
-                        <div class="input-group">
-                           <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                             <input type="text" value="" class="form-control rounded" name="packaging_cost" id="packaging_cost" placeholder="Packaging cost" aria-describedby="basic-addon1" />
-                        </div>
-                        </div>
-                    </div>
-                </div>
-                  <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Ingredient Cost</label>
-                        <div class="input-group">
-                           <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                             <input type="text" value="" class="form-control rounded" name="ingredient_cost" id="ingredient_cost" placeholder="Ingredient cost" aria-describedby="basic-addon1" />
-                        </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Production Category</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <span class="custom-icon"><strong>₱</strong></span>
-                            </div>
-                             <select class="form-control select" id="production_category" name="production_category" required>
-                                    <option value=""  selected>Select Category</option>
-                                    @foreach($production_category as $category)
-                                        <option value="{{ $category->id }}" {{ old('production_category', $item->production_category) == $category->id ? 'selected' : '' }}>
-                                            {{ $category->category_description }}
-                                        </option>
-                                    @endforeach
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Production Location</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                            <select class="form-control select" id="production_location" name="production_location" required>
-                                <option value="">Select Location</option>
-                                @foreach($production_location as $location)
-                                    <option value="{{ $location->id }}" {{ old('production_location', $item->production_location) == $location->id ? 'selected' : '' }}>
-                                        {{ $location->production_location_description }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Labor Cost</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                             <input type="text" value="{{$item->labor_cost}}" class="form-control rounded" name="labor_cost" id="labor_cost" placeholder="Labor cost" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Storage Multiplier</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                             <input type="text" value="{{$item->storage_multiplier}}"  class="form-control rounded" name="storage_multiplier" id="storage_multiplier" placeholder="Storage multiplier" aria-describedby="basic-addon1" />
-                           </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Storage Cost</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                            <input type="text" value="{{$item->storage_cost}}" class="form-control rounded" name="storage_cost" id="storage_cost" placeholder="Storage cost" aria-describedby="basic-addon1" />
-                            </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Gas Cost</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                             <input type="text" value="{{$item->gas_cost}}" class="form-control rounded" name="gas_cost" id="gas_cost" placeholder="Gas cost" aria-describedby="basic-addon1" />
-                     </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Mark Up %</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                           <input type="text"  value="{{$item->markup_percentage}}" class="form-control rounded" name="markup_percentage" id="markup_percentage" placeholder="Mark up percentage" aria-describedby="basic-addon1" />
-                </div>
-                    </div>
-                </div>
-                 
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Depreciation</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                           <input type="text" value="{{$item->depreciation}}"  class="form-control rounded" name="depreciation" id="depreciation" placeholder="Depreciation" aria-describedby="basic-addon1" />
-                           </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Raw Mast Provision</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                           <input type="text"  value="{{$item->raw_mast_provision}}" class="form-control rounded" name="raw_mast_provision" id="raw_mast_provision" value="5" placeholder="Raw mass provision" aria-describedby="basic-addon1" />
-                          </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Total Storage Cost</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                            <input type="text" value="{{$item->total_storage_cost}}"  class="form-control rounded" name="total_storage_cost" id="total_storage_cost" placeholder="Total storage cost" aria-describedby="basic-addon1" readonly/>
-                         </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="" class="control-label">Storage Location</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-sticky-note"></i>
-                            </div>
-                            <select class="form-control select" class="form-control rounded" name="storage_location" id="storage_location" required>
-                                    <option value="">Select Location</option>
-                                    @foreach($storage_location as $location)
-                                        <option value="{{ $location->id }}" {{ old('storage_location', $item->storage_location) == $location->id ? 'selected' : '' }}>
-                                            {{ $location->storage_location_description }}
-                                        </option>
-                                    @endforeach
-                            </select>
-                        </div>
-                    </div>
-                </div>
+               <div class="col-md-4">
+    <div class="form-group">
+        <label for="" class="control-label">Description</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+           <input type="text" value="{{$item->description}}" class="form-control rounded" name="description" placeholder="description" aria-describedby="basic-addon1" required />
+       </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Packaging Cost</label>
+        <div class="input-group">
+           <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+             <input type="text" value="" class="form-control rounded" name="packaging_cost" id="packaging_cost" placeholder="Packaging cost" aria-describedby="basic-addon1" required />
+        </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Ingredient Cost</label>
+        <div class="input-group">
+           <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+             <input type="text" value="" class="form-control rounded" name="ingredient_cost" id="ingredient_cost" placeholder="Ingredient cost" aria-describedby="basic-addon1" required />
+        </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Production Category</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <span class="custom-icon"><strong>₱</strong></span>
+            </div>
+             <select class="form-control select" id="production_category" name="production_category" required>
+                    <option value=""  selected>Select Category</option>
+                    @foreach($production_category as $category)
+                        <option value="{{ $category->id }}" {{ old('production_category', $item->production_category) == $category->id ? 'selected' : '' }}>
+                            {{ $category->category_description }}
+                        </option>
+                    @endforeach
+            </select>
+        </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Production Location</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+            <select class="form-control select" id="production_location" name="production_location" required>
+                <option value="">Select Location</option>
+                @foreach($production_location as $location)
+                    <option value="{{ $location->id }}" {{ old('production_location', $item->production_location) == $location->id ? 'selected' : '' }}>
+                        {{ $location->production_location_description }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Labor Cost</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+             <input type="text" value="{{$item->labor_cost}}" class="form-control rounded" name="labor_cost" id="labor_cost" placeholder="Labor cost" aria-describedby="basic-addon1" required />
+        </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Storage Multiplier</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+             <input type="text" value="{{$item->storage_multiplier}}"  class="form-control rounded" name="storage_multiplier" id="storage_multiplier" placeholder="Storage multiplier" aria-describedby="basic-addon1" required />
+           </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Storage Cost</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+            <input type="text" value="{{$item->storage_cost}}" class="form-control rounded" name="storage_cost" id="storage_cost" placeholder="Storage cost" aria-describedby="basic-addon1" required />
+            </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Gas Cost</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+             <input type="text" value="{{$item->gas_cost}}" class="form-control rounded" name="gas_cost" id="gas_cost" placeholder="Gas cost" aria-describedby="basic-addon1" required />
+     </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Mark Up %</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+           <input type="text"  value="{{$item->markup_percentage}}" class="form-control rounded" name="markup_percentage" id="markup_percentage" placeholder="Mark up percentage" aria-describedby="basic-addon1" required />
+        </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Depreciation</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+           <input type="text" value="{{$item->depreciation}}"  class="form-control rounded" name="depreciation" id="depreciation" placeholder="Depreciation" aria-describedby="basic-addon1" required />
+           </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Raw Mast Provision</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+           <input type="text"  value="{{$item->raw_mast_provision}}" class="form-control rounded" name="raw_mast_provision" id="raw_mast_provision" value="5" placeholder="Raw mass provision" aria-describedby="basic-addon1" required />
+          </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Total Storage Cost</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+            <input type="text" value="{{$item->total_storage_cost}}"  class="form-control rounded" name="total_storage_cost" id="total_storage_cost" placeholder="Total storage cost" aria-describedby="basic-addon1" readonly />
+         </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="form-group">
+        <label for="" class="control-label">Storage Location</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-sticky-note"></i>
+            </div>
+            <select class="form-control select" class="form-control rounded" name="storage_location" id="storage_location" required>
+                    <option value="">Select Location</option>
+                    @foreach($storage_location as $location)
+                        <option value="{{ $location->id }}" {{ old('storage_location', $item->storage_location) == $location->id ? 'selected' : '' }}>
+                            {{ $location->storage_location_description }}
+                        </option>
+                    @endforeach
+            </select>
+        </div>
+    </div>
+</div>
 
-
-
-                <br>
-                 <div class="col-md-12">
-                     <div class="col-md-8"> 
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="" class="control-label">Final Value(VATEX)</label>
-                            <div class="input-group">
-                                <div class="input-group-addon">
-                                    <i class="fa fa-sticky-note"></i>
-                                </div>
-                              <input type="text" value="{{$item->final_value_vatex}}" class="form-control rounded" name="final_value_vatex" id="final_value_vatex" placeholder="Final value vatex" aria-describedby="basic-addon1" readonly />
-                              </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="" class="control-label">Final Value(VATINC)</label>
-                            <div class="input-group">
-                                <div class="input-group-addon">
-                                    <i class="fa fa-sticky-note"></i>
-                                </div>
-                                  <input type="text"  value="{{$item->final_value_vatinc}}" class="form-control rounded" name="final_value_vatinc" id="final_value_vatinc" placeholder="Fina value vatinc" aria-describedby="basic-addon1" readonly />
-                           </div>
-                        </div>
-                    </div>
+<br>
+ <div class="col-md-12">
+     <div class="col-md-8"> 
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <label for="" class="control-label">Final Value(VATEX)</label>
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-sticky-note"></i>
                 </div>
+              <input type="text" value="{{$item->final_value_vatex}}" class="form-control rounded" name="final_value_vatex" id="final_value_vatex" placeholder="Final value vatex" aria-describedby="basic-addon1" readonly />
+              </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <label for="" class="control-label">Final Value(VATINC)</label>
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-sticky-note"></i>
+                </div>
+                  <input type="text"  value="{{$item->final_value_vatinc}}" class="form-control rounded" name="final_value_vatinc" id="final_value_vatinc" placeholder="Fina value vatinc" aria-describedby="basic-addon1" readonly />
+           </div>
+        </div>
+    </div>
+</div>
+
         <hr>
          <div class="row">
                 
@@ -308,9 +306,9 @@
                         <div id="package-tbody" name="package-added" >
                             <!-- Rows injected by JS -->
                         </div>
-                    </div>
-                    <div class="no-data-available text-center py-2" style="display: none;">
-                        <i class="fa fa-table"></i> <span>No Packaging currently save</span>
+                    </div> 
+                      <div class="no-data-available text-center py-2" style="display: none;">
+                        <i style="font-style: italic; color: #6c757d;" class="fa fa-table"></i> <span style="font-style: italic; color: #6c757d;">No Packaging currently save</span>
                     </div>
                 </div>
 
@@ -328,21 +326,21 @@
                             <!-- Rows injected by JS -->
                         </div>
                     </div> 
-                     <div class="no-data-available-ingredient text-center py-2" style="display: none;">
-                        <i class="fa fa-table"></i> <span>No ingredients currently save</span>
+                    <div class="no-data-available-ingredient text-center py-2" style="display: none;">
+                        <i style="font-style: italic; color: #6c757d;" class="fa fa-table"></i> <span style="font-style: italic; color: #6c757d;">No ingredients currently save</span>
                     </div>
+
                 </div>
                 <br>
+                 <br>  
                 <a class="btn btn-primary" id="add-Row"><i class="fa fa-plus"></i> Add New Packaging</a>
                 <a class="btn btn-success" id="add-Row-ingredient"><i class="fa fa-plus"></i> Add New Ingredient</a>
             </div>
            
-                
-                
-                
+             
             </div>
     </div>
-
+                <br>   
  
                 <button type="submit" id="sumit-form-button" class="btn btn-success  hide">+ Save data</button>
             </form>
@@ -355,6 +353,7 @@
                 @endif
                 <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-link'>← Back</a>
             </div>
+ 
     </div>
 
 @push('bottom')
@@ -367,7 +366,7 @@
         //for showing message no package or ingredients found 
         is_noingredient = false;
         showNoData(); 
-
+    showNoDataIngredient();
         //for adding table row assigning unique ids
         let tableRow = 0;
         
@@ -377,26 +376,46 @@
         //loading ingredient and packaging data from contoller
         const production_item_lines = @json($production_item_lines);
 
-
+        console.log(production_item_lines);
         //looping for parent packeaging/ingredients
         production_item_lines.forEach(item => {
             
             if (item.item_code == item.packaging_id) {
-                
-                tableRow++;
-                const newRowHtml = generateRowingredientHtml(
-                    tableRow,
-                    item.item_code,
-                    item.description,
-                    item.ttp,
-                    item.quantity,
-                    item.yield,
-                    item.packaging_size,
-                    item.landed_cost
-                );
-                $(newRowHtml).appendTo('#ingredient-tbody');
-                IngredientSearch(`#itemDesc${tableRow}`, tableRow);
-                showNoData();
+                if(item.yield == null) 
+                {
+                     tableRow++;
+
+                     //function Sub_gen_pack_row(rowId, tasteless_code, quantity, cost, description)
+                    const newRowHtml = generateRowHtml(
+                        tableRow,
+                        item.item_code,
+                        item.quantity,
+                        item.landed_cost,  
+                        item.description,
+                    );
+                    $(newRowHtml).appendTo('#package-tbody');
+                    PackagingSearchInit(`#itemDesc${tableRow}`, tableRow);
+                        showNoDataIngredient();
+                }
+                else
+                {
+                    tableRow++;
+                    const newRowHtml = generateRowingredientHtml(
+                        tableRow,
+                        item.item_code,
+                        item.description,
+                        item.ttp,
+                        item.quantity,
+                        item.yield,
+                        item.packaging_size,
+                        item.landed_cost
+                    );
+                    $(newRowHtml).appendTo('#ingredient-tbody');
+                    IngredientSearch(`#itemDesc${tableRow}`, tableRow);
+                    showNoData();
+
+                }
+               
              }    
         });
 
@@ -420,24 +439,45 @@
          production_item_lines.forEach(item => {
             
             if (item.item_code != item.packaging_id ) { 
-                tableRow++;
-                const matchingInputElement = $(`input[value="${item.packaging_id}"]`);
-                const matchingInputId = matchingInputElement.attr('id');
-                const matchingInput = matchingInputId ? matchingInputId.split("tasteless_code")[1] : '';
+                if(item.yield == null) 
+                {
+                    tableRow++;
+                    const matchingInputElement = $(`input[value="${item.packaging_id}"]`);
+                    const matchingInputId = matchingInputElement.attr('id');
+                    const matchingInput = matchingInputId ? matchingInputId.split("tasteless_code")[1] : '';
+                    
+                    const newRowHtml = Sub_gen_pack_row(
+                        tableRow,
+                        item.item_code,
+                        item.quantity,
+                        item.landed_cost,  
+                        item.description,
+                    );
+                    // console.log(`.sub-ingredient${oldindex}`);
+                    $(newRowHtml).appendTo(`.sub-pack${matchingInput}`); 
+                    PackagingSearchInit(`#itemDesc${tableRow}`, tableRow);
+                }else
+                {
+                    tableRow++;
+                    const matchingInputElement = $(`input[value="${item.packaging_id}"]`);
+                    const matchingInputId = matchingInputElement.attr('id');
+                    const matchingInput = matchingInputId ? matchingInputId.split("tasteless_code")[1] : '';
+                    
+                    const newRowHtml = Sub_gen_ingredient_row(
+                        tableRow,
+                        item.item_code,
+                        item.description,
+                        item.ttp,
+                        item.quantity,
+                        item.yield,
+                        item.packaging_size,
+                        item.landed_cost
+                    );
+                // console.log(`.sub-ingredient${oldindex}`);
+                    $(newRowHtml).appendTo(`.sub-ingredient${matchingInput}`); 
+                    IngredientSearch(`#itemDesc${tableRow}`, tableRow);
+                }
                 
-                const newRowHtml = Sub_gen_ingredient_row(
-                    tableRow,
-                    item.item_code,
-                    item.description,
-                    item.ttp,
-                    item.quantity,
-                    item.yield,
-                    item.packaging_size,
-                    item.landed_cost
-                );
-               // console.log(`.sub-ingredient${oldindex}`);
-                $(newRowHtml).appendTo(`.sub-ingredient${matchingInput}`); 
-                IngredientSearch(`#itemDesc${tableRow}`, tableRow); 
              }    
         });
 
@@ -454,10 +494,11 @@
         $("#add-Row").click(function () { 
             tableRow++;
             console.log( tableRow + " dd-Row");
-            const newRowHtml = generateRowHtml(tableRow, "", "", "", "", "", "", "");
+            const newRowHtml = generateRowHtml(tableRow, "", "", "", "");
              $(newRowHtml).appendTo('#package-tbody');
             PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
             showNoData();
+                showNoDataIngredient();
         });
 
          $("#add-Row-ingredient").click(function () { 
@@ -467,14 +508,15 @@
             $(newRowHtml).appendTo('#ingredient-tbody'); 
             IngredientSearch(`#itemDesc${tableRow}`, tableRow); 
             showNoData();
+                showNoDataIngredient();
         });
         
 
 
         $(document).on('click', '.add-sub-btn', function(event) {
             tableRow++;
-            const parentId = $(this).parent().attr('id').split("ingredient-entry")[1];  
-            const newRowPackHtml = Sub_gen_ingredient_row(tableRow,"","","");  
+            const parentId = $(this).parent().attr('id').split("ingredient-entry")[1];   
+            const newRowPackHtml = Sub_gen_ingredient_row(tableRow, "", "", "", "", "", "", "");  
             $(newRowPackHtml).appendTo(`.sub-ingredient${parentId}`);
             console.log(parentId);
             IngredientSearch(`#itemDesc${tableRow}`, tableRow); 
@@ -484,7 +526,7 @@
         $(document).on('click', '.add-sub-btn-pack', function(event) {
             tableRow++;
             const parentId = $(this).parent().attr('id').split("packaging-entry")[1];  
-            const newRowPackHtml = Sub_gen_pack_row(tableRow,"","","");  
+            const newRowPackHtml = Sub_gen_pack_row(tableRow, "", "", "", "");  
             $(newRowPackHtml).appendTo(`.sub-pack${parentId}`);
             console.log(parentId);
             PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
@@ -499,10 +541,9 @@
                 $(`#itemDesc${rowId}`  ).on('input', function() {
                 $(`#quantity${rowId}`).val('');
                 $(`#cost${rowId}`).val('');
+                $(`#default_cost${rowId}`).val(''); 
                 $(`#tasteless_code${rowId}`).val('');
-                $(`#tasteless_code_original${rowId}`).val('');
-                $(`#ttp${rowId}`).val('');
-                $(`#pack-size${rowId}`).val('');   
+                $(`#tasteless_code_original${rowId}`).val(''); 
             });
             
             $(selector).autocomplete({
@@ -547,9 +588,9 @@
                     $(`#tasteless_code${id}`).val(ui.item.tasteless_code).trigger('change');
                     $(`#tasteless_code_original${id}`).val(ui.item.tasteless_code).trigger('change');
                     $(`#itemDesc${id}`).val(ui.item.item_description); 
-                    $(`#ttp${id}`).val(Number(ui.item.cost).toFixed(2)).attr('readonly', true);
-                    $(`#pack-size${id}`).val(ui.item.packaging_size);  
-                    $(`#quantity${rowId}`).val('1').trigger('change'); 
+                    $(`#cost${id}`).val(Number(ui.item.cost).toFixed(2)).attr('readonly', true); 
+                    $(`#default_cost${id}`).val(Number(ui.item.cost).toFixed(2)); 
+                    $(`#quantity${rowId}`).val('1').trigger('change');
                     //packaging_size
                     
                     calculateFinalValues();
@@ -655,7 +696,7 @@
                         </label>
                         <label>
                             <span class="required-star">*</span> Preparation Qty
-                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any"/>
+                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
                         </label> 
                        
                         <label class="label-wide">
@@ -697,8 +738,8 @@
                         <label class="packaging-label">
                             <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
-                                <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control  " required/>
-                                <input value="" type="text" id="tasteless_code_original${rowId}"   class="packaging form-control  hidden" required/>
+                                <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control hidden " required/>
+                                <input value="${tasteless_code}" type="text" id="tasteless_code_original${rowId}"   class="packaging form-control  hidden" required/>
                                 <input value="${itemDesc}" type="text" id="itemDesc${rowId}" name="produtionlines[${rowId}][][description]" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
                                 <div class="item-list">
                                       <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"  id="ui-id-2${rowId}" style="display: none;  width: 120px; color:red; padding:5px;">
@@ -711,7 +752,7 @@
                         </label>
                         <label>
                             <span class="required-star">*</span> Preparation Qty
-                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any"/>
+                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
                         </label> 
                        
                         <label class="label-wide">
@@ -733,7 +774,7 @@
                         </label>
                         <label>
                             <span class="required-star">*</span> Ingredient Cost
-                            <input value="${cost}" id="cost${rowId}" class="form-control cost" type="text" readonly required>
+                            <input value="${cost}" id="cost${rowId}" class="form-control costparent${rowId} cost" type="text" readonly required>
                         </label>
                     </div>
                     <div class="actions">
@@ -755,7 +796,7 @@
 
   
          //generate sub for packaging
-          function Sub_gen_pack_row(rowId, Packaging, Quantity, Cost, Item_code)
+          function Sub_gen_pack_row(rowId, tasteless_code, quantity, cost, description)
           {
             return `  
             <div class="substitute-packaging" id="packaging-entry${rowId}">
@@ -763,8 +804,8 @@
                       <label class="packaging-label">
                             <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
-                                <input value="" type="text" id="tasteless_code${rowId}"     class="packaging form-control hidden" required/>
-                                <input value="" type="text" id="itemDesc${rowId}"      class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                                <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control hidden" required/>
+                                <input value="${description}" type="text" id="itemDesc${rowId}" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
                                 <div class="item-list">
                                       <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"  id="ui-id-2${rowId}" style="display: none;  width: 120px; color:red; padding:5px;">
                                 <li class="text-center">Loading...</li>
@@ -773,26 +814,15 @@
                              
                             </div>
                             
-                        </label>
-                        <label class="label-wide hide">
-                            <span class="required-star">*</span> TTP <span class="date-updated"></span>
-                            <input value="" class="form-control ttp" id="ttp${rowId}" type="number" readonly required>
-                        </label>
+                        </label> 
                         <label>
                             <span class="required-star">*</span> Preparation Qty
-                            <input value="" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any"/>
-                        </label> 
-                        <label class="label-wide hide"  >
-                            <span class="required-star">*</span> Yield %
-                            <input value="100" class="form-control yield" id="yield${rowId}" type="number" required>
-                        </label> 
-                        <label style="display: none">
-                            <span class="required-star">*</span> Packaging size
-                            <input value="" class="form-control pack-quantity" id="pack-size${rowId}" type="number" readonly required>
-                        </label>
+                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
+                        </label>   
                         <label>
                             <span class="required-star">*</span> Packaging Cost
-                            <input value="" id="cost${rowId}" class="form-control cost" type="text" readonly required>
+                            <input value="${cost}" id="default_cost${rowId}" class="form-control cost hide" type="text" readonly required>
+                            <input value="${cost}" id="cost${rowId}" class="form-control cost" type="text" readonly required>
                         </label>
                 </div>
                 <div class="actions">
@@ -803,44 +833,35 @@
             `;
           }
 
-          function generateRowHtml(rowId, Packaging, Quantity, Cost, Item_code) {
+          function generateRowHtml(rowId, tasteless_code, quantity, cost, description) {
             return `  
                  
                 <div class="packaging-wrapper" id="packaging-entry${rowId}">
                 <div class="packaging-entry" isExisting="true">
                     <div class="packaging-inputs">
-                        <label class="packaging-label">
+                         <label class="packaging-label">
                             <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
-                                <input value="" type="text" id="tasteless_code${rowId}"   class="packaging form-control  hidden" required/>
-                                <input value="" type="text" id="tasteless_code_original${rowId}"   class="packaging form-control  hidden" required/>
-                                <input value="" type="text" id="itemDesc${rowId}"   class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                                <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control  hidden " required/>
+                                <input value="${tasteless_code}" type="text" id="tasteless_code_original${rowId}" class="packaging form-control hidden " required/>
+                                <input value="${description}" type="text" id="itemDesc${rowId}"      class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
                                 <div class="item-list">
-                                </div>
-                                <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${rowId}" id="ui-id-2${rowId}" style="display: none; top: 75px; width: 9%; color:red; padding:5px; left: 15px;">
+                                      <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"  id="ui-id-2${rowId}" style="display: none;  width: 120px; color:red; padding:5px;">
                                 <li class="text-center">Loading...</li>
                                 </ul>
+                                </div>
+                             
                             </div>
-                        </label>
-                        <label class="label-wide hide">
-                            <span class="required-star">*</span> TTP <span class="date-updated"></span>
-                            <input value="" class="form-control ttp" id="ttp${rowId}" type="number" readonly required>
-                        </label>
-                        <label>
-                            <span class="required-star">*</span> Preparation Qty
-                            <input value="" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
-                        </label>  
-                        <label class="label-wide hide">
-                            <span class="required-star">*</span> Yield %
-                             <input value="100" class="form-control yield" id="yield${rowId}" type="number" required>
+                            
                         </label> 
-                        <label style="display: none">
-                            <span class="required-star">*</span> Packaging size
-                            <input value="" class="form-control pack-quantity" id="pack-size${rowId}" type="number" readonly required>
-                        </label>
+                        <label>
+                            <span class="required-star">*</span> Preparation Qty 
+                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
+                        </label>   
                         <label>
                             <span class="required-star">*</span> Packaging Cost
-                            <input value="" id="cost${rowId}" class="form-control cost" type="text" readonly required>
+                            <input value="${cost}" id="default_cost${rowId}" class="form-control cost hide" type="text" readonly required>
+                            <input value="${cost}" id="cost${rowId}" class="form-control costparent${rowId} cost" type="text" readonly required>
                         </label>
                     </div>
                     <div class="actions">
@@ -1025,31 +1046,46 @@
                     console.log('package');     
                 }
                 */
-               
-                 if($(`#tasteless_code${lastChar}`).val() != '' && yieldInput  != '0')
-                {
+
+
+
+                    const container = $(this).closest('.packaging-wrapper').attr('id');
+                    if(container.includes('ingredient-entry'))
+                    {
+                         if($(`#tasteless_code${lastChar}`).val() != '' && yieldInput  != '0')
+                        {
+                            
+                            const yieldPercent = math.round(yieldInput / 100, 4); 
+                            console.log($(`#yield${lastChar}`).val());
+
+                            const uomQty = 1; 
+
+                            let preperationQuantity = $(`#quantity${lastChar}`).val() || 0; 
+
+                            let packagingSize = $(`#pack-size${lastChar}`).val() || 0; 
+
+                            let cost = $(`#ttp${lastChar}`).val() || 0; 
+
+                            const ingredientModifier = math.round(uomQty / packagingSize * preperationQuantity  / yieldPercent, 4);
+                                
+                            const ingredientCost = math.round(ingredientModifier * cost, 4); 
+                            const ingredientQty = math.round(preperationQuantity / yieldInput * 100, 4); 
+
+                            $(`#cost${lastChar}`).val(ingredientCost).attr('readonly', true);
+                            $(`#ingredient-qty${lastChar}`).val(ingredientQty).attr('readonly', true);
+                            
+                        }  
+                    }
+                    else
+                    {
+                       const packaging_cost =  $(`#default_cost${lastChar}`).val() || 0; 
+                       let  quantity = $(`#quantity${lastChar}`).val() || 1;   
                     
-                    const yieldPercent = math.round(yieldInput / 100, 4); 
-                    console.log($(`#yield${lastChar}`).val());
+                       total = packaging_cost * quantity;
 
-                    const uomQty = 1; 
-
-                    let preperationQuantity = $(`#quantity${lastChar}`).val() || 0; 
-
-                    let packagingSize = $(`#pack-size${lastChar}`).val() || 0; 
-
-                    let cost = $(`#ttp${lastChar}`).val() || 0; 
-
-                    const ingredientModifier = math.round(uomQty / packagingSize * preperationQuantity  / yieldPercent, 4);
-                        
-                    const ingredientCost = math.round(ingredientModifier * cost, 4); 
-                    const ingredientQty = math.round(preperationQuantity / yieldInput * 100, 4); 
-
-                    $(`#cost${lastChar}`).val(ingredientCost).attr('readonly', true);
-                    $(`#ingredient-qty${lastChar}`).val(ingredientQty).attr('readonly', true);
-                    
-                }        
-
+                       $(`#cost${lastChar}`).val(total).attr('readonly', true);
+                      
+                    } 
                 calculateFinalValues();
             });
 
@@ -1248,6 +1284,7 @@
                 entry.prevAll('br').first().remove(); 
                 $(this).remove();
                 showNoData();
+                showNoDataIngredient();
                 calculateFinalValues();
             });
           
@@ -1292,7 +1329,7 @@
                 var id = $(this).attr('id');
                 var lastChar = id.split("quantity")[1] || id.split("yield")[1];
 
-                const cost = parseFloat($(`#cost${lastChar}`).val()) || 0;
+                const cost = parseFloat($(`.costparent${lastChar}`).val()) || 0;
                 const quantity = parseFloat($(this).val()) || 0;  
                 
                  
@@ -1360,7 +1397,15 @@
             }
         }
 
-         
+          function showNoDataIngredient() {
+            const hasRows = $('[id*="ingredient-entry"]').length;  
+              console.log(hasRows + 'show');  
+            if (hasRows === 0) {
+                $('.no-data-available-ingredient').show(); 
+            } else {
+                $('.no-data-available-ingredient').hide(); 
+            }
+        }
         
     });
 

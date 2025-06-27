@@ -469,77 +469,97 @@ use App\NewPackaging;
 			return 'null';
 		}
 
-		$html = ' 
-				<style>
-				.ingredients-table {
-					width: 100%;
-					border-collapse: collapse;
-					font-family: Arial, sans-serif;
-					font-size: 14px;
-				}
-				.ingredients-table thead tr {
-					background-color: #f0f0f0;
-				}
-				.ingredients-table thead th {
-					padding: 10px 15px;
-					border-bottom: 2px solid #ccc;
-					text-align: left;
-				}
-				.ingredients-table tbody tr td {
-					padding: 8px 15px;
-					border-bottom: 1px solid #ddd;
-				}
-				.ingredients-table tbody tr:last-child td {
-					border-bottom: none;
-				} 
-				
-				.added {
-				background-color: #e6f4ea; /* soft green */
-				}
+		$html = '
+<style>
+.ingredients-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px; /* vertical space between groups */
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+.ingredients-table thead tr {
+    background-color: #f0f0f0;
+}
+.ingredients-table thead th {
+    padding: 10px 15px;
+    border-bottom: 2px solid #ccc;
+    text-align: left;
+}
+.ingredients-table tbody tr.group-row td {
+    padding: 8px 15px;
+    border: none; /* remove inner horizontal borders */
+    background-color: #fff; /* white background */
+    vertical-align: middle;
+}
+.ingredients-table tbody tr.added td {
+    background-color: #e6f4ea; /* soft green */
+}
+.ingredients-table tbody tr.deleted td {
+    background-color: #fdecea; /* soft red */
+}
+.ingredients-table tbody tr.updated td {
+    background-color: #fff9e6; /* soft yellow */
+}
+/* Remove border bottom from all rows except last in group */
+.ingredients-table tbody tr:not(.group-row) td {
+    border-bottom: none !important;
+}
+/* Optional: add subtle border or shadow around groups by adding it to last row of each group */
+/* You can keep your existing logic to add classes like added, deleted, updated */
+.label {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 75%;
+    font-weight: 600;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.375rem;
+    user-select: none;
+    margin-right: 5px;
+}
+.label-info {
+    background-color: #17a2b8; /* blue */
+}
+.label-danger {
+    background-color: #dc3545; /* red */
+}
 
-				.deleted {
-				background-color: #fdecea; /* soft red */
-				}
+	.ingredients-table {
+  border-collapse: separate;
+  border-spacing: 0 10px; /* space between groups */
+}
 
-				.updated {
-				background-color: #fff9e6; /* soft yellow */
-				}
-				   .label {
-						display: inline-block;
-						padding: 0.25em 0.6em;
-						font-size: 75%;
-						font-weight: 600;
-						line-height: 1;
-						color: #fff;
-						text-align: center;
-						white-space: nowrap;
-						vertical-align: baseline;
-						border-radius: 0.375rem;
-						user-select: none;
-					}
-					.label-info {
-						background-color: #17a2b8; /* blue */
-					}
-					.label-danger {
-						background-color: #dc3545; /* red */
-					}
-					.label-warning {
-						background-color: #ffc107; /* yellow */
-						color: #212529; /* dark text for contrast */
-					}
-				</style>
+/* Remove borders from all rows first */
+.ingredients-table tbody tr td {
+  border: none;
+  padding: 8px 15px;
+}
 
-			 
-				<table class="ingredients-table">
-				<thead>
-					<tr>
-					<th>Key</th>
-					<th>Old Ingredients</th>
-					<th>New Ingredients</th>
-					</tr>
-				</thead>
-				<tbody>
-		';
+/* Add border only after every 4 rows (1 group of description, qty, cost, yield) */
+.ingredients-table tbody tr:nth-child(4n) td {
+  border-bottom: 2px solid #ccc; /* solid border after every group */
+}
+.label-warning {
+    background-color: #ffc107; /* yellow */
+    color: #212529; /* dark text for contrast */
+}
+</style>
+
+<table class="ingredients-table">
+    <thead>
+        <tr>
+            <th>Key</th>
+            <th>Old Ingredients</th>
+            <th>New Ingredients</th>
+        </tr>
+    </thead>
+    <tbody>
+';
+
 
 		$newdatacount = count($new_data);
 		$olddatacount = count($old_data);
@@ -563,38 +583,34 @@ use App\NewPackaging;
 
 						if($safe_value != '' && $old_data[$i][$key] == '')
 						{
-							$html .= "<tr class='added'>
+							$html .= "<tr class='group-row added'>
 								<td style='padding: 8px 12px;'><span class='label label-info'>New! </span> {$safe_key}</td>
 								<td style='padding: 8px 12px;'>N/A</td>
 								<td style='padding: 8px 12px;'>{$safe_value}</td>
-								
-							</tr>";
+								</tr>";
 						}else if($safe_value == '' && $old_data[$i][$key] != '')
 						{
-							$html .= "<tr class='deleted'>
+							$html .= "<tr class='group-row deleted'>
 								<td style='padding: 8px 12px;'><span class='label label-danger'>Deleted </span> {$safe_key}</td>
 								<td style='padding: 8px 12px;'>{$old_data[$i][$key]}</td>
 								<td style='padding: 8px 12px;'>N/A</td>
-								
-							</tr>";	
+								</tr>";	
 						}else
 						{
-							$html .= "<tr class='updated'>
+							$html .= "<tr class='group-row updated'>
 								<td style='padding: 8px 12px;'><span class='label label-warning'>Updated </span> {$safe_key}</td>
 								<td style='padding: 8px 12px;'>{$old_data[$i][$key]}</td>
 								<td style='padding: 8px 12px;'>{$safe_value}</td>
-								
-							</tr>";	
+								</tr>";	
 						}
 						
 					}else
 					{ 
- 						$html .= "<tr style='border-bottom: 1px solid #eee;'>
+ 						$html .= "<tr class='group-row ' style='border-bottom: 1px solid #eee;'>
 									<td style='padding: 8px 12px;'>{$safe_key}</td>
 									<td style='padding: 8px 12px;'>{$old_data[$i][$key]}</td>
 									<td style='padding: 8px 12px;'>{$safe_value}</td>
-									
-								</tr>";
+									</tr>";
 					}
 				}
 				
@@ -611,45 +627,42 @@ use App\NewPackaging;
 					$safe_key = htmlspecialchars($key);
 					$safe_value = htmlspecialchars($value); 
 					if($value != $new_data[$i][$key]){
-					 		
 
-
-						if($safe_value != '' && $new_data[$i][$key] == '')
+					 	if($safe_value != '' && $new_data[$i][$key] == '')
 						{
-							$html .= "<tr class='deleted'>
+							$html .= "<tr class='group-row deleted'>
 								<td style='padding: 8px 12px;'><span class='label label-danger'>Deleted</span> {$safe_key}</td>
 								<td style='padding: 8px 12px;'>{$safe_value}</td>
 								<td style='padding: 8px 12px;'>N/A</td>
-								
-							</tr>";
-						}else if($safe_value == '' && $new_data[$i][$key] != '')
+								</tr>";
+						}
+						else if($safe_value == '' && $new_data[$i][$key] != '')
 						{
-							$html .= "<tr class='added'>
+							$html .= "<tr class='group-row added'>
 								<td style='padding: 8px 12px;'><span class='label label-info'>New! </span>{$safe_key}</td>
 								<td style='padding: 8px 12px;'>N/A</td>
 								<td style='padding: 8px 12px;'>{$new_data[$i][$key]}</td>
-								
-							</tr>";	
-						}else
+								</tr>";	
+						}
+						else
 						{
-							$html .= "<tr class='updated'>
+							$html .= "<tr class='group-row updated'>
 								<td style='padding: 8px 12px;'><span class='label label-warning'>Updated </span>{$safe_key}</td>
 								<td style='padding: 8px 12px;'>{$safe_value}</td>
-								<td style='padding: 8px 12px;'>{$new_data[$i][$key]}</td>
-								
-							</tr>";	
+								<td style='padding: 8px 12px;'>{$new_data[$i][$key]}</td> 
+								</tr>";	
 						}
 						
-					}else
+					}
+					else
 					{ 
-						$html .= "<tr style='border-bottom: 1px solid #eee;'>
+						$html .= "<tr class='group-row ' style='border-bottom: 1px solid #eee;'>
 								<td style='padding: 8px 12px;'>{$safe_key}</td>
 								<td style='padding: 8px 12px;'>{$safe_value}</td>
 								<td style='padding: 8px 12px;'>{$new_data[$i][$key]}</td>
-							</tr>";
+								</tr>";
 					}
-				}
-				
+				} 
 			}
 		}
 
@@ -670,7 +683,7 @@ use App\NewPackaging;
 
 
 	public function addProductionItemsToDB(Request $request){
-	 
+ 
 		$message = '';
 		$time_stamp_now = date('Y-m-d H:i:s');
 			
@@ -700,7 +713,7 @@ use App\NewPackaging;
 
 			if($request['id']){
 			 
-
+				
 					$lastData= [];
 					$lastData = self::getItemLastDetails($request['id']); // Old data from DB
 					$currentData = $request->only(array_keys((array) $lastData)); // Current data from request, matching keys
@@ -722,20 +735,21 @@ use App\NewPackaging;
 					
 					
 
-					//check ingredients data vs. last data
+					// //check ingredients data vs. last data
 					$response = self::ingredientsSearch($request['id']); // Old data ingredients
-
-					$ingredients = $response->getOriginalContent()['ingredients']->map(function ($item) {
+				
+					$ingredients = $response->getOriginalContent()['produtionlines']->map(function ($item) {
 						return [
 							'description' => $item->description,
 							'quantity' => $item->quantity,
 							'cost' => $item->landed_cost,
+							'yield' => $item->yield || 'N/A',
 						];
-					})->toArray(); 
+					})->toArray();  
+					$ingredientsFromRequest = $request->input('produtionlines'); // New ingredients from request --(needs key index clean to match key on old data and check what change, you can see cleaning on generateChangesTable fucntion)
 
-					$ingredientsFromRequest = $request->input('ingredients'); // New ingredients from request --(needs key index clean to match key on old data and check what change, you can see cleaning on generateChangesTable fucntion)
+						
 
-					
 					$old_ingredients_data = [];
 					$new_ingredients_data = [];
 
@@ -744,28 +758,33 @@ use App\NewPackaging;
 							'description' => $ingredient['description'],
 							'quantity'    => $ingredient['quantity'],
 							'cost'        => $ingredient['cost'],
+							'yield'       => $ingredient['yield'] || 'N/A',
 						];
 					}
 					
 					foreach ($ingredientsFromRequest as $key => $ingredient) {
-						$new_ingredients_data[$key] = [
-							'description' => $ingredient['description'],
-							'quantity'    => $ingredient['quantity'],
-							'cost'        => $ingredient['cost'],
-						];
+
+						foreach ($ingredient as $code => $parent_code) {
+							$new_ingredients_data[$code] = [
+								'description' => $parent_code['description'],
+								'quantity'    => $parent_code['quantity'],
+								'cost'        => $parent_code['cost'],
+								'yield'       => $parent_code['yield'] || 'N/A',
+							];
+						}  
 					} 
-					
-					
+				
+					// 
 						
-					//get reference for message on logs
+					// //get reference for message on logs
 					$referenceNumber = ProductionItems::where('id', $request['id'])->value('reference_number');
 
-					//get generated HTML
+					// //get generated HTML
 					$detailsHtmlFields = $this->generateChangesTableFields($differences);
-					$detailsHtmlIngredients = $this->generateChangesTable($new_ingredients_data, $old_ingredients_data);
+				 	$detailsHtmlIngredients = $this->generateChangesTable($new_ingredients_data, $old_ingredients_data);
+ 
 
-
-					// if nothing changes return error
+				 	 // if nothing changes return error
 					if($detailsHtmlFields == 'null' && $detailsHtmlIngredients == 'null')
 					{
 						return response()->json(['No changes are made but your trying to update?'
@@ -785,7 +804,7 @@ use App\NewPackaging;
 					} 
 					
 
-					//combine 2 html generated
+					// //combine 2 html generated
 					$combinedDetails ='<hr> <label style="font-size: 20px; font-weight: bold; color: #f1c40f; background-color: #2c3e50; padding: 6px 12px; border-radius: 6px; display: inline-block;"> Fields changes </label>' . $detailsHtmlFields . '<hr> <label style="font-size: 20px; font-weight: bold; color: #f1c40f; background-color: #2c3e50; padding: 6px 12px; border-radius: 6px; display: inline-block;"> Ingredients Table </label>' . $detailsHtmlIngredients;
 					
 					//push logs to DB cms_logs
@@ -822,10 +841,10 @@ use App\NewPackaging;
 		}
 		else
  		{ 
-			$message = "✔️ Item Added successfully...";
+			
 				$nextId = DB::table('production_items')->max('id') + 1;
 				$ref = 700000000 + $nextId;
-						
+				$message = "✔️ Item Added successfully with reference number ". $ref;		
 			$data['reference_number'] = $ref;
 			
 			$data['created_by'] = CRUDBooster::myId();
@@ -933,7 +952,7 @@ use App\NewPackaging;
 
 			if ($id) { 
 				$data['item'] = self::getItemDetails($id); 
-				  
+				 // dd($data);
 				/*
 				if ($data['item']->approval_status == 202) {
 					return redirect(CRUDBooster::mainpath())->with([
@@ -942,17 +961,17 @@ use App\NewPackaging;
 					]);
 				}
 			 	*/  
-			} 
+				} 
 			
 				$costings = self::costing(self::getItemDetails($id)->reference_number);
 				 
 			 
 
 			 	 $data = array_merge($data, $costings);
-			 	
+			 	//dd($costings);
 				 
 				return $this->view('production-items/add-production-item',   $data);
-	}
+			}
 
 	
 	public function getDetail($id)
@@ -974,7 +993,7 @@ use App\NewPackaging;
 				*/
 
  
-				$data['item'] = self::getItemDetails($id);
+				$data['item'] = self::getItemDetails($id); 
 				/*
 				if ($data['item']->approval_status == 202) {
 					return redirect(CRUDBooster::mainpath())->with([
@@ -984,11 +1003,12 @@ use App\NewPackaging;
 				}
 			 	*/  
 			 
-			
 				$costings = self::costing(self::getItemDetails($id)->reference_number);
+				 
+			 
 
-				
-			 	$data = array_merge($data, $costings);
+			 	 $data = array_merge($data, $costings); 
+				  
 				
 	 
 				return $this->view('production-items/detail-production-item',   $data); 
@@ -1000,15 +1020,17 @@ use App\NewPackaging;
 
 	public function ingredientsSearch($id)
 	{
+		
+
 		$item = DB::table('production_item_lines')
-			->join('production_items', 'production_items.reference_number', '=', 'production_item_lines.production_item_id')
+			->leftjoin('production_items', 'production_items.reference_number', '=', 'production_item_lines.production_item_id')
 			->where('production_items.id', $id)
 			->select('production_item_lines.*') 
 			->get();
 	
-
+		 	
 			return response()->json([
- 				'ingredients' => $item 
+ 				'produtionlines' => $item 
 			]);
 	}
 
@@ -1051,7 +1073,7 @@ use App\NewPackaging;
 				->toArray(); 
 			$data['production_item_lines'] = DB::table('production_item_lines')
 			->select('production_item_lines.*', 'item_masters.ttp', 'item_masters.packaging_size')
-			->join('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
+			->leftjoin('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
 			->where('production_item_lines.production_item_id', $ref)
 			->get()
 			->toArray();
@@ -1163,8 +1185,7 @@ use App\NewPackaging;
 			$query1 = NewPackaging::select('id',
 				'nwp_code as tasteless_code',
 				'item_description as full_item_description',
-				'ttp',
-				'packaging_size')
+				'ttp')
 				->whereNotIn('nwp_code', $existing)
 				->where(function($q) use ($searchTerm) {
 					$q->where('item_description', 'LIKE', '%' . $searchTerm . '%')
@@ -1175,8 +1196,7 @@ use App\NewPackaging;
 			$query2 = ItemMaster::select('id',
 				'tasteless_code',
 				'full_item_description',
-				'ttp',
-				'packaging_size')
+				'landed_cost')
 				->whereNotIn('tasteless_code', $existing)
 				->where(function($q) use ($searchTerm) {
 					$q->where('full_item_description', 'LIKE', '%' . $searchTerm . '%')
@@ -1207,8 +1227,7 @@ use App\NewPackaging;
 					'id' => $items->id,
 					'tasteless_code' => $items->tasteless_code,
 					'item_description' => $items->full_item_description,
-					'cost' => $items->ttp, 
-					'packaging_size' => $items->packaging_size,  
+					'cost' => $items->ttp,   
 				];
 			});
 			
