@@ -363,17 +363,22 @@
 <script>
     
     $(document).ready(function() {
-        //console.log(@json($production_item_lines));
         
+        //for showing message no package or ingredients found 
         is_noingredient = false;
-         
         showNoData(); 
+
+        //for adding table row assigning unique ids
         let tableRow = 0;
         
+        //check if user input raw_mast_provision if yes then dont apply + 5%
         let click_raw = false;
         
+        //loading ingredient and packaging data from contoller
         const production_item_lines = @json($production_item_lines);
 
+
+        //looping for parent packeaging/ingredients
         production_item_lines.forEach(item => {
             
             if (item.item_code == item.packaging_id) {
@@ -390,14 +395,14 @@
                     item.landed_cost
                 );
                 $(newRowHtml).appendTo('#ingredient-tbody');
-                initAutocomplete(`#itemDesc${tableRow}`, tableRow);
+                IngredientSearch(`#itemDesc${tableRow}`, tableRow);
                 showNoData();
              }    
         });
 
          
        
-
+        //triggering tasteless_code change and input to calculate packeaging/ingredients cost
         $(document).ready(function() {
         $('[id*="quantity"], [id*="tasteless_code"]').each(function() {
             const eventInput = new Event('input', { bubbles: true });
@@ -411,14 +416,14 @@
 
 
 
-
+        //looping for sub packeaging/ingredients
          production_item_lines.forEach(item => {
             
-            if (item.item_code != item.packaging_id) { 
+            if (item.item_code != item.packaging_id ) { 
                 tableRow++;
                 const matchingInputElement = $(`input[value="${item.packaging_id}"]`);
                 const matchingInputId = matchingInputElement.attr('id');
-                const matchingInput = matchingInputId ? matchingInputId.split("tasteless_code")[1] : ' wala pre ';
+                const matchingInput = matchingInputId ? matchingInputId.split("tasteless_code")[1] : '';
                 
                 const newRowHtml = Sub_gen_ingredient_row(
                     tableRow,
@@ -432,7 +437,7 @@
                 );
                // console.log(`.sub-ingredient${oldindex}`);
                 $(newRowHtml).appendTo(`.sub-ingredient${matchingInput}`); 
-                initAutocomplete(`#itemDesc${tableRow}`, tableRow); 
+                IngredientSearch(`#itemDesc${tableRow}`, tableRow); 
              }    
         });
 
@@ -460,7 +465,7 @@
             console.log( tableRow + " dd-Row");
             const newRowHtml = generateRowingredientHtml(tableRow, "", "", "", "", "", "", "");
             $(newRowHtml).appendTo('#ingredient-tbody'); 
-            initAutocomplete(`#itemDesc${tableRow}`, tableRow); 
+            IngredientSearch(`#itemDesc${tableRow}`, tableRow); 
             showNoData();
         });
         
@@ -472,7 +477,7 @@
             const newRowPackHtml = Sub_gen_ingredient_row(tableRow,"","","");  
             $(newRowPackHtml).appendTo(`.sub-ingredient${parentId}`);
             console.log(parentId);
-            initAutocomplete(`#itemDesc${tableRow}`, tableRow); 
+            IngredientSearch(`#itemDesc${tableRow}`, tableRow); 
         });
 
 
@@ -487,14 +492,15 @@
 
         
        
-
+        //for packaging search items
         function PackagingSearchInit(selector, rowId) {
            const token = $("#token").val();   
             console.log(rowId + 'pogi');
-             $(`#itemDesc${rowId}`  ).on('input', function() {
+                $(`#itemDesc${rowId}`  ).on('input', function() {
                 $(`#quantity${rowId}`).val('');
                 $(`#cost${rowId}`).val('');
                 $(`#tasteless_code${rowId}`).val('');
+                $(`#tasteless_code_original${rowId}`).val('');
                 $(`#ttp${rowId}`).val('');
                 $(`#pack-size${rowId}`).val('');   
             });
@@ -508,7 +514,7 @@
                     data: { 
                     "_token": token, 
                     "search": request.term, 
-                    values: $('[id*="itemDesc"], [id*="tasteless_code"]').map(function() {
+                    values: $('[id*="itemDesc"], [id*="tasteless_code"], [id*="tasteless_code_original"]').map(function() {
                                 if($(this).val() != "") {
                                     return $(this).val();
                                 } else {
@@ -539,6 +545,7 @@
                   var id = curid.split("itemDesc")[1];
                     console.log(id);
                     $(`#tasteless_code${id}`).val(ui.item.tasteless_code).trigger('change');
+                    $(`#tasteless_code_original${id}`).val(ui.item.tasteless_code).trigger('change');
                     $(`#itemDesc${id}`).val(ui.item.item_description); 
                     $(`#ttp${id}`).val(Number(ui.item.cost).toFixed(2)).attr('readonly', true);
                     $(`#pack-size${id}`).val(ui.item.packaging_size);  
@@ -554,14 +561,15 @@
         }
     
 
-       
-        function initAutocomplete(selector, rowId) {
+        //for packaging ingredients items
+        function IngredientSearch(selector, rowId) {
             const token = $("#token").val();   
             console.log(rowId + 'pogi');
                 $(`#itemDesc${rowId}`  ).on('input', function() {
                 $(`#quantity${rowId}`).val('');
                 $(`#cost${rowId}`).val('');
                 $(`#tasteless_code${rowId}`).val('');
+                $(`#tasteless_code_original${rowId}`).val('');
                 $(`#ttp${rowId}`).val('');
                 $(`#pack-size${rowId}`).val('');  
                 $(`#ingredient-qty${rowId}`).val('');  
@@ -576,7 +584,7 @@
                     data: { 
                     "_token": token, 
                     "search": request.term, 
-                    values: $('[id*="itemDesc"], [id*="tasteless_code"]').map(function() {
+                    values: $('[id*="itemDesc"], [id*="tasteless_code"], [id*="tasteless_code_original"]').map(function() {
                                 if($(this).val() != "") {
                                     return $(this).val();
                                 } else {
@@ -605,8 +613,9 @@
                 select: function (event, ui) {
                   const curid = $(this).attr("id"); 
                   var id = curid.split("itemDesc")[1];
-                    
+                        
                     $(`#tasteless_code${id}`).val(ui.item.tasteless_code).trigger('change');
+                    $(`#tasteless_code_original${id}`).val(ui.item.tasteless_code).trigger('change');
                     $(`#itemDesc${id}`).val(ui.item.item_description); 
                     $(`#ttp${id}`).val(Number(ui.item.cost).toFixed(2)).attr('readonly', true);
                     $(`#pack-size${id}`).val(ui.item.packaging_size); 
@@ -688,7 +697,8 @@
                         <label class="packaging-label">
                             <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
-                                <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" name="produtionlines[${rowId}][][tasteless_code]"  class="packaging form-control hidden" required/>
+                                <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control  " required/>
+                                <input value="" type="text" id="tasteless_code_original${rowId}"   class="packaging form-control  hidden" required/>
                                 <input value="${itemDesc}" type="text" id="itemDesc${rowId}" name="produtionlines[${rowId}][][description]" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
                                 <div class="item-list">
                                       <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"  id="ui-id-2${rowId}" style="display: none;  width: 120px; color:red; padding:5px;">
@@ -803,6 +813,7 @@
                             <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
                                 <input value="" type="text" id="tasteless_code${rowId}"   class="packaging form-control  hidden" required/>
+                                <input value="" type="text" id="tasteless_code_original${rowId}"   class="packaging form-control  hidden" required/>
                                 <input value="" type="text" id="itemDesc${rowId}"   class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
                                 <div class="item-list">
                                 </div>
@@ -883,7 +894,7 @@
         }
 
        
-
+        /* Old remove row
         $(document).on("click", ".removeRow", function (e) {
             const $row = $(this).closest('.tr-border');
            // console.log($(this).closest('.tr-border').html());
@@ -910,10 +921,11 @@
                 }
             });
         });
+        */
 
         //to save data and list to Production Items List module
            $('#save-datas').on('click', function() {
-
+                validateFields();
              if(is_noingredient == true)
                 {
                     Swal.fire({
@@ -924,6 +936,7 @@
                     });
                 } else
                 {
+                    //check if user if on update or add module
                     let itemId = "{{ $item->id }}";
                     if(itemId == "")
                     {
@@ -981,9 +994,16 @@
             });
         });
         */
+
+
+      
+        //$(document).on('input', '.ingredient-quantity', calculateFinalValues);
+       // $(document).on('change', '.ingredient-input', calculateFinalValues);
+
+
+
+
          // Recalculate on any input change
-        $(document).on('input', '.ingredient-quantity', calculateFinalValues);
-        $(document).on('change', '.ingredient-input', calculateFinalValues);
         $(document).on('input change', '[id*="quantity"], [id*="yield"]', function() {
                   
                 var id = $(this).attr('id');
@@ -1034,7 +1054,7 @@
             });
 
 
-             
+        //set sub packeaging/ingredients as primary 
        $(document).on('click', '[id*="set-primary"]', function() {
             const $sub = $(this).closest('.substitute-packaging');
             $sub.siblings().css('background', '#fff');
@@ -1049,14 +1069,7 @@
 
             $(`#tasteless_code${id}`).val(newPrimary).trigger('change');
         });
-
-
-     
-
-
-     
-       
-
+ 
 
 
         function updateparents(id)
@@ -1071,36 +1084,33 @@
         }
 
 
-        //this logic is for updating subparent base on closest tasteless_code id from packaging-wrapper
+        // This logic updates the parent IDs of related sub-elements based on the closest 'tasteless_code' input within the same packaging-wrapper.
+        // The main idea is: when the parent 'tasteless_code' input value changes, 
+        // it dynamically updates the 'name' attributes of all associated sub-elements to keep their data grouped correctly under the new parent ID.
+
        $(document).on('input change', 'input[id^="tasteless_code"]', function() {
             const $wrapper = $(this).closest('.packaging-wrapper');
-
-            // Get current parent id from packaging-wrapper tasteless_code input
+ 
             const parentid = $wrapper.find('input[id^="tasteless_code"]').val();
-
-            // Get old parentid stored on this input (or initialize)
+ 
             const oldParentId = $(this).data('oldParentId') || null;
-
-            // Update this input's stored parentid
+ 
             $(this).data('oldParentId', parentid);
-
-            // Update this input's name attribute
+ 
             var idsub = $(this).attr('id');
             var lastCharsub = idsub.split("tasteless_code")[1]; 
-            $(this).attr('name', `produtionlines[${parentid}][${lastCharsub}][tasteless_code]`); 
+            $(`#tasteless_code_original${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][tasteless_code]`); 
             $(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][description]`); 
             $(`#quantity${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][quantity]`);
             $(`#yield${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][yield]`); 
             $(`#cost${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][cost]`);
-
-            // If parentid changed (or oldParentId is null first time), update all sub inputs
+ 
             if (parentid !== oldParentId) {
                 $wrapper.find('[class^="sub-ingredient"], [class^="sub-pack"]').find('input').each(function() {
                     var subId = $(this).attr('id') || '';
                     var subLastChar = subId.split("tasteless_code")[1] || '';
                     if (subLastChar) {
-                        const ids =  subId.split("tasteless_code")[1]
-                        
+                        const ids =  subId.split("tasteless_code")[1] 
                         $(this).attr('name', `produtionlines[${parentid}][${subLastChar}][tasteless_code]`); 
                         $(`#itemDesc${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][description]`); 
                         $(`#quantity${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][quantity]`);
@@ -1117,7 +1127,7 @@
 
 
 
-
+        //recalculate all fields when something change
         $('#ingredient_cost, #packaging_cost, #labor_cost, #gas_cost, #storage_cost, #storage_multiplier, #depreciation, #raw_mast_provision, #markup_percentage').on('input', function() {
             calculateTotalStorage();
             calculateFinalValues();
@@ -1350,10 +1360,7 @@
             }
         }
 
-         $(document).on('click', '.set-primary', function(event) {
-            //for primary button tsaka na to
-            console.log('setted primary');
-        });
+         
         
     });
 

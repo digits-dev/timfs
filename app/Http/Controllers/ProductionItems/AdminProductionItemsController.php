@@ -870,6 +870,7 @@ use App\NewPackaging;
 			}
 
 			//loop each ingredients and save sa DB 	production_item_lines table
+			// dd($ingredients);
 			 $production_items_toDB->save();
 			 //return redirect()->back()->with('success', 'Production item saved successfully!');
 			return redirect(CRUDBooster::mainpath())
@@ -948,7 +949,7 @@ use App\NewPackaging;
 			 
 
 			 	 $data = array_merge($data, $costings);
-			 	 //dd($data);
+			 	
 				 
 				return $this->view('production-items/add-production-item',   $data);
 	}
