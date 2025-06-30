@@ -31,6 +31,7 @@ use App\Http\Controllers\AdminBrandsAssetsController;
 use App\Http\Controllers\ProductionItems\AdminProductionCategoryController;
 use App\Http\Controllers\SystemUpdateController;
 use App\Http\Controllers\ProductionItems\AdminProductionItemsController;
+use App\Http\Controllers\ProductionItems\AdminProductionItemsHistory;
 use App\Http\Controllers\ProductionItems\AdminProductionLocationsController;
 
 Route::get('/', function () {
@@ -222,6 +223,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/production_locations/add-production-location', [AdminProductionLocationsController::class, 'addProductionItems'])->name('add-production-location');
     Route::post('/admin/production_locations/add-production-location', [AdminProductionLocationsController::class, 'addProductionItemsToDB'])->name('add-production-location-to-db');
     Route::post('/admin/production_items/item-export',[AdminProductionItemsController::class, 'exportItems'])->name('export-items');
+    Route::post('/admin/production_items_history/export-items-history',[AdminProductionItemsHistory::class, 'exportItemsHistory'])->name('export-items-history');
     Route::post('/admin/production_item_categories/add-production-category', [AdminProductionCategoryController::class, 'addProductionCategoryToDB'])->name('add-production-category-to-db');
     
 });

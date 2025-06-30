@@ -14,7 +14,7 @@ class AddYieldAndIngredientQtyToProductionItemLinesTable extends Migration
     public function up()
     {
         Schema::table('production_item_lines', function (Blueprint $table) {
-              $table->decimal('yield', 10, 3)->nullable()->after('landed_cost'); 
+            $table->decimal('yield', 10, 2)->nullable()->after('landed_cost'); 
              $table->string('packaging_id', 255)->nullable()->after('yield');
         });
     }

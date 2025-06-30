@@ -40,10 +40,21 @@
 
 .add-sub-btn-pack  {
     background-color: #367fa9;
+    transform: translateY(-7px); 
     left: 10px;
 }
-.add-sub-btn-pack:hover  {
-    transform: scale(1.2);
+.add-sub-btn-pack:hover  { 
+      transform: translateY(-4px);
+    /* rotate: 90deg; */
+    transition: 200ms;
+}
+.add-sub-btn  {
+    background-color: #367fa9;
+    transform: translateY(-7px); 
+    left: 10px;
+}
+.add-sub-btn:hover  { 
+      transform: translateY(-4px);
     /* rotate: 90deg; */
     transition: 200ms;
 }
@@ -86,7 +97,7 @@
 
                <div class="col-md-4">
     <div class="form-group">
-        <label for="" class="control-label">Description</label>
+        <label for="" class="control-label">  <span style="color: red;">* </span>Description</label>
         <div class="input-group">
             <div class="input-group-addon">
                 <i class="fa fa-sticky-note"></i>
@@ -97,7 +108,7 @@
 </div>
 <div class="col-md-2">
     <div class="form-group">
-        <label for="" class="control-label">Packaging Cost</label>
+        <label for="" class="control-label"> <span style="color: red;">* </span>Packaging Cost</label>
         <div class="input-group">
            <div class="input-group">
             <div class="input-group-addon">
@@ -110,7 +121,7 @@
 </div>
 <div class="col-md-2">
     <div class="form-group">
-        <label for="" class="control-label">Ingredient Cost</label>
+        <label for="" class="control-label"> <span style="color: red;">* </span>Ingredient Cost</label>
         <div class="input-group">
            <div class="input-group">
             <div class="input-group-addon">
@@ -123,7 +134,7 @@
 </div>
 <div class="col-md-2">
     <div class="form-group">
-        <label for="" class="control-label">Production Category</label>
+        <label for="" class="control-label"> <span style="color: red;">* </span>Production Category</label>
         <div class="input-group">
             <div class="input-group-addon">
                 <span class="custom-icon"><strong>₱</strong></span>
@@ -141,7 +152,7 @@
 </div>
 <div class="col-md-2">
     <div class="form-group">
-        <label for="" class="control-label">Production Location</label>
+        <label for="" class="control-label"> <span style="color: red;">* </span>Production Location</label>
         <div class="input-group">
             <div class="input-group-addon">
                 <i class="fa fa-sticky-note"></i>
@@ -159,7 +170,7 @@
 </div>
 <div class="col-md-2">
     <div class="form-group">
-        <label for="" class="control-label">Labor Cost</label>
+        <label for="" class="control-label"> <span style="color: red;">* </span>Labor Cost</label>
         <div class="input-group">
             <div class="input-group-addon">
                 <i class="fa fa-sticky-note"></i>
@@ -170,7 +181,7 @@
 </div>
 <div class="col-md-2">
     <div class="form-group">
-        <label for="" class="control-label">Storage Multiplier</label>
+        <label for="" class="control-label"> <span style="color: red;">* </span>Storage Multiplier</label>
         <div class="input-group">
             <div class="input-group-addon">
                 <i class="fa fa-sticky-note"></i>
@@ -181,7 +192,7 @@
 </div>
 <div class="col-md-2">
     <div class="form-group">
-        <label for="" class="control-label">Storage Cost</label>
+        <label for="" class="control-label"> <span style="color: red;">* </span>Storage Cost</label>
         <div class="input-group">
             <div class="input-group-addon">
                 <i class="fa fa-sticky-note"></i>
@@ -192,7 +203,7 @@
 </div>
 <div class="col-md-2">
     <div class="form-group">
-        <label for="" class="control-label">Gas Cost</label>
+        <label for="" class="control-label"> <span style="color: red;">* </span>Gas Cost</label>
         <div class="input-group">
             <div class="input-group-addon">
                 <i class="fa fa-sticky-note"></i>
@@ -203,7 +214,7 @@
 </div>
 <div class="col-md-2">
     <div class="form-group">
-        <label for="" class="control-label">Mark Up %</label>
+        <label for="" class="control-label"> <span style="color: red;">* </span>Mark Up %</label>
         <div class="input-group">
             <div class="input-group-addon">
                 <i class="fa fa-sticky-note"></i>
@@ -214,7 +225,7 @@
 </div>
 <div class="col-md-2">
     <div class="form-group">
-        <label for="" class="control-label">Depreciation</label>
+        <label for="" class="control-label"> <span style="color: red;">* </span>Depreciation</label>
         <div class="input-group">
             <div class="input-group-addon">
                 <i class="fa fa-sticky-note"></i>
@@ -225,7 +236,7 @@
 </div>
 <div class="col-md-2">
     <div class="form-group">
-        <label for="" class="control-label">Raw Mast Provision</label>
+        <label for="" class="control-label"> <span style="color: red;">* </span>Raw Mast Provision</label>
         <div class="input-group">
             <div class="input-group-addon">
                 <i class="fa fa-sticky-note"></i>
@@ -247,7 +258,7 @@
 </div>
 <div class="col-md-2">
     <div class="form-group">
-        <label for="" class="control-label">Storage Location</label>
+        <label for="" class="control-label"> <span style="color: red;">* </span>Storage Location</label>
         <div class="input-group">
             <div class="input-group-addon">
                 <i class="fa fa-sticky-note"></i>
@@ -333,7 +344,7 @@
                 </div>
                 <br>
                  <br>  
-                <a class="btn btn-primary" id="add-Row"><i class="fa fa-plus"></i> Add New Packaging</a>
+                <a class="btn btn-primary" id="add-Row"><i class="fa fa-plus"></i> Add New Packaging</a> 
                 <a class="btn btn-success" id="add-Row-ingredient"><i class="fa fa-plus"></i> Add New Ingredient</a>
             </div>
            
@@ -365,8 +376,7 @@
         
         //for showing message no package or ingredients found 
         is_noingredient = false;
-        showNoData(); 
-    showNoDataIngredient();
+       
         //for adding table row assigning unique ids
         let tableRow = 0;
         
@@ -947,7 +957,9 @@
         //to save data and list to Production Items List module
            $('#save-datas').on('click', function() {
                 validateFields();
-             if(is_noingredient == true)
+             const packagingRows = $('[id*="packaging-entry"]').length; 
+             const ingredientRows = $('[id*="ingredient-entry"]').length;  
+             if(packagingRows == 0 || ingredientRows == 0)
                 {
                     Swal.fire({
                     icon: 'error',
@@ -1093,8 +1105,7 @@
         //set sub packeaging/ingredients as primary 
        $(document).on('click', '[id*="set-primary"]', function() {
             const $sub = $(this).closest('.substitute-packaging');
-            $sub.siblings().css('background', '#fff');
-            $sub.css('background', '#ffe662');
+           
 
             const wrapperId = $(this).closest('.packaging-wrapper').attr('id') || '';
             const id = wrapperId.replace(/\D/g, '');  // just keep digits
@@ -1103,21 +1114,22 @@
 
             const newPrimary = $(`#tasteless_code${clickedId}`).val();
 
-            $(`#tasteless_code${id}`).val(newPrimary).trigger('change');
+            if ($sub.css('background-color') !== 'rgb(255, 230, 98)') {
+                $(`#tasteless_code${id}`).val(newPrimary).trigger('change');
+                $sub.siblings().css('background', '#fff');
+                $sub.css('background', '#ffe662');
+            } else {
+                let default_code = $(`#tasteless_code_original${id}`).val();
+                $(`#tasteless_code${id}`).val(default_code).trigger('change');
+                $sub.siblings().css('background', '#fff');
+                $sub.css('background', '#fff');
+            }
+
         });
  
 
 
-        function updateparents(id)
-        {
-            // parennt_code = $(`tasteless_code${id}`).val()
-            // $(`tasteless_code${id}`).attr('name', `produtionlines[${parennt_code}][tasteless_code]`);
-            // $(`#itemDesc${id}`).attr('name', `produtionlines[${parennt_code}][description]`);
-            var ids = $(id).attr('id');
-            var lastChar = ids.split("tasteless_code")[1];
-             parennt_code = $(id).val();
-             console.log( parennt_code);
-        }
+      
 
 
         // This logic updates the parent IDs of related sub-elements based on the closest 'tasteless_code' input within the same packaging-wrapper.
@@ -1387,7 +1399,7 @@
 
          function showNoData() {
             const hasRows = $('[id*="packaging-entry"]').length; 
-              console.log(hasRows + 'show');  
+             console.log(hasRows + ' hasRows packaging');
             if (hasRows === 0) {
                 $('.no-data-available').show();
                 is_noingredient = true;
@@ -1399,6 +1411,7 @@
 
           function showNoDataIngredient() {
             const hasRows = $('[id*="ingredient-entry"]').length;  
+            console.log(hasRows + ' hasRows ingredients');
               console.log(hasRows + 'show');  
             if (hasRows === 0) {
                 $('.no-data-available-ingredient').show(); 
@@ -1406,6 +1419,8 @@
                 $('.no-data-available-ingredient').hide(); 
             }
         }
+        showNoData(); 
+        showNoDataIngredient();
         
     });
 
