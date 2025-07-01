@@ -33,6 +33,7 @@ class AdminProductionItemsHistory extends \crocodicstudio\crudbooster\controller
     $this->col = [];
     $this->col[] = ['label' => 'Reference', 'name' => 'reference'];
     $this->col[] = ['label' => 'Action', 'name' => 'action'];
+    $this->col[] = ["label" => "Updated By","name"=>"updated_by","join"=>"cms_users,name" ];
     $this->col[] = ['label' => 'Description', 'name' => 'description'];
     $this->col[] = ['label' => 'Created At', 'name' => 'created_at', 'callback_php' => 'date("Y-m-d H:i:s", strtotime($row->created_at))'];
     $this->col[] = ['label' => 'Updated At', 'name' => 'updated_at', 'callback_php' => 'date("Y-m-d H:i:s", strtotime($row->updated_at))'];
@@ -42,7 +43,14 @@ class AdminProductionItemsHistory extends \crocodicstudio\crudbooster\controller
     $this->form[] = ['label' => 'Reference', 'name' => 'reference', 'type' => 'text', 'validation' => 'required|string|max:255', 'width' => 'col-sm-6'];
     $this->form[] = ['label' => 'Action', 'name' => 'action', 'type' => 'text', 'validation' => 'required|string|max:255', 'width' => 'col-sm-6'];
     $this->form[] = ['label' => 'Description', 'name' => 'description', 'type' => 'textarea', 'validation' => 'required|string|max:255', 'width' => 'col-sm-12'];
-
+    $this->form[] = [
+        'label' => 'Updated By',
+        'name' => 'updated_by',
+        'type' => 'select2',          // or 'select'
+        'datatable' => 'cms_users,name',  // tells the system to get user names from cms_users table
+        'validation' => 'required|integer',
+        'width' => 'col-sm-12'
+    ];    
     # For 'details', you can use WYSIWYG if you want HTML or plain textarea
     $this->form[] = ['label' => 'Details', 'name' => 'details', 'type' => 'wysiwyg', 'validation' => 'nullable|string', 'width' => 'col-sm-12'];
  
@@ -114,27 +122,44 @@ public function exportItemsHistory(Request $request) {
             'Item Code',
             'Action',
             'Description',
-            'Old Data',
+            'key',
+            'Old Data', 
             'New Data', 
+            'Updated By',
             'Created At',
             'Updated At',
         ]);
 
-			DB::table('production_items_history') 
-			->select(
-				 '*'
-			)->cursor()->each(function ($row) use ($handle) {
- 						fputcsv($handle, [
-                            $row->reference,
-                            $row->item_code,
-                            $row->action,
-                            $row->description,
-                            $row->old_data,
-                            $row->new_data, 
-                            $row->created_at,
-                            $row->updated_at,
-                        ]);
-					});
+			 DB::table('production_items_history')
+            ->leftJoin('cms_users', 'cms_users.id', '=', 'production_items_history.updated_by')
+            ->select(
+                'production_items_history.reference',
+                'production_items_history.item_code',
+                'production_items_history.action',
+                'production_items_history.description',
+                'production_items_history.key_old_value',
+                'production_items_history.description_old_value', 
+                'production_items_history.description_new_value',
+                'cms_users.name as updated_by_name',  // alias for clarity
+                'production_items_history.details',
+                'production_items_history.created_at',
+                'production_items_history.updated_at'
+            )
+            ->cursor()
+            ->each(function ($row) use ($handle) {
+                fputcsv($handle, [
+                    $row->reference,
+                    $row->item_code,
+                    $row->action,
+                    $row->description,
+                    $row->key_old_value,
+                    $row->description_old_value, 
+                    $row->description_new_value,
+                    $row->updated_by_name, // include the joined user name here
+                    $row->created_at,
+                    $row->updated_at,
+                ]);
+            });
 
 				fclose($handle);
 			};

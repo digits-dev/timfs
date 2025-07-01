@@ -402,6 +402,7 @@
                         item.quantity,
                         item.landed_cost,  
                         item.description,
+                        item.default_cost
                     );
                     $(newRowHtml).appendTo('#package-tbody');
                     PackagingSearchInit(`#itemDesc${tableRow}`, tableRow);
@@ -462,6 +463,7 @@
                         item.quantity,
                         item.landed_cost,  
                         item.description,
+                        item.default_cost
                     );
                     // console.log(`.sub-ingredient${oldindex}`);
                     $(newRowHtml).appendTo(`.sub-pack${matchingInput}`); 
@@ -504,7 +506,7 @@
         $("#add-Row").click(function () { 
             tableRow++;
             console.log( tableRow + " dd-Row");
-            const newRowHtml = generateRowHtml(tableRow, "", "", "", "");
+            const newRowHtml = generateRowHtml(tableRow, "", "", "", "","");
              $(newRowHtml).appendTo('#package-tbody');
             PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
             showNoData();
@@ -536,7 +538,7 @@
         $(document).on('click', '.add-sub-btn-pack', function(event) {
             tableRow++;
             const parentId = $(this).parent().attr('id').split("packaging-entry")[1];  
-            const newRowPackHtml = Sub_gen_pack_row(tableRow, "", "", "", "");  
+            const newRowPackHtml = Sub_gen_pack_row(tableRow, "", "", "", "", "");  
             $(newRowPackHtml).appendTo(`.sub-pack${parentId}`);
             console.log(parentId);
             PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
@@ -578,8 +580,11 @@
                         if (data.status_no == 1) {
                             $(`#ui-id-2${rowId}`).hide();
                             response($.map(data.items, item => ({
-                                label: item.item_description,
+                               label: `<div>${
+                                            item.from_db == 1 ? '<strong style="font-size: 12px; background-color: #28a745; color: white; padding: 2px 5px; border-radius: 3px; margin-right: 5px;">NEW</strong>' : '<strong style="font-size: 12px; background-color: #17a2b8; color: white; padding: 2px 5px; border-radius: 3px; margin-right: 5px;">IMFS</strong>'
+                                        }${item.item_description}</div>`,
                                 value: item.item_description,
+
                                 ...item
                             })));
                         } else {
@@ -608,7 +613,11 @@
                 },
                 minLength: 1,
                 autoFocus: true
-            }); 
+            }).autocomplete("instance")._renderItem = function(ul, item) {
+                return $("<li>")
+                    .append(item.label)
+                    .appendTo(ul);
+            }; 
         }
     
 
@@ -644,23 +653,23 @@
                             }).get()
                     },
                     success: function (data) {
-                        console.log(data);
-                        if (data.status_no == 1) {
-                            $(`#ui-id-2${rowId}`).hide();
-                            response($.map(data.items, item => ({
-                                label: item.item_description,
-                                value: item.item_description,
-                                ...item
-                            })));
-                        } else {
-                            $('.ui-menu-item').remove();
-                            $('.addedLi').remove();
-                            const $ui = $(`#ui-id-2${rowId}`).html(`<i class="fa fa-exclamation fa-bounce "></i> ${data.message}`);
-                            $ui.toggle($('#itemDesc' + rowId).val().length > 0);
+                            console.log(data);
+                            if (data.status_no == 1) {
+                                $(`#ui-id-2${rowId}`).hide();
+                                response($.map(data.items, item => ({
+                                label: `<div><strong style="font-size: 12px; background-color: #17a2b8; color: white; padding: 2px 5px; border-radius: 3px; margin-right: 5px;">IMFS</strong>${item.item_description}</div>`,
+                                    value: item.item_description,
+                                    ...item
+                                })));
+                            } else {
+                                $('.ui-menu-item').remove();
+                                $('.addedLi').remove();
+                                const $ui = $(`#ui-id-2${rowId}`).html(`<i class="fa fa-exclamation fa-bounce "></i> ${data.message}`);
+                                $ui.toggle($('#itemDesc' + rowId).val().length > 0);
+                            }
                         }
-                    }
-                });
-            },
+                    });
+                },
                 select: function (event, ui) {
                   const curid = $(this).attr("id"); 
                   var id = curid.split("itemDesc")[1];
@@ -670,7 +679,7 @@
                     $(`#itemDesc${id}`).val(ui.item.item_description); 
                     $(`#ttp${id}`).val(Number(ui.item.cost).toFixed(2)).attr('readonly', true);
                     $(`#pack-size${id}`).val(ui.item.packaging_size); 
-                     $(`#quantity${rowId}`).val('1').trigger('change'); 
+                    $(`#quantity${rowId}`).val('1').trigger('change'); 
                     //packaging_size
                   
 
@@ -679,7 +688,11 @@
                 },
                 minLength: 1,
                 autoFocus: true
-            }); 
+            }).autocomplete("instance")._renderItem = function(ul, item) {
+                return $("<li>")
+                    .append(item.label)
+                    .appendTo(ul);
+            }; 
         }
  
 
@@ -806,7 +819,7 @@
 
   
          //generate sub for packaging
-          function Sub_gen_pack_row(rowId, tasteless_code, quantity, cost, description)
+          function Sub_gen_pack_row(rowId, tasteless_code, quantity, cost, description, default_cost)
           {
             return `  
             <div class="substitute-packaging" id="packaging-entry${rowId}">
@@ -831,7 +844,7 @@
                         </label>   
                         <label>
                             <span class="required-star">*</span> Packaging Cost
-                            <input value="${cost}" id="default_cost${rowId}" class="form-control cost hide" type="text" readonly required>
+                            <input value="${default_cost}" id="default_cost${rowId}" class="form-control cost hide" type="text" readonly required>
                             <input value="${cost}" id="cost${rowId}" class="form-control cost" type="text" readonly required>
                         </label>
                 </div>
@@ -843,7 +856,7 @@
             `;
           }
 
-          function generateRowHtml(rowId, tasteless_code, quantity, cost, description) {
+          function generateRowHtml(rowId, tasteless_code, quantity, cost, description, default_cost) {
             return `  
                  
                 <div class="packaging-wrapper" id="packaging-entry${rowId}">
@@ -870,7 +883,7 @@
                         </label>   
                         <label>
                             <span class="required-star">*</span> Packaging Cost
-                            <input value="${cost}" id="default_cost${rowId}" class="form-control cost hide" type="text" readonly required>
+                            <input value="${default_cost}" id="default_cost${rowId}" class="form-control cost hide" type="text" readonly required>
                             <input value="${cost}" id="cost${rowId}" class="form-control costparent${rowId} cost" type="text" readonly required>
                         </label>
                     </div>

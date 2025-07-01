@@ -355,12 +355,8 @@
             </form>
          
              <div class="panel-footer">
-                @if($item->id != '')
-                    <button id="save-datas" class="btn btn-success">+ Update data</button>
-                @else
-                    <button id="save-datas" class="btn btn-success">+ Create data</button>
-                @endif
-                <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-link'>← Back</a>
+               
+                <a class="btn btn-info" href='{{ CRUDBooster::mainpath() }}' class='btn btn-link'>← Back</a>
             </div>
  
     </div>
@@ -370,6 +366,7 @@
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
     
+      
     $(document).ready(function() {
         
         //for showing message no package or ingredients found 
@@ -400,6 +397,7 @@
                         item.quantity,
                         item.landed_cost,  
                         item.description,
+                        item.default_cost
                     );
                     $(newRowHtml).appendTo('#package-tbody');
                     PackagingSearchInit(`#itemDesc${tableRow}`, tableRow);
@@ -423,10 +421,8 @@
                     showNoData();
 
                 }
-               
-             }   
-             
-             $('#ProductionItems').find('input, select, textarea, button').prop('disabled', true);
+                $('#ProductionItems').find('input, select, textarea, button').prop('disabled', true);
+             }    
         });
 
          
@@ -462,6 +458,7 @@
                         item.quantity,
                         item.landed_cost,  
                         item.description,
+                        item.default_cost
                     );
                     // console.log(`.sub-ingredient${oldindex}`);
                     $(newRowHtml).appendTo(`.sub-pack${matchingInput}`); 
@@ -487,7 +484,7 @@
                     $(newRowHtml).appendTo(`.sub-ingredient${matchingInput}`); 
                     IngredientSearch(`#itemDesc${tableRow}`, tableRow);
                 }
-                $('#ProductionItems').find('input, select, textarea, button').prop('disabled', true);
+                 $('#ProductionItems').find('input, select, textarea, button').prop('disabled', true);
              }    
         });
 
@@ -504,7 +501,7 @@
         $("#add-Row").click(function () { 
             tableRow++;
             console.log( tableRow + " dd-Row");
-            const newRowHtml = generateRowHtml(tableRow, "", "", "", "");
+            const newRowHtml = generateRowHtml(tableRow, "", "", "", "","");
              $(newRowHtml).appendTo('#package-tbody');
             PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
             showNoData();
@@ -536,7 +533,7 @@
         $(document).on('click', '.add-sub-btn-pack', function(event) {
             tableRow++;
             const parentId = $(this).parent().attr('id').split("packaging-entry")[1];  
-            const newRowPackHtml = Sub_gen_pack_row(tableRow, "", "", "", "");  
+            const newRowPackHtml = Sub_gen_pack_row(tableRow, "", "", "", "", "");  
             $(newRowPackHtml).appendTo(`.sub-pack${parentId}`);
             console.log(parentId);
             PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
@@ -578,8 +575,11 @@
                         if (data.status_no == 1) {
                             $(`#ui-id-2${rowId}`).hide();
                             response($.map(data.items, item => ({
-                                label: item.item_description,
+                               label: `<div>${
+                                            item.from_db == 1 ? '<strong style="font-size: 12px; background-color: #28a745; color: white; padding: 2px 5px; border-radius: 3px; margin-right: 5px;">NEW</strong>' : '<strong style="font-size: 12px; background-color: #17a2b8; color: white; padding: 2px 5px; border-radius: 3px; margin-right: 5px;">IMFS</strong>'
+                                        }${item.item_description}</div>`,
                                 value: item.item_description,
+
                                 ...item
                             })));
                         } else {
@@ -608,7 +608,11 @@
                 },
                 minLength: 1,
                 autoFocus: true
-            }); 
+            }).autocomplete("instance")._renderItem = function(ul, item) {
+                return $("<li>")
+                    .append(item.label)
+                    .appendTo(ul);
+            }; 
         }
     
 
@@ -644,23 +648,23 @@
                             }).get()
                     },
                     success: function (data) {
-                        console.log(data);
-                        if (data.status_no == 1) {
-                            $(`#ui-id-2${rowId}`).hide();
-                            response($.map(data.items, item => ({
-                                label: item.item_description,
-                                value: item.item_description,
-                                ...item
-                            })));
-                        } else {
-                            $('.ui-menu-item').remove();
-                            $('.addedLi').remove();
-                            const $ui = $(`#ui-id-2${rowId}`).html(`<i class="fa fa-exclamation fa-bounce "></i> ${data.message}`);
-                            $ui.toggle($('#itemDesc' + rowId).val().length > 0);
+                            console.log(data);
+                            if (data.status_no == 1) {
+                                $(`#ui-id-2${rowId}`).hide();
+                                response($.map(data.items, item => ({
+                                label: `<div><strong style="font-size: 12px; background-color: #17a2b8; color: white; padding: 2px 5px; border-radius: 3px; margin-right: 5px;">IMFS</strong>${item.item_description}</div>`,
+                                    value: item.item_description,
+                                    ...item
+                                })));
+                            } else {
+                                $('.ui-menu-item').remove();
+                                $('.addedLi').remove();
+                                const $ui = $(`#ui-id-2${rowId}`).html(`<i class="fa fa-exclamation fa-bounce "></i> ${data.message}`);
+                                $ui.toggle($('#itemDesc' + rowId).val().length > 0);
+                            }
                         }
-                    }
-                });
-            },
+                    });
+                },
                 select: function (event, ui) {
                   const curid = $(this).attr("id"); 
                   var id = curid.split("itemDesc")[1];
@@ -670,7 +674,7 @@
                     $(`#itemDesc${id}`).val(ui.item.item_description); 
                     $(`#ttp${id}`).val(Number(ui.item.cost).toFixed(2)).attr('readonly', true);
                     $(`#pack-size${id}`).val(ui.item.packaging_size); 
-                     $(`#quantity${rowId}`).val('1').trigger('change'); 
+                    $(`#quantity${rowId}`).val('1').trigger('change'); 
                     //packaging_size
                   
 
@@ -679,7 +683,11 @@
                 },
                 minLength: 1,
                 autoFocus: true
-            }); 
+            }).autocomplete("instance")._renderItem = function(ul, item) {
+                return $("<li>")
+                    .append(item.label)
+                    .appendTo(ul);
+            }; 
         }
  
 
@@ -691,7 +699,7 @@
                 <div class="substitute-packaging" id="ingredient-entry${rowId}" >
                 <div class="packaging-inputs">
                        <label class="packaging-label">
-                             Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
+                            <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
                                 <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" name="produtionlines[${rowId}][][tasteless_code]"  class="packaging form-control hidden" required/>
                                 <input value="${itemDesc}" type="text" id="itemDesc${rowId}" name="produtionlines[${rowId}][][description]" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
@@ -705,29 +713,29 @@
                             
                         </label>
                         <label>
-                             Preparation Qty
+                            <span class="required-star">*</span> Preparation Qty
                             <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
                         </label> 
                        
                         <label class="label-wide">
-                             Yield %
+                            <span class="required-star">*</span> Yield %
                             <input value="${yiel}" class="form-control yield" id="yield${rowId}" type="number" required>
                         </label>
                         <label class="label-wide">
-                             TTP <span class="date-updated"></span>
+                            <span class="required-star">*</span> TTP <span class="date-updated"></span>
                             <input value="${ttp}" class="form-control ttp" id="ttp${rowId}" type="number" readonly required>
                         </label>
                         
                         <label>
-                             Ingredient Qty
+                            <span class="required-star">*</span> Ingredient Qty
                             <input value="" class="form-control pack-quantity" id="ingredient-qty${rowId}" type="number" readonly required>
                         </label>
                         <label>
-                             Packaging Size
+                            <span class="required-star">*</span> Packaging Size
                            <input value="${packsize}" class="form-control pack-quantity" id="pack-size${rowId}" type="number" readonly required>
                         </label>
                         <label>
-                             Ingredient Cost
+                            <span class="required-star">*</span> Ingredient Cost
                             <input value="${cost}" id="cost${rowId}" class="form-control cost" type="text" readonly required>
                         </label>
                 </div>
@@ -743,7 +751,7 @@
                 <div class="packaging-entry" isExisting="true">
                     <div class="packaging-inputs">
                         <label class="packaging-label">
-                             Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
+                            <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
                                 <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control hidden " required/>
                                 <input value="${tasteless_code}" type="text" id="tasteless_code_original${rowId}"   class="packaging form-control  hidden" required/>
@@ -758,52 +766,52 @@
                             
                         </label>
                         <label>
-                             Preparation Qty
+                            <span class="required-star">*</span> Preparation Qty
                             <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
                         </label> 
                        
                         <label class="label-wide">
-                             Yield %
+                            <span class="required-star">*</span> Yield %
                             <input value="${yiel}" class="form-control yield" id="yield${rowId}" type="number" required>
                         </label>
                         <label class="label-wide">
-                             TTP <span class="date-updated"></span>
+                            <span class="required-star">*</span> TTP <span class="date-updated"></span>
                             <input value="${ttp}" class="form-control ttp" id="ttp${rowId}" type="number" readonly required>
                         </label>
                         
                         <label>
-                             Ingredient Qty
+                            <span class="required-star">*</span> Ingredient Qty
                             <input value="" class="form-control pack-quantity" id="ingredient-qty${rowId}" type="number" readonly required>
                         </label>
                         <label>
-                             Packaging Size
+                            <span class="required-star">*</span> Packaging Size
                            <input value="${packsize}" class="form-control pack-quantity" id="pack-size${rowId}" type="number" readonly required>
                         </label>
                         <label>
-                             Ingredient Cost
+                            <span class="required-star">*</span> Ingredient Cost
                             <input value="${cost}" id="cost${rowId}" class="form-control costparent${rowId} cost" type="text" readonly required>
                         </label>
                     </div>
-                   
+                
                 </div>
                 <div class="sub-ingredient${rowId}">
                     
 
                 </div>
-             
+              
             </div>
             `;
         }
 
   
          //generate sub for packaging
-          function Sub_gen_pack_row(rowId, tasteless_code, quantity, cost, description)
+          function Sub_gen_pack_row(rowId, tasteless_code, quantity, cost, description, default_cost)
           {
             return `  
             <div class="substitute-packaging" id="packaging-entry${rowId}">
                 <div class="packaging-inputs">
                       <label class="packaging-label">
-                             Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
+                            <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
                                 <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control hidden" required/>
                                 <input value="${description}" type="text" id="itemDesc${rowId}" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
@@ -817,28 +825,28 @@
                             
                         </label> 
                         <label>
-                             Preparation Qty
+                            <span class="required-star">*</span> Preparation Qty
                             <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
                         </label>   
                         <label>
-                             Packaging Cost
-                            <input value="${cost}" id="default_cost${rowId}" class="form-control cost hide" type="text" readonly required>
+                            <span class="required-star">*</span> Packaging Cost
+                            <input value="${default_cost}" id="default_cost${rowId}" class="form-control cost hide" type="text" readonly required>
                             <input value="${cost}" id="cost${rowId}" class="form-control cost" type="text" readonly required>
                         </label>
                 </div>
-             
+              
             </div> 
             `;
           }
 
-          function generateRowHtml(rowId, tasteless_code, quantity, cost, description) {
+          function generateRowHtml(rowId, tasteless_code, quantity, cost, description, default_cost) {
             return `  
                  
                 <div class="packaging-wrapper" id="packaging-entry${rowId}">
                 <div class="packaging-entry" isExisting="true">
                     <div class="packaging-inputs">
                          <label class="packaging-label">
-                             Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
+                            <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
                                 <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control  hidden " required/>
                                 <input value="${tasteless_code}" type="text" id="tasteless_code_original${rowId}" class="packaging form-control hidden " required/>
@@ -853,22 +861,22 @@
                             
                         </label> 
                         <label>
-                             Preparation Qty 
+                            <span class="required-star">*</span> Preparation Qty 
                             <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
                         </label>   
                         <label>
-                             Packaging Cost
-                            <input value="${cost}" id="default_cost${rowId}" class="form-control cost hide" type="text" readonly required>
+                            <span class="required-star">*</span> Packaging Cost
+                            <input value="${default_cost}" id="default_cost${rowId}" class="form-control cost hide" type="text" readonly required>
                             <input value="${cost}" id="cost${rowId}" class="form-control costparent${rowId} cost" type="text" readonly required>
                         </label>
                     </div>
-                 
+                
                 </div>
                 <div class="sub-pack${rowId}">
                     
 
                 </div>
-                
+               
             </div> 
             `;
         }
@@ -906,35 +914,7 @@
             });
         }
 
-       
-        /* Old remove row
-        $(document).on("click", ".removeRow", function (e) {
-            const $row = $(this).closest('.tr-border');
-           // console.log($(this).closest('.tr-border').html());
-            e.preventDefault();
-            Swal.fire({
-                title: "Are you sure?",
-                text: "This row will be removed.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Save',
-                returnFocus: false,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $row.addClass('slide-out-right');
-                    // Remove row after animation ends
-                    $row.on('animationend', function () {
-                        $row.remove(); 
-                       
-                        showNoData(); // Update no data message
-                         calculateFinalValues();
-                    });
-                }
-            });
-        });
-        */
+   
 
         //to save data and list to Production Items List module
            $('#save-datas').on('click', function() {
@@ -1084,31 +1064,7 @@
             });
 
 
-        //set sub packeaging/ingredients as primary 
-       $(document).on('click', '[id*="set-primary"]', function() {
-            const $sub = $(this).closest('.substitute-packaging');
-           
-
-            const wrapperId = $(this).closest('.packaging-wrapper').attr('id') || '';
-            const id = wrapperId.replace(/\D/g, '');  // just keep digits
-
-            const clickedId = $(this).attr('id').replace(/\D/g, '');
-
-            const newPrimary = $(`#tasteless_code${clickedId}`).val();
-
-            if ($sub.css('background-color') !== 'rgb(255, 230, 98)') {
-                $(`#tasteless_code${id}`).val(newPrimary).trigger('change');
-                $sub.siblings().css('background', '#fff');
-                $sub.css('background', '#ffe662');
-            } else {
-                let default_code = $(`#tasteless_code_original${id}`).val();
-                $(`#tasteless_code${id}`).val(default_code).trigger('change');
-                $sub.siblings().css('background', '#fff');
-                $sub.css('background', '#fff');
-            }
-
-        });
- 
+     
 
 
       
@@ -1168,137 +1124,9 @@
             click_raw = true;
         });
         
+ 
 
-
-
-
-
-
-
-
-        //Added code
-
-
-
-        $(document).on('click', '.move-up', function() {
-            const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper');
-
-             
-            const prevBr = entry.prevAll('br').first(); 
-            let sibling = entry.prev();
-            while (sibling.length && sibling.is('br')) {
-                sibling = sibling.prev();
-            } 
-            $(sibling).animate(
-                {
-                    top: `+=${entry.outerHeight()}`,
-                },
-                {
-                    duration: 300,
-                    queue: false,
-                    done: function() {
-                        $(sibling).css('top', '0');
-                    }
-                }
-            );
-
-            entry.animate(
-                {
-                    top: `-=${sibling.outerHeight()}`
-                },
-                {
-                    duration: 300,
-                    queue: false,
-                    done: function() {
-                        entry.css('top', '0');
-                      
-                        if (prevBr.length) {
-                            entry.insertAfter(prevBr);
-                        } else {
-                            entry.insertBefore(sibling);
-                        }
-                    }
-                }
-            );
-        });
-
-        $(document).on('click', '.move-down', function() {
-            const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper');
-
-           
-            const nextBr = entry.nextAll('br').first();
-
-             
-            let sibling = entry.next();
-            while (sibling.length && sibling.is('br')) {
-                sibling = sibling.next();
-            }
-
-            if (!sibling.length) return;
-
-            $(sibling).animate(
-                {
-                    top: `-=${entry.outerHeight()}`,
-                },
-                {
-                    duration: 300,
-                    queue: false,
-                    done: function() {
-                        $(sibling).css('top', '0');
-                    }
-                }
-            );
-
-            entry.animate(
-                {
-                    top: `+=${sibling.outerHeight()}`
-                },
-                {
-                    duration: 300,
-                    queue: false,
-                    done: function() {
-                        entry.css('top', '0');
-                    
-                        if (nextBr.length) {
-                            entry.insertBefore(nextBr);
-                        } else {
-                            entry.insertAfter(sibling);
-                        }
-                    }
-                }
-            );
-        });
-
-         $(document).on('click', '.delete', function(event) {
-             
-            const entry = $(this).parents(
-                '.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper'
-            );
-            entry.hide(300, function() {
-                entry.prevAll('br').first().remove(); 
-                $(this).remove();
-                showNoData();
-                showNoDataIngredient();
-                calculateFinalValues();
-            });
-          
-        }); 
-
-
-        $(document).on('click', '.delete-sub', function(event) {
-               
-            const subEntry = $(this).parents(`
-                .substitute-ingredient, 
-                .new-substitute-ingredient, 
-                .substitute-packaging, 
-                .new-substitute-packaging
-            `);
-            subEntry.hide('fast', function() {
-                $(this).remove();
-              calculateFinalValues();
-            });
-           
-        });
+       
  
 
          // Calculate total storage cost
@@ -1406,7 +1234,7 @@
         
     });
 
- $('#ProductionItems').find('input, select, textarea, button').prop('disabled', true);
+  $('#ProductionItems').find('input, select, textarea, button').prop('disabled', true);
       
 </script>
 @endpush

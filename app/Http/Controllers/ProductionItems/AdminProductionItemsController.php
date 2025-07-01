@@ -426,7 +426,7 @@ use App\NewPackaging;
 
 		 
 
-	public function generateChangesTableFields(array $differences): string {
+	public function generateChangesTableFields(array $differences, $reference_number, $created_at): string {
 				//return null string if no changes
 				if (empty($differences)) {
 					return 'null';
@@ -444,6 +444,22 @@ use App\NewPackaging;
 				foreach ($differences as $key => $change) {
 					$old = htmlspecialchars((string)$change['old']);
 					$new = htmlspecialchars((string)$change['new']);
+					
+
+					DB::table('production_items_history')->insert([
+					'reference' => $reference_number,
+					'item_code' =>  '',
+					'action' => 'Update Production Item lines', 
+					'description' => 'User Production Item Creation',
+					'key_old_value' => $key, // .': '. $safe_value,
+					'description_old_value' => $old,	
+					'key_new_value' => $key,
+					'description_new_value' => $new,  
+					'updated_by' => CRUDBooster::myId() ?: 1, 
+					'details'  =>  'new update for production with reference number ' . $reference_number,
+					'created_at' => $created_at,  
+					'updated_at' => now(),
+					]);
 
 					$html .= '<tr style="border-bottom: 1px solid #eee;">';
 					$html .= "<td style='padding: 8px 12px; border-right: 1px solid #ddd; color: #333;'>{$key}</td>";
@@ -582,9 +598,12 @@ use App\NewPackaging;
 							'item_code' =>  $old_data[$i]['item_code'],
 							'action' => 'Update Production Item lines', 
 							'description' => 'User Production Item Creation',
-							'old_data' => $safe_key .': '. $safe_value,
-							'new_data'  =>   $safe_key .': '. $old_data[$i][$key],
-							'details'  =>  'new production item has been created with reference number ' . $reference_number,
+							'key_old_value' => $safe_key, // .': '. $safe_value,
+							'description_old_value' => $old_data[$i][$key],	
+							'key_new_value' => $safe_key,
+							'description_new_value' => $safe_value,  
+							'updated_by' => CRUDBooster::myId() ?: 1, 
+							'details'  =>  'new update for production with reference number ' . $reference_number,
 							'created_at' => $created_at,  
 							'updated_at' => now(),
 							]);
@@ -637,14 +656,31 @@ use App\NewPackaging;
 					$safe_value = htmlspecialchars($value); 
 					if($value != $new_data[$i][$key]){ 
 
+ 						// reference
+						// item_code
+						// action
+						// description
+						// key_old_value
+						// description_old_value
+						// key_new_value
+						// description_new_value
+						// created_by
+						// updated_by
+						// details
+						// created_at
+						// updated_at
+
 						DB::table('production_items_history')->insert([
 						'reference' => $reference_number,
 						'item_code' =>  $old_data[$i]['item_code'],
 						'action' => 'Update Production Item lines', 
 						'description' => 'User Production Item Creation',
-						'old_data' => $safe_key .': '. $safe_value,
-						'new_data'  =>   $safe_key .': '. $old_data[$i][$key],
-						'details'  =>  'new production item has been created with reference number ' . $reference_number,
+ 						'key_old_value' => $safe_key, // .': '. $safe_value,
+						'description_old_value' => $old_data[$i][$key],	
+						'key_new_value' => $safe_key,
+						'description_new_value' => $safe_value,  
+						'updated_by' => CRUDBooster::myId() ?: 1, 
+						'details'  =>  'new update for production with reference number ' . $reference_number,
 						'created_at' => $created_at,  
 						'updated_at' => now(),
 						]);
@@ -802,76 +838,92 @@ use App\NewPackaging;
 				
 
 					
+					$clean_index = [];
 
- 
+					foreach($new_ingredients_data as $index)
+					{
 
-					// //get generated HTML
-					$detailsHtmlFields = $this->generateChangesTableFields($differences);
-				 	$detailsHtmlIngredients = $this->generateChangesTable($new_ingredients_data, $old_ingredients_data,  $item->reference_number, $item->created_at);
-					
-
-				 	 // if nothing changes return error
-					if($detailsHtmlFields == 'null' && $detailsHtmlIngredients == 'null')
+						$clean_index[] = $index;   
+					}
+	 
+					 // if nothing changes return error
+					 
+					if($old_ingredients_data == $clean_index && empty($differences))
 					{
 						return response()->json(['No changes are made but your trying to update?'
 							], 422);  
-					}
-
-					if($detailsHtmlIngredients == 'null')
+					}else
 					{
+						// //get generated HTML
+						$detailsHtmlFields = $this->generateChangesTableFields($differences, $item->reference_number, $item->created_at);
+						$ProductionItemLines = $this->generateChangesTable($new_ingredients_data, $old_ingredients_data,  $item->reference_number, $item->created_at);
 						
-						$detailsHtmlIngredients = '<p style="font-family: Arial, sans-serif; font-size: 14px;">No changes detected.</p>';
+	
+						if($old_ingredients_data == $clean_index)
+						{
+							
+							$ProductionItemLines = '<p style="font-family: Arial, sans-serif; font-size: 14px;">No changes detected.</p>';
+							
+						}
 						
-					}
-					
-					if($detailsHtmlFields == 'null')
-					{
-						$detailsHtmlFields = '<p style="font-family: Arial, sans-serif; font-size: 14px;">No changes detected.</p>';
-					} 
-					
+						if($detailsHtmlFields == 'null')
+						{
+							$detailsHtmlFields = '<p style="font-family: Arial, sans-serif; font-size: 14px;">No changes detected.</p>';
+						} 
+						
 
-					// //combine 2 html generated
-					$combinedDetails ='<hr> <label style="font-size: 20px; font-weight: bold; color: #f1c40f; background-color: #2c3e50; padding: 6px 12px; border-radius: 6px; display: inline-block;"> Fields changes </label>' . $detailsHtmlFields . '<hr> <label style="font-size: 20px; font-weight: bold; color: #f1c40f; background-color: #2c3e50; padding: 6px 12px; border-radius: 6px; display: inline-block;"> Ingredients Table </label>' . $detailsHtmlIngredients;
-					
-					//push logs to DB cms_logs
-					DB::table('cms_logs')->insert([
-						'ipaddress' => request()->ip(),
-						'useragent' => request()->userAgent(),
-						'url' => request()->fullUrl(),
-						'description' => 'Update data at production item reference number '. $item->reference_number,
-						'details' => $combinedDetails,
-						'id_cms_users' => CRUDBooster::myId() ?: 1,
-						'created_at' =>$item->created_at,
+						// //combine 2 html generated
+						$combinedDetails ='<hr> <label style="font-size: 20px; font-weight: bold; color: #f1c40f; background-color: #2c3e50; padding: 6px 12px; border-radius: 6px; display: inline-block;"> Fields changes </label>' . $detailsHtmlFields . '<hr> <label style="font-size: 20px; font-weight: bold; color: #f1c40f; background-color: #2c3e50; padding: 6px 12px; border-radius: 6px; display: inline-block;"> Production item lines </label>' . $ProductionItemLines;
+						
+						//push logs to DB cms_logs
+						DB::table('cms_logs')->insert([
+							'ipaddress' => request()->ip(),
+							'useragent' => request()->userAgent(),
+							'url' => request()->fullUrl(),
+							'description' => 'Update data at production item reference number '. $item->reference_number,
+							'details' => $combinedDetails,
+							'id_cms_users' => CRUDBooster::myId() ?: 1,
+							'created_at' => $item->created_at,
+							'updated_at' => now(),
+						]);
+
+
+ 
+						DB::table('production_items_history')->insert([
+						'reference' =>$item->reference_number,
+						'action' => 'Update', 
+						'description' => 'User Production Item Creation ' .  $item->reference_number,
+						'key_old_value' => '', // .': '. $safe_value,
+						'description_old_value' => '',	
+						'key_new_value' => '',
+						'description_new_value' => '',  
+						'updated_by' => CRUDBooster::myId() ?: 1, 
+						'details'  =>  $combinedDetails, 
+						'created_at' =>  $item->created_at,  
 						'updated_at' => now(),
-					]);
+						]);
 
 
 
 
-					DB::table('production_items_history')->insert([
-					'reference' =>  $item->reference_number,
-					'action' => 'Update', 
-					'description' => 'User Production Item Creation ' .  $item->reference_number,
-					'old_data' => '',
-					'new_data'  =>  '',
-					'details'  =>   $combinedDetails,
-					'created_at' =>  $item->created_at,  
-					'updated_at' => now(),
-					]);
-
-					$message = "✔️ Item updated successfully...";
-					 
-					
-					$data['updated_at'] = $time_stamp_now;
-					$data['updated_by'] = CRUDBooster::myId();
-					$data['reference_number'] = $item->reference_number;
-
-					//delete old ingredients to db for new add
-					//DB::table('production_item_lines')->where('production_item_id', $production_items_toDB->reference_number)->delete();
 
 
-					$message = "✔️ Item reference number " . $data['reference_number'] . " updated successfully...";
 
+
+
+						$message = "✔️ Item updated successfully...";
+						
+						
+						$data['updated_at'] = $time_stamp_now;
+						$data['updated_by'] = CRUDBooster::myId();
+						$data['reference_number'] = $item->reference_number;
+
+						//delete old ingredients to db for new add
+						//DB::table('production_item_lines')->where('production_item_id', $production_items_toDB->reference_number)->delete();
+
+
+						$message = "✔️ Item reference number " . $data['reference_number'] . " updated successfully...";
+					} 
 
 		}
 		else
@@ -903,8 +955,11 @@ use App\NewPackaging;
 				'reference' => $ref,
 				'action' => 'Create', 
 				'description' => 'User Production Item Creation',
-				'old_data' => '',
-				'new_data'  =>  '',
+				'key_old_value' => '', // .': '. $safe_value,
+				'description_old_value' => '',	
+				'key_new_value' => '',
+				'description_new_value' => '',  
+				'updated_by' => CRUDBooster::myId() ?: 1, 
 				'details'  =>  'new production item has been created with reference number ' . $ref, 
 				'created_at' => now(),
 				'updated_at' => now(),
@@ -1143,15 +1198,21 @@ use App\NewPackaging;
 				->get()
 				->toArray(); 
 			$data['production_item_lines'] = DB::table('production_item_lines')
-			->select('production_item_lines.*', 'item_masters.ttp', 'item_masters.packaging_size')
+			->select('production_item_lines.*', 
+			DB::raw('
+				case WHEN item_masters.landed_cost is null
+				THEN new_packagings.ttp 
+				ELSE item_masters.landed_cost
+				END as default_cost
+			'), 
+			'item_masters.ttp', 
+			'item_masters.packaging_size')
 			->leftjoin('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
+			->leftjoin('new_packagings', 'production_item_lines.item_code', '=', 'new_packagings.nwp_code')
 			->where('production_item_lines.production_item_id', $ref) 
 			->orderBy('production_item_lines.id')
 			->get()
-			->toArray();
-
-		 	 
-		
+			->toArray(); 
 
 			return $data;
 		}
@@ -1251,7 +1312,8 @@ use App\NewPackaging;
 
 			$query1 = NewPackaging::select('id',
 				'nwp_code as tasteless_code',
-				'item_description as full_item_description',
+				'item_description as full_item_description', 
+				DB::raw('1 as db'),
 				'ttp')
 				->whereNotIn('nwp_code', $existing)
 				->where(function($q) use ($searchTerm) {
@@ -1263,6 +1325,7 @@ use App\NewPackaging;
 			$query2 = ItemMaster::select('id',
 				'tasteless_code',
 				'full_item_description',
+				DB::raw('2 as db'),
 				'landed_cost')
 				->whereNotIn('tasteless_code', $existing)
 				->where(function($q) use ($searchTerm) {
@@ -1292,8 +1355,9 @@ use App\NewPackaging;
 			$formattedItems = $unionquery->map(function ($items) {
 				return [
 					'id' => $items->id,
-					'tasteless_code' => $items->tasteless_code,
+					'tasteless_code' => $items->tasteless_code, 
 					'item_description' => $items->full_item_description,
+					'from_db' => $items->db,
 					'cost' => $items->ttp,   
 				];
 			});
