@@ -102,7 +102,12 @@
             <div class="input-group-addon">
                 <i class="fa fa-sticky-note"></i>
             </div>
-           <input type="text" value="{{$item->description}}" class="form-control rounded" name="description" placeholder="description" aria-describedby="basic-addon1" required />
+             @if($item->id != '')
+                <input type="text" value="{{$item->description}}" class="form-control rounded" name="description" placeholder="description" aria-describedby="basic-addon1"  readonly/>
+            @else
+                <input type="text" value="{{$item->description}}" class="form-control rounded" name="description" placeholder="description" aria-describedby="basic-addon1"  required/>
+            @endif 
+           
        </div>
     </div>
 </div>
@@ -755,7 +760,7 @@
           function generateRowingredientHtml(rowId, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost) {
             return ` 
             
-                <div class="packaging-wrapper" id="ingredient-entry${rowId}">
+            <div class="packaging-wrapper" id="ingredient-entry${rowId}">
                 <div class="packaging-entry" isExisting="true">
                     <div class="packaging-inputs">
                         <label class="packaging-label">
@@ -806,7 +811,7 @@
                         <button class="btn btn-danger delete" title="Delete Ingredient" type="button"> <i class="fa fa-trash" ></i></button>
                     </div>
                 </div>
-                <div class="sub-ingredient${rowId}">
+                <div class="sub-ingredient${rowId} sub-elements">
                     
 
                 </div>
@@ -893,7 +898,7 @@
                         <button class="btn btn-danger delete" title="Delete Ingredient" type="button"> <i class="fa fa-trash" ></i></button>
                     </div>
                 </div>
-                <div class="sub-pack${rowId}">
+                <div class="sub-pack${rowId} sub-elements">
                     
 
                 </div>
@@ -977,7 +982,7 @@
                     Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Please add ingredients first, packaging can’t be empty!',
+                    text: 'Please ensure that both Ingredients and Packaging Production lines are not left empty.',
                     confirmButtonText: 'OK'
                     });
                 } else
@@ -1026,8 +1031,7 @@
             
            
         });
-
-        /* 
+ 
         $('#ProductionItems').on('submit', function() {
         Swal.fire({
             title: 'Loading...',
@@ -1039,7 +1043,7 @@
             },
             });
         });
-        */
+      
 
 
       
@@ -1137,7 +1141,7 @@
                 $sub.siblings().css('background', '#fff');
                 $sub.css('background', '#fff');
             }
-
+            calculateFinalValues();
         });
  
 
@@ -1349,28 +1353,58 @@
             const rawMastProvision = 0; 
 
             
-             $('[id*="quantity"]').each(function() {
-                
-                var id = $(this).attr('id');
-                var lastChar = id.split("quantity")[1] || id.split("yield")[1];
-
-                const cost = parseFloat($(`.costparent${lastChar}`).val()) || 0;
-                const quantity = parseFloat($(this).val()) || 0;  
-                
+            $('[class*="packaging-wrapper"]').each(function() {
                  
-                    const container = $(this).closest('.packaging-wrapper').attr('id');
+                var id = $(this).attr('id');
+                var lastChar = id.split("ingredient-entry")[1] || id.split("packaging-entry")[1];
+
+                let cost;  
+                ids = [];
+                const sub =  $(this).find('.sub-elements').children('.substitute-packaging').each(function(){
+                    ids.push($(this).attr('id'));
+
+                });
+
+                  
+                       
+                     
+                    const quantity = parseFloat(cost) || 0;  
+                    const container = $(this).attr('id');
+              
+                    console.log(ids.length);    
+                    if(ids.length == 0)
+                    {
+                        cost = parseFloat($(`.costparent${lastChar}`).val()) || 0;
+                    }
+                    else
+                    {
+                        cost = parseFloat($(`.costparent${lastChar}`).val()) || 0;
+                         ids.forEach(function(id) {
+                            const $el = $(`#${id}`); // select element by id
+                            
+                            if ($el.css('background-color') === 'rgb(255, 230, 98)') {
+                                var lastCharEl = id.split("ingredient-entry")[1] || id.split("packaging-entry")[1];
+                                console.log($('#cost'+ lastCharEl).val());
+                                cost = parseFloat($('#cost'+ lastCharEl).val()) || 0;  
+                            } 
+                        });
+            
+                    }
+                    
                     if(container.includes('ingredient-entry'))
                     {
+                       
                        ingredientsCost += cost; 
                     }
                     else
                     {
+                        
                        packagingsCost += cost; 
                     }
-                }); 
-                $('#packaging_cost').val(packagingsCost.toFixed(2));
-                $('#ingredient_cost').val(ingredientsCost.toFixed(2));
-          
+            }); 
+            $('#packaging_cost').val(packagingsCost.toFixed(2));
+            $('#ingredient_cost').val(ingredientsCost.toFixed(2));
+        
 
            // const packagingcost = parseFloat($('#packaging_cost').val()) || 0;
            // const ingredientcost = parseFloat($('#ingredient_cost').val()) || 0;
