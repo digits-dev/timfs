@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('mysql:backup')->daily()->at('23:00');
+        //$schedule->command('mysql:backup')->daily()->at('23:00');
         $schedule->call('\App\Http\Controllers\PriceChangeController@updateCosting')->daily()->at('00:01');
     }
 
