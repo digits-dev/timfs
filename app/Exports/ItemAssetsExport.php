@@ -28,6 +28,7 @@ class ItemAssetsExport implements FromQuery, WithHeadings, WithMapping
             'Model',
             'Size',
             'Color',
+            'Asset Type',
             'Vendor Name 1',
             'Vendor Name 2',
             'Vendor Name 3',
@@ -58,6 +59,7 @@ class ItemAssetsExport implements FromQuery, WithHeadings, WithMapping
             $data_item->model, 
             $data_item->size, 
             $data_item->color, 
+            $data_item->asset_type_description, 
             $data_item->vendor1_id, 
             $data_item->vendor2_id, 
             $data_item->vendor3_id, 
@@ -76,6 +78,7 @@ class ItemAssetsExport implements FromQuery, WithHeadings, WithMapping
 
     public function query() {        
         $items = ItemMastersFa::query() 
+        ->join('asset_types','item_masters_fas.asset_type','=','asset_types.id')
         ->leftJoin('brands_assets','item_masters_fas.brand_id','=','brands_assets.id')
         ->join('fa_coa_categories','item_masters_fas.categories_id','=','fa_coa_categories.id')
         ->join('fa_sub_categories','item_masters_fas.subcategories_id','=','fa_sub_categories.id')
@@ -93,7 +96,8 @@ class ItemAssetsExport implements FromQuery, WithHeadings, WithMapping
             'item_masters_fas.supplier_item_code', 
             'item_masters_fas.model', 
             'item_masters_fas.size', 
-            'item_masters_fas.color', 
+            'item_masters_fas.color',
+            'asset_types.asset_type_description', 
             'item_masters_fas.vendor1_id', 
             'item_masters_fas.vendor2_id', 
             'item_masters_fas.vendor3_id', 

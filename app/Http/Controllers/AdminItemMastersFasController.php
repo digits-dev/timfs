@@ -81,6 +81,7 @@
 			$this->col[] = ["label"=>"Model","name"=>"model"];
 			$this->col[] = ["label"=>"Size","name"=>"size"];
 			$this->col[] = ["label"=>"Color","name"=>"color"];
+			$this->col[] = ["label"=>"Asset Type","name"=>"asset_type", "join" => "asset_types,asset_type_description"];
 			$this->col[] = ["label" => "Created Date", "name" => "created_at", "visible" => CRUDBooster::myColumnView()->create_date ? true : false];
 			$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->create_by ? true : false];
 			$this->col[] = ["label" => "Updated Date", "name" => "updated_at", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];
@@ -470,7 +471,7 @@
 			$submaster_details = self::getSubmasters();
 
 			$data = array_merge($data, $submaster_details);
-			
+			// dd($data);
 			return $this->view('item-master-fa/add-edit', $data);
 		}
 
@@ -504,11 +505,16 @@
 				->where('status', 'ACTIVE')
 				->get()
 				->toArray();
+			$data['asset_types'] = DB::table('asset_types')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();	
 
 			return $data;
 		}
 
 		public function submitAddOrEdit(Request $request) {
+			//dd($request);
 			$input = $request->all();
 			if ($input['item_photo']) {
 				$filename_filler = $input['tasteless_code'] ?? 'new_item';
@@ -537,7 +543,8 @@
 			$my_privilege_id = CRUDBooster::myPrivilegeId();
 		
 			$data = $request->all();
-
+			//dd($data);
+			$data['asset_type'] = $request->asset_type;  
 			unset(
 				$data['_token'], 
 				$data['item_photo'], 
@@ -560,7 +567,7 @@
 				$data['created_by'] = $action_by;
 				$data['created_at'] = $time_stamp;
 			}
-
+			
 			if (!$tasteless_code && !$input['item_masters_approvals_id']) {
 				$data['action_type'] = 'CREATE';
 				$inserted_id = ItemMastersFasApprovals::insertGetId($data);
@@ -622,11 +629,11 @@
 		}
 
 		public function assetsUploadSave(Request $request) {
+			
 			$data = $request->all();	
 			$file = $data['import_file'];
 			$path_excel = $file->store('temp');
-			$path = storage_path('app').'/'.$path_excel;
-
+			$path = storage_path('app').'/'.$path_excel; 
 			try {
 				if($request->upload_type == "create"){
 					Excel::import(new UploadAssetsMasterfile, $path);	
@@ -665,7 +672,8 @@
 				"vendor5_id"         => "VENDOR5 NAME",
 				"model"              => "MODEL",
 				"measurement"        => "MEASUREMENT",
-				"color"              => "COLOR"
+				"color"              => "COLOR",
+				"asset_type"         => "Asset Type"
 			];
 	
 			$arrData = [
@@ -684,7 +692,8 @@
 				"vendor5_id"         => "VENDOR5 NAME",
 				"model"              => "LG",
 				"measurement"        => "12mm",
-				"color"              => "BLACK"
+				"color"              => "BLACK",
+				"asset_type"         => "Mobile"
 			];
 	
 			$spreadsheet = new Spreadsheet();

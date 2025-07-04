@@ -219,6 +219,17 @@
                                 <th><span class="required-star">*</span> Color</th>
                                 <td><input value="{{ $item->color ?: '' }}" type="text" name="color" id="color" class="form-control" required oninput="this.value = this.value.toUpperCase()" readonly></td>
                             </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Asset Type</th>
+                                <td>
+                                 <select name="asset_type" id="asset_type" class="form-control" disabled>
+                                        <option value="" disabled {{ empty($item->asset_type) ? 'selected' : '' }}>None selected...</option>
+                                          @foreach ($asset_types as $asset_type)
+                                         <option value="{{ $asset_type->id }}" {{ $asset_type->id == $item->asset_type ? 'selected' : '' }}>{{ $asset_type->asset_type_description }}</option>
+                                        @endforeach
+                                </select>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

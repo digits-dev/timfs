@@ -24,6 +24,7 @@ class ItemMastersFasApprovals extends Model
         'model',
         'size',
         'color',
+        'asset_type',
         'categories_id',
         'subcategories_id',
         'cost',

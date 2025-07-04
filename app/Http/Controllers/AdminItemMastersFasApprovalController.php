@@ -58,6 +58,7 @@
 			$this->col[] = ["label"=>"Model","name"=>"model"];
 			$this->col[] = ["label"=>"Size","name"=>"size"];
 			$this->col[] = ["label"=>"Color","name"=>"color"];
+			$this->col[] = ["label"=>"Asset Type","name"=>"asset_type", "join" => "asset_types,asset_type_description"];
 			$this->col[] = ["label" => "Created Date", "name" => "created_at", "visible" => CRUDBooster::myColumnView()->create_date ? true : false];
 			$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name", "visible" => CRUDBooster::myColumnView()->create_by ? true : false];
 			$this->col[] = ["label" => "Updated Date", "name" => "updated_at", "visible" => CRUDBooster::myColumnView()->update_date ? true : false];

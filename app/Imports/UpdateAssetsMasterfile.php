@@ -23,7 +23,9 @@ class UpdateAssetsMasterfile implements ToCollection, WithHeadingRow
      */
     public function collection(Collection $rows)
     {
+      
         foreach ($rows->toArray() as $row){
+            // dd($rows);
             $brand = DB::table('brands_assets')->where(DB::raw('LOWER(TRIM(brand_description))'),strtolower(trim($row['brand_name'])))->first();
         			
             ItemMastersFa::where(['tasteless_code'=>$row['tasteless_code']])
