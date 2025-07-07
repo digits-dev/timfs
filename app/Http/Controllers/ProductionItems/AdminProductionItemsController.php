@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\ProductionItems;
 
-	use Session;
+use App\CodeCounter;
+use Session;
 
 	use Maatwebsite\Excel\Facades\Excel;
 
@@ -18,8 +19,12 @@
 	use App\Models\ProductionItems\ProductionLocation;
 	use App\ItemMaster;
 use App\Models\ProductionItems\ProductionItemLines;
+use App\Models\ProductionItems\ProductionItemLinesModelApproval;
 use App\Models\ProductionItems\ProductionItems;
+use App\Models\ProductionItems\ProductionItemsApproval as ProductionItemsProductionItemsApproval;
+use App\Models\ProductionItems\ProductionItemsModelApproval;
 use App\NewPackaging;
+use ProductionItemsApproval;
 
 	class AdminProductionItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
  
@@ -929,16 +934,20 @@ use App\NewPackaging;
 		else
  		{ 
 			
-				$nextId = DB::table('production_items')->max('id') + 1;
-				$ref = 700000000 + $nextId;
+				 
+				$nextId = CodeCounter::where('type', 'PRODUCTION ITEMS')->value('code_7');
+				CodeCounter::where('type', 'PRODUCTION ITEMS')->increment('code_7');
+
+		 
+				$ref = $nextId;
 				$message = "✔️ Item Added successfully with reference number ". $ref;		
 				$data['reference_number'] = $ref;
 				
 				$data['created_by'] = CRUDBooster::myId();
 				$data['updated_by'] = CRUDBooster::myId();
-
-			
-			 
+				$data['approval_status'] = 202;
+				
+			    //status 202=pending, 200=approve, 400=reject
 
 				DB::table('cms_logs')->insert([
 				'ipaddress' => request()->ip(),
@@ -960,7 +969,7 @@ use App\NewPackaging;
 				'key_new_value' => '',
 				'description_new_value' => '',  
 				'updated_by' => CRUDBooster::myId() ?: 1, 
-				'details'  =>  'new production item has been created with reference number ' . $ref, 
+				'details'  =>  'new production item has on pending with reference number ' . $ref, 
 				'created_at' => now(),
 				'updated_at' => now(),
 				]);
@@ -1013,7 +1022,7 @@ use App\NewPackaging;
 
 			//loop each ingredients and save sa DB 	production_item_lines table
 			// dd($ingredients); 
-				$cost = ProductionItems::updateOrCreate(
+				$cost = ProductionItemsModelApproval::updateOrCreate(
 					['reference_number' => $data['reference_number']],
 					$data
 				);
@@ -1029,8 +1038,8 @@ use App\NewPackaging;
 		public function ingredientSearchToItemMaster($reference_number, $tasteless_code, $description, $quantity, $yield, $landed_cost, $packaging_id)
 		{ 
 			
-
-			$production_items_toDB = new ProductionItemLines();
+			
+			$production_items_toDB = new ProductionItemLinesModelApproval();
 
 			$production_items_toDB->production_item_id = $reference_number;
 			$production_items_toDB->item_code = $tasteless_code;  
@@ -1040,7 +1049,8 @@ use App\NewPackaging;
 			$production_items_toDB->yield = $yield;
 			$production_items_toDB->packaging_id = $packaging_id;
 			$production_items_toDB->is_alternative = 1;
- 
+			$production_items_toDB->approval_status = 202;
+
 			$production_items_toDB->save();
  
 		}

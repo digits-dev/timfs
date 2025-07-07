@@ -5,12 +5,12 @@ namespace App\Models\ProductionItems;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductionItemLines extends Model
+class ProductionItemLinesModelApproval extends Model
 {
     use HasFactory;
+    
 
-
-    protected $table = 'production_item_lines';
+     protected $table = 'production_item_lines_approvals';
 
     protected $fillable = [
         'production_item_id',
