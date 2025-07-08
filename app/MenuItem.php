@@ -22,7 +22,9 @@ class MenuItem extends Model
         'available_concepts',
         'status',
         'approval_status',
-        'created_by'
+        'created_by',
+        'approved_by',
+        'approved_at'
     ];
 
     private static function getSegmentationChecks()
@@ -119,7 +121,12 @@ class MenuItem extends Model
        static::creating(function($model)
        {
            $model->created_by = CRUDBooster::myId();
+           $model->action_type = "Create";
+           $model->approval_status = 1;
+           $model->approved_by = 1;
+           $model->approved_at = now();
        });
+
        static::updating(function($model)
        {
            $model->updated_by = CRUDBooster::myId();
