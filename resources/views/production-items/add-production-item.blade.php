@@ -9,7 +9,10 @@
 <script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
 <link rel="stylesheet" href="{{asset('css/edit-rnd-menu.css')}}">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
 
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -38,32 +41,7 @@
     justify-content: center;
     align-items: center;
 }
-
-  .add-sub-btn-labor {
-    font-size: 14;
-    height: 30px;
-    width: 30px;
-    border-radius: 50%;
-    color: white;
-    position: absolute;
-    bottom: -15px;
-    cursor: pointer;
-    transition: 200ms;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.add-sub-btn-labor  {
-    background-color: #e75500;
-    transform: translateY(-7px); 
-    left: 10px;
-}
-
-.add-sub-btn-labor:hover  { 
-      transform: translateY(-4px);
-    /* rotate: 90deg; */
-    transition: 200ms;
-}
+ 
 
 .add-sub-btn-pack  {
     background-color: #367fa9;
@@ -104,7 +82,32 @@
         height: auto;
         display: block;
     }
-
+ 
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #fff;
+    }
+    .card img {
+      max-width: 100%;
+      border-radius: 4px 4px 0 0;
+    }
+    .card-body {
+      padding: 10px 0;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .card-text {
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
 </style>
 @endpush
 @extends('crudbooster::admin_template')
@@ -391,69 +394,82 @@
 
 <button id="sumit-form-btn" class="btn btn-primary hide" type="submit">submit</button>
 
-
-     
-          <h3 class="text-center text-bold">Production Item Lines</h3>
-         
-           <hr>
-         <div class="row">
-                
-                <div class="col-md-12">
-                    <div class="box-header text-center">
-                        <h3 class="box-title"><b>Packaging</b></h3>
+ 
+          <h3 class="text-center text-bold">Production Item Lines</h3> 
+           <br>  
+                 <div class="card"> 
+                    <div class="row">
+                    <div class="col-md-12"> 
+                             <h3 class="card-title text-center" style="position: relative; top: -25px;"><b>Ingredients</b></h3>  
                     </div>
-                </div>
-                </div>
-                <div class="package-box" style="margin-bottom: 5px">
-                    <div class="package-table w-100" style="width: 100%;">
-                        <div id="package-tbody" name="package-added" >
-                            <!-- Rows injected by JS -->
+                    </div>
+                     <br> 
+                    <div class="ingredient-box" style="margin-bottom: 5px; position: relative; top: -20px;">
+                        <div class="ingredient-table w-100" style="width: 100%;">
+                            <div id="ingredient-tbody" name="ingredient-added" >
+                                <!-- Rows injected by JS -->
+                            </div>
+                        </div> 
+                        <div class="no-data-available-ingredient text-center py-2" style="display: none;">
+                            <i style="font-style: italic; color: #6c757d;" class="fa fa-table"></i> <span style="font-style: italic; color: #6c757d;">No ingredients currently save</span>
                         </div>
-                    </div> 
-                      <div class="no-data-available text-center py-2" style="display: none;">
-                        <i style="font-style: italic; color: #6c757d;" class="fa fa-table"></i> <span style="font-style: italic; color: #6c757d;">No Packaging currently save</span>
-                    </div>
-                </div>
 
-                <hr>
-                <div class="row">
-                <div class="col-md-12">
-                    <div class="box-header text-center">
-                        <h3 class="box-title"><b>Ingredients</b></h3>
                     </div>
-                </div>
-                </div>
-                 <div class="ingredient-box" style="margin-bottom: 5px">
-                    <div class="ingredient-table w-100" style="width: 100%;">
-                        <div id="ingredient-tbody" name="ingredient-added" >
-                            <!-- Rows injected by JS -->
+
+                    <a class="btn btn-success" id="add-Row-ingredient">
+                    <i class="fa fa-leaf" aria-hidden="true"></i> Add New Ingredient
+                    </a> 
+                </div> 
+
+
+
+                 <div class="card">
+                    <div class="row">
+                    <div class="col-md-12 "> 
+                      <h3 class="card-title text-center" style="position: relative; top: -25px;"><b>Packaging</b></h3> 
+                    </div>
+                    
+                    </div>
+                    <br> 
+                    <div class="package-box" style="margin-bottom: 5px; position: relative; top: -20px;">
+                        <div class="package-table w-100" style="width: 100%;">
+                            <div id="package-tbody" name="package-added" >
+                                <!-- Rows injected by JS -->
+                            </div>
+                        </div>  
+                        <div class="no-data-available text-center py-2" style="display: none;">
+                            <i style="font-style: italic; color: #6c757d;" class="fa fa-table"></i> <span style="font-style: italic; color: #6c757d; ">No Packaging currently save</span>
                         </div>
-                    </div> 
-                    <div class="no-data-available-ingredient text-center py-2" style="display: none;">
-                        <i style="font-style: italic; color: #6c757d;" class="fa fa-table"></i> <span style="font-style: italic; color: #6c757d;">No ingredients currently save</span>
+                        
                     </div>
-
+                     <a class="btn btn-primary" id="add-Row">
+                    <i class="fa fa-cube" aria-hidden="true"></i> Add New Packaging
+                    </a> 
                 </div>
 
-                  <hr>
+
+
+
                 <div class="row">
-                <div class="col-md-12">
-                    <div class="box-header text-center">
-                        <h3 class="box-title"><b>Labor</b></h3>
-                    </div>
-                </div>
+              
                 </div>
                  <div class="ingredient-box" style="margin-bottom: 5px">
                     <div class="labor-table w-100" style="width: 100%;">
                         <div id="labor-tbody" name="ingredient-added" >
-                           <div class="packaging-wrapper" id="labor-entry">
-                            <div class="labor-entry" isExisting="true">
+                           <div class="card" id="labor-entry">
+                              <div class="col-md-12">
+                                <div class="box-header text-center">
+                                    <h3 class="box-title"><b>Labor</b></h3>
+                                </div>
+                            </div>
+                            
+                            <div class="labor-entry col-md-12" isExisting="true">
                                 <div class="labor-inputs"> 
                                     <label class="labor-label">
                                        
                                         <span class="required-star">*</span> Labor Cost per Minute  <span class="item-from label"></span> <span class="label label-danger"></span>
                                         <div> 
-                                            <input value="" type="text" id="labor_cost_per_minute" class="form-control display-labor span-2" placeholder="eg: 120" required/>
+                                            <input value="" type="text" id="labor_cost_per_minute" class="form-control display-labor span-2" placeholder="eg 120" required/>
                                          </div>
                                     </label> 
                                     <label>
@@ -466,29 +482,25 @@
                                         <input value="" id="labor_cost_val" class="form-control costparent cost" type="text" readonly required>
                                     </label>
                                 </div> 
+                                  <br>
                             </div>
+                            <br>
                             <div class="sub-labor sub-elements">
                                 <br>
                                 <div class="no-data-available-labor text-center py-2"  >
                                     <i style="font-style: italic; color: #6c757d;" class="fa fa-table"></i> <span style="font-style: italic; color: #6c757d;">No Labor currently save</span>
                                 </div>
                             </div>
-                            <div class="add-sub-btn-labor" title="Add Labor">
-                                <i class="glyphicon glyphicon-briefcase"></i>
-                            </div> 
+                            <br>
+                              <br>
+                            <a class="btn btn-primary add-sub-btn-labor" id="add-Row">
+                                <i class="glyphicon glyphicon-briefcase"></i> Add New Labor
+                            </a> 
                         </div> 
                         </div>
                     </div>  
                 </div> 
-                 <br>  
-                <a class="btn btn-primary" id="add-Row">
-                <i class="fa fa-cube" aria-hidden="true"></i> Add New Packaging
-                </a> 
-
-                <a class="btn btn-success" id="add-Row-ingredient">
-                <i class="fa fa-leaf" aria-hidden="true"></i> Add New Ingredient
-                </a> 
-
+                 <br>   
                 <hr>
                 <br>
             </div>
@@ -1071,7 +1083,7 @@
 
           function Sub_gen_Labor_row(rowId) {
             return `  
-                <div class="substitute-packaging" id="labor-entry-sub${rowId}">
+                <div class="substitute-packaging animate__animated animate__bounceIn"  id="labor-entry-sub${rowId}">
                 <div class="packaging-inputs">
                    
                     <label>
@@ -1128,7 +1140,7 @@
         function Sub_gen_ingredient_row(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost)
           {
             return `  
-                <div class="substitute-packaging" id="ingredient-entry${rowId}" >
+                <div class="substitute-packaging animate__animated animate__bounceIn" id="ingredient-entry${rowId}" >
                 <div class="packaging-inputs">
                        <label class="packaging-label">
                             <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
@@ -1183,7 +1195,7 @@
           function generateRowingredientHtml(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost) {
             return ` 
             
-            <div class="packaging-wrapper" id="ingredient-entry${rowId}">
+            <div class="packaging-wrapper animate__animated animate__bounceIn" id="ingredient-entry${rowId}">
                 <div class="packaging-entry" isExisting="true">
                     <div class="packaging-inputs">
                         <label class="packaging-label">
@@ -1251,7 +1263,7 @@
           function Sub_gen_pack_row(rowId, DB_id, tasteless_code, quantity, cost, description, default_cost)
           {
             return `  
-            <div class="substitute-packaging" id="packaging-entry${rowId}">
+            <div class="substitute-packaging  animate__animated animate__bounceIn" id="packaging-entry${rowId}">
                 <div class="packaging-inputs">
                       <label class="packaging-label">
                             <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
@@ -1289,7 +1301,7 @@
           function generateRowHtml(rowId, DB_id, tasteless_code, quantity, cost, description, default_cost) {
             return `  
                  
-                    <div class="packaging-wrapper" id="packaging-entry${rowId}">
+                    <div class="packaging-wrapper animate__animated animate__bounceIn" id="packaging-entry${rowId}">
                     <div class="packaging-entry" isExisting="true">
                         <div class="packaging-inputs">
                             <label class="packaging-label">
@@ -1593,7 +1605,7 @@
             const id = wrapperId.replace(/\D/g, '');   
 
             const clickedId = $(this).attr('id').replace(/\D/g, '');
-
+            
             const newPrimary = $(`#tasteless_code${clickedId}`).val();
 
             if ($sub.css('background-color') !== 'rgb(255, 230, 98)') {
@@ -1607,6 +1619,10 @@
                 $sub.css('background', '#fff');
             }
             calculateFinalValues();
+
+            $sub.removeClass('animate__animated animate__bounceIn animate__rubberBand');   
+            void $sub[0].offsetWidth;  
+            $sub.addClass('animate__animated animate__rubberBand');
         });
  
 
@@ -1684,8 +1700,12 @@
 
         $(document).on('click', '.move-up', function() {
             const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper');
+            const chld = entry.find('.animate__bounceIn, .animate__rubberBand'); 
 
-             
+
+            entry.removeClass('animate__animated animate__bounceIn');
+            chld.removeClass('animate__animated animate__bounceIn animate__rubberBand'); 
+
             const prevBr = entry.prevAll('br').first(); 
             let sibling = entry.prev();
             while (sibling.length && sibling.is('br')) {
@@ -1726,8 +1746,12 @@
 
         $(document).on('click', '.move-down', function() {
             const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper');
+            const chld = entry.find('.animate__bounceIn, .animate__rubberBand'); 
 
-           
+
+            entry.removeClass('animate__animated animate__bounceIn');
+            chld.removeClass('animate__animated animate__bounceIn animate__rubberBand'); 
+
             const nextBr = entry.nextAll('br').first();
 
              
@@ -1776,7 +1800,7 @@
             const entry = $(this).parents(
                 '.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper'
             );
-            entry.hide(300, function() {
+            entry.addClass('animate__animated animate__bounceOut').one('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', function() {
                 entry.prevAll('br').first().remove(); 
                 $(this).remove();
                 showNoData();
@@ -1795,12 +1819,13 @@
                 .substitute-packaging, 
                 .new-substitute-packaging
             `);
-            subEntry.hide('fast', function() {
+           subEntry.addClass('animate__animated animate__bounceOut').one('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', function() {
                 $(this).remove();
                 showNoDataLabor();
-              calculateFinalValues();
-              CalculateLabor();
+                calculateFinalValues();
+                CalculateLabor();
             });
+
            
         });
  
