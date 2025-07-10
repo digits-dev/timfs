@@ -13,15 +13,18 @@ class ProductionItemLines extends Model
     protected $table = 'production_item_lines';
 
     protected $fillable = [
+        'id',
         'production_item_id',
         'item_code',
         'description',
         'quantity',
         'landed_cost',
         'yield',
+        'packaging_id',
         'ingredient_qty',
         'is_alternative',
         'approved_by',
+        'production_item_line_id',
         'approval_status',
         'approved_at',
         'created_at',	

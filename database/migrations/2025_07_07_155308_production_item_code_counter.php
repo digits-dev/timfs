@@ -46,6 +46,6 @@ class ProductionItemCodeCounter extends Migration
      */
     public function down()
     {
-         DB::table('code_counters')->whereIn('type', 'PRODUCTION ITEMS')->delete();
+       //  DB::table('code_counters')->whereIn('type', 'PRODUCTION ITEMS')->delete();
     }
 }

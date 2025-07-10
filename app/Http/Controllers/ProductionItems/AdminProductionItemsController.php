@@ -745,7 +745,7 @@ use ProductionItemsApproval;
 
 
 	public function addProductionItemsToDB(Request $request){
- 
+		 
 		$message = '';
 		$time_stamp_now = date('Y-m-d H:i:s');
 			
@@ -977,52 +977,50 @@ use ProductionItemsApproval;
 
 		}
 
-			$ingredients = $request->input('produtionlines'); // get the array
-
-			DB::table('production_item_lines')->where('production_item_id', $data['reference_number'])->delete(); 	
-
+			$production_item_id = $data['reference_number'];
+			$ingredients = $request->input('produtionlines');
+			$new_id = 0;
+			// Flatten all new item_codes for later comparison
 		 
-
-			// $newIngredients = [];
-			// $counter = 0;
-
-			// foreach ($ingredients as $parentKey => $childArray) {
-			// 	$newIngredients[$parentKey] = [];
-			// 	foreach ($childArray as $child) {
-			// 		$newIngredients[$parentKey][$counter++] = $child;
-			// 	}
-			// }
-
-			// $ingredients = $newIngredients;
-
- 
-
-
-
-			 
-
+			$newItemCodesID = [];
 
 			if (count($ingredients) > 0) {
 				foreach ($ingredients as $parentCode => $ingredientGroup) {
-					 
-					foreach ($ingredientGroup as $key => $ingredient) { 
-						self::ingredientSearchToItemMaster(
+					foreach ($ingredientGroup as $ingredient) { 
 						 
-							$data['reference_number'],
-							$ingredient['tasteless_code'],
-							$ingredient['description'],
-							$ingredient['quantity'],
-							$ingredient['yield'],
-							$ingredient['cost'],
-							$parentCode
+						$new_id++;
+						$newItemCodesID[] = $new_id;
+						ProductionItemLines::updateOrCreate(
+							[
+								'production_item_id' => $production_item_id,
+								'production_item_line_id' => $new_id,
+							],
+							[ 
+								'production_item_id' => $production_item_id,
+								'item_code' => $ingredient['tasteless_code'],	
+								'description' => $ingredient['description'],
+								'quantity' => $ingredient['quantity'],
+								'yield' => $ingredient['yield'],
+								'landed_cost' => $ingredient['cost'],
+								'packaging_id' => $parentCode,
+								'is_alternative' => 1,
+								'production_item_line_id' => $new_id,
+								'approval_status' => 202,
+							]
 						);
 					}
 				}
 			}
+		 
 
+			ProductionItemLines::where('production_item_id', $production_item_id)
+				->whereNotIn('production_item_line_id', $newItemCodesID) 
+				->delete();
+
+ 
 			//loop each ingredients and save sa DB 	production_item_lines table
 			// dd($ingredients); 
-				$cost = ProductionItemsModelApproval::updateOrCreate(
+				$cost = ProductionItems::updateOrCreate(
 					['reference_number' => $data['reference_number']],
 					$data
 				);
@@ -1034,30 +1032,7 @@ use ProductionItemsApproval;
 			])->send();
 		
 	}
-
-		public function ingredientSearchToItemMaster($reference_number, $tasteless_code, $description, $quantity, $yield, $landed_cost, $packaging_id)
-		{ 
-			
-			
-			$production_items_toDB = new ProductionItemLinesModelApproval();
-
-			$production_items_toDB->production_item_id = $reference_number;
-			$production_items_toDB->item_code = $tasteless_code;  
-			$production_items_toDB->description = $description;
-			$production_items_toDB->quantity = $quantity;
-			$production_items_toDB->landed_cost = $landed_cost;
-			$production_items_toDB->yield = $yield;
-			$production_items_toDB->packaging_id = $packaging_id;
-			$production_items_toDB->is_alternative = 1;
-			$production_items_toDB->approval_status = 202;
-
-			$production_items_toDB->save();
  
-		}
-
-
-
-
 	 	public function getAdd() {
 			if (!CRUDBooster::isCreate())
 				CRUDBooster::redirect(
@@ -1104,7 +1079,7 @@ use ProductionItemsApproval;
 			 
 
 			 	 $data = array_merge($data, $costings);
-			 	//dd($costings);
+			 	//dd($data);
 				 
 				return $this->view('production-items/add-production-item',   $data);
 			}
@@ -1146,7 +1121,7 @@ use ProductionItemsApproval;
 			 	 $data = array_merge($data, $costings); 
 				  
 				
-				//dd($costings);
+				 
 				return $this->view('production-items/detail-production-item',   $data); 
 	}
 
@@ -1215,14 +1190,20 @@ use ProductionItemsApproval;
 				ELSE item_masters.landed_cost
 				END as default_cost
 			'), 
+			'production_item_lines.production_item_line_id',
 			'item_masters.ttp', 
 			'item_masters.packaging_size')
 			->leftjoin('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
 			->leftjoin('new_packagings', 'production_item_lines.item_code', '=', 'new_packagings.nwp_code')
 			->where('production_item_lines.production_item_id', $ref) 
-			->orderBy('production_item_lines.id')
+			->orderBy('production_item_lines.production_item_line_id' , 'asc')
 			->get()
 			->toArray(); 
+			$data['menu_ingredients_preparations'] = DB::table('menu_ingredients_preparations')
+				->where('status', 'ACTIVE') 
+				->get()
+				->toArray(); 
+
 
 			return $data;
 		}

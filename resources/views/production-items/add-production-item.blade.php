@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"> 
 <script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
 <link rel="stylesheet" href="{{asset('css/edit-rnd-menu.css')}}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
 
 
@@ -38,6 +39,32 @@
     align-items: center;
 }
 
+  .add-sub-btn-labor {
+    font-size: 14;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    color: white;
+    position: absolute;
+    bottom: -15px;
+    cursor: pointer;
+    transition: 200ms;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.add-sub-btn-labor  {
+    background-color: #e75500;
+    transform: translateY(-7px); 
+    left: 10px;
+}
+
+.add-sub-btn-labor:hover  { 
+      transform: translateY(-4px);
+    /* rotate: 90deg; */
+    transition: 200ms;
+}
+
 .add-sub-btn-pack  {
     background-color: #367fa9;
     transform: translateY(-7px); 
@@ -58,6 +85,26 @@
     /* rotate: 90deg; */
     transition: 200ms;
 }
+
+ table, tbody, td, th {
+        border: 1px solid black !important;
+        padding-left: 50px;
+    }
+
+    th {
+        width: 35%;
+    }
+      .photo-section {
+        max-width: 400px;
+        margin: 0 auto; 
+    }
+
+    .photo-section img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+
 </style>
 @endpush
 @extends('crudbooster::admin_template')
@@ -90,12 +137,364 @@
         <input name="id" value="{{$item->id}}" class="hide"/> 
         <div class="row"> 
             <div class="col-md-12">
+                 
+        <hr>
+            <h3 class="text-center text-bold">ITEM DETAILS</h3>
+
+<input value="" name="tasteless_code" type="text" class="tasteless_code hide">
+
+<div class="row">
+    <div class="col-md-6">
+        <table class="table-responsive table">
+            <tbody>
+                <tr>
+                    <th>Tasteless Code</th>
+                    <td><input value="" type="text" name="tasteless_code" id="tasteless_code" class="form-control" readonly></td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Item Description</th>
+                    <td><input value="" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Display Photo</th>
+                    <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" required></td>
+                </tr>
+                <tr>
+                    <th>File Reference Link</th>
+                    <td><input type="text" value="" name="file_link" id="file_link" class="form-control"></td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Brand Description</th>
+                    <td>
+                        <select name="brands_id" id="brands_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Tax Code</th>
+                    <td>
+                        <select name="tax_codes_id" id="tax_codes_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Account</th>
+                    <td>
+                        <select name="accounts_id" id="accounts_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> COGS Account</th>
+                    <td>
+                        <select name="cogs_accounts_id" id="cogs_accounts_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Asset Account</th>
+                    <td>
+                        <select name="asset_accounts_id" id="asset_accounts_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Purchase Description</th>
+                    <td>
+                        <input type="text" value="" class="form-control" name="purchase_description" id="purchase_description" readonly>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Fulfillment Type</th>
+                    <td>
+                        <select name="fulfillment_type_id" id="fulfillment_type_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> U/M</th>
+                    <td>
+                        <select name="uoms_id" id="uoms_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> U/M Set</th>
+                    <td>
+                        <select name="uoms_set_id" id="uoms_set_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Currency</th>
+                    <td>
+                        <select name="currencies_id" id="currencies_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Supplier Cost</th>
+                    <td>
+                        <input value="" type="number" step="any" class="form-control" name="purchase_price" id="purchase_price" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Sales Price</th>
+                    <td>
+                        <input value=""  type="number" step="any" class="form-control" name="ttp" id="ttp" required>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <table class="table-responsive table">
+            <tbody>
+                <tr>
+                    <th>Sales Price Change</th>
+                    <td>
+                        <input value=""  type="number" step="any" class="form-control" name="ttp_price_change" id="ttp_price_change">
+                    </td>
+                </tr>
+                <tr>
+                    <th>Sales Price Effective Date</th>
+                    <td>
+                        <input value=""  type="date" step="any" class="form-control" name="ttp_price_effective_date" id="ttp_price_effective_date">
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Commi Margin</th>
+                    <td>
+                        <input value="" type="number" step="any" class="form-control" name="ttp_percentage" id="ttp_percentage" readonly>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Landed Cost</th>
+                    <td>
+                        <input value="" type="number" step="any" class="form-control" name="landed_cost" id="landed_cost" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Preferred Vendor</th>
+                    <td>
+                        <select name="suppliers_id" id="suppliers_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Reorder Pt (Min)</th>
+                    <td>
+                        <input value="" type="number" step="any" class="form-control" name="reorder_pt" id="reorder_pt" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Group</th>
+                    <td>
+                        <select name="groups_id" id="groups_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Category Description</th>
+                    <td>
+                        <select name="categories_id" id="categories_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Subcategory Description</th>
+                    <td>
+                        <select name="subcategories_id" id="subcategories_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Specifications</th>
+                    <td>
+                        <input value="" type="text" class="form-control" name="packaging_dimension" id="packaging_dimension">
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Packaging Size</th>
+                    <td>
+                        <input value="" type="number" step="any" class="form-control" name="packaging_size" id="packaging_size" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> Packaging UOM</th>
+                    <td>
+                        <select name="packagings_id" id="packagings_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Supplier Item Code</th>
+                    <td>
+                        <input value="" type="text" class="form-control" name="supplier_item_code" id="supplier_item_code">
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> MOQ Store</th>
+                    <td>
+                        <input value="" type="number" step="any" class="form-control" name="moq_store" id="moq_store" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="required-star">*</span> SKU Status</th>
+                    <td>
+                        <select name="sku_statuses_id" id="sku_statuses_id" class="form-control" required>
+                            <option value="" disabled selected>None selected...</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3 class="text-center text-bold">SEGMENTATIONS</h3>
+        <input type="text" class="hide" name="segmentations" id="segmentations">
+        <table class="table table-reponsive">
+            <tr>
+                <th>Segmentation (Example)</th>
+                <td>
+                    <select class="segmentation_select" id="segmentation_example" _value="Example" class="form-control" multiple="multiple">
+                        <option class="segment_column_example" value="segment_column_example">Segment Description Example</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <div class="photo-section">
+            <h3 class="text-center text-bold">DISPLAY PHOTO</h3>
+            <img src="" alt="Item Photo">
+        </div>
+    </div>
+</div>
+
+<button id="sumit-form-btn" class="btn btn-primary hide" type="submit">submit</button>
+
+
+     
+          <h3 class="text-center text-bold">Production Item Lines</h3>
+         
+           <hr>
+         <div class="row">
                 
+                <div class="col-md-12">
+                    <div class="box-header text-center">
+                        <h3 class="box-title"><b>Packaging</b></h3>
+                    </div>
+                </div>
+                </div>
+                <div class="package-box" style="margin-bottom: 5px">
+                    <div class="package-table w-100" style="width: 100%;">
+                        <div id="package-tbody" name="package-added" >
+                            <!-- Rows injected by JS -->
+                        </div>
+                    </div> 
+                      <div class="no-data-available text-center py-2" style="display: none;">
+                        <i style="font-style: italic; color: #6c757d;" class="fa fa-table"></i> <span style="font-style: italic; color: #6c757d;">No Packaging currently save</span>
+                    </div>
+                </div>
 
+                <hr>
+                <div class="row">
+                <div class="col-md-12">
+                    <div class="box-header text-center">
+                        <h3 class="box-title"><b>Ingredients</b></h3>
+                    </div>
+                </div>
+                </div>
+                 <div class="ingredient-box" style="margin-bottom: 5px">
+                    <div class="ingredient-table w-100" style="width: 100%;">
+                        <div id="ingredient-tbody" name="ingredient-added" >
+                            <!-- Rows injected by JS -->
+                        </div>
+                    </div> 
+                    <div class="no-data-available-ingredient text-center py-2" style="display: none;">
+                        <i style="font-style: italic; color: #6c757d;" class="fa fa-table"></i> <span style="font-style: italic; color: #6c757d;">No ingredients currently save</span>
+                    </div>
 
+                </div>
 
+                  <hr>
+                <div class="row">
+                <div class="col-md-12">
+                    <div class="box-header text-center">
+                        <h3 class="box-title"><b>Labor</b></h3>
+                    </div>
+                </div>
+                </div>
+                 <div class="ingredient-box" style="margin-bottom: 5px">
+                    <div class="labor-table w-100" style="width: 100%;">
+                        <div id="labor-tbody" name="ingredient-added" >
+                           <div class="packaging-wrapper" id="labor-entry">
+                            <div class="labor-entry" isExisting="true">
+                                <div class="labor-inputs"> 
+                                    <label class="labor-label">
+                                       
+                                        <span class="required-star">*</span> Labor Cost per Minute  <span class="item-from label"></span> <span class="label label-danger"></span>
+                                        <div> 
+                                            <input value="" type="text" id="labor_cost_per_minute" class="form-control display-labor span-2" placeholder="eg: 120" required/>
+                                         </div>
+                                    </label> 
+                                    <label>
+                                        <span class="required-star">*</span> Total Minutes per Pack    
+                                        <input value="" id="total_minutes_per_pack" class="form-control costparent cost" type="text" readonly required>
+                                    </label>
+                                     
+                                    <label>
+                                        <span class="required-star">*</span> Total Labor Cost    
+                                        <input value="" id="labor_cost_val" class="form-control costparent cost" type="text" readonly required>
+                                    </label>
+                                </div> 
+                            </div>
+                            <div class="sub-labor sub-elements">
+                                <br>
+                                <div class="no-data-available-labor text-center py-2"  >
+                                    <i style="font-style: italic; color: #6c757d;" class="fa fa-table"></i> <span style="font-style: italic; color: #6c757d;">No Labor currently save</span>
+                                </div>
+                            </div>
+                            <div class="add-sub-btn-labor" title="Add Labor">
+                                <i class="glyphicon glyphicon-briefcase"></i>
+                            </div> 
+                        </div> 
+                        </div>
+                    </div>  
+                </div> 
+                 <br>  
+                <a class="btn btn-primary" id="add-Row">
+                <i class="fa fa-cube" aria-hidden="true"></i> Add New Packaging
+                </a> 
 
-               <div class="col-md-4">
+                <a class="btn btn-success" id="add-Row-ingredient">
+                <i class="fa fa-leaf" aria-hidden="true"></i> Add New Ingredient
+                </a> 
+
+                <hr>
+                <br>
+            </div>
+             
+             <h3 class="text-center text-bold">Costing Fields</h3>
+                <!-- <div class="col-md-4">
     <div class="form-group">
         <label for="" class="control-label">  <span style="color: red;">* </span>Description</label>
         <div class="input-group">
@@ -110,7 +509,9 @@
            
        </div>
     </div>
-</div>
+</div> -->
+   <br>
+   
 <div class="col-md-2">
     <div class="form-group">
         <label for="" class="control-label"> <span style="color: red;">* </span>Packaging Cost</label>
@@ -180,7 +581,7 @@
             <div class="input-group-addon">
                 <i class="fa fa-sticky-note"></i>
             </div>
-             <input type="text" value="{{$item->labor_cost}}" class="form-control rounded" name="labor_cost" id="labor_cost" placeholder="Labor cost" aria-describedby="basic-addon1" required />
+             <input type="text" value="{{$item->labor_cost}}" class="form-control rounded" name="labor_cost" id="labor_cost" placeholder="Labor cost" aria-describedby="basic-addon1" readonly required />
         </div>
     </div>
 </div>
@@ -307,53 +708,9 @@
         </div>
     </div>
 </div>
-
-        <hr>
-         <div class="row">
-                
-                <div class="col-md-12">
-                    <div class="box-header text-center">
-                        <h3 class="box-title"><b>Packaging</b></h3>
-                    </div>
-                </div>
-                </div>
-                <div class="package-box" style="margin-bottom: 5px">
-                    <div class="package-table w-100" style="width: 100%;">
-                        <div id="package-tbody" name="package-added" >
-                            <!-- Rows injected by JS -->
-                        </div>
-                    </div> 
-                      <div class="no-data-available text-center py-2" style="display: none;">
-                        <i style="font-style: italic; color: #6c757d;" class="fa fa-table"></i> <span style="font-style: italic; color: #6c757d;">No Packaging currently save</span>
-                    </div>
-                </div>
-
-                <hr>
-                <div class="row">
-                <div class="col-md-12">
-                    <div class="box-header text-center">
-                        <h3 class="box-title"><b>Ingredients</b></h3>
-                    </div>
-                </div>
-            </div>
-                 <div class="ingredient-box" style="margin-bottom: 5px">
-                    <div class="ingredient-table w-100" style="width: 100%;">
-                        <div id="ingredient-tbody" name="ingredient-added" >
-                            <!-- Rows injected by JS -->
-                        </div>
-                    </div> 
-                    <div class="no-data-available-ingredient text-center py-2" style="display: none;">
-                        <i style="font-style: italic; color: #6c757d;" class="fa fa-table"></i> <span style="font-style: italic; color: #6c757d;">No ingredients currently save</span>
-                    </div>
-
-                </div>
-                <br>
-                 <br>  
-                <a class="btn btn-primary" id="add-Row"><i class="fa fa-plus"></i> Add New Packaging</a> 
-                <a class="btn btn-success" id="add-Row-ingredient"><i class="fa fa-plus"></i> Add New Ingredient</a>
-            </div>
-           
              
+
+    <br>
             </div>
     </div>
                 <br>   
@@ -403,6 +760,7 @@
                      //function Sub_gen_pack_row(rowId, tasteless_code, quantity, cost, description)
                     const newRowHtml = generateRowHtml(
                         tableRow,
+                        item.production_item_line_id,
                         item.item_code,
                         item.quantity,
                         item.landed_cost,  
@@ -418,6 +776,7 @@
                     tableRow++;
                     const newRowHtml = generateRowingredientHtml(
                         tableRow,
+                        item.production_item_line_id,
                         item.item_code,
                         item.description,
                         item.ttp,
@@ -464,6 +823,7 @@
                     
                     const newRowHtml = Sub_gen_pack_row(
                         tableRow,
+                        item.production_item_line_id,
                         item.item_code,
                         item.quantity,
                         item.landed_cost,  
@@ -482,6 +842,7 @@
                     
                     const newRowHtml = Sub_gen_ingredient_row(
                         tableRow,
+                        item.production_item_line_id,
                         item.item_code,
                         item.description,
                         item.ttp,
@@ -521,19 +882,18 @@
          $("#add-Row-ingredient").click(function () { 
             tableRow++;
             console.log( tableRow + " dd-Row");
-            const newRowHtml = generateRowingredientHtml(tableRow, "", "", "", "", "", "", "");
+            const newRowHtml = generateRowingredientHtml(tableRow, "", "", "", "", "", "", "", "");
             $(newRowHtml).appendTo('#ingredient-tbody'); 
             IngredientSearch(`#itemDesc${tableRow}`, tableRow); 
             showNoData();
                 showNoDataIngredient();
         });
         
-
-
+ 
         $(document).on('click', '.add-sub-btn', function(event) {
             tableRow++;
             const parentId = $(this).parent().attr('id').split("ingredient-entry")[1];   
-            const newRowPackHtml = Sub_gen_ingredient_row(tableRow, "", "", "", "", "", "", "");  
+            const newRowPackHtml = Sub_gen_ingredient_row(tableRow, "", "", "", "", "", "", "", "");  
             $(newRowPackHtml).appendTo(`.sub-ingredient${parentId}`);
             console.log(parentId);
             IngredientSearch(`#itemDesc${tableRow}`, tableRow); 
@@ -548,6 +908,14 @@
             console.log(parentId);
             PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
         });
+
+        $(document).on('click', '.add-sub-btn-labor', function(event) {
+            tableRow++; 
+            const newRowPackHtml = Sub_gen_Labor_row(tableRow);  
+            $(newRowPackHtml).appendTo(`.sub-labor`); 
+            showNoDataLabor();
+        });
+
 
         
        
@@ -701,9 +1069,63 @@
         }
  
 
+          function Sub_gen_Labor_row(rowId) {
+            return `  
+                <div class="substitute-packaging" id="labor-entry-sub${rowId}">
+                <div class="packaging-inputs">
+                   
+                    <label>
+                    <span class="required-star">*</span> Preparations
+                    <select class="form-control select" id="preparations${rowId}" name="preparations" required>
+                        <option value="">Select Process </option>
+                        @foreach($menu_ingredients_preparations as $preparations)
+                            <option value="{{ $preparations->id }}" {{ old('preparations', $item->menu_ingredients_preparations) == $preparations->id ? 'selected' : '' }}>
+                                {{ $preparations->preparation_desc }}
+                            </option>
+                        @endforeach
+                    </select>
+                    </label> 
+
+                    <label class="label-wide">
+                    <span class="required-star">*</span> Time (minutes)
+                    <input
+                        value=""
+                        class="form-control yield"
+                        id="time-labor${rowId}"
+                        name="time"
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="Enter minutes"
+                        required
+                    >
+                    </label>
+
+                    <label class="label-wide">
+                    <label> 
+                    <label class="label-wide">
+                    <span class="required-star">*</span> Yield %
+                    <input value="" class="form-control yield" id="yiel${rowId}" type="number" required>
+                    </label>
+                    <label class="label-wide">
+                    <span class="required-star">*</span> Minutes per pack <span class="date-updated"></span>
+                    <input value="" class="form-control ttp" id="pack-minute${rowId}" type="number" readonly required>
+                    </label> 
+                     
+                </div>
+                <div class="actions"> 
+                    <button class="btn btn-danger delete-sub" title="Delete Ingredient" type="button">
+                    <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+                </div>`;
+            }
+
+             
 
 
-            function Sub_gen_ingredient_row(rowId, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost)
+
+        function Sub_gen_ingredient_row(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost)
           {
             return `  
                 <div class="substitute-packaging" id="ingredient-entry${rowId}" >
@@ -712,6 +1134,7 @@
                             <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
                                 <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" name="produtionlines[${rowId}][][tasteless_code]"  class="packaging form-control hidden" required/>
+                                <input value="${DB_id}" type="text" id="DB_id${rowId}" class="packaging form-control hidden"/>
                                 <input value="${itemDesc}" type="text" id="itemDesc${rowId}" name="produtionlines[${rowId}][][description]" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
                                 <div class="item-list">
                                       <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"  id="ui-id-2${rowId}" style="display: none;  width: 120px; color:red; padding:5px;">
@@ -757,7 +1180,7 @@
             `;
           }
 
-          function generateRowingredientHtml(rowId, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost) {
+          function generateRowingredientHtml(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost) {
             return ` 
             
             <div class="packaging-wrapper" id="ingredient-entry${rowId}">
@@ -767,6 +1190,7 @@
                             <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
                                 <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control hidden " required/>
+                                 <input value="${DB_id}" type="text" id="DB_id${rowId}" class="packaging form-control hidden"/>
                                 <input value="${tasteless_code}" type="text" id="tasteless_code_original${rowId}"   class="packaging form-control  hidden" required/>
                                 <input value="${itemDesc}" type="text" id="itemDesc${rowId}" name="produtionlines[${rowId}][][description]" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
                                 <div class="item-list">
@@ -824,7 +1248,7 @@
 
   
          //generate sub for packaging
-          function Sub_gen_pack_row(rowId, tasteless_code, quantity, cost, description, default_cost)
+          function Sub_gen_pack_row(rowId, DB_id, tasteless_code, quantity, cost, description, default_cost)
           {
             return `  
             <div class="substitute-packaging" id="packaging-entry${rowId}">
@@ -833,6 +1257,7 @@
                             <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
                                 <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control hidden" required/>
+                                 <input value="${DB_id}" type="text" id="DB_id${rowId}" class="packaging form-control hidden"/>
                                 <input value="${description}" type="text" id="itemDesc${rowId}" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
                                 <div class="item-list">
                                       <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"  id="ui-id-2${rowId}" style="display: none;  width: 120px; color:red; padding:5px;">
@@ -861,51 +1286,52 @@
             `;
           }
 
-          function generateRowHtml(rowId, tasteless_code, quantity, cost, description, default_cost) {
+          function generateRowHtml(rowId, DB_id, tasteless_code, quantity, cost, description, default_cost) {
             return `  
                  
-                <div class="packaging-wrapper" id="packaging-entry${rowId}">
-                <div class="packaging-entry" isExisting="true">
-                    <div class="packaging-inputs">
-                         <label class="packaging-label">
-                            <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
-                            <div>
-                                <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control  hidden " required/>
-                                <input value="${tasteless_code}" type="text" id="tasteless_code_original${rowId}" class="packaging form-control hidden " required/>
-                                <input value="${description}" type="text" id="itemDesc${rowId}"      class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
-                                <div class="item-list">
-                                      <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"  id="ui-id-2${rowId}" style="display: none;  width: 120px; color:red; padding:5px;">
-                                <li class="text-center">Loading...</li>
-                                </ul>
+                    <div class="packaging-wrapper" id="packaging-entry${rowId}">
+                    <div class="packaging-entry" isExisting="true">
+                        <div class="packaging-inputs">
+                            <label class="packaging-label">
+                                <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
+                                <div>
+                                    <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control  hidden " required/>
+                                    <input value="${DB_id}" type="text" id="DB_id${rowId}" class="packaging form-control hidden"/>
+                                    <input value="${tasteless_code}" type="text" id="tasteless_code_original${rowId}" class="packaging form-control hidden " required/>
+                                    <input value="${description}" type="text" id="itemDesc${rowId}"      class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
+                                    <div class="item-list">
+                                        <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"  id="ui-id-2${rowId}" style="display: none;  width: 120px; color:red; padding:5px;">
+                                    <li class="text-center">Loading...</li>
+                                    </ul>
+                                    </div>
+                                
                                 </div>
-                             
-                            </div>
-                            
-                        </label> 
-                        <label>
-                            <span class="required-star">*</span> Preparation Qty 
-                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
-                        </label>   
-                        <label>
-                            <span class="required-star">*</span> Packaging Cost
-                            <input value="${default_cost}" id="default_cost${rowId}" class="form-control cost hide" type="text" readonly required>
-                            <input value="${cost}" id="cost${rowId}" class="form-control costparent${rowId} cost" type="text" readonly required>
-                        </label>
+                                
+                            </label> 
+                            <label>
+                                <span class="required-star">*</span> Preparation Qty 
+                                <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
+                            </label>   
+                            <label>
+                                <span class="required-star">*</span> Packaging Cost
+                                <input value="${default_cost}" id="default_cost${rowId}" class="form-control cost hide" type="text" readonly required>
+                                <input value="${cost}" id="cost${rowId}" class="form-control costparent${rowId} cost" type="text" readonly required>
+                            </label>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-info move-up" title="Move Up" type="button"> <i class="fa fa-arrow-up" ></i></button>
+                            <button class="btn btn-info move-down" title="Move Down" type="button"> <i class="fa fa-arrow-down" ></i></button>
+                            <button class="btn btn-danger delete" title="Delete Ingredient" type="button"> <i class="fa fa-trash" ></i></button>
+                        </div>
                     </div>
-                    <div class="actions">
-                        <button class="btn btn-info move-up" title="Move Up" type="button"> <i class="fa fa-arrow-up" ></i></button>
-                        <button class="btn btn-info move-down" title="Move Down" type="button"> <i class="fa fa-arrow-down" ></i></button>
-                        <button class="btn btn-danger delete" title="Delete Ingredient" type="button"> <i class="fa fa-trash" ></i></button>
-                    </div>
-                </div>
-                <div class="sub-pack${rowId} sub-elements">
-                    
+                    <div class="sub-pack${rowId} sub-elements">
+                        
 
-                </div>
-                <div  class="add-sub-btn-pack" title="Add Substitute Packaging">
-                    <i class="fa fa-plus"></i>
+                    </div>
+                    <div  class="add-sub-btn-pack" title="Add Substitute Packaging">
+                        <i class="fa fa-plus"></i>
+                    </div> 
                 </div> 
-            </div> 
             `;
         }
 
@@ -1119,13 +1545,52 @@
             });
 
 
+            // $(document).on('input change', '[id*="quantity"], [id*="yield"]', function() {
+
+            $(document).on('input change', '[id*="yiel"], [id*="time-labor"], [id*="labor_cost_per_minute"]', function() {
+                  
+                var id = $(this).attr('id');
+                var lastChar = id.split("time-labor")[1] || id.split("yiel")[1] || id.split("labor_cost_per_minute")[1];
+                console.log(lastChar);
+                let yieldInput = $(`#yiel${lastChar}`).val() || 0;
+                console.log(yieldInput);
+
+                let time = $(`#time-labor${lastChar}`).val() || 0; 
+                let total = math.round(time / yieldInput, 2); 
+                 $(`#pack-minute${lastChar}`).val(total);
+                CalculateLabor();
+            }); 
+
+
+
+            function CalculateLabor()
+            {
+                let cost = 0; 
+                
+                $('[id*="pack-minute"]').each(function() { 
+                    cost += parseFloat($(this).val()) || 0; 
+                 
+                });  
+
+                
+               
+                let labor_cost_per_minute = $('#labor_cost_per_minute').val();
+                let total = math.round(cost * labor_cost_per_minute, 2); 
+                $(`#total_minutes_per_pack`).val(math.round(cost, 2));
+                $(`#labor_cost_val`).val(total);
+                $(`#labor_cost`).val(total).trigger('input');
+                
+            }
+
+
+
         //set sub packeaging/ingredients as primary 
        $(document).on('click', '[id*="set-primary"]', function() {
             const $sub = $(this).closest('.substitute-packaging');
            
 
             const wrapperId = $(this).closest('.packaging-wrapper').attr('id') || '';
-            const id = wrapperId.replace(/\D/g, '');  // just keep digits
+            const id = wrapperId.replace(/\D/g, '');   
 
             const clickedId = $(this).attr('id').replace(/\D/g, '');
 
@@ -1165,11 +1630,12 @@
             var idsub = $(this).attr('id');
             var lastCharsub = idsub.split("tasteless_code")[1]; 
             $(`#tasteless_code_original${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][tasteless_code]`); 
+            
             $(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][description]`); 
             $(`#quantity${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][quantity]`);
             $(`#yield${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][yield]`); 
             $(`#cost${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][cost]`);
- 
+            $(`#DB_id${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][DB_id]`); 
             if (parentid !== oldParentId) {
                 $wrapper.find('[class^="sub-ingredient"], [class^="sub-pack"]').find('input').each(function() {
                     var subId = $(this).attr('id') || '';
@@ -1177,11 +1643,12 @@
                     if (subLastChar) {
                         const ids =  subId.split("tasteless_code")[1] 
                         $(this).attr('name', `produtionlines[${parentid}][${subLastChar}][tasteless_code]`); 
+                         
                         $(`#itemDesc${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][description]`); 
                         $(`#quantity${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][quantity]`);
                         $(`#yield${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][yield]`); 
                         $(`#cost${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][cost]`); 
-
+                        $(`#DB_id${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][DB_id]`);
                     }
                 });
             }
@@ -1330,7 +1797,9 @@
             `);
             subEntry.hide('fast', function() {
                 $(this).remove();
+                showNoDataLabor();
               calculateFinalValues();
+              CalculateLabor();
             });
            
         });
@@ -1456,7 +1925,7 @@
             }
         }
 
-          function showNoDataIngredient() {
+        function showNoDataIngredient() {
             const hasRows = $('[id*="ingredient-entry"]').length;  
             console.log(hasRows + ' hasRows ingredients');
               console.log(hasRows + 'show');  
@@ -1466,9 +1935,21 @@
                 $('.no-data-available-ingredient').hide(); 
             }
         }
+
+          function showNoDataLabor() {
+            const hasRows = $('[id*="labor-entry-sub"]').length;  
+            console.log(hasRows + ' hasRows ingredients');
+              console.log(hasRows + 'show');  
+             if (hasRows === 0) {
+                $('.no-data-available-labor').show(); 
+            } else {
+                $('.no-data-available-labor').hide(); 
+            }
+        }
+        
         showNoData(); 
         showNoDataIngredient();
-        
+        showNoDataLabor();
     });
 
  

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ProductionItems;
 
+use crocodicstudio\crudbooster\helpers\CRUDBooster;
 use Illuminate\Http\Request;
 
 class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
@@ -16,7 +17,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
-			$this->button_add = true;
+			$this->button_add = false;
 			$this->button_edit = false;
 			$this->button_delete = false;
 			$this->button_detail = true;
@@ -31,6 +32,35 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			$this->col = [];
 			$this->col[] = ["label"=>"Reference Number","name"=>"reference_number"];
 			$this->col[] = ["label"=>"Description","name"=>"description"];
+			$this->col[] = ["label" => "Approval Status", "name" => "approval_status",
+							"callback"=>function($row)
+							{
+								 if ($row->approval_status == '202') {
+									return '<center><span style="
+											background-color:rgb(252, 164, 41); 
+											color: white; 
+											padding: 3px 8px; 
+											border-radius: 3px; 
+											font-weight: bold; 
+											font-size: 8px; 
+											text-align: center;
+											min-width: 20px;
+										">PENDING</span></center>';
+								}else if ($row->approval_status == '400')
+								{
+									return '<center><span style="
+											background-color:rgba(255, 0, 0, 0.86); 
+											color: white; 
+											padding: 3px 8px; 
+											border-radius: 3px; 
+											font-weight: bold; 
+											font-size: 8px; 
+											text-align: center;
+											min-width: 20px;
+										">REJECT</span></center>';
+								}
+						 
+							}];
 			$this->col[] = ["label"=>"Production Category","name"=>"production_category","join"=>"production_item_categories,category_description" ];
 			$this->col[] = ["label"=>"Production Location","name"=>"production_location","join"=>"production_locations,production_location_description"];
 			$this->col[] = ["label"=>"Depreciation","name"=>"depreciation"];
@@ -59,7 +89,14 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 	        */
 	  
 		 
-
+			$this->addaction = array();
+			$this->addaction[] = [
+					'title'=>'Approve',
+					'url'=>CRUDBooster::mainpath('approve_or_reject/[id]'),
+					'icon'=>'fa fa-thumbs-up',
+					'color' => ' ',
+					"showIf"=>"[approval_status] == '202'",
+			];
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
