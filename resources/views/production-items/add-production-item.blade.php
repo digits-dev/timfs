@@ -107,6 +107,15 @@
       font-size: 14px;
       color: #555;
     }
+ 
+
+  .select2-selection__choice {
+        background-color: #3190c7 !important;
+        border-color: #367fa9 !important;
+        color: #fff !important;
+    }
+ 
+</style>
   </style>
 </style>
 @endpush
@@ -142,257 +151,323 @@
             <div class="col-md-12">
                  
         <hr>
-            <h3 class="text-center text-bold">ITEM DETAILS</h3>
+           
+         <h3 class="text-center text-bold">ITEM DETAILS</h3>
+            @csrf
+            <input value="{{ $item->tasteless_code }}" name="tasteless_code" type="text" class="tasteless_code hide">
+            @if ($item_masters_approvals_id)
+            <input type="text" name="item_masters_approvals_id" value="{{ $item_masters_approvals_id }}" class="hide">
+            @endif
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table-responsive table">
+                        <tbody>
+                            @if ($item->tasteless_code)
+                            <tr>
+                                <th>Tasteless Code</th>
+                                <td><input value="{{ $item->tasteless_code}}" type="text" name="tasteless_code" id="tasteless_code" class="form-control" readonly></td>
+                            </tr>
+                            @endif
+                            <tr>
+                                <th><span class="required-star">*</span> Item Description</th>
+                                <td><input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">{{ $item->tasteless_code && !$item->image_filename ? '*' : '' }}</span> Display Photo</th>
+                                <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ $item->tasteless_code && !$item->image_filename ? 'required' : '' }} ></td>
+                            </tr>
+                            <tr>
+                                <th>File Reference Link</th>
+                                <td><input type="text" value="{{ $item->file_link ?: '' }}" name="file_link" id="file_link" class="form-control"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Brand Description</th>
+                                <td> 
+                                    <select  class="form-control" style="width: 100%;"  id="brands_id" name="brands_id" required>     
+                                    </select>  
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Tax Code</th>
+                                <td>
+                                    <select name="tax_codes_id" id="tax_codes_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($tax_codes as $tax_code)
+                                        <option value="{{ $tax_code->id }}" {{ $tax_code->id == $item->tax_codes_id ? 'selected' : '' }}>{{ $tax_code->tax_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Account</th>
+                                <td>
+                                    <select name="accounts_id" id="accounts_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($accounts as $account)
+                                        <option value="{{ $account->id }}" {{ $account->id == $item->accounts_id ? 'selected' : '' }}>{{ $account->group_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  COGS Account</th>
+                                <td>
+                                    <select name="cogs_accounts_id" id="cogs_accounts_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($cogs_accounts as $cogs_account)
+                                        <option value="{{ $cogs_account->id }}" {{ $cogs_account->id == $item->cogs_accounts_id ? 'selected' : '' }}>{{ $cogs_account->group_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Asset Account</th>
+                                <td>
+                                    <select name="asset_accounts_id" id="asset_accounts_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($asset_accounts as $asset_account)
+                                        <option value="{{ $asset_account->id }}" {{ $asset_account->id == $item->asset_accounts_id ? 'selected' : '' }}>{{ $asset_account->group_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span>  Purchase Description</th>
+                                <td>
+                                    <input type="text" value="{{ $item->purchase_description }}" class="form-control" name="purchase_description" id="purchase_description" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Fulfillment Type</th>
+                                <td>
+                                    <select name="fulfillment_type_id" id="fulfillment_type_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($fulfillment_types as $fulfillment_type)
+                                        <option value="{{ $fulfillment_type->id }}" {{ $fulfillment_type->id == $item->fulfillment_type_id ? 'selected' : '' }}>{{ $fulfillment_type->fulfillment_method }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> U/M</th>
+                                <td>
+                                    <select name="uoms_id" id="uoms_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($uoms as $uom)
+                                        <option value="{{ $uom->id }}" {{ $uom->id == $item->uoms_id ? 'selected' : '' }}>{{ $uom->uom_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> U/M Set</th>
+                                <td>
+                                    <select name="uoms_set_id" id="uoms_set_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($uom_sets as $uom_set)
+                                        <option value="{{ $uom_set->id }}" {{ $uom_set->id == $item->uoms_set_id ? 'selected' : '' }}>{{ $uom_set->uom_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Currency</th>
+                                <td>
+                                    <select name="currencies_id" id="currencies_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($currencies as $currency)
+                                        <option value="{{ $currency->id }}" {{ $currency->id == $item->currencies_id ? 'selected' : '' }}>{{ $currency->currency_code }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Supplier Cost</th>
+                                <td>
+                                    <input value="{{ $item->purchase_price }}" type="number" step="any" class="form-control" name="purchase_price" id="purchase_price" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Sales Price</th>
+                                <td>
+                                    <input value="{{ $item->ttp }}"  type="number" step="any" class="form-control" name="ttp" id="ttp" {{$item->tasteless_code ? 'readonly' : ''}} required>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table-responsive table">
+                        <tbody>
+                            @if ($item->tasteless_code)
+                            <tr>
+                                <th>Sales Price Change</th>
+                                <td>
+                                    <input value="{{ $item->ttp_price_change }}"  type="number" step="any" class="form-control" name="ttp_price_change" id="ttp_price_change">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Sales Price Effective Date</th>
+                                <td>
+                                    <input value="{{ $item->ttp_price_effective_date }}"  type="date" step="any" class="form-control" name="ttp_price_effective_date" id="ttp_price_effective_date">
+                                </td>
+                            </tr>
+                            @endif
+                            <tr>
+                                <th><span class="required-star">*</span> Commi Margin</th>
+                                <td>
+                                    <input value="{{ $item->ttp_percentage }}" type="number" step="any" class="form-control" name="ttp_percentage" id="ttp_percentage" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Landed Cost</th>
+                                <td>
+                                    <input value="{{ $item->landed_cost }}" type="number" step="any" class="form-control" name="landed_cost" id="landed_cost" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Preferred Vendor</th>
+                                <td> 
+                                    <select  class="form-control" style="width: 100%;"  id="suppliers_id" name="suppliers_id" required>     
+                                    </select>  
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Reorder Pt (Min)</th>
+                                <td>
+                                    <input value="{{ $item->reorder_pt }}" type="number" step="any" class="form-control" name="reorder_pt" id="reorder_pt" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Group</th>
+                                <td>
+                                    <select name="groups_id" id="groups_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($groups as $group)
+                                        <option value="{{ $group->id }}" {{ $group->id == $item->groups_id ? 'selected' : '' }}>{{ $group->group_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Category Description</th>
+                                <td>
+                                    <select name="categories_id" id="categories_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}" {{ $category->id == $item->categories_id ? 'selected' : '' }}>{{ $category->category_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Subcategory Description</th>
+                                <td>
+                                    <select name="subcategories_id" id="subcategories_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($subcategories as $subcategory)
+                                        <option value="{{ $subcategory->id }}" {{ $subcategory->id == $item->subcategories_id ? 'selected' : '' }}>{{ $subcategory->subcategory_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Specifications</th>
+                                <td>
+                                    <input value="{{ $item->packaging_dimension }}" type="text" class="form-control" name="packaging_dimension" id="packaging_dimension">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Packaging Size</th>
+                                <td>
+                                    <input value="{{ $item->packaging_size }}" type="number" step="any" class="form-control" name="packaging_size" id="packaging_size" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Packaging UOM</th>
+                                <td>
+                                    <select name="packagings_id" id="packagings_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($packagings as $packaging)
+                                        <option value="{{ $packaging->id }}" {{ $packaging->id == $item->packagings_id ? 'selected' : '' }}>{{ $packaging->packaging_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Supplier Item Code</th>
+                                <td>
+                                    <input value="{{ $item->supplier_item_code }}" type="text" class="form-control" name="supplier_item_code" id="supplier_item_code">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> MOQ Store</th>
+                                <td>
+                                    <input value="{{ $item->moq_store }}" type="number" step="any" class="form-control" name="moq_store" id="moq_store" required>
+                                </td>
+                            </tr>
+                            @if ($item->tasteless_code)
+                            <tr>
+                                <th><span class="required-star">*</span> SKU Status</th>
+                                <td>
+                                    <select name="sku_statuses_id" id="sku_statuses_id" class="form-control" required>
+                                        <option value="" disabled selected>None selected...</option>
+                                        @foreach ($sku_statuses as $sku_status)
+                                        <option value="{{ $sku_status->id }}" {{ $sku_status->id == $item->sku_statuses_id ? 'selected' : '' }}>{{ $sku_status->sku_status_description }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="text-center text-bold">SEGMENTATIONS</h3>
+                    <input type="text" class="hide" name="segmentations" id="segmentations">
+                    <table class="table table-reponsive">
+                    @php $selected = [] @endphp
+                    @foreach ($sku_legends as $sku_legend)
+                        @php
+                            $value = $sku_legend->sku_legend;
+                            $id_name = str_replace(' ', '_', $value);
+                            $id_name = strtolower($id_name);
+                            $selected[$id_name] = [];
+                            if ($item) {
+                                foreach ($segmentations as $segmentation) {
+                                    $column = $segmentation->segment_column_name;
+                                    $item_value = $item->{$column};
+                                    if ($item_value == $value) {
+                                        $selected[$id_name][] = $column;
+                                    }
+                                }
+                            }
 
-<input value="" name="tasteless_code" type="text" class="tasteless_code hide">
-
-<div class="row">
-    <div class="col-md-6">
-        <table class="table-responsive table">
-            <tbody>
-                <tr>
-                    <th>Tasteless Code</th>
-                    <td><input value="" type="text" name="tasteless_code" id="tasteless_code" class="form-control" readonly></td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Item Description</th>
-                    <td><input value="" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Display Photo</th>
-                    <td><input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" required></td>
-                </tr>
-                <tr>
-                    <th>File Reference Link</th>
-                    <td><input type="text" value="" name="file_link" id="file_link" class="form-control"></td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Brand Description</th>
-                    <td>
-                        <select name="brands_id" id="brands_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Tax Code</th>
-                    <td>
-                        <select name="tax_codes_id" id="tax_codes_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Account</th>
-                    <td>
-                        <select name="accounts_id" id="accounts_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> COGS Account</th>
-                    <td>
-                        <select name="cogs_accounts_id" id="cogs_accounts_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Asset Account</th>
-                    <td>
-                        <select name="asset_accounts_id" id="asset_accounts_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Purchase Description</th>
-                    <td>
-                        <input type="text" value="" class="form-control" name="purchase_description" id="purchase_description" readonly>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Fulfillment Type</th>
-                    <td>
-                        <select name="fulfillment_type_id" id="fulfillment_type_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> U/M</th>
-                    <td>
-                        <select name="uoms_id" id="uoms_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> U/M Set</th>
-                    <td>
-                        <select name="uoms_set_id" id="uoms_set_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Currency</th>
-                    <td>
-                        <select name="currencies_id" id="currencies_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Supplier Cost</th>
-                    <td>
-                        <input value="" type="number" step="any" class="form-control" name="purchase_price" id="purchase_price" required>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Sales Price</th>
-                    <td>
-                        <input value=""  type="number" step="any" class="form-control" name="ttp" id="ttp" required>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="col-md-6">
-        <table class="table-responsive table">
-            <tbody>
-                <tr>
-                    <th>Sales Price Change</th>
-                    <td>
-                        <input value=""  type="number" step="any" class="form-control" name="ttp_price_change" id="ttp_price_change">
-                    </td>
-                </tr>
-                <tr>
-                    <th>Sales Price Effective Date</th>
-                    <td>
-                        <input value=""  type="date" step="any" class="form-control" name="ttp_price_effective_date" id="ttp_price_effective_date">
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Commi Margin</th>
-                    <td>
-                        <input value="" type="number" step="any" class="form-control" name="ttp_percentage" id="ttp_percentage" readonly>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Landed Cost</th>
-                    <td>
-                        <input value="" type="number" step="any" class="form-control" name="landed_cost" id="landed_cost" required>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Preferred Vendor</th>
-                    <td>
-                        <select name="suppliers_id" id="suppliers_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Reorder Pt (Min)</th>
-                    <td>
-                        <input value="" type="number" step="any" class="form-control" name="reorder_pt" id="reorder_pt" required>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Group</th>
-                    <td>
-                        <select name="groups_id" id="groups_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Category Description</th>
-                    <td>
-                        <select name="categories_id" id="categories_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Subcategory Description</th>
-                    <td>
-                        <select name="subcategories_id" id="subcategories_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Specifications</th>
-                    <td>
-                        <input value="" type="text" class="form-control" name="packaging_dimension" id="packaging_dimension">
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Packaging Size</th>
-                    <td>
-                        <input value="" type="number" step="any" class="form-control" name="packaging_size" id="packaging_size" required>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> Packaging UOM</th>
-                    <td>
-                        <select name="packagings_id" id="packagings_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Supplier Item Code</th>
-                    <td>
-                        <input value="" type="text" class="form-control" name="supplier_item_code" id="supplier_item_code">
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> MOQ Store</th>
-                    <td>
-                        <input value="" type="number" step="any" class="form-control" name="moq_store" id="moq_store" required>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span class="required-star">*</span> SKU Status</th>
-                    <td>
-                        <select name="sku_statuses_id" id="sku_statuses_id" class="form-control" required>
-                            <option value="" disabled selected>None selected...</option>
-                        </select>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6">
-        <h3 class="text-center text-bold">SEGMENTATIONS</h3>
-        <input type="text" class="hide" name="segmentations" id="segmentations">
-        <table class="table table-reponsive">
-            <tr>
-                <th>Segmentation (Example)</th>
-                <td>
-                    <select class="segmentation_select" id="segmentation_example" _value="Example" class="form-control" multiple="multiple">
-                        <option class="segment_column_example" value="segment_column_example">Segment Description Example</option>
-                    </select>
-                </td>
-            </tr>
-        </table>
-    </div>
-    <div class="col-md-6">
-        <div class="photo-section">
-            <h3 class="text-center text-bold">DISPLAY PHOTO</h3>
-            <img src="" alt="Item Photo">
-        </div>
-    </div>
-</div>
-
-<button id="sumit-form-btn" class="btn btn-primary hide" type="submit">submit</button>
+                        @endphp
+                        <tr>
+                            <th>Segmentation ({{ $value }})</th>
+                            <td>
+                                <select class="segmentation_select" id="segmentation_{{ $id_name }}" _value="{{ $value }}" class="form-control" multiple="multiple" >
+                                    @foreach ($segmentations as $segmentation)
+                                    <option {{ in_array($segmentation->segment_column_name, $selected[$id_name]) ? 'selected' : '' }} class="{{ $segmentation->segment_column_name }}" value="{{ $segmentation->segment_column_name }}">{{ $segmentation->segment_column_description }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </table>
+                </div>
+                @if ($item->image_filename)
+                <div class="col-md-6">
+                    <div class="photo-section">
+                        <h3 class="text-center text-bold">DISPLAY PHOTO</h3>
+                        <img src="{{ asset('/img/item-master/' . $item->image_filename) }}" alt="Item Photo">
+                    </div>
+                </div>
+                @endif
+            </div>
 
  
           <h3 class="text-center text-bold">Production Item Lines</h3> 
@@ -745,12 +820,12 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
-    
+ 
     $(document).ready(function() {
         
         //for showing message no package or ingredients found 
         is_noingredient = false;
-       
+        
         //for adding table row assigning unique ids
         let tableRow = 0;
         
@@ -872,8 +947,30 @@
         });
 
 
-
-
+          $(`  
+            #tax_codes_id,
+            #accounts_id,
+            #cogs_accounts_id,
+            #asset_accounts_id,
+            #fulfillment_type_id,
+            #uoms_id,
+            #uoms_set_id,
+            #currencies_id, 
+            #groups_id,
+            #categories_id,
+            #subcategories_id,
+            #packagings_id,
+            #sku_statuses_id
+            `).select2({
+                width: '100%',
+                height: '100%',
+                placeholder: 'None selected...'
+            });
+        
+        $('.segmentation_select').select2({
+            width: '100%',
+            // placeholder: 'None selected...'
+        });
 
         $('body').addClass('sidebar-collapse');
         $(`.select`).select2({
@@ -928,9 +1025,56 @@
             showNoDataLabor();
         });
 
-
-        
+        ajax_add(); 
        
+        function ajax_add()
+        {
+            Brandsearch('#brands_id','brands', 'status','INACTIVE', 'brand_description');
+            Brandsearch('#suppliers_id', 'suppliers', 'last_name', null, 'last_name');
+
+
+            function Brandsearch(select, target, status, status_value, description) {  
+
+                $(select).select2({
+                    placeholder: 'None selected...', 
+                ajax: {
+                    url: `/admin/production_items/${target}/${status}/${status_value}/${description}`,
+                    type: 'GET',
+                    dataType: 'json',
+                
+                    delay: 250, 
+                    data: params => ({
+                        search: params.term                 
+                    }),
+                    processResults: function (data, params) {
+                        const mapped = data.items.map(item => ({
+                            id:   item.id,
+                            text: item.description,
+                            // stash any extra fields you need later:
+                            ...item
+                        }));
+                        return {
+                            results: mapped, 
+                        };
+                    },
+                        cache: true
+                    }   
+                });
+
+                $('#brands_id').on('select2:select', function(e) {
+                    const picked = e.params.data;
+                    $(this)
+                    .next('.select2-container')
+                    .find('.select2-selection__rendered')
+                    .text(picked.text); 
+                });
+            }
+
+
+        }
+        
+
+
         //for packaging search items
         function PackagingSearchInit(selector, rowId) {
            const token = $("#token").val();   

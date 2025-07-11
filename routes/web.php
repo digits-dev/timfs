@@ -225,6 +225,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/production_items/item-export',[AdminProductionItemsController::class, 'exportItems'])->name('export-items');
     Route::post('/admin/production_items_history/export-items-history',[AdminProductionItemsHistory::class, 'exportItemsHistory'])->name('export-items-history');
     Route::post('/admin/production_item_categories/add-production-category', [AdminProductionCategoryController::class, 'addProductionCategoryToDB'])->name('add-production-category-to-db');
+    Route::get('/admin/production_items/{table}/{status}/{status_value}/{description}', [AdminProductionItemsController::class, 'getProductionItemsSubmaster'])->name('getProductionItemsSubmaster');
     
 });
 

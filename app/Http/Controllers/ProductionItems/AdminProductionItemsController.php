@@ -1169,7 +1169,112 @@ use ProductionItemsApproval;
 	public function costing($ref) {
 	 
 			$data = [];
+			$data['tax_codes'] = DB::table('tax_codes')
+				->where('status', 'ACTIVE')
+				->orderBy('tax_description')
+				->get()
+				->toArray();
 
+			$data['accounts'] = DB::table('accounts')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['cogs_accounts'] = DB::table('cogs_accounts')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['asset_accounts'] = DB::table('asset_accounts')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['fulfillment_types'] = DB::table('fulfillment_methods')
+				->where('status', 'ACTIVE')
+				->orderBy('fulfillment_method')
+				->get()
+				->toArray();
+
+			$data['uoms'] = DB::table('uoms')
+				->where('status', 'ACTIVE')
+				->orderBy('uom_description')
+				->get()
+				->toArray();
+
+			$data['uom_sets'] = DB::table('uoms_set')
+				->where('status', 'ACTIVE')
+				->orderBy('uom_description')
+				->get()
+				->toArray();
+
+			$data['currencies'] = DB::table('currencies')
+				->where('status', 'ACTIVE')
+				->orderBy('currency_code')
+				->get()
+				->toArray();
+
+			$data['groups'] = DB::table('groups')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['categories'] = DB::table('categories')
+				->where('status', 'ACTIVE')
+				->orderBy('category_description')
+				->get()
+				->toArray();
+
+			$data['subcategories'] = DB::table('subcategories')
+				->select('id', 'subcategory_description', 'categories_id')
+				->where('status', 'ACTIVE')
+				->orderBy('subcategory_description')
+				->get()
+				->toArray();
+
+			$data['packagings'] = DB::table('packagings')
+				->where('status', 'ACTIVE')
+				->orderBy('packaging_description')
+				->get()
+				->toArray();
+
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()
+				->toArray();
+
+			$data['sku_legends'] = DB::table('sku_legends')
+				->where('status', 'ACTIVE')
+				->where('sku_legend', '!=', 'X')
+				->get()
+				->toArray();
+
+			$data['sku_statuses'] = DB::table('sku_statuses')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
+			// EDIT ITEM
+			$data['types'] = DB::table('types')
+				->where('status', 'ACTIVE')
+				->orderBy('type_description')
+				->get()
+				->toArray();
+			$data['sku_legends'] = DB::table('sku_legends')
+			->where('status', 'ACTIVE')
+			->where('sku_legend', '!=', 'X')
+			->get()
+			->toArray();
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()
+				->toArray();
 			$data['production_category'] = DB::table('production_item_categories')
 				->where('status', 'ACTIVE') 
 				->get()
@@ -1208,8 +1313,24 @@ use ProductionItemsApproval;
 			return $data;
 		}
 
-
-
+	
+			public function getProductionItemsSubmaster(Request $request, $table, $status, $status_value, $description) {
+					$searchTerm = $request->input('search');
+					 
+				
+						$items = DB::table($table)
+						->where($status, 'NOT LIKE', "%{$status_value}%")
+						->where($description, 'LIKE', "%{$searchTerm}%")
+						->select('id', "{$description} as description")
+						->limit(50)
+						->get()
+						->toArray();
+					
+					return response()->json([
+						'status_no' => 1,
+						'items' => $items 
+					]);
+			}
 
 
 
