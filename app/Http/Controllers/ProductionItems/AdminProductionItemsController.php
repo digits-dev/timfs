@@ -745,7 +745,7 @@ use ProductionItemsApproval;
 
 
 	public function addProductionItemsToDB(Request $request){
-		 
+		dd($request);
 		$message = '';
 		$time_stamp_now = date('Y-m-d H:i:s');
 			
@@ -1315,8 +1315,8 @@ use ProductionItemsApproval;
 
 	
 			public function getProductionItemsSubmaster(Request $request, $table, $status, $status_value, $description) {
-					$searchTerm = $request->input('search');
-					 
+						$searchTerm = $request->input('search');
+					  
 				
 						$items = DB::table($table)
 						->where($status, 'NOT LIKE', "%{$status_value}%")
@@ -1351,7 +1351,7 @@ use ProductionItemsApproval;
 				'id',
 				'tasteless_code',
 				'full_item_description',
-				'ttp',
+				'landed_cost as ttp',
 				'packaging_size') 
 			->whereNotIn('tasteless_code', $existing)
 			->whereRaw('(tasteless_code LIKE ? OR full_item_description LIKE ?)', ["%{$searchTerm}%", "%{$searchTerm}%"])
@@ -1424,7 +1424,8 @@ use ProductionItemsApproval;
 
 			$query1 = NewPackaging::select('id',
 				'nwp_code as tasteless_code',
-				'item_description as full_item_description', 
+				'item_description as full_item_description',
+				'packaging_size',
 				DB::raw('1 as db'),
 				'ttp')
 				->whereNotIn('nwp_code', $existing)
@@ -1437,7 +1438,8 @@ use ProductionItemsApproval;
 			$query2 = ItemMaster::select('id',
 				'tasteless_code',
 				'full_item_description',
-				DB::raw('2 as db'),
+				'packaging_size',
+				DB::raw('2 as db'), 
 				'landed_cost')
 				->whereNotIn('tasteless_code', $existing)
 				->where(function($q) use ($searchTerm) {
@@ -1470,7 +1472,8 @@ use ProductionItemsApproval;
 					'tasteless_code' => $items->tasteless_code, 
 					'item_description' => $items->full_item_description,
 					'from_db' => $items->db,
-					'cost' => $items->ttp,   
+					'cost' => $items->ttp,
+					'packaging_size' =>  $items->packaging_size
 				];
 			});
 			
