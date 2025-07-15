@@ -31,7 +31,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"Reference Number","name"=>"reference_number"];
-			$this->col[] = ["label"=>"Description","name"=>"description"];
+			$this->col[] = ["label"=>"Description","name"=>"full_item_description"];
 			$this->col[] = ["label" => "Approval Status", "name" => "approval_status",
 							"callback"=>function($row)
 							{
@@ -59,7 +59,19 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 											min-width: 20px;
 										">REJECT</span></center>';
 								}
-						 
+								else if ($row->approval_status == '200')
+								{
+									return '<center><span style="
+											background-color:rgb(0, 255, 34); 
+											color: white; 
+											padding: 3px 8px; 
+											border-radius: 3px; 
+											font-weight: bold; 
+											font-size: 8px; 
+											text-align: center;
+											min-width: 20px;
+										">APPROVED</span></center>';
+								}
 							}];
 			$this->col[] = ["label"=>"Production Category","name"=>"production_category","join"=>"production_item_categories,category_description" ];
 			$this->col[] = ["label"=>"Production Location","name"=>"production_location","join"=>"production_locations,production_location_description"];

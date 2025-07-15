@@ -143,15 +143,13 @@
             });
         </script>
         @endif
-            <form action="{{ route('add-production-items-to-db') }}" method="POST" id="ProductionItems" enctype="multipart/form-data">
+            <form action="{{ route('add-production-items-to-db') }}" method="POST" id="ProductionItems"  enctype="multipart/form-data">
                 @csrf
                 <div class="panel-body">
                     <input name="id" value="{{$item->id}}" class="hide"/>
                     <div class="row">
-                        <div class="col-md-12">
-                            <hr>
-                            <h3 class="text-center text-bold">ITEM DETAILS</h3>
-                            @csrf
+                        <div class="col-md-12"> 
+                            <h3 class="text-center text-bold">ITEM DETAILS</h3> 
                             <input value="{{ $item->tasteless_code }}" name="tasteless_code" type="text" class="tasteless_code hide">
                             @if ($item_masters_approvals_id)
                                 <input type="text" name="item_masters_approvals_id" value="{{ $item_masters_approvals_id }}" class="hide">
@@ -174,10 +172,10 @@
                                                     <input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()">
                                                 </td>
                                             </tr>
-                                            <tr>
-                                                <th><span class="required-star">{{ $item->tasteless_code && !$item->image_filename ? '*' : '' }}</span> Display Photo</th>
+                                             <tr>
+                                                <th><span class="required-star">*</span> Display Photo</th>
                                                 <td>
-                                                    <input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" max="2000000" {{ $item->tasteless_code && !$item->image_filename ? 'required' : '' }}>
+                                                    <input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" required>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -296,7 +294,7 @@
                                             <tr>
                                                 <th><span class="required-star">*</span> Sales Price</th>
                                                 <td>
-                                                    <input value="{{ $item->ttp }}"  type="number" step="any" class="form-control" name="ttp" id="ttp" {{$item->tasteless_code ? 'readonly' : ''}} required>
+                                                    <input value="{{ $item->ttp }}"  type="number" step="any" class="form-control" name="ttp" id="ttp" {{$item->ttp ? 'readonly' : ''}} required>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -465,15 +463,15 @@
                                             </tr>
                                         @endforeach
                                     </table>
-                                </div>
-                                @if ($item->image_filename)
-                                <div class="col-md-6">
-                                    <div class="photo-section">
-                                        <h3 class="text-center text-bold">DISPLAY PHOTO</h3>
-                                        <img src="{{ asset('/img/item-master/' . $item->image_filename) }}" alt="Item Photo">
+                                </div> 
+                                   @if ($item->image_filename)
+                                    <div class="col-md-6">
+                                        <div class="photo-section">
+                                            <h3 class="text-center text-bold">DISPLAY PHOTO</h3>
+                                            <img src="{{ asset('/img/item-master/' . $item->image_filename) }}" alt="Item Photo">
+                                        </div>
                                     </div>
-                                </div>
-                                @endif
+                                    @endif
                             </div>
 
                             <h3 class="text-center text-bold">Production Item Lines</h3>
@@ -545,7 +543,7 @@
                                                 <div>
                                                     <input 
                                                         value="" 
-                                                        type="text" 
+                                                        type="number" 
                                                         id="labor_cost_per_minute" 
                                                         name="labor_cost_per_minute"
                                                         class="form-control display-labor span-2" 
@@ -592,7 +590,7 @@
                                             </div>
                                             <br>
                                             <br>
-                                            <a class="btn btn-primary add-sub-btn-labor" id="add-Row">
+                                            <a class="btn btn-primary add-sub-btn-labor">
                                                 <i class="glyphicon glyphicon-briefcase"></i> Add New Labor
                                             </a>
                                         </div>
@@ -616,8 +614,8 @@
                                                 <th>Values</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr>
+                                        <tbody> 
+                                              <tr>
                                                 <td>Packaging Cost</td>
                                                 <td>
                                                     <input type="number" step="any" name="packaging_cost" id="packaging_cost" value="{{ $item->packaging_cost }}" class="form-control text-right">
@@ -663,9 +661,9 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td>Markup %</td>
+                                                <td>Transfer Price Category </td>
                                                 <td>
-                                                    <select name="markup_percentage" id="markup_percentage" class="form-control select2">
+                                                    <select name="transfer_price_cathegory" id="transfer_price_cathegory" class="form-control select2">
                                                         <option value="">Select Transfer Price Category</option>
                                                         {{-- @foreach ($transfer_price_categories as $tcat)
                                                         <option value="{{ $tcat->markup_percentage }}" {{ old('markup_percentage', $item->markup_percentage) == $tcat->markup_percentage ? 'selected' : '' }}>
@@ -673,6 +671,12 @@
                                                         </option>
                                                         @endforeach--}}
                                                     </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Markup %</td>
+                                                <td> 
+                                                    <input type="number" name="markup_percentage" id="markup_percentage" value="{{ $item->markup_percentage }}" class="form-control text-right">
                                                 </td>
                                             </tr>
                                             <tr>
@@ -1221,10 +1225,16 @@
             return `  
                 <div class="substitute-packaging animate__animated animate__bounceIn"  id="labor-entry-sub${rowId}">
                 <div class="packaging-inputs">
-                   
+                    <input
+                        value="labor"
+                        class="form-control yield hide"
+                        name="LaborLines[${rowId}][production_item_line_type]" 
+                        type="text"  
+                        required
+                    >
                     <label>
                     <span class="required-star">*</span> Preparations
-                    <select class="form-control select labor-cost-dropdown" id="preparations${rowId}" name="preparations" required>
+                    <select class="form-control select labor-cost-dropdown" id="preparations${rowId}" name="LaborLines[${rowId}][preparations]" required>
                         <option value="">Select Process </option>
                         @foreach($menu_ingredients_preparations as $preparations)
                             <option value="{{ $preparations->id }}" {{ old('preparations', $item->menu_ingredients_preparations) == $preparations->id ? 'selected' : '' }}>
@@ -1239,9 +1249,8 @@
                     <input
                         value=""
                         class="form-control yield"
-                       name="LaborLines[${rowId}][time-labor]"
-                        id="time-labor${rowId}"
-                        name="time"
+                        name="LaborLines[${rowId}][time-labor]"
+                        id="time-labor${rowId}" 
                         type="number"
                         min="0"
                         step="1"
@@ -1282,6 +1291,14 @@
                        <label class="packaging-label">
                             <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
+                                <input
+                                        value="ingredient"
+                                        class="form-control yield hide"
+                                        name="" 
+                                        id="production_type${rowId}"
+                                        type="text"  
+                                        required
+                                    >
                                 <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" name="produtionlines[${rowId}][][tasteless_code]"  class="packaging form-control hidden" required/>
                                 <input value="${DB_id}" type="text" id="DB_id${rowId}" class="packaging form-control hidden"/>
                                 <input value="${itemDesc}" type="text" id="itemDesc${rowId}" name="produtionlines[${rowId}][][description]" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
@@ -1298,7 +1315,17 @@
                             <span class="required-star">*</span> Preparation Qty
                             <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
                         </label> 
-                       
+                          <label>
+                        <span class="required-star">*</span> Preparations
+                        <select class="form-control select labor-cost-dropdown" id="preparations${rowId}" name="preparations" required>
+                            <option value="">Select Process </option>
+                            @foreach($menu_ingredients_preparations as $preparations)
+                                <option value="{{ $preparations->id }}" {{ old('preparations', $item->menu_ingredients_preparations) == $preparations->id ? 'selected' : '' }}>
+                                    {{ $preparations->preparation_desc }}
+                                </option>
+                            @endforeach
+                        </select>
+                        </label> 
                         <label class="label-wide">
                             <span class="required-star">*</span> Yield %
                             <input value="${yiel}" class="form-control yield" id="yield${rowId}" type="number" required>
@@ -1347,6 +1374,14 @@
                         <label class="packaging-label">
                             <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
+                               <input
+                                        value="ingredient"
+                                        class="form-control yield hide"
+                                        name="" 
+                                        id="production_type${rowId}"
+                                        type="text"  
+                                        required
+                                    >
                                 <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control hidden " required/>
                                  <input value="${DB_id}" type="text" id="DB_id${rowId}" class="packaging form-control hidden"/>
                                 <input value="${tasteless_code}" type="text" id="tasteless_code_original${rowId}"   class="packaging form-control  hidden" required/>
@@ -1364,7 +1399,17 @@
                             <span class="required-star">*</span> Preparation Qty
                             <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
                         </label> 
-                       
+                        <label>
+                        <span class="required-star">*</span> Preparations
+                        <select class="form-control select labor-cost-dropdown" id="preparations${rowId}" name="preparations" required>
+                            <option value="">Select Process </option>
+                            @foreach($menu_ingredients_preparations as $preparations)
+                                <option value="{{ $preparations->id }}" {{ old('preparations', $item->menu_ingredients_preparations) == $preparations->id ? 'selected' : '' }}>
+                                    {{ $preparations->preparation_desc }}
+                                </option>
+                            @endforeach
+                        </select>
+                        </label> 
                         <label class="label-wide">
                             <span class="required-star">*</span> Yield %
                             <input value="${yiel}" class="form-control yield" id="yield${rowId}" type="number" required>
@@ -1422,6 +1467,14 @@
                       <label class="packaging-label">
                             <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
                             <div>
+                                 <input
+                                        value="packaging"
+                                        class="form-control yield hide"
+                                        name="" 
+                                        id="production_type${rowId}"
+                                        type="text"  
+                                        required
+                                    >
                                 <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control hidden" required/>
                                  <input value="${DB_id}" type="text" id="DB_id${rowId}" class="packaging form-control hidden"/>
                                 <input value="${description}" type="text" id="itemDesc${rowId}" class="form-control display-packaging span-2" placeholder="Search by Item Desc, Brand or Item Code" required/>
@@ -1473,6 +1526,14 @@
                             <label class="packaging-label">
                                 <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
                                 <div>
+                                    <input
+                                        value="packaging"
+                                        class="form-control yield hide"
+                                        name="" 
+                                        id="production_type${rowId}"
+                                        type="text"  
+                                        required
+                                    >
                                     <input value="${tasteless_code}" type="text" id="tasteless_code${rowId}" class="packaging form-control  hidden " required/>
                                     <input value="${DB_id}" type="text" id="DB_id${rowId}" class="packaging form-control hidden"/>
                                     <input value="${tasteless_code}" type="text" id="tasteless_code_original${rowId}" class="packaging form-control hidden " required/>
@@ -1592,8 +1653,10 @@
         //to save data and list to Production Items List module
            $('#save-datas').on('click', function() {
                 validateFields();
+                 const segmentations =  getSelectedSegmentations();
              const packagingRows = $('[id*="packaging-entry"]').length; 
              const ingredientRows = $('[id*="ingredient-entry"]').length;  
+              $('#segmentations').val(JSON.stringify(segmentations));
              if(packagingRows == 0 || ingredientRows == 0)
                 {
                     Swal.fire({
@@ -1846,6 +1909,8 @@
             $(`#yield${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][yield]`); 
             $(`#cost${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][cost]`);
             $(`#DB_id${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][DB_id]`); 
+            $(`#production_type${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][production_item_line_type]`);  
+
             if (parentid !== oldParentId) {
                 $wrapper.find('[class^="sub-ingredient"], [class^="sub-pack"]').find('input').each(function() {
                     var subId = $(this).attr('id') || '';
@@ -1859,6 +1924,7 @@
                         $(`#yield${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][yield]`); 
                         $(`#cost${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][cost]`); 
                         $(`#DB_id${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][DB_id]`);
+                        $(`#production_type${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][production_item_line_type]`);  
                     }
                 });
             }

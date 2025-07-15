@@ -2,6 +2,24 @@
 
 use App\CodeCounter;
 use Session;
+use Illuminate\Support\Str; 
+	use Maatwebsite\Excel\HeadingRowImport;
+	use Maatwebsite\Excel\Imports\HeadingRowFormatter; 
+	use App\Brand;  
+	use App\ApprovalWorkflowSetting; 
+	use App\Group;
+	use App\SalesPriceChangeHistory;
+	use App\Segmentation;
+	use Illuminate\Support\Facades\Input;
+	use Illuminate\Support\Facades\Log;
+	use Illuminate\Support\Facades\Redirect;
+	use Carbon\Carbon;
+	use Illuminate\Support\Facades\Schema;
+	use Illuminate\Support\Facades\Storage;
+	use Intervention\Image\Facades\Image;
+	use Spatie\ImageOptimizer\OptimizerChainFactory; 
+
+
 
 	use Maatwebsite\Excel\Facades\Excel;
 
@@ -53,7 +71,7 @@ use ProductionItemsApproval;
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"Reference Number","name"=>"reference_number"];
-			$this->col[] = ["label"=>"Description","name"=>"description"];
+			$this->col[] = ["label"=>"Description","name"=>"full_item_description"];
 			$this->col[] = ["label"=>"Production Category","name"=>"production_category","join"=>"production_item_categories,category_description" ];
 			$this->col[] = ["label"=>"Production Location","name"=>"production_location","join"=>"production_locations,production_location_description"];
 			$this->col[] = ["label"=>"Depreciation","name"=>"depreciation"];
@@ -745,29 +763,16 @@ use ProductionItemsApproval;
 
 
 	public function addProductionItemsToDB(Request $request){
-		dd($request);
+		//dd($request);
 		$message = '';
 		$time_stamp_now = date('Y-m-d H:i:s');
 			
 		
-			$validated = $request->validate([ 
-				'description' => 'required|string',
-				'production_category' => 'required|integer',
-				'production_location' => 'required|integer',  
-				'labor_cost' => 'required|numeric|max:99999999.99',
-				'gas_cost' => 'required|numeric|max:99999999.99',
-				'storage_cost' => 'required|numeric|max:99999999.99',
-				'storage_multiplier' => 'required|numeric|max:99999999.99',
-				'total_storage_cost' => 'required|numeric|max:99999999.99',
-				'storage_location' => 'nullable|integer',
-				'depreciation' => 'required|numeric|max:99999999.99',
-				'raw_mast_provision' => 'required|numeric|max:99999999.99',
-				'markup_percentage' => 'required|numeric|max:99999999.99',
-				'final_value_vatex' => 'required|numeric|max:99999999.99',
+			$validated = $request->validate([  
 				'final_value_vatinc' => 'required|numeric|max:99999999.99', 
 			]);
 
-			$data = $validated;
+			$data =  $request->all();
 
 			
 
@@ -949,6 +954,78 @@ use ProductionItemsApproval;
 				
 			    //status 202=pending, 200=approve, 400=reject
 
+
+					$input = $data;
+
+					if ($input['item_photo']) {
+						$filename_filler = $input['tasteless_code'] ?? 'new_item';
+						$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
+			
+						$img_file = $input['item_photo'];
+						$filename = date('Y-m-d') . "-$filename_filler-$random_string." . $img_file->getClientOriginalExtension();
+						$image = Image::make($img_file);
+						
+						$image->resize(1024, 768, function ($constraint) {
+							$constraint->aspectRatio();
+							$constraint->upsize();
+						});
+			
+						// Save the resized image to the public folder
+						$image->save(public_path('img/production-items/' . $filename));
+						// Optimize the uploaded image
+						$optimizerChain = OptimizerChainFactory::create();
+						$optimizerChain->optimize(public_path('img/production-items/' . $filename));
+					}
+
+
+					if ($filename) $data['image_filename'] = $filename;  
+
+
+					$segment_columns = DB::table('segmentations')
+						->where('status', 'ACTIVE')
+						->pluck('segment_column_name')
+						->toArray();
+		
+
+					$segmentations = (array) json_decode($input['segmentations']);
+					//segmentation => initializing all to 'X'
+					foreach ($segment_columns as $segment_column) {
+						$data[$segment_column] = 'X';
+					}
+
+					//overwriting the selected segmentations
+					foreach ($segmentations as $value => $columns) {
+						foreach ($columns as $column_name) {
+							$data[$column_name] = $value;
+						}
+					}
+					
+					if ($input['item_photo']) {
+						$filename_filler = $input['tasteless_code'] ?? 'new_item';
+						$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
+			
+						$img_file = $input['item_photo'];
+						$filename = date('Y-m-d') . "-$filename_filler-$random_string." . $img_file->getClientOriginalExtension();
+						$image = Image::make($img_file);
+						
+						$image->resize(1024, 768, function ($constraint) {
+							$constraint->aspectRatio();
+							$constraint->upsize();
+						});
+			
+						// Save the resized image to the public folder
+						$image->save(public_path('img/production-items/' . $filename));
+						// Optimize the uploaded image
+						$optimizerChain = OptimizerChainFactory::create();
+						$optimizerChain->optimize(public_path('img/production-items/' . $filename));
+					}
+
+
+
+
+
+
+
 				DB::table('cms_logs')->insert([
 				'ipaddress' => request()->ip(),
 				'useragent' => request()->userAgent(),
@@ -976,14 +1053,18 @@ use ProductionItemsApproval;
 
 
 		}
-
+			
 			$production_item_id = $data['reference_number'];
 			$ingredients = $request->input('produtionlines');
+			$labor_lines = $request->input('LaborLines');
 			$new_id = 0;
+			$labor_new_id = 0;
 			// Flatten all new item_codes for later comparison
-		 
+			// dd($ingredients);	
+			//mula dito
 			$newItemCodesID = [];
-
+			
+			 
 			if (count($ingredients) > 0) {
 				foreach ($ingredients as $parentCode => $ingredientGroup) {
 					foreach ($ingredientGroup as $ingredient) { 
@@ -1002,25 +1083,48 @@ use ProductionItemsApproval;
 								'quantity' => $ingredient['quantity'],
 								'yield' => $ingredient['yield'],
 								'landed_cost' => $ingredient['cost'],
-								'packaging_id' => $parentCode,
-								'is_alternative' => 1,
+								'packaging_id' => $parentCode, 
 								'production_item_line_id' => $new_id,
+								'production_item_line_type' => $ingredient['production_item_line_type'],
 								'approval_status' => 202,
 							]
 						);
 					}
 				}
 			}
-		 
+			//$(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][description]`); 
+		
 
 			ProductionItemLines::where('production_item_id', $production_item_id)
 				->whereNotIn('production_item_line_id', $newItemCodesID) 
 				->delete();
-
- 
+			//hanggadito 
+			 
+			if (count($labor_lines) > 0) {
+				foreach ($labor_lines as $parentCode => $labor_lines_description) {
+					$new_id++;
+					$newItemCodesID[] = $new_id;
+					ProductionItemLines::updateOrCreate(
+						[
+							'production_item_id' => $production_item_id,
+							'production_item_line_id' => $new_id,
+						],
+						[ 
+							'production_item_id' => $production_item_id, 
+							'time_labor' => $labor_lines_description['time-labor'], 
+							'yield' => $labor_lines_description['yiel'],
+							'preparations' => $ingredient['preparations'], 
+							'production_item_line_id' => $new_id,
+							'production_item_line_type' => $labor_lines_description['production_item_line_type'],
+							'approval_status' => 202,
+						]
+					); 
+				}
+			}
+			
 			//loop each ingredients and save sa DB 	production_item_lines table
 			// dd($ingredients); 
-				$cost = ProductionItems::updateOrCreate(
+				$cost = ProductionItemsModelApproval::updateOrCreate(
 					['reference_number' => $data['reference_number']],
 					$data
 				);
@@ -1032,7 +1136,8 @@ use ProductionItemsApproval;
 			])->send();
 		
 	}
- 
+	
+	 
 	 	public function getAdd() {
 			if (!CRUDBooster::isCreate())
 				CRUDBooster::redirect(
