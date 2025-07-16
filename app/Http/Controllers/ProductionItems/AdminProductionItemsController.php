@@ -945,7 +945,7 @@ use ProductionItemsApproval;
 
 		 
 				$ref = $nextId;
-				$message = "✔️ Item Added successfully with reference number ". $ref;		
+				$message = "✔️ successfully Added Pending Item with reference number ". $ref;		
 				$data['reference_number'] = $ref;
 				
 				$data['created_by'] = CRUDBooster::myId();
@@ -1063,12 +1063,11 @@ use ProductionItemsApproval;
 			// dd($ingredients);	
 			//mula dito
 			$newItemCodesID = [];
-			
 			 
 			if (count($ingredients) > 0) {
 				foreach ($ingredients as $parentCode => $ingredientGroup) {
 					foreach ($ingredientGroup as $ingredient) { 
-						 
+						
 						$new_id++;
 						$newItemCodesID[] = $new_id;
 						ProductionItemLines::updateOrCreate(
@@ -1082,6 +1081,7 @@ use ProductionItemsApproval;
 								'description' => $ingredient['description'],
 								'quantity' => $ingredient['quantity'],
 								'yield' => $ingredient['yield'],
+								'preparations' => $ingredient['preparations'], 
 								'landed_cost' => $ingredient['cost'],
 								'packaging_id' => $parentCode, 
 								'production_item_line_id' => $new_id,
@@ -1102,6 +1102,7 @@ use ProductionItemsApproval;
 			 
 			if (count($labor_lines) > 0) {
 				foreach ($labor_lines as $parentCode => $labor_lines_description) {
+					
 					$new_id++;
 					$newItemCodesID[] = $new_id;
 					ProductionItemLines::updateOrCreate(
@@ -1113,7 +1114,7 @@ use ProductionItemsApproval;
 							'production_item_id' => $production_item_id, 
 							'time_labor' => $labor_lines_description['time-labor'], 
 							'yield' => $labor_lines_description['yiel'],
-							'preparations' => $ingredient['preparations'], 
+							'preparations' => $labor_lines_description['preparations'], 
 							'production_item_line_id' => $new_id,
 							'production_item_line_type' => $labor_lines_description['production_item_line_type'],
 							'approval_status' => 202,
@@ -1393,22 +1394,25 @@ use ProductionItemsApproval;
 				->get()
 				->toArray(); 
 			$data['production_item_lines'] = DB::table('production_item_lines')
-			->select('production_item_lines.*', 
-			DB::raw('
-				case WHEN item_masters.landed_cost is null
-				THEN new_packagings.ttp 
-				ELSE item_masters.landed_cost
-				END as default_cost
-			'), 
-			'production_item_lines.production_item_line_id',
-			'item_masters.ttp', 
-			'item_masters.packaging_size')
-			->leftjoin('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
-			->leftjoin('new_packagings', 'production_item_lines.item_code', '=', 'new_packagings.nwp_code')
-			->where('production_item_lines.production_item_id', $ref) 
-			->orderBy('production_item_lines.production_item_line_id' , 'asc')
-			->get()
-			->toArray(); 
+											->select('production_item_lines.*', 
+											DB::raw('
+												case WHEN item_masters.landed_cost is null
+												THEN new_packagings.ttp 
+												ELSE item_masters.landed_cost
+												END as default_cost
+											'), 
+											'production_item_lines.production_item_line_id',
+											'item_masters.ttp', 
+											'item_masters.packaging_size',
+											'menu_ingredients_preparations.preparation_desc')
+											->leftjoin('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
+											->leftjoin('new_packagings', 'production_item_lines.item_code', '=', 'new_packagings.nwp_code')
+											->leftjoin('menu_ingredients_preparations', 'production_item_lines.preparations', '=', 'menu_ingredients_preparations.id')
+											->where('production_item_lines.production_item_id', $ref) 
+											->orderBy('production_item_lines.production_item_line_id' , 'asc')
+											->get()
+											->toArray(); 
+
 			$data['menu_ingredients_preparations'] = DB::table('menu_ingredients_preparations')
 				->where('status', 'ACTIVE') 
 				->get()
@@ -1456,7 +1460,7 @@ use ProductionItemsApproval;
 				'id',
 				'tasteless_code',
 				'full_item_description',
-				'landed_cost as ttp',
+				'landed_cost',
 				'packaging_size') 
 			->whereNotIn('tasteless_code', $existing)
 			->whereRaw('(tasteless_code LIKE ? OR full_item_description LIKE ?)', ["%{$searchTerm}%", "%{$searchTerm}%"])
@@ -1476,7 +1480,7 @@ use ProductionItemsApproval;
 					'id' => $item->id,
 					'tasteless_code' => $item->tasteless_code,
 					'item_description' => $item->full_item_description,
-					'cost' => $item->ttp, 
+					'cost' => $item->landed_cost, 
 					'packaging_size' => $item->packaging_size, 
 				];
 			});

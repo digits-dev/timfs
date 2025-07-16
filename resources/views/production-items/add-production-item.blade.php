@@ -142,27 +142,25 @@
                 });
             });
         </script>
-        @endif
-            <form action="{{ route('add-production-items-to-db') }}" method="POST" id="ProductionItems"  enctype="multipart/form-data">
+        @endif 
+            <form action="{{ $table == 'production_items' ? route('add-production-items-to-db') : route('approve_or_reject_production_items_push') }}" method="POST" id="ProductionItems"  enctype="multipart/form-data">
                 @csrf
+                 <input type="text" class="hide" value="{{ $item->reference_number }}" id="production_item_reference_number" name="reference_number">
                 <div class="panel-body">
                     <input name="id" value="{{$item->id}}" class="hide"/>
                     <div class="row">
                         <div class="col-md-12"> 
                             <h3 class="text-center text-bold">ITEM DETAILS</h3> 
-                            <input value="{{ $item->tasteless_code }}" name="tasteless_code" type="text" class="tasteless_code hide">
-                            @if ($item_masters_approvals_id)
-                                <input type="text" name="item_masters_approvals_id" value="{{ $item_masters_approvals_id }}" class="hide">
-                            @endif
+                            <input value="{{ $item->tasteless_code }}" name="tasteless_code" type="text" class="tasteless_code hide"> 
                             <div class="row">
                                 <div class="col-md-6">
                                     <table class="table-responsive table">
                                         <tbody>
-                                            @if ($item->tasteless_code)
+                                            @if ($item->reference_number)
                                             <tr>
                                                 <th>Tasteless Code</th>
                                                 <td>
-                                                    <input value="{{ $item->tasteless_code}}" type="text" name="tasteless_code" id="tasteless_code" class="form-control" readonly>
+                                                    <input value="{{ $item->reference_number}}" type="text" name="reference_number" id="reference_number" class="form-control" readonly>
                                                 </td>
                                             </tr>
                                             @endif
@@ -188,6 +186,7 @@
                                                 <th><span class="required-star">*</span>  Brand Description</th>
                                                 <td>
                                                     <select class="form-control" style="width: 100%;" id="brands_id" name="brands_id" required>
+                                                         <option value="{{$item->brands_id}}" selected>{{ $item->brand_description }}</option>
                                                     </select>
                                                 </td>
                                             </tr>
@@ -334,6 +333,7 @@
                                                 <th><span class="required-star">*</span> Preferred Vendor</th>
                                                 <td>
                                                     <select class="form-control" style="width: 100%;" id="suppliers_id" name="suppliers_id" required>
+                                                         <option value="{{$item->suppliers_id}}" selected>{{ $item->last_name }}</option>
                                                     </select>
                                                 </td>
                                             </tr>
@@ -451,24 +451,24 @@
                                                     }
                                                 }
                                             @endphp
-                                            <tr>
-                                                <th>Segmentation ({{ $value }})</th>
-                                                <td>
-                                                    <select class="segmentation_select" id="segmentation_{{ $id_name }}" _value="{{ $value }}" class="form-control" multiple="multiple">
-                                                        @foreach ($segmentations as $segmentation)
-                                                            <option {{ in_array($segmentation->segment_column_name, $selected[$id_name]) ? 'selected' : '' }} class="{{ $segmentation->segment_column_name }}" value="{{ $segmentation->segment_column_name }}">{{ $segmentation->segment_column_description }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                        @endforeach
+                                                <tr>
+                                                    <th>Segmentation ({{ $value }})</th>
+                                                    <td>
+                                                        <select class="segmentation_select" id="segmentation_{{ $id_name }}" _value="{{ $value }}" class="form-control" multiple="multiple">
+                                                            @foreach ($segmentations as $segmentation)
+                                                                <option {{ in_array($segmentation->segment_column_name, $selected[$id_name]) ? 'selected' : '' }} class="{{ $segmentation->segment_column_name }}" value="{{ $segmentation->segment_column_name }}">{{ $segmentation->segment_column_description }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                     </table>
                                 </div> 
                                    @if ($item->image_filename)
                                     <div class="col-md-6">
                                         <div class="photo-section">
                                             <h3 class="text-center text-bold">DISPLAY PHOTO</h3>
-                                            <img src="{{ asset('/img/item-master/' . $item->image_filename) }}" alt="Item Photo">
+                                            <img src="{{ asset('/img/production-items/' . $item->image_filename) }}" alt="Item Photo">
                                         </div>
                                     </div>
                                     @endif
@@ -541,23 +541,23 @@
                                                 <span class="required-star">*</span> Labor Cost per Minute
                                                 <span class="item-from label"></span> <span class="label label-danger"></span>
                                                 <div>
-                                                    <input 
-                                                        value="" 
+                                                    <input  
                                                         type="number" 
                                                         id="labor_cost_per_minute" 
                                                         name="labor_cost_per_minute"
                                                         class="form-control display-labor span-2" 
+                                                        value="{{round($item->labor_cost_per_minute)}}"
                                                         placeholder="eg 120" 
                                                         required
-                                                    />
+                                                     />
                                                 </div>
                                             </label>
                                             <label>
                                                 <span class="required-star">*</span> Total Minutes per Pack
-                                                <input 
-                                                    value="" 
+                                                <input  
                                                     id="total_minutes_per_pack" 
                                                     name="total_minutes_per_pack"
+                                                    value="{{round($item->total_minutes_per_pack)}}"
                                                     class="form-control costparent cost" 
                                                     type="text" 
                                                     readonly 
@@ -566,17 +566,16 @@
                                             </label>
                                             <label>
                                                 <span class="required-star">*</span> Total Labor Cost
-                                                <input 
-                                                    value="" 
+                                                <input  
                                                     id="labor_cost_val" 
                                                     name="labor_cost_val"
                                                     class="form-control costparent cost" 
+                                                    value="{{round($item->labor_cost_val)}}"
                                                     type="text" 
                                                     readonly 
                                                     required
                                                 >
-                                            </label>
-
+                                            </label> 
                                                 </div>
                                                 <br>
                                             </div>
@@ -688,7 +687,7 @@
                                             <tr>
                                                 <td> Utilities</td>
                                                 <td>
-                                                    <input type="number" name="cost_contribution_pct" id="cost_contribution_pct" value="{{ $item->utilities }}" class="form-control text-right">
+                                                    <input type="number" name="utilities" id="utilities" value="{{ $item->utilities }}" class="form-control text-right">
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -798,12 +797,21 @@
 
          
              <div class="panel-footer">
-                @if($item->id != '')
-                    <button id="save-datas" class="btn btn-success">+ Update data</button>
-                @else
-                    <button id="save-datas" class="btn btn-success">+ Create data</button>
+
+                @if($table != 'production_items_approvals') 
+                    @if($item->id != '')
+                        <button id="save-datas" class="btn btn-success">+ Update data</button>
+                    @else
+                        <button id="save-datas" class="btn btn-success">+ Create data</button>
                 @endif
-                <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-link'>← Back</a>
+                    <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-link'>← Back</a>
+                @else
+                    <div class="panel-footer"> 
+                        <button _action="approve" class="btn btn-success action-btn" id="approve-btn"><i class="fa fa-thumbs-up"></i> Approve</button>
+                        <button _action="reject" class="btn btn-danger action-btn" id="reject-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-down"></i> Reject</button>
+                        <a href='{{ CRUDBooster::mainpath() }}' id="cancel-btn" class='btn btn-default'>Cancel</a>
+                    </div>
+                 @endif
             </div>
  
     </div>
@@ -814,7 +822,10 @@
 <script>
  
     $(document).ready(function() {
-        
+         
+
+         
+
         //for showing message no package or ingredients found 
         is_noingredient = false;
         
@@ -831,8 +842,8 @@
         //looping for parent packeaging/ingredients
         production_item_lines.forEach(item => {
             
-            if (item.item_code == item.packaging_id) {
-                if(item.yield == null) 
+            if (item.item_code == item.packaging_id && item.production_item_line_type != 'labor') {
+                if(item.production_item_line_type == 'packaging') 
                 {
                      tableRow++;
 
@@ -851,7 +862,7 @@
                     PackagingSearchInit(`#itemDesc${tableRow}`, tableRow);
                         showNoDataIngredient();
                 }
-                else
+                else if(item.item_code == item.packaging_id)
                 {
                     tableRow++;
                     const newRowHtml = generateRowingredientHtml(
@@ -859,11 +870,16 @@
                         item.production_item_line_id,
                         item.item_code,
                         item.description,
-                        item.ttp,
+                        item.landed_cost,
                         item.quantity,
                         item.yield,
                         item.packaging_size,
-                        item.landed_cost
+                        item.landed_cost,
+                        "",
+                        "",
+                        item.preparations,
+                        item.preparation_desc
+                        //rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost , costparent_contribution, qty_contribution, preparations ,description
                     );
                     $(newRowHtml).appendTo('#ingredient-tbody');
                     IngredientSearch(`#itemDesc${tableRow}`, tableRow);
@@ -893,8 +909,8 @@
         //looping for sub packeaging/ingredients
          production_item_lines.forEach(item => {
             
-            if (item.item_code != item.packaging_id ) { 
-                if(item.yield == null) 
+            if (item.item_code != item.packaging_id  && item.production_item_line_type != 'labor') { 
+                if(item.production_item_line_type == 'packaging') 
                 {
                     tableRow++;
                     const matchingInputElement = $(`input[value="${item.packaging_id}"]`);
@@ -914,7 +930,7 @@
                     // console.log(`.sub-ingredient${oldindex}`);
                     $(newRowHtml).appendTo(`.sub-pack${matchingInput}`); 
                     PackagingSearchInit(`#itemDesc${tableRow}`, tableRow);
-                }else
+                }else if (item.item_code != item.packaging_id)
                 {
                     tableRow++;
                     const matchingInputElement = $(`input[value="${item.packaging_id}"]`);
@@ -922,23 +938,29 @@
                     const matchingInput = matchingInputId ? matchingInputId.split("tasteless_code")[1] : '';
                     
                     const newRowHtml = Sub_gen_ingredient_row(
-                        tableRow,
+                         tableRow,
                         item.production_item_line_id,
                         item.item_code,
                         item.description,
-                        item.ttp,
+                        item.landed_cost,
                         item.quantity,
                         item.yield,
                         item.packaging_size,
-                        item.landed_cost
+                        item.landed_cost,
+                        "",
+                        "",
+                        item.preparations,
+                        item.preparation_desc
                     );
                 // console.log(`.sub-ingredient${oldindex}`);
                     $(newRowHtml).appendTo(`.sub-ingredient${matchingInput}`); 
                     IngredientSearch(`#itemDesc${tableRow}`, tableRow);
-                }
+                } 
                 
              }    
         });
+
+      
 
 
           $(`  
@@ -1014,13 +1036,17 @@
 
         $(document).on('click', '.add-sub-btn-labor', function(event) {
             tableRow++; 
-            const newRowPackHtml = Sub_gen_Labor_row(tableRow);  
+            const newRowPackHtml = Sub_gen_Labor_row(tableRow,"","","","");  
             $(newRowPackHtml).appendTo(`.sub-labor`); 
             showNoDataLabor();
         });
 
         ajax_add(); 
        
+        
+       
+         
+
         function ajax_add()
         {
             Brandsearch('#brands_id','brands', 'status','INACTIVE', 'brand_description');
@@ -1052,21 +1078,12 @@
                     },
                         cache: true
                     }   
-                });
-
-                $('#brands_id').on('select2:select', function(e) {
-                    const picked = e.params.data;
-                    $(this)
-                    .next('.select2-container')
-                    .find('.select2-selection__rendered')
-                    .text(picked.text); 
-                });
+                }); 
+               
             }
 
 
-        }
-        
-
+        } 
 
         //for packaging search items
         function PackagingSearchInit(selector, rowId) {
@@ -1221,7 +1238,7 @@
         }
  
 
-          function Sub_gen_Labor_row(rowId) {
+          function Sub_gen_Labor_row(rowId, time_labor, yields, preparations, description) {
             return `  
                 <div class="substitute-packaging animate__animated animate__bounceIn"  id="labor-entry-sub${rowId}">
                 <div class="packaging-inputs">
@@ -1236,7 +1253,10 @@
                     <span class="required-star">*</span> Preparations
                     <select class="form-control select labor-cost-dropdown" id="preparations${rowId}" name="LaborLines[${rowId}][preparations]" required>
                         <option value="">Select Process </option>
-                        @foreach($menu_ingredients_preparations as $preparations)
+                        <option value="${preparations}" selected>
+                                 ${description}
+                        </option>
+                        @foreach($menu_ingredients_preparations as $preparations) 
                             <option value="{{ $preparations->id }}" {{ old('preparations', $item->menu_ingredients_preparations) == $preparations->id ? 'selected' : '' }}>
                                 {{ $preparations->preparation_desc }}
                             </option>
@@ -1247,7 +1267,7 @@
                     <label class="label-wide">
                     <span class="required-star">*</span> Time (minutes)
                     <input
-                        value=""
+                        value="${time_labor}"
                         class="form-control yield"
                         name="LaborLines[${rowId}][time-labor]"
                         id="time-labor${rowId}" 
@@ -1263,7 +1283,7 @@
                     <label> 
                     <label class="label-wide">
                     <span class="required-star">*</span> Yield %
-                    <input value=""  class="form-control yield"  name="LaborLines[${rowId}][yiel]" id="yiel${rowId}" type="number" required>
+                    <input value="${yields}"  class="form-control yield"  name="LaborLines[${rowId}][yiel]" id="yiel${rowId}" type="number" required>
                     </label>
                     <label class="label-wide">
                     <span class="required-star">*</span> Minutes per pack <span class="date-updated"></span>
@@ -1283,7 +1303,7 @@
 
 
 
-        function Sub_gen_ingredient_row(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost, costparent_contribution, qty_contribution)
+        function Sub_gen_ingredient_row(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost, costparent_contribution, qty_contribution, preparations, description)
           {
             return `  
                 <div class="substitute-packaging animate__animated animate__bounceIn" id="ingredient-entry${rowId}" >
@@ -1319,6 +1339,9 @@
                         <span class="required-star">*</span> Preparations
                         <select class="form-control select labor-cost-dropdown" id="preparations${rowId}" name="preparations" required>
                             <option value="">Select Process </option>
+                            <option value="${preparations}" selected>
+                                    ${description}
+                            </option>
                             @foreach($menu_ingredients_preparations as $preparations)
                                 <option value="{{ $preparations->id }}" {{ old('preparations', $item->menu_ingredients_preparations) == $preparations->id ? 'selected' : '' }}>
                                     {{ $preparations->preparation_desc }}
@@ -1365,7 +1388,7 @@
             `;
           }
                                                 
-          function generateRowingredientHtml(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost , costparent_contribution, qty_contribution) {
+          function generateRowingredientHtml(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost , costparent_contribution, qty_contribution, preparations ,description) {
             return ` 
             
             <div class="packaging-wrapper animate__animated animate__bounceIn" id="ingredient-entry${rowId}">
@@ -1403,6 +1426,9 @@
                         <span class="required-star">*</span> Preparations
                         <select class="form-control select labor-cost-dropdown" id="preparations${rowId}" name="preparations" required>
                             <option value="">Select Process </option>
+                            <option value="${preparations}" selected>
+                                    ${description}
+                            </option>
                             @foreach($menu_ingredients_preparations as $preparations)
                                 <option value="{{ $preparations->id }}" {{ old('preparations', $item->menu_ingredients_preparations) == $preparations->id ? 'selected' : '' }}>
                                     {{ $preparations->preparation_desc }}
@@ -1651,6 +1677,27 @@
         */
 
         //to save data and list to Production Items List module
+            $('#approve-btn').on('click', function(){ 
+                 const segmentations =  getSelectedSegmentations(); 
+              $('#segmentations').val(JSON.stringify(segmentations));
+                 Swal.fire({
+                        title: 'Do you want to Approve this production item?', 
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Save',
+                        returnFocus: false,
+                        }).then((result) => {
+                        
+                                if (result.isConfirmed) {
+                                    $('#sumit-form-button').click();
+                                }
+                            
+                            
+                        });
+            });
+
            $('#save-datas').on('click', function() {
                 validateFields();
                  const segmentations =  getSelectedSegmentations();
@@ -1788,9 +1835,7 @@
 
 
                         $(`#cost${lastChar}`).val(Number(ingredientCost).toFixed(2)).attr('readonly', true);
-                        $(`#ingredient-qty${lastChar}`).val(Number(ingredientQty).toFixed(2)).attr('readonly', true);
-                        
-                       
+                        $(`#ingredient-qty${lastChar}`).val(Number(ingredientQty).toFixed(2)).attr('readonly', true); 
                     }  
                 }
                 else
@@ -1882,8 +1927,7 @@
             $sub.addClass('animate__animated animate__rubberBand');
         });
  
-
-
+ 
       
 
 
@@ -1910,7 +1954,7 @@
             $(`#cost${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][cost]`);
             $(`#DB_id${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][DB_id]`); 
             $(`#production_type${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][production_item_line_type]`);  
-
+            $(`#preparations${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][preparations]`);
             if (parentid !== oldParentId) {
                 $wrapper.find('[class^="sub-ingredient"], [class^="sub-pack"]').find('input').each(function() {
                     var subId = $(this).attr('id') || '';
@@ -1925,6 +1969,7 @@
                         $(`#cost${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][cost]`); 
                         $(`#DB_id${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][DB_id]`);
                         $(`#production_type${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][production_item_line_type]`);  
+                         $(`#preparations${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][preparations]`);
                     }
                 });
             }
@@ -2262,9 +2307,33 @@
             }
         }
         
+        production_item_lines.forEach(item => {
+            
+            if (item.production_item_line_type == 'labor') { 
+                    tableRow++; 
+                    const newRowPackHtml = Sub_gen_Labor_row(tableRow, item.time_labor, item.yield, item.preparations, item.preparation_desc);  
+                    $(newRowPackHtml).appendTo(`.sub-labor`); 
+                    showNoDataLabor(); 
+                    $(`#time-labor${tableRow}`).trigger('change');
+             }    
+        });
+
+
         showNoData(); 
         showNoDataIngredient();
         showNoDataLabor();
+
+        let disableifapproval = "{{$table}}"; 
+
+        if(disableifapproval == 'production_items_approvals')
+        {
+            $('#ProductionItems').find('input, select, textarea').prop('disabled', true);
+            $('[class*="btn"]').hide();
+            $('#approve-btn').show(); 
+            $('#reject-btn').show();
+            $('#cancel-btn').show();
+        }
+         
     });
 
  

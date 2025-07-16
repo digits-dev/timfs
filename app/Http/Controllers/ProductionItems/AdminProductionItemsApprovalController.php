@@ -1,9 +1,51 @@
 <?php
 
 namespace App\Http\Controllers\ProductionItems;
+	use Maatwebsite\Excel\HeadingRowImport;
+	use Maatwebsite\Excel\Imports\HeadingRowFormatter; 
+	use App\Brand;  
+	use App\ApprovalWorkflowSetting;
+use App\CodeCounter;
+use Illuminate\Support\Str; 
+use App\Group;
+	use App\SalesPriceChangeHistory;
+	use App\Segmentation;
+	use Illuminate\Support\Facades\Input;
+	use Illuminate\Support\Facades\Log;
+	use Illuminate\Support\Facades\Redirect;
+	use Carbon\Carbon;
+	use Illuminate\Support\Facades\Schema;
+	use Illuminate\Support\Facades\Storage;
+	use Intervention\Image\Facades\Image;  
 
+
+
+	use Maatwebsite\Excel\Facades\Excel;
+ 
+	use App\Exports\ExcelTemplate;
+	use App\Exports\BartenderExport;
+	use App\Exports\ItemExport;
+	use App\Exports\POSExport;
+	use App\Exports\QBExport;
+	use App\Exports\ProdutionItems;
+ 
+	use App\Models\ProductionItems\ProductionItemCategory;
+	use App\Models\ProductionItems\ProductionItemStorageLocation;
+	use App\Models\ProductionItems\ProductionLocation;
+	use App\ItemMaster;
+use App\Models\ProductionItems\ProductionItemLines;
+use App\Models\ProductionItems\ProductionItemLinesModelApproval; 
+use App\Models\ProductionItems\ProductionItemsApproval as ProductionItemsProductionItemsApproval;
+use App\Models\ProductionItems\ProductionItemsModelApproval;
+use App\NewPackaging;
+use ProductionItemsApproval;
+
+
+use App\Models\ProductionItems\ProductionItems;
 use crocodicstudio\crudbooster\helpers\CRUDBooster;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
  
@@ -42,7 +84,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 											padding: 3px 8px; 
 											border-radius: 3px; 
 											font-weight: bold; 
-											font-size: 8px; 
+											font-size: 11px; 
 											text-align: center;
 											min-width: 20px;
 										">PENDING</span></center>';
@@ -75,7 +117,6 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 							}];
 			$this->col[] = ["label"=>"Production Category","name"=>"production_category","join"=>"production_item_categories,category_description" ];
 			$this->col[] = ["label"=>"Production Location","name"=>"production_location","join"=>"production_locations,production_location_description"];
-			$this->col[] = ["label"=>"Depreciation","name"=>"depreciation"];
 			$this->col[] = ["label"=>"Final Value Vatex","name"=>"final_value_vatex"];
 			$this->col[] = ["label"=>"Final Value Vatinc","name"=>"final_value_vatinc"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name" ];
@@ -104,7 +145,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			$this->addaction = array();
 			$this->addaction[] = [
 					'title'=>'Approve',
-					'url'=>CRUDBooster::mainpath('approve_or_reject/[id]'),
+					'url'=>CRUDBooster::mainpath('approve_or_reject_production_items/[id]'),
 					'icon'=>'fa fa-thumbs-up',
 					'color' => ' ',
 					"showIf"=>"[approval_status] == '202'",
@@ -370,4 +411,404 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 	        //Your code here
 
 	    }
+
+
+		public function approveOrReject($id)
+		{	
+			$data = [];  
+			$data['item'] = self::getItemDetails($id);  
+			$costings = self::costing(self::getItemDetails($id)->reference_number);
+				 
+			 
+
+			$data = array_merge($data, $costings); 
+
+			return $this->view('production-items/add-production-item', $data);
+		}
+		
+		public function getItemDetails($id) {
+			$item = DB::table('production_items_approvals') 
+				->select(
+					 'production_items_approvals.*',
+					 'brands.brand_description',
+					 'suppliers.last_name'
+				)
+				->join('brands', 'production_items_approvals.brands_id','=','brands.id')
+				->join('suppliers', 'production_items_approvals.suppliers_id','=','suppliers.id')
+				->where('production_items_approvals.id', $id) 
+				->limit(1)
+				->first();
+
+
+
+ 			return $item;
+		}
+
+		public function costing($ref) {
+	 
+			$data = [];
+			$data['tax_codes'] = DB::table('tax_codes')
+				->where('status', 'ACTIVE')
+				->orderBy('tax_description')
+				->get()
+				->toArray();
+
+			$data['accounts'] = DB::table('accounts')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['cogs_accounts'] = DB::table('cogs_accounts')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['asset_accounts'] = DB::table('asset_accounts')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['fulfillment_types'] = DB::table('fulfillment_methods')
+				->where('status', 'ACTIVE')
+				->orderBy('fulfillment_method')
+				->get()
+				->toArray();
+
+			$data['uoms'] = DB::table('uoms')
+				->where('status', 'ACTIVE')
+				->orderBy('uom_description')
+				->get()
+				->toArray();
+
+			$data['uom_sets'] = DB::table('uoms_set')
+				->where('status', 'ACTIVE')
+				->orderBy('uom_description')
+				->get()
+				->toArray();
+
+			$data['currencies'] = DB::table('currencies')
+				->where('status', 'ACTIVE')
+				->orderBy('currency_code')
+				->get()
+				->toArray();
+
+			$data['groups'] = DB::table('groups')
+				->where('status', 'ACTIVE')
+				->orderBy('group_description')
+				->get()
+				->toArray();
+
+			$data['categories'] = DB::table('categories')
+				->where('status', 'ACTIVE')
+				->orderBy('category_description')
+				->get()
+				->toArray();
+
+			$data['subcategories'] = DB::table('subcategories')
+				->select('id', 'subcategory_description', 'categories_id')
+				->where('status', 'ACTIVE')
+				->orderBy('subcategory_description')
+				->get()
+				->toArray();
+
+			$data['packagings'] = DB::table('packagings')
+				->where('status', 'ACTIVE')
+				->orderBy('packaging_description')
+				->get()
+				->toArray();
+
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()
+				->toArray();
+
+			$data['sku_legends'] = DB::table('sku_legends')
+				->where('status', 'ACTIVE')
+				->where('sku_legend', '!=', 'X')
+				->get()
+				->toArray();
+
+			$data['sku_statuses'] = DB::table('sku_statuses')
+				->where('status', 'ACTIVE')
+				->get()
+				->toArray();
+
+			// EDIT ITEM
+			$data['types'] = DB::table('types')
+				->where('status', 'ACTIVE')
+				->orderBy('type_description')
+				->get()
+				->toArray();
+			$data['sku_legends'] = DB::table('sku_legends')
+			->where('status', 'ACTIVE')
+			->where('sku_legend', '!=', 'X')
+			->get()
+			->toArray();
+			$data['segmentations'] = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('segment_column_description')
+				->get()
+				->toArray();
+			$data['production_category'] = DB::table('production_item_categories')
+				->where('status', 'ACTIVE') 
+				->get()
+				->toArray();
+			$data['storage_location'] = DB::table('production_item_storage_locations')
+				->where('status', 'ACTIVE') 
+				->get()
+				->toArray();
+			$data['production_location'] = DB::table('production_locations')
+				->where('status', 'ACTIVE') 
+				->get()
+				->toArray(); 
+			$data['production_item_lines'] = DB::table('production_item_lines')
+											->select('production_item_lines.*', 
+											DB::raw('
+												case WHEN item_masters.landed_cost is null
+												THEN new_packagings.ttp 
+												ELSE item_masters.landed_cost
+												END as default_cost
+											'), 
+											'production_item_lines.production_item_line_id',
+											'item_masters.ttp', 
+											'item_masters.packaging_size',
+											'menu_ingredients_preparations.preparation_desc')
+											->leftjoin('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
+											->leftjoin('new_packagings', 'production_item_lines.item_code', '=', 'new_packagings.nwp_code')
+											->leftjoin('menu_ingredients_preparations', 'production_item_lines.preparations', '=', 'menu_ingredients_preparations.id')
+											->where('production_item_lines.production_item_id', $ref) 
+											->orderBy('production_item_lines.production_item_line_id' , 'asc')
+											->get()
+											->toArray();  
+			$data['menu_ingredients_preparations'] = DB::table('menu_ingredients_preparations')
+				->where('status', 'ACTIVE') 
+				->get()
+				->toArray(); 
+
+
+			return $data;
+		}
+
+
+
+		public function addProductionItemsToDB(Request $request){
+		 
+		$message = '';
+		$time_stamp_now = date('Y-m-d H:i:s');
+			
+		
+			$validated = $request->validate([  
+				'final_value_vatinc' => 'required|numeric|max:99999999.99', 
+			]);
+
+			$data =  $request->all();
+
+			 
+			
+				 
+				 
+		 
+				$ref = $data['reference_number'];
+				$message = "✔️ Item Added successfully with reference number ". $ref;		
+				$data['reference_number'] = $ref;
+				
+				$data['created_by'] = CRUDBooster::myId();
+				$data['updated_by'] = CRUDBooster::myId();
+				$data['approval_status'] = 202;
+				
+			    //status 202=pending, 200=approve, 400=reject
+
+
+					$input = $data;
+
+					if ($input['item_photo']) {
+						$filename_filler = $input['tasteless_code'] ?? 'new_item';
+						$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
+			
+						$img_file = $input['item_photo'];
+						$filename = date('Y-m-d') . "-$filename_filler-$random_string." . $img_file->getClientOriginalExtension();
+						$image = Image::make($img_file);
+						
+						$image->resize(1024, 768, function ($constraint) {
+							$constraint->aspectRatio();
+							$constraint->upsize();
+						});
+			
+						// Save the resized image to the public folder
+						$image->save(public_path('img/production-items/' . $filename));
+						// Optimize the uploaded image
+						$optimizerChain = OptimizerChainFactory::create();
+						$optimizerChain->optimize(public_path('img/production-items/' . $filename));
+					}
+
+
+					if ($filename) $data['image_filename'] = $filename;  
+
+
+					$segment_columns = DB::table('segmentations')
+						->where('status', 'ACTIVE')
+						->pluck('segment_column_name')
+						->toArray();
+		
+
+					$segmentations = (array) json_decode($input['segmentations']);
+					//segmentation => initializing all to 'X'
+					foreach ($segment_columns as $segment_column) {
+						$data[$segment_column] = 'X';
+					}
+
+					//overwriting the selected segmentations
+					foreach ($segmentations as $value => $columns) {
+						foreach ($columns as $column_name) {
+							$data[$column_name] = $value;
+						}
+					}
+					
+					if ($input['item_photo']) {
+						$filename_filler = $input['tasteless_code'] ?? 'new_item';
+						$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
+			
+						$img_file = $input['item_photo'];
+						$filename = date('Y-m-d') . "-$filename_filler-$random_string." . $img_file->getClientOriginalExtension();
+						$image = Image::make($img_file);
+						
+						$image->resize(1024, 768, function ($constraint) {
+							$constraint->aspectRatio();
+							$constraint->upsize();
+						});
+			
+						// Save the resized image to the public folder
+						$image->save(public_path('img/production-items/' . $filename));
+						// Optimize the uploaded image
+						$optimizerChain = OptimizerChainFactory::create();
+						$optimizerChain->optimize(public_path('img/production-items/' . $filename));
+					 
+					}
+
+
+
+
+
+
+
+				DB::table('cms_logs')->insert([
+				'ipaddress' => request()->ip(),
+				'useragent' => request()->userAgent(),
+				'url' => request()->fullUrl(),
+				'description' => 'User Production Item Creation',
+				'details'  =>  'Production Items Approved ' . $ref,
+				'id_cms_users' => CRUDBooster::myId(),
+				'created_at' => now(),
+				'updated_at' => now(),
+				]);
+
+				DB::table('production_items_history')->insert([
+				'reference' => $ref,
+				'action' => 'Create', 
+				'description' => 'User Production Item Creation',
+				'key_old_value' => '', // .': '. $safe_value,
+				'description_old_value' => '',	
+				'key_new_value' => '',
+				'description_new_value' => '',  
+				'updated_by' => CRUDBooster::myId() ?: 1, 
+				'details'  =>  'Production Items Approved ' . $ref, 
+				'created_at' => now(),
+				'updated_at' => now(),
+				]);
+
+ 
+			
+			$production_item_id = $data['reference_number'];
+			$ingredients = $request->input('produtionlines');
+			$labor_lines = $request->input('LaborLines');
+			$new_id = 0;
+			$labor_new_id = 0;
+			// Flatten all new item_codes for later comparison
+			// dd($ingredients);	
+			//mula dito
+			$newItemCodesID = [];
+			 
+			if (count($ingredients) > 0) {
+				foreach ($ingredients as $parentCode => $ingredientGroup) {
+					foreach ($ingredientGroup as $ingredient) { 
+						
+						$new_id++;
+						$newItemCodesID[] = $new_id;
+						ProductionItemLines::updateOrCreate(
+							[
+								'production_item_id' => $production_item_id,
+								'production_item_line_id' => $new_id,
+							],
+							[ 
+								'production_item_id' => $production_item_id,
+								'item_code' => $ingredient['tasteless_code'],	
+								'description' => $ingredient['description'],
+								'quantity' => $ingredient['quantity'],
+								'yield' => $ingredient['yield'],
+								'preparations' => $ingredient['preparations'], 
+								'landed_cost' => $ingredient['cost'],
+								'packaging_id' => $parentCode, 
+								'production_item_line_id' => $new_id,
+								'production_item_line_type' => $ingredient['production_item_line_type'],
+								'approval_status' => 202,
+							]
+						);
+					}
+				}
+			}
+			//$(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][description]`); 
+		
+
+			ProductionItemLines::where('production_item_id', $production_item_id)
+				->whereNotIn('production_item_line_id', $newItemCodesID) 
+				->delete();
+			//hanggadito 
+			 
+			if (count($labor_lines) > 0) {
+				foreach ($labor_lines as $parentCode => $labor_lines_description) {
+					
+					$new_id++;
+					$newItemCodesID[] = $new_id;
+					ProductionItemLines::updateOrCreate(
+						[
+							'production_item_id' => $production_item_id,
+							'production_item_line_id' => $new_id,
+						],
+						[ 
+							'production_item_id' => $production_item_id, 
+							'time_labor' => $labor_lines_description['time-labor'], 
+							'yield' => $labor_lines_description['yiel'],
+							'preparations' => $labor_lines_description['preparations'], 
+							'production_item_line_id' => $new_id,
+							'production_item_line_type' => $labor_lines_description['production_item_line_type'],
+							'approval_status' => 202,
+						]
+					); 
+				}
+			}
+			
+			//loop each ingredients and save sa DB 	production_item_lines table
+			// dd($ingredients); 
+				$approvalStatus = ProductionItemsModelApproval::updateOrCreate(
+					['reference_number' => $data['reference_number']],
+					['approval_status' => 200]
+				);
+
+				$cost = ProductionItems::updateOrCreate(
+					['reference_number' => $data['reference_number']],
+					$data
+				);
+			 //return redirect()->back()->with('success', 'Production item saved successfully!');
+			return redirect(CRUDBooster::mainpath())
+			->with([
+					'message_type' => 'success',
+					'message' => $message,
+			])->send();
+		
+	}
+
 }
