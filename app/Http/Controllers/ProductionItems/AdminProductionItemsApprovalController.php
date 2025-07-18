@@ -96,7 +96,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 											padding: 3px 8px; 
 											border-radius: 3px; 
 											font-weight: bold; 
-											font-size: 8px; 
+											font-size: 11px; 
 											text-align: center;
 											min-width: 20px;
 										">REJECT</span></center>';
@@ -109,12 +109,13 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 											padding: 3px 8px; 
 											border-radius: 3px; 
 											font-weight: bold; 
-											font-size: 8px; 
+											font-size: 11px; 
 											text-align: center;
 											min-width: 20px;
 										">APPROVED</span></center>';
 								}
 							}];
+			$this->col[] = ["label"=>"Action Type","name"=>"action_type"];
 			$this->col[] = ["label"=>"Production Category","name"=>"production_category","join"=>"production_item_categories,category_description" ];
 			$this->col[] = ["label"=>"Production Location","name"=>"production_location","join"=>"production_locations,production_location_description"];
 			$this->col[] = ["label"=>"Final Value Vatex","name"=>"final_value_vatex"];
@@ -412,6 +413,17 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 
 	    }
 
+		public function getDetail($id)
+		{
+			$data = [];  
+			$data['item'] = self::getItemDetails($id);  
+			$costings = self::costing(self::getItemDetails($id)->reference_number);
+			$data['view'] = 'true'; 
+			 
+
+			$data = array_merge($data, $costings);  
+			return $this->view('production-items/add-production-item', $data);
+		}
 
 		public function approveOrReject($id)
 		{	
@@ -565,23 +577,23 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 				->where('status', 'ACTIVE') 
 				->get()
 				->toArray(); 
-			$data['production_item_lines'] = DB::table('production_item_lines')
-											->select('production_item_lines.*', 
+			$data['production_item_lines'] = DB::table('production_item_lines_approvals')
+											->select('production_item_lines_approvals.*', 
 											DB::raw('
 												case WHEN item_masters.landed_cost is null
 												THEN new_packagings.ttp 
 												ELSE item_masters.landed_cost
 												END as default_cost
 											'), 
-											'production_item_lines.production_item_line_id',
+											'production_item_lines_approvals.production_item_line_id',
 											'item_masters.ttp', 
 											'item_masters.packaging_size',
 											'menu_ingredients_preparations.preparation_desc')
-											->leftjoin('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
-											->leftjoin('new_packagings', 'production_item_lines.item_code', '=', 'new_packagings.nwp_code')
-											->leftjoin('menu_ingredients_preparations', 'production_item_lines.preparations', '=', 'menu_ingredients_preparations.id')
-											->where('production_item_lines.production_item_id', $ref) 
-											->orderBy('production_item_lines.production_item_line_id' , 'asc')
+											->leftjoin('item_masters', 'production_item_lines_approvals.item_code', '=', 'item_masters.tasteless_code')
+											->leftjoin('new_packagings', 'production_item_lines_approvals.item_code', '=', 'new_packagings.nwp_code')
+											->leftjoin('menu_ingredients_preparations', 'production_item_lines_approvals.preparations', '=', 'menu_ingredients_preparations.id')
+											->where('production_item_lines_approvals.production_item_id', $ref) 
+											->orderBy('production_item_lines_approvals.production_item_line_id' , 'asc')
 											->get()
 											->toArray();  
 			$data['menu_ingredients_preparations'] = DB::table('menu_ingredients_preparations')
@@ -596,7 +608,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 
 
 		public function addProductionItemsToDB(Request $request){
-		 
+	 
 		$message = '';
 		$time_stamp_now = date('Y-m-d H:i:s');
 			
@@ -625,28 +637,15 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 
 					$input = $data;
 
-					if ($input['item_photo']) {
-						$filename_filler = $input['tasteless_code'] ?? 'new_item';
-						$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
-			
-						$img_file = $input['item_photo'];
-						$filename = date('Y-m-d') . "-$filename_filler-$random_string." . $img_file->getClientOriginalExtension();
-						$image = Image::make($img_file);
-						
-						$image->resize(1024, 768, function ($constraint) {
-							$constraint->aspectRatio();
-							$constraint->upsize();
-						});
-			
-						// Save the resized image to the public folder
-						$image->save(public_path('img/production-items/' . $filename));
-						// Optimize the uploaded image
-						$optimizerChain = OptimizerChainFactory::create();
-						$optimizerChain->optimize(public_path('img/production-items/' . $filename));
-					}
+					 $input['item_photo'] = DB::table('production_items_approvals') 
+					->select('image_filename')
+					->where('reference_number', '=', $ref)
+					->pluck('image_filename')
+    				->first();
 
 
-					if ($filename) $data['image_filename'] = $filename;  
+
+					if ($input['item_photo']) $data['image_filename'] = $input['item_photo'];  
 
 
 					$segment_columns = DB::table('segmentations')
@@ -666,28 +665,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 						foreach ($columns as $column_name) {
 							$data[$column_name] = $value;
 						}
-					}
-					
-					if ($input['item_photo']) {
-						$filename_filler = $input['tasteless_code'] ?? 'new_item';
-						$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
-			
-						$img_file = $input['item_photo'];
-						$filename = date('Y-m-d') . "-$filename_filler-$random_string." . $img_file->getClientOriginalExtension();
-						$image = Image::make($img_file);
-						
-						$image->resize(1024, 768, function ($constraint) {
-							$constraint->aspectRatio();
-							$constraint->upsize();
-						});
-			
-						// Save the resized image to the public folder
-						$image->save(public_path('img/production-items/' . $filename));
-						// Optimize the uploaded image
-						$optimizerChain = OptimizerChainFactory::create();
-						$optimizerChain->optimize(public_path('img/production-items/' . $filename));
-					 
-					}
+					} 
 
 
 
@@ -750,7 +728,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 								'quantity' => $ingredient['quantity'],
 								'yield' => $ingredient['yield'],
 								'preparations' => $ingredient['preparations'], 
-								'landed_cost' => $ingredient['cost'],
+								'landed_cost' => $ingredient['ttp'],
 								'packaging_id' => $parentCode, 
 								'production_item_line_id' => $new_id,
 								'production_item_line_type' => $ingredient['production_item_line_type'],
@@ -795,7 +773,9 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			// dd($ingredients); 
 				$approvalStatus = ProductionItemsModelApproval::updateOrCreate(
 					['reference_number' => $data['reference_number']],
-					['approval_status' => 200]
+					['approval_status' => 200,
+					'approved_by' => CRUDBooster::myId(),
+					'approved_at' => now()]                                 
 				);
 
 				$cost = ProductionItems::updateOrCreate(

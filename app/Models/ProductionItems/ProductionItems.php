@@ -94,6 +94,7 @@ protected $fillable = [
     'fulfillment_type_id',
     'accounts_id',
     'asset_accounts_id',
+    'action_type',
     'cogs_accounts_id',
     'quantity_on_hand',
     'accumulated_depreciation',

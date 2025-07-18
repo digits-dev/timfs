@@ -652,6 +652,7 @@
         console.log(checkLandedCost(), checkCommiMargin());
         const isValid = checkLandedCost() && checkCommiMargin();
         $('#segmentations').val(JSON.stringify(segmentations));
+        console.log(segmentations);
         console.log(isValid);
         if (isValid) {
             Swal.fire({

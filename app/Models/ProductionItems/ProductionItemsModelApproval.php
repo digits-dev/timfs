@@ -52,6 +52,7 @@ class ProductionItemsModelApproval extends Model
     'full_item_description',
     'brands_id',
     'groups_id',
+    'action_type',
     'categories_id',
     'subcategories_id',
     'types_id',

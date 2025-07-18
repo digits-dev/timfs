@@ -763,7 +763,7 @@ use ProductionItemsApproval;
 
 
 	public function addProductionItemsToDB(Request $request){
-		//dd($request);
+ 
 		$message = '';
 		$time_stamp_now = date('Y-m-d H:i:s');
 			
@@ -925,6 +925,8 @@ use ProductionItemsApproval;
 						
 						
 						$data['updated_at'] = $time_stamp_now;
+						$data['action_type'] = "UPDATE";
+						$data['approval_status'] = 202;
 						$data['updated_by'] = CRUDBooster::myId();
 						$data['reference_number'] = $item->reference_number;
 
@@ -943,7 +945,7 @@ use ProductionItemsApproval;
 				$nextId = CodeCounter::where('type', 'PRODUCTION ITEMS')->value('code_7');
 				CodeCounter::where('type', 'PRODUCTION ITEMS')->increment('code_7');
 
-		 
+
 				$ref = $nextId;
 				$message = "✔️ successfully Added Pending Item with reference number ". $ref;		
 				$data['reference_number'] = $ref;
@@ -951,76 +953,14 @@ use ProductionItemsApproval;
 				$data['created_by'] = CRUDBooster::myId();
 				$data['updated_by'] = CRUDBooster::myId();
 				$data['approval_status'] = 202;
-				
+				$data['action_type'] = "CREATE";		
 			    //status 202=pending, 200=approve, 400=reject
 
 
-					$input = $data;
-
-					if ($input['item_photo']) {
-						$filename_filler = $input['tasteless_code'] ?? 'new_item';
-						$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
-			
-						$img_file = $input['item_photo'];
-						$filename = date('Y-m-d') . "-$filename_filler-$random_string." . $img_file->getClientOriginalExtension();
-						$image = Image::make($img_file);
-						
-						$image->resize(1024, 768, function ($constraint) {
-							$constraint->aspectRatio();
-							$constraint->upsize();
-						});
-			
-						// Save the resized image to the public folder
-						$image->save(public_path('img/production-items/' . $filename));
-						// Optimize the uploaded image
-						$optimizerChain = OptimizerChainFactory::create();
-						$optimizerChain->optimize(public_path('img/production-items/' . $filename));
-					}
-
-
-					if ($filename) $data['image_filename'] = $filename;  
-
-
-					$segment_columns = DB::table('segmentations')
-						->where('status', 'ACTIVE')
-						->pluck('segment_column_name')
-						->toArray();
-		
-
-					$segmentations = (array) json_decode($input['segmentations']);
-					//segmentation => initializing all to 'X'
-					foreach ($segment_columns as $segment_column) {
-						$data[$segment_column] = 'X';
-					}
-
-					//overwriting the selected segmentations
-					foreach ($segmentations as $value => $columns) {
-						foreach ($columns as $column_name) {
-							$data[$column_name] = $value;
-						}
-					}
 					
-					if ($input['item_photo']) {
-						$filename_filler = $input['tasteless_code'] ?? 'new_item';
-						$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
-			
-						$img_file = $input['item_photo'];
-						$filename = date('Y-m-d') . "-$filename_filler-$random_string." . $img_file->getClientOriginalExtension();
-						$image = Image::make($img_file);
-						
-						$image->resize(1024, 768, function ($constraint) {
-							$constraint->aspectRatio();
-							$constraint->upsize();
-						});
-			
-						// Save the resized image to the public folder
-						$image->save(public_path('img/production-items/' . $filename));
-						// Optimize the uploaded image
-						$optimizerChain = OptimizerChainFactory::create();
-						$optimizerChain->optimize(public_path('img/production-items/' . $filename));
-					}
 
-
+					
+ 
 
 
 
@@ -1052,7 +992,51 @@ use ProductionItemsApproval;
 				]);
 
 
-		}
+		}	
+			$input = $data; 
+			if ($input['item_photo']) {
+				$filename_filler = $input['tasteless_code'] ?? 'new_item';
+				$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
+	
+				$img_file = $input['item_photo'];
+				$filename = date('Y-m-d') . "-$filename_filler-$random_string." . $img_file->getClientOriginalExtension();
+				$image = Image::make($img_file);
+				
+				$image->resize(1024, 768, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
+	
+				// Save the resized image to the public folder
+				$image->save(public_path('img/production-items/' . $filename));
+				// Optimize the uploaded image
+				$optimizerChain = OptimizerChainFactory::create();
+				$optimizerChain->optimize(public_path('img/production-items/' . $filename));
+			}
+
+
+			if ($filename) $data['image_filename'] = $filename;  
+
+
+			$segment_columns = DB::table('segmentations')
+						->where('status', 'ACTIVE')
+						->pluck('segment_column_name')
+						->toArray();
+		
+
+			$segmentations = (array) json_decode($data['segmentations']);
+			//segmentation => initializing all to 'X'
+			foreach ($segment_columns as $segment_column) {
+				$data[$segment_column] = 'X';
+			}
+
+			//overwriting the selected segmentations
+			foreach ($segmentations as $value => $columns) {
+				foreach ($columns as $column_name) {
+					$data[$column_name] = $value; 
+				} 
+			}
+
 			
 			$production_item_id = $data['reference_number'];
 			$ingredients = $request->input('produtionlines');
@@ -1062,15 +1046,15 @@ use ProductionItemsApproval;
 			// Flatten all new item_codes for later comparison
 			// dd($ingredients);	
 			//mula dito
-			$newItemCodesID = [];
-			 
+
+			
+			$newItemCodesID = []; 
 			if (count($ingredients) > 0) {
 				foreach ($ingredients as $parentCode => $ingredientGroup) {
-					foreach ($ingredientGroup as $ingredient) { 
-						
+					foreach ($ingredientGroup as $ingredient) {  
 						$new_id++;
 						$newItemCodesID[] = $new_id;
-						ProductionItemLines::updateOrCreate(
+						ProductionItemLinesModelApproval::updateOrCreate(
 							[
 								'production_item_id' => $production_item_id,
 								'production_item_line_id' => $new_id,
@@ -1082,7 +1066,7 @@ use ProductionItemsApproval;
 								'quantity' => $ingredient['quantity'],
 								'yield' => $ingredient['yield'],
 								'preparations' => $ingredient['preparations'], 
-								'landed_cost' => $ingredient['cost'],
+								'landed_cost' => $ingredient['ttp'],
 								'packaging_id' => $parentCode, 
 								'production_item_line_id' => $new_id,
 								'production_item_line_type' => $ingredient['production_item_line_type'],
@@ -1095,7 +1079,7 @@ use ProductionItemsApproval;
 			//$(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][description]`); 
 		
 
-			ProductionItemLines::where('production_item_id', $production_item_id)
+			ProductionItemLinesModelApproval::where('production_item_id', $production_item_id)
 				->whereNotIn('production_item_line_id', $newItemCodesID) 
 				->delete();
 			//hanggadito 
@@ -1105,7 +1089,7 @@ use ProductionItemsApproval;
 					
 					$new_id++;
 					$newItemCodesID[] = $new_id;
-					ProductionItemLines::updateOrCreate(
+					ProductionItemLinesModelApproval::updateOrCreate(
 						[
 							'production_item_id' => $production_item_id,
 							'production_item_line_id' => $new_id,
@@ -1121,10 +1105,9 @@ use ProductionItemsApproval;
 						]
 					); 
 				}
-			}
-			
+			} 
 			//loop each ingredients and save sa DB 	production_item_lines table
-			// dd($ingredients); 
+		
 				$cost = ProductionItemsModelApproval::updateOrCreate(
 					['reference_number' => $data['reference_number']],
 					$data
@@ -1257,15 +1240,18 @@ use ProductionItemsApproval;
 
 
 
-	public function getItemDetails($id) {
+	public function getItemDetails($id) { 
 			$item = DB::table('production_items') 
 				->select(
-					 '*'
+					 'production_items.*',
+					 'brands.brand_description',
+					 'suppliers.last_name'
 				)
+				->join('brands', 'production_items.brands_id','=','brands.id')
+				->join('suppliers', 'production_items.suppliers_id','=','suppliers.id')
 				->where('production_items.id', $id) 
 				->limit(1)
 				->first();
-
 
 
  			return $item;

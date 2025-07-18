@@ -170,12 +170,14 @@
                                                     <input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()">
                                                 </td>
                                             </tr>
+                                            @if($table == 'production_items') 
                                              <tr>
                                                 <th><span class="required-star">*</span> Display Photo</th>
                                                 <td>
-                                                    <input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control" required>
+                                                    <input type="file" name="item_photo" id="item_photo" accept="image/*" class="form-control">
                                                 </td>
                                             </tr>
+                                            @endif
                                             <tr>
                                                 <th>File Reference Link</th>
                                                 <td>
@@ -677,13 +679,7 @@
                                                 <td> 
                                                     <input type="number" name="markup_percentage" id="markup_percentage" value="{{ $item->markup_percentage }}" class="form-control text-right">
                                                 </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Total Storage Cost</td>
-                                                <td>
-                                                    <input type="number" name="total_storage_cost" id="total_storage_cost" value="{{ $item->total_storage_cost }}" class="form-control text-right">
-                                                </td>
-                                            </tr>
+                                            </tr> 
                                             <tr>
                                                 <td> Utilities</td>
                                                 <td>
@@ -806,11 +802,13 @@
                 @endif
                     <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-link'>← Back</a>
                 @else
+                    @if(!$view) 
                     <div class="panel-footer"> 
                         <button _action="approve" class="btn btn-success action-btn" id="approve-btn"><i class="fa fa-thumbs-up"></i> Approve</button>
                         <button _action="reject" class="btn btn-danger action-btn" id="reject-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-down"></i> Reject</button>
                         <a href='{{ CRUDBooster::mainpath() }}' id="cancel-btn" class='btn btn-default'>Cancel</a>
                     </div>
+                    @endif
                  @endif
             </div>
  
@@ -822,9 +820,9 @@
 <script>
  
     $(document).ready(function() {
-         
-
-         
+        
+       
+       
 
         //for showing message no package or ingredients found 
         is_noingredient = false;
@@ -938,7 +936,7 @@
                     const matchingInput = matchingInputId ? matchingInputId.split("tasteless_code")[1] : '';
                     
                     const newRowHtml = Sub_gen_ingredient_row(
-                         tableRow,
+                        tableRow,
                         item.production_item_line_id,
                         item.item_code,
                         item.description,
@@ -1042,10 +1040,6 @@
         });
 
         ajax_add(); 
-       
-        
-       
-         
 
         function ajax_add()
         {
@@ -1085,7 +1079,7 @@
 
         } 
 
-        //for packaging search items
+         //for packaging search items
         function PackagingSearchInit(selector, rowId) {
            const token = $("#token").val();   
             console.log(rowId + 'pogi');
@@ -1108,11 +1102,11 @@
                     "_token": token, 
                     "search": request.term, 
                     values: $('[id*="itemDesc"], [id*="tasteless_code"], [id*="tasteless_code_original"]').map(function() {
-                                if($(this).val() != "") {
-                                    return $(this).val();
-                                } else {
+                                // if($(this).val() != "") {
+                                //     return $(this).val();
+                                // } else {
                                     return 'null';
-                                }
+                                //}
                             }).get()
                     },
                     success: function (data) {
@@ -1187,11 +1181,11 @@
                     "_token": token, 
                     "search": request.term, 
                     values: $('[id*="itemDesc"], [id*="tasteless_code"], [id*="tasteless_code_original"]').map(function() {
-                                if($(this).val() != "") {
-                                    return $(this).val();
-                                } else {
+                                // if($(this).val() != "") {
+                                //     return $(this).val();
+                                // } else {
                                     return 'null';
-                                }
+                                //}
                             }).get()
                     },
                     success: function (data) {
@@ -1299,10 +1293,7 @@
                 </div>`;
             }
 
-             
-
-
-
+              
         function Sub_gen_ingredient_row(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost, costparent_contribution, qty_contribution, preparations, description)
           {
             return `  
@@ -1691,6 +1682,8 @@
                         }).then((result) => {
                         
                                 if (result.isConfirmed) {
+
+                                    $('#ProductionItems').find('input, select, textarea').prop('disabled', false);
                                     $('#sumit-form-button').click();
                                 }
                             
@@ -1699,11 +1692,13 @@
             });
 
            $('#save-datas').on('click', function() {
+            
                 validateFields();
-                 const segmentations =  getSelectedSegmentations();
-             const packagingRows = $('[id*="packaging-entry"]').length; 
-             const ingredientRows = $('[id*="ingredient-entry"]').length;  
-              $('#segmentations').val(JSON.stringify(segmentations));
+                const segmentations =  getSelectedSegmentations();
+                const packagingRows = $('[id*="packaging-entry"]').length; 
+                const ingredientRows = $('[id*="ingredient-entry"]').length;  
+                $('#segmentations').val(JSON.stringify(segmentations));
+                console.log(segmentations);
              if(packagingRows == 0 || ingredientRows == 0)
                 {
                     Swal.fire({
@@ -1775,21 +1770,15 @@
             return segmentation;
         }
 
-        $('#ProductionItems').on('submit', function() {
-        Swal.fire({
-            title: 'Loading...',
-            html: 'Please wait...',
-            allowEscapeKey: false,
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading()
-            },
-            });
-        });
-      
+         
+    $('.segmentation_select').on("select2:unselect", function(event) {
+        const element = event.params.data.element;
+        const $element = $(element);
+        $element.attr('selected', false);
+        const className = $element.prop('class');
+        const otherOptions = $(`.segmentation_select option.${className}`).attr('disabled', false);
+    });
 
-
-      
         //$(document).on('input', '.ingredient-quantity', calculateFinalValues);
         // $(document).on('change', '.ingredient-input', calculateFinalValues);
 
@@ -1951,6 +1940,7 @@
             $(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][description]`); 
             $(`#quantity${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][quantity]`);
             $(`#yield${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][yield]`); 
+            $(`#ttp${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][ttp]`);
             $(`#cost${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][cost]`);
             $(`#DB_id${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][DB_id]`); 
             $(`#production_type${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][production_item_line_type]`);  
@@ -1965,7 +1955,8 @@
                          
                         $(`#itemDesc${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][description]`); 
                         $(`#quantity${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][quantity]`);
-                        $(`#yield${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][yield]`); 
+                        $(`#yield${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][yield]`);
+                         $(`#ttp${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][ttp]`); 
                         $(`#cost${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][cost]`); 
                         $(`#DB_id${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][DB_id]`);
                         $(`#production_type${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][production_item_line_type]`);  
@@ -1981,7 +1972,7 @@
 
 
         //recalculate all fields when something change
-        $('#ingredient_cost, #packaging_cost, #labor_cost, #gas_cost, #storage_cost, #storage_multiplier, #depreciation, #raw_mast_provision, #markup_percentage').on('input', function() {
+        $('#ingredient_cost, #packaging_cost, #utilities , #labor_cost, #gas_cost, #storage_cost, #storage_multiplier, #depreciation, #raw_mast_provision, #markup_percentage').on('input', function() {
             calculateTotalStorage();
             calculateFinalValues();
         });
@@ -2140,7 +2131,7 @@
             const storageCost = parseFloat($('#storage_cost').val()) || 0;
             const storageMultiplier = parseFloat($('#storage_multiplier').val()) || 0;
             const totalStorage = storageCost * storageMultiplier;
-            $('#total_storage_cost').val(totalStorage.toFixed(2));
+            //$('#total_storage_cost').val(totalStorage.toFixed(2));
         }
 
 
@@ -2221,19 +2212,19 @@
         const ingredientCost = parseFloat($('#ingredient_cost').val()) || 0;
         const labor = parseFloat($('#labor_cost').val()) || 0;
         const gas = parseFloat($('#gas_cost').val()) || 0;
-        const totalStorage = parseFloat($('#total_storage_cost').val()) || 0;
+        const StorageCost = parseFloat($('#storage_cost').val()) / 100 || 0;
         const depreciation = parseFloat($('#depreciation').val()) || 0;
-        const rawMatsProvisionPercent = parseFloat($('#raw_mast_provision').val()) / 100 || 0; 
+        const utilities = parseFloat($('#utilities').val()) / 100 || 0; 
         const markupPercent = parseFloat($('#markup_percentage').val()) / 100 || 0; 
 
         
         const total_fields = packagingCost + ingredientCost + labor + gas;
 
         
-        const total_row = packagingCost + ingredientCost;
+        const food_cost = packagingCost + ingredientCost;
 
          
-        const total = total_fields + totalStorage + depreciation + (total_row * rawMatsProvisionPercent);
+        const total = total_fields + StorageCost + depreciation + food_cost + utilities;
 
       
         const finalValueVATex = total * (1 + markupPercent);
@@ -2318,7 +2309,6 @@
              }    
         });
 
-
         showNoData(); 
         showNoDataIngredient();
         showNoDataLabor();
@@ -2333,7 +2323,6 @@
             $('#reject-btn').show();
             $('#cancel-btn').show();
         }
-         
     });
 
  

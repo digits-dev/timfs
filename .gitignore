@@ -6,6 +6,7 @@
 /public/img/item-sourcing/*
 /public/item-master-files/*
 /public/item-sourcing-files/*
+/public/img/production-items/*
 .env
 .env.backup
 .phpunit.result.cache
