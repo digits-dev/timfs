@@ -708,14 +708,16 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			// Flatten all new item_codes for later comparison
 			// dd($ingredients);	
 			//mula dito
-			$newItemCodesID = [];
-			 
+
+			
+			$newItemCodesID = []; 
 			if (count($ingredients) > 0) {
 				foreach ($ingredients as $parentCode => $ingredientGroup) {
-					foreach ($ingredientGroup as $ingredient) { 
-						
+					$gg = $new_id;
+				  	$parent_id = $gg + 1;
+					foreach ($ingredientGroup as $ingredient) {  
 						$new_id++;
-						$newItemCodesID[] = $new_id;
+						$newItemCodesID[] = $new_id; 
 						ProductionItemLines::updateOrCreate(
 							[
 								'production_item_id' => $production_item_id,
@@ -729,19 +731,20 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 								'yield' => $ingredient['yield'],
 								'preparations' => $ingredient['preparations'], 
 								'landed_cost' => $ingredient['ttp'],
-								'packaging_id' => $parentCode, 
+								'packaging_id' =>  $parent_id, 
 								'production_item_line_id' => $new_id,
 								'production_item_line_type' => $ingredient['production_item_line_type'],
 								'approval_status' => 202,
 							]
 						);
 					}
+					$gg = 0;
 				}
-			}
+			} 
 			//$(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][description]`); 
 		
 
-			ProductionItemLines::where('production_item_id', $production_item_id)
+			ProductionItemLinesModelApproval::where('production_item_id', $production_item_id)
 				->whereNotIn('production_item_line_id', $newItemCodesID) 
 				->delete();
 			//hanggadito 

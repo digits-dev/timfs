@@ -839,15 +839,13 @@
         console.log(production_item_lines);
         //looping for parent packeaging/ingredients
         production_item_lines.forEach(item => {
-            
-            if (item.item_code == item.packaging_id && item.production_item_line_type != 'labor') {
-                if(item.production_item_line_type == 'packaging') 
-                {
-                     tableRow++;
+                tableRow = item.production_item_line_id;
+                if(item.production_item_line_type == 'packaging' && item.production_item_line_id == item.packaging_id) 
+                { 
 
                      //function Sub_gen_pack_row(rowId, tasteless_code, quantity, cost, description)
                     const newRowHtml = generateRowHtml(
-                        tableRow,
+                        item.production_item_line_id,
                         item.production_item_line_id,
                         item.item_code,
                         item.quantity,
@@ -857,14 +855,13 @@
                         item.packaging_size
                     );
                     $(newRowHtml).appendTo('#package-tbody');
-                    PackagingSearchInit(`#itemDesc${tableRow}`, tableRow);
+                    PackagingSearchInit(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
                         showNoDataIngredient();
                 }
-                else if(item.item_code == item.packaging_id)
-                {
-                    tableRow++;
+                else if(item.production_item_line_id == item.packaging_id && item.production_item_line_type != 'labor')
+                { 
                     const newRowHtml = generateRowingredientHtml(
-                        tableRow,
+                        item.production_item_line_id,
                         item.production_item_line_id,
                         item.item_code,
                         item.description,
@@ -880,43 +877,25 @@
                         //rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost , costparent_contribution, qty_contribution, preparations ,description
                     );
                     $(newRowHtml).appendTo('#ingredient-tbody');
-                    IngredientSearch(`#itemDesc${tableRow}`, tableRow);
+                   IngredientSearch(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
                     showNoData();
 
-                }
-               
-             }    
+                } 
         });
 
-         
        
-        //triggering tasteless_code change and input to calculate packeaging/ingredients cost
-        $(document).ready(function() {
-        $('[id*="quantity"], [id*="tasteless_code"]').each(function() {
-            const eventInput = new Event('input', { bubbles: true });
-            const eventChange = new Event('change', { bubbles: true }); 
-            this.dispatchEvent(eventInput);
-            this.dispatchEvent(eventChange);
-        });
-        });
 
-
-
-
-
-        //looping for sub packeaging/ingredients
-         production_item_lines.forEach(item => {
+        production_item_lines.forEach(item => {
             
-            if (item.item_code != item.packaging_id  && item.production_item_line_type != 'labor') { 
-                if(item.production_item_line_type == 'packaging') 
-                {
-                    tableRow++;
-                    const matchingInputElement = $(`input[value="${item.packaging_id}"]`);
-                    const matchingInputId = matchingInputElement.attr('id');
-                    const matchingInput = matchingInputId ? matchingInputId.split("tasteless_code")[1] : '';
+                tableRow = item.production_item_line_id;
+
+              if(item.production_item_line_type == 'packaging' && item.production_item_line_id != item.packaging_id ) 
+                { 
+                 
+                    const matchingInput =  item.packaging_id;
                     
                     const newRowHtml = Sub_gen_pack_row(
-                        tableRow,
+                        item.production_item_line_id,
                         item.production_item_line_id,
                         item.item_code,
                         item.quantity,
@@ -927,16 +906,14 @@
                     );
                     // console.log(`.sub-ingredient${oldindex}`);
                     $(newRowHtml).appendTo(`.sub-pack${matchingInput}`); 
-                    PackagingSearchInit(`#itemDesc${tableRow}`, tableRow);
-                }else if (item.item_code != item.packaging_id)
-                {
-                    tableRow++;
-                    const matchingInputElement = $(`input[value="${item.packaging_id}"]`);
-                    const matchingInputId = matchingInputElement.attr('id');
-                    const matchingInput = matchingInputId ? matchingInputId.split("tasteless_code")[1] : '';
+                    PackagingSearchInit(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
+                }else if (item.production_item_line_id != item.packaging_id  && item.production_item_line_type != 'labor')
+                { 
+                   
+                    const matchingInput = item.packaging_id;
                     
                     const newRowHtml = Sub_gen_ingredient_row(
-                        tableRow,
+                        item.production_item_line_id,
                         item.production_item_line_id,
                         item.item_code,
                         item.description,
@@ -952,14 +929,31 @@
                     );
                 // console.log(`.sub-ingredient${oldindex}`);
                     $(newRowHtml).appendTo(`.sub-ingredient${matchingInput}`); 
-                    IngredientSearch(`#itemDesc${tableRow}`, tableRow);
-                } 
-                
-             }    
+                IngredientSearch(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
+                }
+                else if (item.production_item_line_type == 'labor')
+                { 
+                    const newRowPackHtml = Sub_gen_Labor_row(item.production_item_line_id, item.time_labor, item.yield, item.preparations, item.preparation_desc);  
+                    $(newRowPackHtml).appendTo(`.sub-labor`); 
+                    showNoDataLabor(); 
+                    $(`#time-labor${item.production_item_line_id}`).trigger('change');
+           
+                }
+
         });
 
-      
 
+
+      
+   //triggering tasteless_code change and input to calculate packeaging/ingredients cost
+        $(document).ready(function() {
+        $('[id*="quantity"], [id*="tasteless_code"]').each(function() {
+            const eventInput = new Event('input', { bubbles: true });
+            const eventChange = new Event('change', { bubbles: true }); 
+            this.dispatchEvent(eventInput);
+            this.dispatchEvent(eventChange);
+        });
+        });
 
           $(`  
             #tax_codes_id,
@@ -2298,17 +2292,7 @@
             }
         }
         
-        production_item_lines.forEach(item => {
-            
-            if (item.production_item_line_type == 'labor') { 
-                    tableRow++; 
-                    const newRowPackHtml = Sub_gen_Labor_row(tableRow, item.time_labor, item.yield, item.preparations, item.preparation_desc);  
-                    $(newRowPackHtml).appendTo(`.sub-labor`); 
-                    showNoDataLabor(); 
-                    $(`#time-labor${tableRow}`).trigger('change');
-             }    
-        });
-
+       
         showNoData(); 
         showNoDataIngredient();
         showNoDataLabor();
