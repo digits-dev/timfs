@@ -1046,7 +1046,7 @@ use ProductionItemsApproval;
 			// Flatten all new item_codes for later comparison
 			// dd($ingredients);	
 			//mula dito
- 
+			// dd($ingredients);	
 			$newItemCodesID = []; 
 			if (count($ingredients) > 0) {
 				foreach ($ingredients as $parentCode => $ingredientGroup) {

@@ -839,8 +839,8 @@
         console.log(production_item_lines);
         //looping for parent packeaging/ingredients
         production_item_lines.forEach(item => {
-                tableRow = item.production_item_line_id;
-                if(item.production_item_line_type == 'packaging' && item.production_item_line_id == item.packaging_id) 
+            
+                if(item.production_item_line_type == 'packaging' && item.production_item_line_id == item.packaging_id && item.production_item_line_type != 'labor') 
                 { 
 
                      //function Sub_gen_pack_row(rowId, tasteless_code, quantity, cost, description)
@@ -855,9 +855,12 @@
                         item.packaging_size
                     );
                     $(newRowHtml).appendTo('#package-tbody');
-                    PackagingSearchInit(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
-                        showNoDataIngredient();
+                     showNoDataIngredient();
+                     if ($(`#itemDesc${item.production_item_line_id}`).length > 0) {
+                        PackagingSearchInit(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
+                     }
                 }
+                
                 else if(item.production_item_line_id == item.packaging_id && item.production_item_line_type != 'labor')
                 { 
                     const newRowHtml = generateRowingredientHtml(
@@ -877,19 +880,13 @@
                         //rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost , costparent_contribution, qty_contribution, preparations ,description
                     );
                     $(newRowHtml).appendTo('#ingredient-tbody');
-                   IngredientSearch(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
                     showNoData();
+                    if ($(`#itemDesc${item.production_item_line_id}`).length > 0) {
+                     IngredientSearch(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
+                    }
+                    
 
-                } 
-        });
-
-       
-
-        production_item_lines.forEach(item => {
-            
-                tableRow = item.production_item_line_id;
-
-              if(item.production_item_line_type == 'packaging' && item.production_item_line_id != item.packaging_id ) 
+                }else if(item.production_item_line_type == 'packaging' && item.production_item_line_id != item.packaging_id  && item.production_item_line_type != 'labor') 
                 { 
                  
                     const matchingInput =  item.packaging_id;
@@ -906,8 +903,13 @@
                     );
                     // console.log(`.sub-ingredient${oldindex}`);
                     $(newRowHtml).appendTo(`.sub-pack${matchingInput}`); 
-                    PackagingSearchInit(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
-                }else if (item.production_item_line_id != item.packaging_id  && item.production_item_line_type != 'labor')
+                     showNoDataIngredient();
+                     if ($(`#itemDesc${item.production_item_line_id}`).length > 0) {
+                        PackagingSearchInit(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
+                     }
+                }
+
+                else if (item.production_item_line_id != item.packaging_id && item.production_item_line_type != 'labor')
                 { 
                    
                     const matchingInput = item.packaging_id;
@@ -927,24 +929,18 @@
                         item.preparations,
                         item.preparation_desc
                     );
-                // console.log(`.sub-ingredient${oldindex}`);
+                    // console.log(`.sub-ingredient${oldindex}`);
                     $(newRowHtml).appendTo(`.sub-ingredient${matchingInput}`); 
-                IngredientSearch(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
-                }
-                else if (item.production_item_line_type == 'labor')
-                { 
-                    const newRowPackHtml = Sub_gen_Labor_row(item.production_item_line_id, item.time_labor, item.yield, item.preparations, item.preparation_desc);  
-                    $(newRowPackHtml).appendTo(`.sub-labor`); 
-                    showNoDataLabor(); 
-                    $(`#time-labor${item.production_item_line_id}`).trigger('change');
-           
-                }
-
+                    showNoData();
+                    if ($(`#itemDesc${item.production_item_line_id}`).length > 0) {
+                     IngredientSearch(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
+                    }
+                } 
+                tableRow = item.production_item_line_id;
         });
 
-
-
-      
+          
+        console.log(tableRow + ' 11111111111111111111');
    //triggering tasteless_code change and input to calculate packeaging/ingredients cost
         $(document).ready(function() {
         $('[id*="quantity"], [id*="tasteless_code"]').each(function() {
@@ -1920,41 +1916,43 @@
 
        $(document).on('input change', 'input[id^="tasteless_code"]', function() {
             const $wrapper = $(this).closest('.packaging-wrapper');
- 
+
             const parentid = $wrapper.find('input[id^="tasteless_code"]').val();
- 
+
+            const parentid_todb = $wrapper.find('input[id^="tasteless_code"]').attr('id').replace(/\D/g, '');
+
             const oldParentId = $(this).data('oldParentId') || null;
  
             $(this).data('oldParentId', parentid);
  
             var idsub = $(this).attr('id');
             var lastCharsub = idsub.split("tasteless_code")[1]; 
-            $(`#tasteless_code_original${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][tasteless_code]`); 
+            $(`#tasteless_code_original${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][tasteless_code]`); 
             
-            $(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][description]`); 
-            $(`#quantity${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][quantity]`);
-            $(`#yield${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][yield]`); 
-            $(`#ttp${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][ttp]`);
-            $(`#cost${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][cost]`);
-            $(`#DB_id${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][DB_id]`); 
-            $(`#production_type${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][production_item_line_type]`);  
-            $(`#preparations${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][preparations]`);
-            if (parentid !== oldParentId) {
+            $(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][description]`); 
+            $(`#quantity${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][quantity]`);
+            $(`#yield${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][yield]`); 
+            $(`#ttp${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][ttp]`);
+            $(`#cost${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][cost]`);
+            $(`#DB_id${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][DB_id]`); 
+            $(`#production_type${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][production_item_line_type]`);  
+            $(`#preparations${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][preparations]`);
+            if (parentid_todb !== oldParentId) {
                 $wrapper.find('[class^="sub-ingredient"], [class^="sub-pack"]').find('input').each(function() {
                     var subId = $(this).attr('id') || '';
                     var subLastChar = subId.split("tasteless_code")[1] || '';
                     if (subLastChar) {
                         const ids =  subId.split("tasteless_code")[1] 
-                        $(this).attr('name', `produtionlines[${parentid}][${subLastChar}][tasteless_code]`); 
+                        $(this).attr('name', `produtionlines[${parentid_todb}][${subLastChar}][tasteless_code]`); 
                          
-                        $(`#itemDesc${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][description]`); 
-                        $(`#quantity${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][quantity]`);
-                        $(`#yield${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][yield]`);
-                         $(`#ttp${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][ttp]`); 
-                        $(`#cost${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][cost]`); 
-                        $(`#DB_id${ids}`).attr('name', `produtionlines[${parentid}][${subLastChar}][DB_id]`);
-                        $(`#production_type${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][production_item_line_type]`);  
-                         $(`#preparations${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][preparations]`);
+                        $(`#itemDesc${ids}`).attr('name', `produtionlines[${parentid_todb}][${subLastChar}][description]`); 
+                        $(`#quantity${ids}`).attr('name', `produtionlines[${parentid_todb}][${subLastChar}][quantity]`);
+                        $(`#yield${ids}`).attr('name', `produtionlines[${parentid_todb}][${subLastChar}][yield]`);
+                         $(`#ttp${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][ttp]`); 
+                        $(`#cost${ids}`).attr('name', `produtionlines[${parentid_todb}][${subLastChar}][cost]`); 
+                        $(`#DB_id${ids}`).attr('name', `produtionlines[${parentid_todb}][${subLastChar}][DB_id]`);
+                        $(`#production_type${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][production_item_line_type]`);  
+                         $(`#preparations${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][preparations]`);
                     }
                 });
             }
@@ -2292,7 +2290,17 @@
             }
         }
         
-       
+        production_item_lines.forEach(item => {
+            
+            if (item.production_item_line_type == 'labor') { 
+                    tableRow++; 
+                    const newRowPackHtml = Sub_gen_Labor_row(tableRow, item.time_labor, item.yield, item.preparations, item.preparation_desc);  
+                    $(newRowPackHtml).appendTo(`.sub-labor`); 
+                    showNoDataLabor(); 
+                    $(`#time-labor${tableRow}`).trigger('change');
+             }    
+        });
+
         showNoData(); 
         showNoDataIngredient();
         showNoDataLabor();

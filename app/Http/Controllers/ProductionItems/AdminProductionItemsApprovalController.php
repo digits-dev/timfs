@@ -610,13 +610,9 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 		public function addProductionItemsToDB(Request $request){
 	 
 		$message = '';
-		$time_stamp_now = date('Y-m-d H:i:s');
+	 
 			
-		
-			$validated = $request->validate([  
-				'final_value_vatinc' => 'required|numeric|max:99999999.99', 
-			]);
-
+		 
 			$data =  $request->all();
 
 			 
@@ -706,7 +702,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			$new_id = 0;
 			$labor_new_id = 0;
 			// Flatten all new item_codes for later comparison
-			// dd($ingredients);	
+			 //dd($ingredients);	
 			//mula dito
 
 			
@@ -744,7 +740,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			//$(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][description]`); 
 		
 
-			ProductionItemLinesModelApproval::where('production_item_id', $production_item_id)
+			ProductionItemLines::where('production_item_id', $production_item_id)
 				->whereNotIn('production_item_line_id', $newItemCodesID) 
 				->delete();
 			//hanggadito 
