@@ -145,6 +145,7 @@
         @endif 
             <form action="{{ $table == 'production_items' ? route('add-production-items-to-db') : route('approve_or_reject_production_items_push') }}" method="POST" id="ProductionItems"  enctype="multipart/form-data">
                 @csrf
+                 <input type="text" class="hide" id="action-selected" name="action">
                  <input type="text" class="hide" value="{{ $item->reference_number }}" id="production_item_reference_number" name="reference_number">
                 <div class="panel-body">
                     <input name="id" value="{{$item->id}}" class="hide"/>
@@ -631,7 +632,7 @@
                                             <tr>
                                                 <td>Labor Cost</td>
                                                 <td>
-                                                    <input type="number" step="any" name="labor_cost" id="labor_cost" value="{{ $item->labor_cost }}" class="form-control text-right">
+                                                    <input type="number" step="any" name="labor_cost" id="labor_cost" value="{{ $item->labor_cost }}" class="form-control text-right" readonly required>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -664,20 +665,20 @@
                                             <tr>
                                                 <td>Transfer Price Category </td>
                                                 <td>
-                                                    <select name="transfer_price_cathegory" id="transfer_price_cathegory" class="form-control select2">
-                                                        <option value="">Select Transfer Price Category</option>
-                                                        {{-- @foreach ($transfer_price_categories as $tcat)
-                                                        <option value="{{ $tcat->markup_percentage }}" {{ old('markup_percentage', $item->markup_percentage) == $tcat->markup_percentage ? 'selected' : '' }}>
-                                                            {{ $tcat->description }} — {{ $tcat->markup_percentage }}%
+                                                    <select name="transfer_price_category" id="transfer_price_category" class="form-control select2">
+                                                         <option value="">Select Category</option>
+                                                        @foreach ($transfer_price_category as $tcat)
+                                                        <option value="{{ $tcat->id }}"  data-markup="{{ $tcat->transfer_price_category_markup }}" {{ $item->transfer_price_category == $tcat->id ? 'selected' : '' }}>
+                                                            {{ $tcat->transfer_price_category_description }}
                                                         </option>
-                                                        @endforeach--}}
+                                                        @endforeach
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>Markup %</td>
                                                 <td> 
-                                                    <input type="number" name="markup_percentage" id="markup_percentage" value="{{ $item->markup_percentage }}" class="form-control text-right">
+                                                    <input type="number" name="markup_percentage" id="markup_percentage" value="{{ $item->markup_percentage }}" class="form-control text-right" readonly required>
                                                 </td>
                                             </tr> 
                                             <tr>
@@ -746,16 +747,7 @@
                             </div>
                         </div>
 
-                        @push('scripts')
-                        <script>
-                            $(function () {
-                                $('#markup_percentage').select2({
-                                    placeholder: 'Select Transfer Price Category',
-                                    width: '100%'
-                                });
-                            });
-                        </script>
-                        @endpush
+                       
 
                         <br>
                         <div class="col-md-12">
@@ -823,6 +815,8 @@
         
        
        
+       let gg = "{{$item->transfer_price_category}}"
+       console.log(gg);
 
         //for showing message no package or ingredients found 
         is_noingredient = false;
@@ -964,12 +958,21 @@
             #categories_id,
             #subcategories_id,
             #packagings_id,
-            #sku_statuses_id
+            #sku_statuses_id, 
+            #production_category,
+            #transfer_price_category,
+            #production_location,
+            #storage_location
             `).select2({
                 width: '100%',
                 height: '100%',
                 placeholder: 'None selected...'
             });
+        
+        $('#transfer_price_category').select2({
+            width: '380px'  // makes Select2 respect the select's width/max-width
+        });
+
         
         $('.segmentation_select').select2({
             width: '100%',
@@ -1319,12 +1322,9 @@
                           <label>
                         <span class="required-star">*</span> Preparations
                         <select class="form-control select labor-cost-dropdown" id="preparations${rowId}" name="preparations" required>
-                            <option value="">Select Process </option>
-                            <option value="${preparations}" selected>
-                                    ${description}
-                            </option>
+                            <option value=""  ${description == null ? 'selected' : ''}>Select Process </option> 
                             @foreach($menu_ingredients_preparations as $preparations)
-                                <option value="{{ $preparations->id }}" {{ old('preparations', $item->menu_ingredients_preparations) == $preparations->id ? 'selected' : '' }}>
+                                <option value="{{ $preparations->id }}" ${@json($preparations->id) == preparations ? 'selected' : '' }>
                                     {{ $preparations->preparation_desc }}
                                 </option>
                             @endforeach
@@ -1406,12 +1406,9 @@
                         <label>
                         <span class="required-star">*</span> Preparations
                         <select class="form-control select labor-cost-dropdown" id="preparations${rowId}" name="preparations" required>
-                            <option value="">Select Process </option>
-                            <option value="${preparations}" selected>
-                                    ${description}
-                            </option>
-                            @foreach($menu_ingredients_preparations as $preparations)
-                                <option value="{{ $preparations->id }}" {{ old('preparations', $item->menu_ingredients_preparations) == $preparations->id ? 'selected' : '' }}>
+                            <option value=""  ${description == null ? 'selected' : ''}>Select Process </option>
+                             @foreach($menu_ingredients_preparations as $preparations)
+                                <option value="{{ $preparations->id }}" ${@json($preparations->id) == preparations ? 'selected' : '' }>
                                     {{ $preparations->preparation_desc }}
                                 </option>
                             @endforeach
@@ -1628,15 +1625,17 @@
         }
 
        
-        /* Old remove row
-        $(document).on("click", ".removeRow", function (e) {
-            const $row = $(this).closest('.tr-border');
-           // console.log($(this).closest('.tr-border').html());
-            e.preventDefault();
+        //to save data and list to Production Items List module
+        $('.action-btn').on('click', function() {
+            const action = $(this).attr('_action'); 
+            const segmentations =  getSelectedSegmentations();  
+            $('#segmentations').val(JSON.stringify(segmentations));
+            $('#action-selected').val(action);
             Swal.fire({
-                title: "Are you sure?",
-                text: "This row will be removed.",
-                icon: "warning",
+                title: `Do you want to ${action} this item?`,
+                html:  action == 'approve' ? `🟢 Doing so will update the Production Item Masterfile.`
+                    : `🔴 Doing so will turn the status of this item to <span class="label label-danger">REJECTED</span>.`,
+                icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
@@ -1644,42 +1643,13 @@
                 returnFocus: false,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $row.addClass('slide-out-right');
-                    // Remove row after animation ends
-                    $row.on('animationend', function () {
-                        $row.remove(); 
-                       
-                        showNoData(); // Update no data message
-                         calculateFinalValues();
-                    });
+                    $('#ProductionItems').find('input, select, textarea').prop('disabled', false);
+                    $('#sumit-form-button').click();
                 }
             });
         });
-        */
-
-        //to save data and list to Production Items List module
-            $('#approve-btn').on('click', function(){ 
-                 const segmentations =  getSelectedSegmentations(); 
-              $('#segmentations').val(JSON.stringify(segmentations));
-                 Swal.fire({
-                        title: 'Do you want to Approve this production item?', 
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Save',
-                        returnFocus: false,
-                        }).then((result) => {
-                        
-                                if (result.isConfirmed) {
-
-                                    $('#ProductionItems').find('input, select, textarea').prop('disabled', false);
-                                    $('#sumit-form-button').click();
-                                }
-                            
-                            
-                        });
-            });
+ 
+            
 
            $('#save-datas').on('click', function() {
             
@@ -1959,7 +1929,11 @@
         });
 
 
-
+         $('#transfer_price_category').on('change', function(){ 
+            var markup = $(this).find('option:selected').data('markup');  // get data-markup
+            $('#markup_percentage').val(markup).trigger('input');
+             
+         })
 
 
 
@@ -1975,7 +1949,7 @@
         });
         
 
-
+       
 
 
 
@@ -2082,7 +2056,7 @@
                 }
             );
         });
-
+        
          $(document).on('click', '.delete', function(event) {
              
             const entry = $(this).parents(
@@ -2204,22 +2178,19 @@
         const ingredientCost = parseFloat($('#ingredient_cost').val()) || 0;
         const labor = parseFloat($('#labor_cost').val()) || 0;
         const gas = parseFloat($('#gas_cost').val()) || 0;
-        const StorageCost = parseFloat($('#storage_cost').val()) / 100 || 0;
-        const depreciation = parseFloat($('#depreciation').val()) || 0;
-        const utilities = parseFloat($('#utilities').val()) / 100 || 0; 
-        const markupPercent = parseFloat($('#markup_percentage').val()) / 100 || 0; 
+        const StorageCost = parseFloat($('#storage_cost').val()) || 0; 
+        const utilities = parseFloat($('#utilities').val()) || 0; 
+        const markupPercent = parseFloat($('#markup_percentage').val()) || 0; 
 
-        
-        const total_fields = packagingCost + ingredientCost + labor + gas;
-
+         
         
         const food_cost = packagingCost + ingredientCost;
 
          
-        const total = total_fields + StorageCost + depreciation + food_cost + utilities;
+        const total = labor + gas + StorageCost + utilities + markupPercent + food_cost;
 
       
-        const finalValueVATex = total * (1 + markupPercent);
+        const finalValueVATex = total;
          
            
             $('#final_value_vatex').val(finalValueVATex.toFixed(2));
@@ -2306,8 +2277,9 @@
         showNoDataLabor();
 
         let disableifapproval = "{{$table}}"; 
+        let view_ = "{{$view}}"; 
 
-        if(disableifapproval == 'production_items_approvals')
+        if(disableifapproval == 'production_items_approvals' || view_ == 'true')
         {
             $('#ProductionItems').find('input, select, textarea').prop('disabled', true);
             $('[class*="btn"]').hide();

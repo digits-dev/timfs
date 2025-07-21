@@ -1109,7 +1109,7 @@ use ProductionItemsApproval;
 				}
 			} 
 			//loop each ingredients and save sa DB 	production_item_lines table
-		
+			 
 				$cost = ProductionItemsModelApproval::updateOrCreate(
 					['reference_number' => $data['reference_number']],
 					$data
@@ -1178,42 +1178,14 @@ use ProductionItemsApproval;
 	
 	public function getDetail($id)
 	{
-		 
-				if ($action == 'edit') {
-					if (!CRUDBooster::isUpdate())
-						CRUDBooster::redirect(
-						CRUDBooster::adminPath(),
-						trans('crudbooster.denied_access')
-					);
-				}
-				
-				$data = []; 
-				/*
-				$data['production_category'] = ProductionItemCategory::active();
-				$data['storage_location'] = ProductionItemStorageLocation::active();
-				$data['production_location'] = ProductionLocation::active();
-				*/
+		$data = [];  
+		$data['item'] = self::getItemDetails($id);  
+		$costings = self::costing(self::getItemDetails($id)->reference_number);
+		$data['view'] = 'true'; 
+			
 
- 
-				$data['item'] = self::getItemDetails($id); 
-				/*
-				if ($data['item']->approval_status == 202) {
-					return redirect(CRUDBooster::mainpath())->with([
-						'message_type' => 'danger',
-						'message' => '✖️ You cannot edit a pending item...',
-					]);
-				}
-			 	*/  
-			 
-				$costings = self::costing(self::getItemDetails($id)->reference_number);
-				 
-			 
-
-			 	 $data = array_merge($data, $costings); 
-				  
-				
-				 
-				return $this->view('production-items/detail-production-item',   $data); 
+		$data = array_merge($data, $costings);  
+		return $this->view('production-items/add-production-item', $data);
 	}
 
 
@@ -1333,6 +1305,12 @@ use ProductionItemsApproval;
 			$data['packagings'] = DB::table('packagings')
 				->where('status', 'ACTIVE')
 				->orderBy('packaging_description')
+				->get()
+				->toArray();
+			
+			$data['transfer_price_category'] = DB::table('transfer_price_category')
+				->where('status', 'ACTIVE')
+				->orderBy('transfer_price_category_description')
 				->get()
 				->toArray();
 
@@ -1610,8 +1588,7 @@ use ProductionItemsApproval;
 				'Item Code',
 				'Line Description',
 				'Quantity',
-				'Landed Cost',
-				'Is Alternative',
+				'Landed Cost', 
 				'Created By',
 				'Updated By',
 				'Created At',
@@ -1624,7 +1601,7 @@ use ProductionItemsApproval;
 			->leftJoin('production_item_categories', 'production_items.production_category', '=', 'production_item_categories.id')
 			->select(
 				'production_items.reference_number',
-				'production_items.description as product_description',
+				'production_items.full_item_description as product_description',
 				'production_item_categories.category_description',
 				'production_locations.production_location_description',
 				'production_items.labor_cost',
@@ -1640,8 +1617,7 @@ use ProductionItemsApproval;
 				'production_item_lines.item_code',
 				'production_item_lines.description as ingredient_description',
 				'production_item_lines.quantity',
-				'production_item_lines.landed_cost',
-				'production_item_lines.is_alternative',
+				'production_item_lines.landed_cost', 
 				'production_items.created_by',
 				'production_items.updated_by',
 				'production_items.created_at',
@@ -1665,8 +1641,7 @@ use ProductionItemsApproval;
 							$row->item_code,
 							$row->ingredient_description,
 							$row->quantity,
-							$row->landed_cost,
-							$row->is_alternative,
+							$row->landed_cost, 
 							$row->created_by,
 							$row->updated_by,
 							$row->created_at,

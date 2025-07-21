@@ -434,7 +434,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			 
 
 			$data = array_merge($data, $costings); 
-
+		 
 			return $this->view('production-items/add-production-item', $data);
 		}
 		
@@ -548,7 +548,11 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 				->where('status', 'ACTIVE')
 				->get()
 				->toArray();
-
+			$data['transfer_price_category'] = DB::table('transfer_price_category')
+				->where('status', 'ACTIVE')
+				->orderBy('transfer_price_category_description')
+				->get()
+				->toArray();
 			// EDIT ITEM
 			$data['types'] = DB::table('types')
 				->where('status', 'ACTIVE')
@@ -614,15 +618,49 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			
 		 
 			$data =  $request->all();
+ 			$ref = $data['reference_number'];
+			//	dd($request->action);
+			if($request->action == 'reject')
+			{
+				DB::table('cms_logs')->insert([
+				'ipaddress' => request()->ip(),
+				'useragent' => request()->userAgent(),
+				'url' => request()->fullUrl(),
+				'description' => 'User Reject Production Item',
+				'details'  =>  'Production Items Reject ' . $ref,
+				'id_cms_users' => CRUDBooster::myId(),
+				'created_at' => now(),
+				'updated_at' => now(),
+				]);
 
-			 
-			
-				 
+				DB::table('production_items_history')->insert([
+				'reference' => $ref,
+				'action' => 'Create', 
+				'description' => 'User Reject Production Item',
+				'key_old_value' => '', // .': '. $safe_value,
+				'description_old_value' => '',	
+				'key_new_value' => '',
+				'description_new_value' => '',  
+				'updated_by' => CRUDBooster::myId() ?: 1, 
+				'details'  =>  'Production Items Reject ' . $ref, 
+				'created_at' => now(),
+				'updated_at' => now(),
+				]);
+
+				$approvalStatus = ProductionItemsModelApproval::updateOrCreate(
+					['reference_number' => $data['reference_number']],
+					['approval_status' => 400]                                 
+				); 
+
+				return redirect(CRUDBooster::mainpath())
+				->with([
+						'message_type' => 'success',
+						'message' => 'Item Successfully Rejected',
+				])->send();
+			}
 				 
 		 
-				$ref = $data['reference_number'];
-				$message = "✔️ Item Added successfully with reference number ". $ref;		
-				$data['reference_number'] = $ref;
+				$message = "✔️ Item Added successfully with reference number ". $ref;	 
 				
 				$data['created_by'] = CRUDBooster::myId();
 				$data['updated_by'] = CRUDBooster::myId();
@@ -644,26 +682,24 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 					if ($input['item_photo']) $data['image_filename'] = $input['item_photo'];  
 
 
-					$segment_columns = DB::table('segmentations')
-						->where('status', 'ACTIVE')
-						->pluck('segment_column_name')
-						->toArray();
-		
-
-					$segmentations = (array) json_decode($input['segmentations']);
-					//segmentation => initializing all to 'X'
-					foreach ($segment_columns as $segment_column) {
-						$data[$segment_column] = 'X';
-					}
-
-					//overwriting the selected segmentations
-					foreach ($segmentations as $value => $columns) {
-						foreach ($columns as $column_name) {
-							$data[$column_name] = $value;
-						}
-					} 
+			$segment_columns = DB::table('segmentations')
+				->where('status', 'ACTIVE')
+				->pluck('segment_column_name')
+				->toArray();
 
 
+			$segmentations = (array) json_decode($data['segmentations']);
+			//segmentation => initializing all to 'X'
+			foreach ($segment_columns as $segment_column) {
+				$data[$segment_column] = 'X';
+			}
+
+			//overwriting the selected segmentations
+			foreach ($segmentations as $value => $columns) {
+				foreach ($columns as $column_name) {
+					$data[$column_name] = $value; 
+				} 
+			}
 
 
 
@@ -673,7 +709,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 				'ipaddress' => request()->ip(),
 				'useragent' => request()->userAgent(),
 				'url' => request()->fullUrl(),
-				'description' => 'User Production Item Creation',
+				'description' => 'User Approve Production Item',
 				'details'  =>  'Production Items Approved ' . $ref,
 				'id_cms_users' => CRUDBooster::myId(),
 				'created_at' => now(),
@@ -683,7 +719,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 				DB::table('production_items_history')->insert([
 				'reference' => $ref,
 				'action' => 'Create', 
-				'description' => 'User Production Item Creation',
+				'description' => 'User Approve Production Item',
 				'key_old_value' => '', // .': '. $safe_value,
 				'description_old_value' => '',	
 				'key_new_value' => '',
