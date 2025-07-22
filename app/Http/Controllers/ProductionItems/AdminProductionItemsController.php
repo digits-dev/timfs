@@ -767,10 +767,57 @@ use ProductionItemsApproval;
 		$message = '';
 		$time_stamp_now = date('Y-m-d H:i:s');
 			
-		
-			$validated = $request->validate([  
-				'final_value_vatinc' => 'required|numeric|max:99999999.99', 
+		 	$input = $request->only([ 
+					'reference_number',
+					'id',
+					'tasteless_code',
+					'full_item_description',
+					'file_link',
+					'brands_id',
+					'tax_codes_id',
+					'accounts_id',
+					'cogs_accounts_id',
+					'asset_accounts_id',
+					'purchase_description',
+					'fulfillment_type_id',
+					'uoms_id',
+					'uoms_set_id',
+					'currencies_id',
+					'purchase_price',
+					'ttp',
+					'ttp_percentage',
+					'landed_cost',
+					'suppliers_id',
+					'reorder_pt',
+					'groups_id',
+					'categories_id',
+					'subcategories_id',
+					'packaging_dimension',
+					'packaging_size',
+					'packagings_id',
+					'supplier_item_code',
+					'moq_store',
+					'segmentations',
+					'productionlines',
+					'labor_cost_per_minute',
+					'total_minutes_per_pack',
+					'labor_cost_val',
+					'LaborLines',
+					'packaging_cost',
+					'ingredient_cost',
+					'labor_cost',
+					'gas_cost',
+					'storage_cost',
+					'transfer_price_category',
+					'markup_percentage',
+					'utilities',
+					'production_category',
+					'production_location',
+					'storage_location',
+					'final_value_vatex',
+					'final_value_vatinc',
 			]);
+
 
 			$data =  $request->all();
 
@@ -1391,11 +1438,13 @@ use ProductionItemsApproval;
 	
 			public function getProductionItemsSubmaster(Request $request, $table, $status, $status_value, $description) {
 						$searchTerm = $request->input('search');
-					  
-				
+					  if (!Schema::hasColumn($table, $status) || !Schema::hasColumn($table, $description)) {
+							return response()->json(['status_no' => 0, 'message' => 'Invalid columns'], 400);
+						}
+									
 						$items = DB::table($table)
-						->where($status, 'NOT LIKE', "%{$status_value}%")
-						->where($description, 'LIKE', "%{$searchTerm}%")
+						->where($status, 'NOT LIKE', '%' . $status_value .'%')
+						->where($description, 'LIKE', '%' . $searchTerm .'%')
 						->select('id', "{$description} as description")
 						->limit(50)
 						->get()

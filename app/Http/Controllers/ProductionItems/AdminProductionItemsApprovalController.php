@@ -54,7 +54,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->title_field = "id";
 			$this->limit = "20";
-			$this->orderby = "id,desc";
+			$this->orderby = "updated_at,desc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
@@ -327,7 +327,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-	            
+	        $query->orderByRaw('GREATEST(production_items_approvals.created_at, production_items_approvals.updated_at) DESC');     
 	    }
 
 	    /*
