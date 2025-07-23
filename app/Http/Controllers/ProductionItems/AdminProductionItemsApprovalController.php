@@ -170,7 +170,34 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 	        | @label, @count, @icon, @color 
 	        |
 	        */
-	        $this->index_statistic = array();
+	        $this->index_statistic = array(); 
+			 	$pending_count = DB::table('production_items_approvals')
+					->where('approval_status', '202')
+					->count();
+				$approved_count = DB::table('production_items_approvals')
+					->where('approval_status', '200')
+					->count();
+				$rejected_count = DB::table('production_items_approvals')
+					->where('approval_status', '400')
+					->count();
+				$this->index_statistic[] = [
+					'label' => 'Pending Items',
+					'count' => $pending_count,
+					'icon' => 'fa fa-hourglass-half',
+					'color' => 'orange',
+				];
+				$this->index_statistic[] = [
+					'label' => 'Approved Items',
+					'count' => $approved_count,
+					'icon' => 'fa fa-thumbs-up',
+					'color' => 'green',
+				];
+				$this->index_statistic[] = [
+					'label' => 'Rejected Items',
+					'count' => $rejected_count,
+					'icon' => 'fa fa-thumbs-down',
+					'color' => 'red',
+				]; 
 
 
 
@@ -236,7 +263,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 	        | @label, @count, @icon, @color 
 	        |
 	        */
-	        $this->index_statistic = array();
+	    
 
 
  
@@ -613,10 +640,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 
 		public function addProductionItemsToDB(Request $request){
 	 
-		$message = '';
-	 
-			
-		 
+			$message = ''; 
 			$data =  $request->all();
  			$ref = $data['reference_number'];
 			//	dd($request->action);
