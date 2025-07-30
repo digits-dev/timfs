@@ -572,7 +572,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 				->where('status', 'ACTIVE') 
 				->get()
 				->toArray();
-				$data['production_location'] = DB::table('production_locations')
+			$data['production_location'] = DB::table('production_locations')
 				->where('status', 'ACTIVE') 
 				->get()
 				->toArray(); 
@@ -589,38 +589,33 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 				->leftjoin('cms_users', 'production_items_comments.created_by', '=', 'cms_users.id')
 				->get()
 				->toArray(); 
-
-
-			$data['production_item_lines'] = DB::table('production_item_lines')
-											->select('production_item_lines.*', 
+					
+			$data['production_item_lines'] = DB::table('production_item_lines_approvals')
+											->select('production_item_lines_approvals.*', 
 											DB::raw('
 												case WHEN item_masters.landed_cost is null
 												THEN new_packagings.ttp 
 												ELSE item_masters.landed_cost
 												END as default_cost
 											'), 
-											'production_item_lines.production_item_line_id',
+											'production_item_lines_approvals.production_item_line_id',
 											'item_masters.ttp', 
 											'item_masters.packaging_size',
 											'menu_ingredients_preparations.preparation_desc')
-											->leftjoin('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
-											->leftjoin('new_packagings', 'production_item_lines.item_code', '=', 'new_packagings.nwp_code')
-											->leftjoin('menu_ingredients_preparations', 'production_item_lines.preparations', '=', 'menu_ingredients_preparations.id')
-											->where('production_item_lines.production_item_id', $ref) 
-											->orderBy('production_item_lines.production_item_line_id' , 'asc')
+											->leftjoin('item_masters', 'production_item_lines_approvals.item_code', '=', 'item_masters.tasteless_code')
+											->leftjoin('new_packagings', 'production_item_lines_approvals.item_code', '=', 'new_packagings.nwp_code')
+											->leftjoin('menu_ingredients_preparations', 'production_item_lines_approvals.preparations', '=', 'menu_ingredients_preparations.id')
+											->where('production_item_lines_approvals.production_item_id', $ref) 
+											->orderBy('production_item_lines_approvals.production_item_line_id' , 'asc')
 											->get()
-											->toArray(); 
-
-			$data['menu_ingredients_preparations'] = DB::table('menu_ingredients_preparations') 
+											->toArray();  
+			$data['menu_ingredients_preparations'] = DB::table('menu_ingredients_preparations')
 				->where('status', 'ACTIVE') 
 				->get()
 				->toArray(); 
-
 			$data['comment_id'] = DB::table('production_items_comments')
 				->select(DB::raw('MAX(ROUND(comment_id)) as max_comment_id'))
 				->value('max_comment_id');
-	
- 
 
 			return $data;
 		}
