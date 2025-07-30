@@ -30,6 +30,7 @@ use App\Http\Controllers\AdminFaCoaSubCategoriesController;
 use App\Http\Controllers\AdminBrandsAssetsController;
 use App\Http\Controllers\ProductionItems\AdminProductionCategoryController;
 use App\Http\Controllers\ProductionItems\AdminProductionItemsApprovalController;
+use App\Http\Controllers\ProductionItems\AdminProductionItemsComments;
 use App\Http\Controllers\SystemUpdateController;
 use App\Http\Controllers\ProductionItems\AdminProductionItemsController;
 use App\Http\Controllers\ProductionItems\AdminProductionItemsHistory;
@@ -229,6 +230,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/production_items/{table}/{status}/{status_value}/{description}', [AdminProductionItemsController::class, 'getProductionItemsSubmaster'])->name('getProductionItemsSubmaster');
     Route::get('/admin/production_items_approvals/approve_or_reject_production_items/{id}', [AdminProductionItemsApprovalController::class, 'approveOrReject'])->name('approve_or_reject_production_items');
     Route::post('/admin/production_items_approvals/approve_or_reject_production_items', [AdminProductionItemsApprovalController::class, 'addProductionItemsToDB'])->name('approve_or_reject_production_items_push');
+    Route::post('/admin/production_items_approvals/send-comment', [AdminProductionItemsController::class, 'SendComment'])->name('send-comment');
 });
 
 Route::get('/item_masters/api/get-items/{secret_key}', [AdminItemMastersController::class, 'getUpdatedItems'])->name('get_updated_items');

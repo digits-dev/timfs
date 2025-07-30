@@ -40,6 +40,7 @@ use App\Models\ProductionItems\ProductionItemLines;
 use App\Models\ProductionItems\ProductionItemLinesModelApproval;
 use App\Models\ProductionItems\ProductionItems;
 use App\Models\ProductionItems\ProductionItemsApproval as ProductionItemsProductionItemsApproval;
+use App\Models\ProductionItems\ProductionItemsComments;
 use App\Models\ProductionItems\ProductionItemsModelApproval;
 use App\NewPackaging;
 use ProductionItemsApproval;
@@ -74,9 +75,14 @@ use ProductionItemsApproval;
 			$this->col[] = ["label"=>"Description","name"=>"full_item_description"];
 			$this->col[] = ["label"=>"Production Category","name"=>"production_category","join"=>"production_item_categories,category_description" ];
 			$this->col[] = ["label"=>"Production Location","name"=>"production_location","join"=>"production_locations,production_location_description"];
-			$this->col[] = ["label"=>"Depreciation","name"=>"depreciation"];
-			$this->col[] = ["label"=>"Final Value Vatex","name"=>"final_value_vatex"];
-			$this->col[] = ["label"=>"Final Value Vatinc","name"=>"final_value_vatinc"];
+			$this->col[] = ["label"=>"FC Landed cost","name"=>"landed_cost"];
+			$this->col[] = ["label"=>"OPEX","name"=>"opex"];
+			$this->col[] = ["label"=>"PM / Store Supplies", "name" => "packaging_cost","callback"=>function($row){
+				return round($row->packaging_cost , 2);
+			}];
+			$this->col[] = ["label"=>"TP (Existing)","name"=>"final_value_existing"];
+			$this->col[] = ["label"=>"TP Vat Ex (Revised Price)","name"=>"final_value_vatex"];
+			$this->col[] = ["label"=>"TP Vat Inc (Updated)","name"=>"final_value_vatinc"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name" ];
 			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name" ];
 			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
@@ -326,7 +332,7 @@ use ProductionItemsApproval;
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-	            
+	             
 	    }
 
 	    /*
@@ -428,8 +434,7 @@ use ProductionItemsApproval;
 					'production_items.storage_cost',
 					'production_items.storage_multiplier',
 					'production_items.total_storage_cost',
-					'production_items.storage_location',
-					'production_items.depreciation',
+					'production_items.storage_location', 
 					'production_items.raw_mast_provision',
 					'production_items.markup_percentage',
 					'production_items.final_value_vatex',
@@ -844,12 +849,7 @@ use ProductionItemsApproval;
 								'new' => $currentData[$key],
 							];
 						}
-					}
-					
-					
-					
-					
-					
+					} 
 
 					// //check lines data vs. last data
 					$response = self::ingredientsSearch($request['id']); // Old data ingredients
@@ -960,14 +960,7 @@ use ProductionItemsApproval;
 						'updated_at' => now(),
 						]);
 
-
-
-
-
-
-
-
-
+  
 						$message = "✔️ Item updated successfully...";
 						
 						
@@ -1000,18 +993,10 @@ use ProductionItemsApproval;
 				$data['created_by'] = CRUDBooster::myId();
 				$data['updated_by'] = CRUDBooster::myId();
 				$data['approval_status'] = 202;
-				$data['action_type'] = "CREATE";		
+				$data['action_type'] = "CREATE"; 
 			    //status 202=pending, 200=approve, 400=reject
 
-
-					
-
-					
  
-
-
-
-
 
 				DB::table('cms_logs')->insert([
 				'ipaddress' => request()->ip(),
@@ -1155,6 +1140,11 @@ use ProductionItemsApproval;
 					); 
 				}
 			} 
+
+		 
+			$data['final_value_existing'] = DB::table('production_items_approvals')
+			->where('reference_number', $data['reference_number'])
+			->value('final_value_vatex') ?? $data['final_value_vatex'];
 			//loop each ingredients and save sa DB 	production_item_lines table
 			 
 				$cost = ProductionItemsModelApproval::updateOrCreate(
@@ -1406,6 +1396,21 @@ use ProductionItemsApproval;
 				->where('status', 'ACTIVE') 
 				->get()
 				->toArray(); 
+			$data['production_items_comments'] = DB::table('production_items_comments')
+				->select('production_items_comments.production_items_id',
+				'production_items_comments.comment_content',
+				'production_items_comments.comment_id',
+				'production_items_comments.parent_id',
+				'cms_users.name as created_by',
+				'cms_users.photo as profile_pic',
+				'production_items_comments.created_at',
+				'production_items_comments.updated_at')
+				->where('production_items_id', $ref) 
+				->leftjoin('cms_users', 'production_items_comments.created_by', '=', 'cms_users.id')
+				->get()
+				->toArray(); 
+
+
 			$data['production_item_lines'] = DB::table('production_item_lines')
 											->select('production_item_lines.*', 
 											DB::raw('
@@ -1426,11 +1431,16 @@ use ProductionItemsApproval;
 											->get()
 											->toArray(); 
 
-			$data['menu_ingredients_preparations'] = DB::table('menu_ingredients_preparations')
+			$data['menu_ingredients_preparations'] = DB::table('menu_ingredients_preparations') 
 				->where('status', 'ACTIVE') 
 				->get()
 				->toArray(); 
 
+			$data['comment_id'] = DB::table('production_items_comments')
+				->select(DB::raw('MAX(ROUND(comment_id)) as max_comment_id'))
+				->value('max_comment_id');
+	
+ 
 
 			return $data;
 		}
@@ -1609,13 +1619,44 @@ use ProductionItemsApproval;
 			]);
 		}
 
+
+		public function SendComment(Request $request)
+		{ 		
+			// 		'production_items_id',
+			//     'comment_content',
+			//     'comment_id',
+			//     'parent_id',
+			//     'created_by',
+			//     'created_at',
+			//     'updated_at'
+			// ];
+
+
+				$data =  $request->all();
+				$data['created_by'] = CRUDBooster::myId();
+				$data['created_at'] = now();
+				$data['updated_at'] = now();
+				 
+				ProductionItemsComments::updateOrCreate(
+					[
+						'production_items_id' => $data['production_items_id'],
+						'comment_id' => $data['comment_id'] 	
+					], 
+					$data
+				); 
+				 
+			 	
+				
+			return response()->json($data);
+		}
+
 	 	public function exportItems(Request $request) {
 			//dd($request);
 			//$filename = $request->input('filename');
 			//return Excel::download(new ProdutionItems, $filename.'.xlsx');
-				$filename = $request->input('filename') . '.csv';
+			$filename = $request->input('filename') . '.csv';
 
-		$callback = function () {
+			$callback = function () {
 			$handle = fopen('php://output', 'w');
 
 			// Header row
@@ -1657,8 +1698,7 @@ use ProductionItemsApproval;
 				'production_items.gas_cost',
 				'production_items.utilities',
 				'production_items.storage_cost',
-				'production_items.total_storage_cost',
-				'production_items.depreciation',
+				'production_items.total_storage_cost', 
 				'production_items.raw_mast_provision',
 				'production_items.markup_percentage',
 				'production_items.final_value_vatex',
@@ -1681,8 +1721,7 @@ use ProductionItemsApproval;
 							$row->gas_cost,
 							$row->utilities,
 							$row->storage_cost,
-							$row->total_storage_cost,
-							$row->depreciation,
+							$row->total_storage_cost, 
 							$row->raw_mast_provision,
 							$row->markup_percentage,
 							$row->final_value_vatex,

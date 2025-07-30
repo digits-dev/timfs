@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class ProductionItemsPackagingCostColumn extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('production_items', function (Blueprint $table) { 
+             $table->decimal('packaging_cost', 10, 3)->nullable()->after('transfer_price_category');  
+        });
+
+         Schema::table('production_items_approvals', function (Blueprint $table) { 
+            $table->decimal('packaging_cost', 10, 3)->nullable()->after('transfer_price_category');  
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('production_items', function (Blueprint $table) {
+            $table->dropColumn('packaging_cost');
+        });
+
+        Schema::table('production_items_approvals', function (Blueprint $table) {
+            $table->dropColumn('packaging_cost');
+        });
+    }
+}

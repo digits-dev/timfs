@@ -1,51 +1,13 @@
 <?php
 
 namespace App\Http\Controllers\ProductionItems;
-	use Maatwebsite\Excel\HeadingRowImport;
-	use Maatwebsite\Excel\Imports\HeadingRowFormatter; 
-	use App\Brand;  
-	use App\ApprovalWorkflowSetting;
-use App\CodeCounter;
-use Illuminate\Support\Str; 
-use App\Group;
-	use App\SalesPriceChangeHistory;
-	use App\Segmentation;
-	use Illuminate\Support\Facades\Input;
-	use Illuminate\Support\Facades\Log;
-	use Illuminate\Support\Facades\Redirect;
-	use Carbon\Carbon;
-	use Illuminate\Support\Facades\Schema;
-	use Illuminate\Support\Facades\Storage;
-	use Intervention\Image\Facades\Image;  
-
-
-
-	use Maatwebsite\Excel\Facades\Excel;
  
-	use App\Exports\ExcelTemplate;
-	use App\Exports\BartenderExport;
-	use App\Exports\ItemExport;
-	use App\Exports\POSExport;
-	use App\Exports\QBExport;
-	use App\Exports\ProdutionItems;
- 
-	use App\Models\ProductionItems\ProductionItemCategory;
-	use App\Models\ProductionItems\ProductionItemStorageLocation;
-	use App\Models\ProductionItems\ProductionLocation;
-	use App\ItemMaster;
-use App\Models\ProductionItems\ProductionItemLines;
-use App\Models\ProductionItems\ProductionItemLinesModelApproval; 
-use App\Models\ProductionItems\ProductionItemsApproval as ProductionItemsProductionItemsApproval;
-use App\Models\ProductionItems\ProductionItemsModelApproval;
-use App\NewPackaging;
-use ProductionItemsApproval;
-
-
-use App\Models\ProductionItems\ProductionItems;
-use crocodicstudio\crudbooster\helpers\CRUDBooster;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Spatie\ImageOptimizer\OptimizerChainFactory;
+	use App\Models\ProductionItems\ProductionItemLines; 
+	use App\Models\ProductionItems\ProductionItemsModelApproval;
+ 	use App\Models\ProductionItems\ProductionItems;
+	use crocodicstudio\crudbooster\helpers\CRUDBooster;
+	use Illuminate\Http\Request;
+	use Illuminate\Support\Facades\DB; 
 
 class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
  
@@ -84,7 +46,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 											padding: 3px 8px; 
 											border-radius: 3px; 
 											font-weight: bold; 
-											font-size: 11px; 
+											font-size: 8px; 
 											text-align: center;
 											min-width: 20px;
 										">PENDING</span></center>';
@@ -96,7 +58,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 											padding: 3px 8px; 
 											border-radius: 3px; 
 											font-weight: bold; 
-											font-size: 11px; 
+											font-size: 8px; 
 											text-align: center;
 											min-width: 20px;
 										">REJECT</span></center>';
@@ -109,7 +71,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 											padding: 3px 8px; 
 											border-radius: 3px; 
 											font-weight: bold; 
-											font-size: 11px; 
+											font-size: 8px; 
 											text-align: center;
 											min-width: 20px;
 										">APPROVED</span></center>';
@@ -118,8 +80,14 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			$this->col[] = ["label"=>"Action Type","name"=>"action_type"];
 			$this->col[] = ["label"=>"Production Category","name"=>"production_category","join"=>"production_item_categories,category_description" ];
 			$this->col[] = ["label"=>"Production Location","name"=>"production_location","join"=>"production_locations,production_location_description"];
-			$this->col[] = ["label"=>"Final Value Vatex","name"=>"final_value_vatex"];
-			$this->col[] = ["label"=>"Final Value Vatinc","name"=>"final_value_vatinc"];
+				$this->col[] = ["label"=>"FC Landed cost","name"=>"landed_cost"];
+			$this->col[] = ["label"=>"OPEX","name"=>"opex"];
+			$this->col[] = ["label"=>"PM / Store Supplies", "name" => "packaging_cost","callback"=>function($row){
+				return round($row->packaging_cost , 2);
+			}];
+			$this->col[] = ["label"=>"TP (Existing)","name"=>"final_value_existing"];
+			$this->col[] = ["label"=>"TP Vat Ex (Revised Price)","name"=>"final_value_vatex"];
+			$this->col[] = ["label"=>"TP Vat Inc (Updated)","name"=>"final_value_vatinc"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name" ];
 			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name" ];
 			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
@@ -604,34 +572,55 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 				->where('status', 'ACTIVE') 
 				->get()
 				->toArray();
-			$data['production_location'] = DB::table('production_locations')
+				$data['production_location'] = DB::table('production_locations')
 				->where('status', 'ACTIVE') 
 				->get()
 				->toArray(); 
-			$data['production_item_lines'] = DB::table('production_item_lines_approvals')
-											->select('production_item_lines_approvals.*', 
+			$data['production_items_comments'] = DB::table('production_items_comments')
+				->select('production_items_comments.production_items_id',
+				'production_items_comments.comment_content',
+				'production_items_comments.comment_id',
+				'production_items_comments.parent_id',
+				'cms_users.name as created_by',
+				'cms_users.photo as profile_pic',
+				'production_items_comments.created_at',
+				'production_items_comments.updated_at')
+				->where('production_items_id', $ref) 
+				->leftjoin('cms_users', 'production_items_comments.created_by', '=', 'cms_users.id')
+				->get()
+				->toArray(); 
+
+
+			$data['production_item_lines'] = DB::table('production_item_lines')
+											->select('production_item_lines.*', 
 											DB::raw('
 												case WHEN item_masters.landed_cost is null
 												THEN new_packagings.ttp 
 												ELSE item_masters.landed_cost
 												END as default_cost
 											'), 
-											'production_item_lines_approvals.production_item_line_id',
+											'production_item_lines.production_item_line_id',
 											'item_masters.ttp', 
 											'item_masters.packaging_size',
 											'menu_ingredients_preparations.preparation_desc')
-											->leftjoin('item_masters', 'production_item_lines_approvals.item_code', '=', 'item_masters.tasteless_code')
-											->leftjoin('new_packagings', 'production_item_lines_approvals.item_code', '=', 'new_packagings.nwp_code')
-											->leftjoin('menu_ingredients_preparations', 'production_item_lines_approvals.preparations', '=', 'menu_ingredients_preparations.id')
-											->where('production_item_lines_approvals.production_item_id', $ref) 
-											->orderBy('production_item_lines_approvals.production_item_line_id' , 'asc')
+											->leftjoin('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
+											->leftjoin('new_packagings', 'production_item_lines.item_code', '=', 'new_packagings.nwp_code')
+											->leftjoin('menu_ingredients_preparations', 'production_item_lines.preparations', '=', 'menu_ingredients_preparations.id')
+											->where('production_item_lines.production_item_id', $ref) 
+											->orderBy('production_item_lines.production_item_line_id' , 'asc')
 											->get()
-											->toArray();  
-			$data['menu_ingredients_preparations'] = DB::table('menu_ingredients_preparations')
+											->toArray(); 
+
+			$data['menu_ingredients_preparations'] = DB::table('menu_ingredients_preparations') 
 				->where('status', 'ACTIVE') 
 				->get()
 				->toArray(); 
 
+			$data['comment_id'] = DB::table('production_items_comments')
+				->select(DB::raw('MAX(ROUND(comment_id)) as max_comment_id'))
+				->value('max_comment_id');
+	
+ 
 
 			return $data;
 		}
@@ -688,7 +677,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 				
 				$data['created_by'] = CRUDBooster::myId();
 				$data['updated_by'] = CRUDBooster::myId();
-				$data['approval_status'] = 202;
+				$data['approval_status'] = 200;
 				
 			    //status 202=pending, 200=approve, 400=reject
 
@@ -827,7 +816,13 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 					); 
 				}
 			}
-			
+
+			$data['final_value_existing'] = DB::table('production_items')
+			->where('reference_number', $data['reference_number'])
+			->value('final_value_vatex') ?? $data['final_value_vatex'];
+				 
+ 
+
 			//loop each ingredients and save sa DB 	production_item_lines table
 			// dd($ingredients); 
 				$approvalStatus = ProductionItemsModelApproval::updateOrCreate(
