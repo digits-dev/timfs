@@ -296,7 +296,7 @@
                                             <tr>
                                                 <th><span class="required-star">*</span> Sales Price</th>
                                                 <td>
-                                                    <input value="{{ $item->ttp }}"  type="number" step="any" class="form-control" name="ttp" id="ttp" {{$item->ttp ? 'readonly' : ''}} required readonly>
+                                                    <input value="{{ $item->ttp }}"  type="number" step="any" class="form-control sales_price" name="ttp" id="ttp" {{$item->ttp ? 'readonly' : ''}} required readonly>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -605,40 +605,41 @@
                             <h3 class="text-center text-bold">Cost Summary</h3>
 
                             <div class="row"> 
+                                @if($isAddPage != "add" && $isAddPage != "detail")
                                 <div class="col-lg-4 col-md-12 mb-3">   
                                      <h5 class="text-center font-weight-bold">Comments</h5>  
-                                 <div class="panel panel-default" style="border:1px solid #ddd; border-radius:5px; box-shadow:0 2px 5px rgba(0,0,0,0.05); font-family:Arial, sans-serif;">
-                                <div class="panel-heading" style="background-color:#f8f8f8; padding:10px 15px; border-bottom:1px solid #ddd;">
-                                    <h3 class="panel-title" style="margin:0; font-size:16px; display:flex; align-items:center;">
-                                        <span class="glyphicon glyphicon-comment" style="margin-right:8px;"></span>
-                                        Recent Comments
-                                    </h3>
-                                </div>
-                                <div class="panel-body" style="padding:15px;">
-                                    <ul class="media-list" style="list-style:none; padding:0; margin:0;">
-                                        <div class="coment-bottom bg-white p-3 px-4" style="margin-bottom:10px;">
-                                            <div class="d-flex align-items-center add-comment-section mt-4 mb-4" style="display:flex; gap:12px; align-items:center;">
-                                                <img src="http://timfs.test/img/production-items/2025-07-24-new_item-uWd1EAjSUs.png" alt="User Avatar" width="38" height="38" style="border-radius:50%; object-fit:cover;" />
-                                                <input type="text" class="form-control mr-3 flex-grow-1" placeholder="Add comment" id="add_comment_field" 
-                                                    style="flex-grow:1; padding:8px 12px; border:1px solid #ccc; border-radius:4px; font-size:14px;" />
-                                                <button class="btn btn-primary d-flex align-items-center px-4 py-2 add-comment-btn" type="button"
-                                                    style="background-color:#007bff; color:#fff; border:none; border-radius:4px; padding:8px 16px; cursor:pointer; display:flex; align-items:center; font-size:14px;">
-                                                    <i class="glyphicon glyphicon-send mr-2" style="margin-right:6px;"></i> Comment
-                                                </button>
+                                        <div class="panel panel-default" style="border:1px solid #ddd; border-radius:5px; box-shadow:0 2px 5px rgba(0,0,0,0.05); font-family:Arial, sans-serif;">
+                                            <div class="panel-heading" style="background-color:#f8f8f8; padding:10px 15px; border-bottom:1px solid #ddd;">
+                                                <h3 class="panel-title" style="margin:0; font-size:16px; display:flex; align-items:center;">
+                                                    <span class="glyphicon glyphicon-comment" style="margin-right:8px;"></span>
+                                                    Recent Comments
+                                                </h3>
                                             </div>
-                                            <hr style="border:none; border-top:1px solid #eee; margin:10px 0;">
-                                        </div>
+                                            <div class="panel-body" style="padding:15px;">
+                                                <ul class="media-list" style="list-style:none; padding:0; margin:0;">
+                                                    <div class="coment-bottom bg-white p-3 px-4" style="margin-bottom:10px;">
+                                                        <div class="d-flex align-items-center add-comment-section mt-4 mb-4" style="display:flex; gap:12px; align-items:center;">
+                                                            <img src="{{CRUDBooster::myPhoto()}}" alt="User Avatar" width="38" height="38" style="border-radius:50%; object-fit:cover;" />
+                                                            <input type="text" class="form-control mr-3 flex-grow-1" placeholder="Add comment" id="add_comment_field" 
+                                                                style="flex-grow:1; padding:8px 12px; border:1px solid #ccc; border-radius:4px; font-size:14px;" />
+                                                            <button class="btn btn-primary d-flex align-items-center px-4 py-2 add-comment-btn" type="button"
+                                                                style="background-color:#007bff; color:#fff; border:none; border-radius:4px; padding:8px 16px; cursor:pointer; display:flex; align-items:center; font-size:14px;">
+                                                                <i class="glyphicon glyphicon-send mr-2" style="margin-right:6px;"></i> Comment
+                                                            </button>
+                                                        </div>
+                                                        <hr style="border:none; border-top:1px solid #eee; margin:10px 0;">
+                                                    </div>
 
-                                        <div class="comment-section" style="height: 515px; max-height: 515px; overflow-y: auto; padding-right:10px;">
-                                            <!-- Sample Comment -->
-                                          
-                                            <!-- Additional comment blocks go here -->
+                                                    <div class="comment-section" style="height: 515px; max-height: 515px; overflow-y: auto; padding-right:10px;">
+                                                        <!-- Sample Comment -->
+                                                    
+                                                        <!-- Additional comment blocks go here -->
+                                                    </div>
+                                                </ul>
+                                            </div>
                                         </div>
-                                    </ul>
                                 </div>
-                            </div>
-
-                                </div>
+                                @endif
                                 <!-- ========== 1. COST COMPONENTS (Fixed Inputs) =============================== -->
                                 <div class="col-lg-4 col-md-12 mb-3">
                                     <h5 class="text-center font-weight-bold">Cost Break Down</h5>
@@ -650,57 +651,91 @@
                                             </tr>
                                         </thead>
                                         <tbody> 
-                                            <tr class="hide">
+                                            <tr>
                                                 <td>Packaging Cost</td>
                                                 <td>
-                                                    <input type="number" step="any" name="packaging_cost" id="packaging_cost" value="{{ $item->packaging_cost }}" class="form-control text-right">
+                                                    <input type="number" step="any" name="packaging_cost" id="packaging_cost" value="{{ $item->packaging_cost }}" class="form-control text-right" readonly required>
                                                 </td>
                                             </tr>
-                                            <tr class="hide">
-                                                <td>Ingredient Cost</td>
+                                            <tr>
+                                                <td> Food Cost </td><!--Ingredient Cost</td>-->
                                                 <td>
-                                                    <input type="number"  step="any" name="ingredient_cost" id="ingredient_cost" value="{{ $item->ingredient_cost }}" class="form-control text-right">
+                                                    <input type="number"  step="any" name="ingredient_cost" id="ingredient_cost" value="{{ $item->ingredient_cost }}" class="form-control text-right" readonly required>
                                                 </td>
                                             </tr>
+                                             <!--
                                              <tr>
                                                 <td>Food Cost</td>
                                                 <td>
                                                     <input type="number"  step="any" name="food_cost" id="food_cost" value="" class="form-control text-right">
                                                 </td>
                                             </tr>
+                                            -->
                                             <tr>
                                                 <td>Labor Cost</td>
                                                 <td>
                                                     <input type="number" step="any" name="labor_cost" id="labor_cost" value="{{ $item->labor_cost }}" class="form-control text-right" readonly required>
                                                 </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Gas Cost (%)</td>
-                                                <td>
-                                                    <input type="number"  step="0.01" name="gas_cost" id="gas_cost" value="{{ $item->gas_cost }}" class="form-control text-right">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Storage Cost (%)</td>
-                                                <td>
-                                                    <input type="number" name="storage_cost" id="storage_cost" value="{{ $item->storage_cost }}" class="form-control text-right">
-                                                </td>
-                                            </tr>
-                                             <tr>
-                                                <td> Utilities (%)</td>
-                                                <td>
-                                                    <input type="number" name="utilities" id="utilities" value="{{ $item->utilities }}" class="form-control text-right">
-                                                </td>
-                                            </tr>
-                                              <tr>
-                                                <td> Opex</td>
-                                                <td>
-                                                    <input type="number" name="opex" id="opex" value="{{ $item->opex }}" class="form-control text-right" readonly required>
-                                                </td>
-                                            </tr>
+                                            </tr> 
                                         </tbody>
                                     </table>
+
+                                    <h5 class="text-center font-weight-bold">Opex Break Down</h5>
+                                    <table class="table table-bordered">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Particulars</th>
+                                                <th>Values</th>
+                                                <th>Particulars * Ingredient Cost</th>
+                                            </tr>
+                                        </thead>
+                                            <tbody> 
+                                                <tr>
+                                                    <td>Gas Cost (%)</td>
+                                                    <td>
+                                                        <input type="number"  step="0.01" name="gas_cost" id="gas_cost" value="{{ $item->gas_cost }}" class="form-control text-right">
+                                                    </td>
+                                                      <td>
+                                                        <input type="number" name="gas_costxfc" id="gas_costxfc" value="{{ $item->gas_costxfc }}" class="form-control text-right" readonly required>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Storage Cost (%)</td>
+                                                    <td>
+                                                        <input type="number" name="storage_cost" id="storage_cost" value="{{ $item->storage_cost }}" class="form-control text-right">
+                                                    </td>
+                                                      <td>
+                                                        <input type="number" name="storage_costxfc" id="storage_costxfc" value="{{ $item->storage_costxfc }}" class="form-control text-right" readonly required>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td> Meralco (%)</td>
+                                                    <td>
+                                                        <input type="number" name="meralco" id="meralco" value="{{ $item->meralco }}" class="form-control text-right">
+                                                    </td>
+                                                      <td>
+                                                        <input type="number" name="meralcoxfc" id="meralcoxfc" value="{{ $item->meralcoxfc }}" class="form-control text-right" readonly required>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td> Water (%)</td>
+                                                    <td>
+                                                        <input type="number" name="water" id="water" value="{{ $item->water }}" class="form-control text-right">
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="waterxfc" id="waterxfc" value="{{ $item->waterxfc }}" class="form-control text-right" readonly required>
+                                                    </td>
+                                                </tr>
+                                                    <tr>
+                                                    <td> Opex</td>
+                                                    <td colspan="2">
+                                                        <input type="number" name="opex" id="opex" value="{{ $item->opex }}" class="form-control text-right" readonly required>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                    </table>
                                 </div>
+ 
 
                                 <!-- ========== 2. PERCENTAGES / MULTIPLIERS =================================== -->
                                 <div class="col-lg-4 col-md-12 mb-3">
@@ -771,7 +806,7 @@
                                                         @endforeach
                                                     </select>
                                                 </td>
-                                            </tr>
+                                          </tr>
                                             <tr>
                                                 <td>Storage Location</td>
                                                 <td>
@@ -801,13 +836,13 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                            <td>LC + SP</td>
+                                            <td>Food Cost + Packaging</td>
                                                 <td> 
-                                                    <input type="text" value="" class="form-control rounded" name="lc_sp" id="lc_sp" placeholder="Landed Cost + Supplier" aria-describedby="basic-addon1" readonly /> 
+                                                    <input type="text" value="" class="form-control rounded" name="fc_pm" id="fc_pm" placeholder="Food Cost + Packaging" aria-describedby="basic-addon1" readonly /> 
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>FC + PM + Opex</td>
+                                                <td>Food Cost + Packaging + Opex</td>
                                                 <td>  
                                                     <input type="text" value="" class="form-control rounded" name="fc_pm_opex" id="fc_pm_opex" placeholder="Food Cost + Packaging Materials + Opex" aria-describedby="basic-addon1" readonly />
                                                 </td>
@@ -865,9 +900,9 @@
 <script>
  
     $(document).ready(function() {
-        
+         const allSubcategories = {!! json_encode($subcategories) !!};
        
-        
+        console.log("{{$isAddPage}}");
 
         //for showing message no package or ingredients found 
         is_noingredient = false;
@@ -879,9 +914,223 @@
         //check if need to disable fields
         let disableifapproval = "{{$table}}"; 
         let view_ = "{{$view}}"; 
+       
+        // This Section is for all calculations
+        state = {
+            yieldPercent : 0,
+            preperationQuantity : 0,
+            packagingSize : 0,
+            landed_cost : 0, 
+            packaging_cost: 0,
+            time_labor: 0,
+            gas_cost: 0, 
+            storage_cost: 0,
+            meralco: 0,
+            water: 0,
+            ingredient_costs: 0
+        } 
+
+        //calculation cestion
+        function calculateOpexLines(id)
+        {
+          return  state[id] * state.ingredient_costs;
+        }
+
+        function calculateLabor()
+        {
+            let calPackMinutes = state.time_labor / state.yieldPercent 
+            
+            return  calPackMinutes;
+        }
+
+        function CalculateLabor()
+        {
+            let cost = 0; 
+            
+            $('[id*="pack-minute"]').each(function() { 
+                cost += parseFloat($(this).val()) || 0;  
+            });  
+
+            let labor_cost_per_minute = $('#labor_cost_per_minute').val();
+            let total = math.round(cost * labor_cost_per_minute, 2); 
+            $(`#total_minutes_per_pack`).val(math.round(cost, 2));
+            $(`#labor_cost_val`).val(total);
+            $(`#labor_cost`).val(total).trigger('input');
+            
+        }
+
+        function calculateIngreditents()
+        { 
+            function get_actual_pack_uom()
+            {
+                return state.yieldPercent / 100 * state.packagingSize; 
+            }
+
+            function get_actual_ingredient_cost(actual_pack_uom)
+            {
+                return (state.landed_cost / actual_pack_uom) * state.preperationQuantity;
+            } 
+
+            let actual_pack_uom = get_actual_pack_uom();
+            let actual_ingredient_cost = get_actual_ingredient_cost(actual_pack_uom);
+
+            return { actual_pack_uom, actual_ingredient_cost };
+        }
+
+        function calculatePackagings()
+        {
+            let piece_cost = state.packaging_cost / state.packagingSize
+            return piece_cost * state.preperationQuantity;
+        }
+        
+        function calculateFinalValues() {
+            console.log($('#tasteless_code_original1').val());
+            let ingredientsCost = 0;
+            let packagingsCost = 0;
+            let total_prepquantity_ing = 0;
+            let total_prepquantity_pac = 0;
+            const rawMastProvision = 0; 
+
+            $('[class*="packaging-wrapper"]').each(function() {
+                 
+                var id = $(this).attr('id');
+                var lastChar = getIdNumber(id);
+                let cost;    
+                const quantity = parseFloat(cost) || 0;  
+                const container = $(this).attr('id'); 
+                cost = parseFloat($(`.costparent${lastChar}`).val()) || 0;
+                 
+                if(container.includes('ingredient-entry'))
+                {
+                    
+                    ingredientsCost += cost;  
+                    total_prepquantity_ing += parseFloat($('#quantity'+$(this).attr('id').replace(/\D/g, '')).val()) || 0; 
+                }
+                else
+                {
+                    packagingsCost += cost; 
+                    total_prepquantity_pac += parseFloat($('#quantity'+$(this).attr('id').replace(/\D/g, '')).val()) || 0; 
+                }
+            }); 
+            $('#packaging_cost').val(packagingsCost.toFixed(2));
+            $('#ingredient_cost').val(ingredientsCost.toFixed(2));  
+            $('#gas_cost, #storage_cost, #meralco, #water').trigger('change');
+
+
+            const packagingCost = parseFloat($('#packaging_cost').val()) || 0;
+            const ingredientCost = parseFloat($('#ingredient_cost').val()) || 0;
+            const labor = parseFloat($('#labor_cost').val()) || 0;
+            const gas = parseFloat($('#gas_cost').val()) / 100 || 0;
+            const StorageCost = parseFloat($('#storage_cost').val()) / 100 || 0; 
+            const utilities = parseFloat($('#utilities').val()) / 100 || 0; 
+            const markupPercent = parseFloat($('#markup_percentage').val()) || 0; 
+            const landed_cost = parseFloat($('#landed_cost').val()) || 0; 
+            const purchase_price = parseFloat($('#purchase_price').val()) || 0; 
+           // const opex = gas + StorageCost + utilities;
+            //const fc_pm = landed_cost + purchase_price;
+
+            //added code
+            let gas_costxfc = parseFloat($('#gas_costxfc').val()) / 100 || 0;
+            let storage_costxfc = parseFloat($('#storage_costxfc').val()) / 100 || 0;
+            let meralcoxfc = parseFloat($('#meralcoxfc').val()) / 100 || 0;
+            let waterxfc = parseFloat($('#waterxfc').val()) / 100 || 0;
+            let opex = gas_costxfc + storage_costxfc + meralcoxfc + waterxfc; 
+            console.log(opex);
+            $('#opex').val(opex.toFixed(2)); 
+            
+            
+            const food_cost = packagingCost + ingredientCost;
+            const fc_pm_opex =  food_cost + opex;
+ 
+            $('#fc_pm_opex').val(fc_pm_opex.toFixed(2));
+            $('#fc_pm').val(food_cost.toFixed(2));
+            $('#landed_cost').val(food_cost.toFixed(2)).trigger('input');
+            $('#purchase_price').val(food_cost.toFixed(2));
+            const total = labor + markupPercent + ingredientCost + opex;
+
+        
+            const finalValueVATex = total;
+         
+            $('#ttp').val(finalValueVATex.toFixed(2)).trigger('input'); // sales_price
+            $('#final_value_vatex').val(finalValueVATex.toFixed(2));
+            $('#final_value_vatinc').val((finalValueVATex * 1.12).toFixed(2)); 
+ 
+            // setting cost contribution
+            $('[id*="qty-contribution"]').each(function() {
+
+                let id = $(this).attr('id');
+                let lastChar = getIdNumber(id);
+                let cost = Number($(`#cost${lastChar}`).val());  
+
+                if(!isNaN(Number($(`#quantity${lastChar}`).val()).getContribution(total_prepquantity_ing)))
+                {
+                    $(this).val(Number($(`#quantity${lastChar}`).val()).getContribution(total_prepquantity_ing).toString() + '%');
+                }else
+                {
+                    $(this).val('');
+                }
+
+                if(!isNaN(cost.getContribution($(`#ingredient_cost`).val())))
+                {
+                    $(`#costparent-contribution${lastChar}`).val(cost.getContribution($(`#ingredient_cost`).val() || 0).toString() + '%');      
+                }
+                else
+                {
+                     $(`#costparent-contribution${lastChar}`).val('');
+                }
+               
+            }); 
+
+             $('[id*="qty-contribution-pack"]').each(function() {
+                    
+                let id = $(this).attr('id');
+                let lastChar = getIdNumber(id);
+                let cost = Number($(`#cost${lastChar}`).val()); 
+                if(!isNaN(Number($(`#quantity${lastChar}`).val()).getContribution(total_prepquantity_pac)))
+                {
+                   $(this).val(Number($(`#quantity${lastChar}`).val()).getContribution(total_prepquantity_pac).toString() + '%');
+                }else
+                {
+                    $(this).val('');
+                }
+              
+                
+
+                if(!isNaN(cost.getContribution($(`#packaging_cost`).val())))
+                {
+                    $(`#costparent-contribution-pack${lastChar}`).val(cost.getContribution($(`#packaging_cost`).val()).toString() + '%');
+                } 
+                else
+                {
+                    $(`#costparent-contribution${lastChar}`).val('');
+                }
+            }); 
+        }
+
+
+
+        Number.prototype.getContribution = function(total_cost) {
+           // total_ingredient_cost = $(total_cost).val() || 0;
+            contribution = this.toFixed(2) || 0;
+
+            return Number(contribution / total_cost * 100, 1).toFixed(2) || 0;
+        } 
+
+
+
         //loading ingredient and packaging data from contoller
         Load_Production_Item_Lines();
- 
+  
+        //triggering tasteless_code change and input to calculate packeaging/ingredients cost
+        $(document).ready(function() {
+            $('[id*="quantity"], [id*="tasteless_code"]').each(function() {
+                const eventInput = new Event('input', { bubbles: true });
+                const eventChange = new Event('change', { bubbles: true }); 
+                this.dispatchEvent(eventInput);
+                this.dispatchEvent(eventChange);
+            });
+        });
+
 
           $(`  
             #tax_codes_id,
@@ -1115,8 +1364,7 @@
                     console.log(id);
                     $(`#tasteless_code${id}`).val(ui.item.tasteless_code).trigger('change');
                     $(`#tasteless_code_original${id}`).val(ui.item.tasteless_code).trigger('change');
-                    $(`#itemDesc${id}`).val(ui.item.item_description); 
-                    $(`#cost${id}`).val(Number(ui.item.cost).toFixed(2)).attr('readonly', true); 
+                    $(`#itemDesc${id}`).val(ui.item.item_description);  
                     $(`#default_cost${id}`).val(Number(ui.item.cost).toFixed(2)); 
                     $(`#pack-size${rowId}`).val(Number(ui.item.packaging_size).toFixed(2));
                     $(`#quantity${rowId}`).val('1').trigger('change');
@@ -1234,7 +1482,36 @@
             });
         }
 
-       
+        function checkLandedCost(){
+            const supplierCost = parseFloat($('#purchase_price').val());
+            const landedCost = parseFloat($('#landed_cost').val());
+            return landedCost >= math.floor(supplierCost, 2);
+        }
+        
+        function updateCommiMargin() {
+            const salesPrice = parseFloat($('#ttp_price_change').val() || $('#ttp').val() || 0);
+            const landedCost = parseFloat($('#landed_cost').val() || 0);
+            if (!landedCost || !salesPrice) return;
+            const commiMargin = math.round((salesPrice - landedCost) / salesPrice, 2);
+
+            $('#ttp_percentage').val(commiMargin);
+        }
+
+
+        function checkCommiMargin(){
+            const fulfillmentType = $('#fulfillment_type_id :selected').text();
+            const CommiMargin = parseFloat($('#ttp_percentage').val());
+
+            if (isNaN(CommiMargin) || CommiMargin < 0) {
+                return false;
+            }
+
+            if (fulfillmentType == 'DELIVERY-COMMI') {
+                return CommiMargin >= 0;
+            }
+            return true;
+        }
+
         //to save data and list to Production Items List module
         $('.action-btn').on('click', function() {
             const action = $(this).attr('_action'); 
@@ -1268,7 +1545,9 @@
                 const packagingRows = $('[id*="packaging-entry"]').length; 
                 const ingredientRows = $('[id*="ingredient-entry"]').length;  
                 $('#segmentations').val(JSON.stringify(segmentations));
+                const isValid = checkLandedCost() && checkCommiMargin();
                 console.log(segmentations);
+             if (isValid) {
              if(packagingRows == 0 || ingredientRows == 0)
                 {
                     Swal.fire({
@@ -1320,6 +1599,13 @@
                         });
                     }
                 }
+            }else{
+                Swal.fire({
+                    icon: "error",
+                    title: "Invalid Input!",
+                    text: "Check landed cost, supplier cost value, and commi margin.",
+                });
+            }
             
            
         });
@@ -1356,44 +1642,29 @@
             const className = $element.prop('class');
             const otherOptions = $(`.segmentation_select option.${className}`).not($element).attr('disabled', true);
         });
- 
-          
-         // Recalculate on any input change
+  
+        // Recalculate on any input change
         $(document).on('input change', '[id*="quantity"], [id*="yield"]', function() {
                   
                 var id = $(this).attr('id');
-                var lastChar = id.split("quantity")[1] || id.split("yield")[1];
-                console.log(lastChar);
-                const yieldInput = $(`#yield${lastChar}`).val() || 0;
-                console.log(yieldInput);
+                var lastChar = getIdNumber(id); 
+                state.yieldPercent = $(`#yield${lastChar}`).val() || 0; 
+                
                 const container = $(this).closest('.packaging-wrapper').attr('id');
                 
                 if(container.includes('ingredient-entry'))
                 {
-                    if($(`#tasteless_code${lastChar}`).val() != '' && yieldInput  != '0')
+                    if($(`#tasteless_code${lastChar}`).val() != '' && state.yieldPercent  != '0')
                     {
-                        
-                        const yieldPercent = math.round(yieldInput / 100, 4); 
-                        console.log($(`#yield${lastChar}`).val());
+                        state.preperationQuantity = $(`#quantity${lastChar}`).val() || 0; 
 
-                        const uomQty = 1; 
+                        state.packagingSize = $(`#pack-size${lastChar}`).val() || 0; 
 
-                        let preperationQuantity = $(`#quantity${lastChar}`).val() || 0; 
-
-                        let packagingSize = $(`#pack-size${lastChar}`).val() || 0; 
-
-                        let cost = $(`#ttp${lastChar}`).val() || 0; 
-                        
+                        state.landed_cost = $(`#ttp${lastChar}`).val() || 0;  
                         
 
-                        let actual_pack_uom = yieldPercent * packagingSize;
-
-                        let actual_ingredient_cost = (cost / packagingSize * actual_pack_uom) * preperationQuantity;
-
-                       // const ingredientModifier = math.round(uomQty / packagingSize * preperationQuantity  / yieldPercent, 4);
-                            
-                        const ingredientCost = math.round(actual_ingredient_cost, 4); 
-                        const ingredientQty = math.round(actual_pack_uom, 4);  
+                        const ingredientCost = math.round(calculateIngreditents().actual_ingredient_cost, 4); 
+                        const ingredientQty = math.round(calculateIngreditents().actual_pack_uom, 4);  
 
 
                         $(`#cost${lastChar}`).val(Number(ingredientCost).toFixed(2)).attr('readonly', true);
@@ -1402,58 +1673,68 @@
                 }
                 else
                 {
-                    const packaging_cost =  $(`#default_cost${lastChar}`).val() || 0; 
-                    let  quantity = $(`#quantity${lastChar}`).val() || 1;   
-                    let packsize = $(`#pack-size${lastChar}`).val() || 1; 
+                    state.packaging_cost =  $(`#default_cost${lastChar}`).val() || 0; 
+                    state.preperationQuantity = $(`#quantity${lastChar}`).val() || 1;   
+                    state.packagingSize = $(`#pack-size${lastChar}`).val() || 1; 
+                    
 
-                    let piece_cost = packaging_cost / packsize
-
-
-                    total = piece_cost * quantity;
-
-                    $(`#cost${lastChar}`).val(Number(total).toFixed(2)).attr('readonly', true);
+                    $(`#cost${lastChar}`).val(Number(calculatePackagings()).toFixed(2)).attr('readonly', true);
                     
                 } 
                 calculateFinalValues();
             });
 
-            //Calcualte labor lines fields on change/input new data
-            $(document).on('input change', '[id*="yiel"], [id*="time-labor"], [id*="labor_cost_per_minute"]', function() {
-                  
+            //Calcualte labor lines fields on change/input new data 
+            $(document).on('change input', '[id*="yiel"], [id*="time-labor"], [id*="labor_cost_per_minute"]', function() {
+              
                 var id = $(this).attr('id');
-                var lastChar = id.split("time-labor")[1] || id.split("yiel")[1] || id.split("labor_cost_per_minute")[1];
-                console.log(lastChar);
-                let yieldInput = $(`#yiel${lastChar}`).val() / 100 || 0;
-                console.log(yieldInput);
+                var lastChar = getIdNumber(id); 
+                state.yieldPercent = $(`#yiel${lastChar}`).val() || 0;
+                 
 
-                let time = $(`#time-labor${lastChar}`).val() / 100 || 0; 
-                let total = math.round(time / yieldInput, 2); 
-                 $(`#pack-minute${lastChar}`).val(total);
-                CalculateLabor();
+                state.time_labor = $(`#time-labor${lastChar}`).val() || 0; 
+                let total = math.round(calculateLabor(), 2); 
+                 $(`#pack-minute${lastChar}`).val(total); 
+                 CalculateLabor();
             }); 
  
-            function CalculateLabor()
-            {
-                let cost = 0; 
-                
-                $('[id*="pack-minute"]').each(function() { 
-                    cost += parseFloat($(this).val()) || 0;  
-                });  
+            
 
-                
-               
-                let labor_cost_per_minute = $('#labor_cost_per_minute').val() / 100;
-                let total = math.round(cost * labor_cost_per_minute, 2); 
-                $(`#total_minutes_per_pack`).val(math.round(cost, 2));
-                $(`#labor_cost_val`).val(total);
-                $(`#labor_cost`).val(total).trigger('input');
-                
+
+
+        $('#categories_id').change(function() {
+            const categoriesId = $('#categories_id').val();
+            const subcategoriesElement = $('#subcategories_id');
+            const subcategories = allSubcategories.filter(e => e.categories_id == categoriesId);
+            $('#subcategories_id').html('');
+            const firstOption = $(document.createElement('option'))
+                .attr({
+                    selected: true,
+                    disabled: true
+                })
+                .text('None selected...');
+            subcategoriesElement.append(firstOption);
+            subcategories.forEach(e => {
+                const option = $(document.createElement('option'))
+                .attr({
+                    value: e.id
+                })
+                .text(e.subcategory_description);
+                subcategoriesElement.append(option);
+            });
+        });
+
+        $('#full_item_description').on('input', function() {
+            const text = $(this).val();
+            $('#purchase_description').val(text);
+        });
+        
+        $('form input').on('keyup keypress', function(event) {
+            if (event.keyCode == 13) {
+                event.preventDefault();
+                return;
             }
-
-
-
-
-
+        });
 
         //set sub packaging/ingredients as primary  
        $(document).on('click', '[id*="set-primary"]', function() { 
@@ -1483,10 +1764,11 @@
                 'yield': $(`#yield${parentId}`).val(),
                 'ttp': $(`#ttp${parentId}`).val(),
                 'ingredient-qty': $(`#ingredient-qty${parentId}`).val(),
-                'qty-contribution': $(`#qty-contribution${parentId}`).val(),
+                'qty-contribution': $(`#qty-contribution${parentId}`).val(), 
                 'pack-size': $(`#pack-size${parentId}`).val(),
                 'cost': $(`#cost${parentId}`).val(),
-                'costparent-contribution': $(`#costparent-contribution${parentId}`).val()
+                'costparent-contribution': $(`#costparent-contribution${parentId}`).val(),
+                'default_cost': $(`#default_cost${parentId}`).val()
             };
 
             let sibling = $(this).closest('.substitute-packaging'); 
@@ -1494,7 +1776,7 @@
 
             const sub_id = sibling.attr('id').replace(/\D/g, '');
             
-             let sub_contents = {
+            let sub_contents = {
                 'tasteless_code': $(`#tasteless_code${sub_id}`).val(),
                 'itemDesc': $(`#itemDesc${sub_id}`).val(),
                 'quantity': $(`#quantity${sub_id}`).val(),
@@ -1505,8 +1787,11 @@
                 'qty-contribution': $(`#qty-contribution${sub_id}`).val(),
                 'pack-size': $(`#pack-size${sub_id}`).val(),
                 'cost': $(`#cost${sub_id}`).val(),
-                'costparent-contribution': $(`#costparent-contribution${sub_id}`).val()
+                'costparent-contribution': $(`#costparent-contribution${sub_id}`).val(),
+                'default_cost': $(`#default_cost${sub_id}`).val(),
             };
+            console.log(sub_contents);
+             console.log(parent_contents);
 
             entry.removeClass('animate__animated animate__bounceIn'); 
             
@@ -1517,7 +1802,7 @@
                     top: `-=${entry.outerHeight() * total_sub}`,
                 },
                 {
-                    duration: 500,
+                    duration: 100,
                     queue: false,
                     done: function() {
                         $(sibling).css('top', '0');
@@ -1525,6 +1810,7 @@
                         Object.entries(sub_contents).forEach(function ([key, value]){
                             $(`#${key+parentId}`).val(value); 
                         }); 
+                       //  $(`#quantity${parentId}`).trigger('change');
                     }
                 }
             );
@@ -1534,7 +1820,7 @@
                     top: `+=${sibling.outerHeight() * total_sub}`,
                 },
                 {
-                    duration: 500,
+                    duration: 100,
                     queue: false,
                     done: function() {
                         $(wrapperId).css('top', '0');
@@ -1551,72 +1837,40 @@
 
              
         });
- 
- 
-       
-
-        // This logic updates the parent IDs of related sub-elements based on the closest 'tasteless_code' input within the same packaging-wrapper.
-        // The main idea is: when the parent 'tasteless_code' input value changes, 
-        // it dynamically updates the 'name' attributes of all associated sub-elements to keep their data grouped correctly under the new parent ID.
+  
+        // setting ingredients and packaging name for form submission
         $(document).on('input change', 'input[id^="tasteless_code"]', function() {
-            const $wrapper = $(this).closest('.packaging-wrapper');
+            const $wrapper = $(this).closest('.packaging-wrapper');   
+            const parentid_todb = $wrapper.find('input[id^="tasteless_code"]').attr('id').replace(/\D/g, ''); 
+              
 
-            const parentid = $wrapper.find('input[id^="tasteless_code"]').val();
-
-            const parentid_todb = $wrapper.find('input[id^="tasteless_code"]').attr('id').replace(/\D/g, '');
-
-            const oldParentId = $(this).data('oldParentId') || null;
- 
-            $(this).data('oldParentId', parentid);
- 
-            var idsub = $(this).attr('id');
-            var lastCharsub = idsub.split("tasteless_code")[1]; 
-            $(`#tasteless_code_original${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][tasteless_code]`); 
-            
-            $(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][description]`); 
-            $(`#quantity${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][quantity]`);
-            $(`#yield${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][yield]`); 
-            $(`#ttp${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][ttp]`);
-            $(`#cost${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][cost]`);
-            $(`#DB_id${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][DB_id]`); 
-            $(`#production_type${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][production_item_line_type]`);  
-            $(`#preparations${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][preparations]`);
-            if (parentid_todb !== oldParentId) {
-                $wrapper.find('[class^="sub-ingredient"], [class^="sub-pack"]').find('input').each(function() {
-                    var subId = $(this).attr('id') || '';
-                    var subLastChar = subId.split("tasteless_code")[1] || '';
-                    if (subLastChar) {
-                        const ids =  subId.split("tasteless_code")[1] 
-                        $(this).attr('name', `produtionlines[${parentid_todb}][${subLastChar}][tasteless_code]`); 
-                         
-                        $(`#itemDesc${ids}`).attr('name', `produtionlines[${parentid_todb}][${subLastChar}][description]`); 
-                        $(`#quantity${ids}`).attr('name', `produtionlines[${parentid_todb}][${subLastChar}][quantity]`);
-                        $(`#yield${ids}`).attr('name', `produtionlines[${parentid_todb}][${subLastChar}][yield]`);
-                         $(`#ttp${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][ttp]`); 
-                        $(`#cost${ids}`).attr('name', `produtionlines[${parentid_todb}][${subLastChar}][cost]`); 
-                        $(`#DB_id${ids}`).attr('name', `produtionlines[${parentid_todb}][${subLastChar}][DB_id]`);
-                        $(`#production_type${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][production_item_line_type]`);  
-                         $(`#preparations${lastCharsub}`).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][preparations]`);
-                    }
-                });
-            }
+        $wrapper.find('input, select').each(function (){ 
+                
+                let idsub = $(this).attr('id');
+                let lastCharsub = idsub.replace(/[^0-9]/g, '');
+                let name  = idsub.replace(/\d+/g, ''); 
+                $(this).attr('name', `produtionlines[${parentid_todb}][${lastCharsub}][${name}]`);
+            });
         });
 
+        
 
         $('#transfer_price_category').on('change', function(){ 
-        var markup = $(this).find('option:selected').data('markup');  // get data-markup
-        $('#markup_percentage').val(Number(markup / 100).toFixed(2)).trigger('input');
-            
+            var markup = $(this).find('option:selected').data('markup');  // get data-markup
+            $('#markup_percentage').val(Number(markup / 100).toFixed(2)).trigger('input'); 
         });
  
-        $('#gas_cost, #ingredient_cost').on('change', function() {
-                let gas =  $(this).val();
-                let ingredient_cost =  $('#ingredient_cost').val(); 
-                let total = gas * ingredient_cost;  
-                $(this).val(Number(total).toFixed(2)).trigger('input');
+        $('#gas_cost, #ingredient_cost, #storage_cost, #meralco, #water').on('change', function() { 
+                let id = $(this).attr('id'); 
+                state[id] = $(this).val(); 
+                state.ingredient_costs = $('#ingredient_cost').val();
+                $(`#${id}xfc`).val(calculateOpexLines(id).toFixed(2));  
         });
  
- 
+        $('#ttp, #landed_cost').on('input', function() { 
+            updateCommiMargin();
+        });
+
         $(document).on('click', '.move-up', function() {
             const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper');
             const chld = entry.find('.animate__bounceIn, .animate__rubberBand'); 
@@ -1761,151 +2015,16 @@
 
 
         
-
-
-
-        // Calculate final values
-        function calculateFinalValues() {
-            console.log($('#tasteless_code_original1').val());
-            let ingredientsCost = 0;
-            let packagingsCost = 0;
-            let total_prepquantity_ing = 0;
-            let total_prepquantity_pac = 0;
-            const rawMastProvision = 0; 
-
-                $('[class*="packaging-wrapper"]').each(function() {
-                 
-                var id = $(this).attr('id');
-                var lastChar = id.split("ingredient-entry")[1] || id.split("packaging-entry")[1];
-
-                let cost;  
-                ids = [];
-                const sub =  $(this).find('.sub-elements').children('.substitute-packaging').each(function(){
-                    ids.push($(this).attr('id'));
-
-                });
-
-                  
-                       
-                    
-                    const quantity = parseFloat(cost) || 0;  
-                    const container = $(this).attr('id');
-              
-                    console.log(ids.length);    
-                    if(ids.length == 0)
-                    {
-                        cost = parseFloat($(`.costparent${lastChar}`).val()) || 0;
-                    }
-                    else
-                    {
-                        cost = parseFloat($(`.costparent${lastChar}`).val()) || 0;
-                        ids.forEach(function(id) {
-                            const $el = $(`#${id}`); // select element by id
-                            
-                            if ($el.css('background-color') === 'rgb(255, 230, 98)') {
-                                var lastCharEl = id.split("ingredient-entry")[1] || id.split("packaging-entry")[1];
-                                console.log($('#cost'+ lastCharEl).val());
-                                cost = parseFloat($('#cost'+ lastCharEl).val()) || 0;  
-                            } 
-                        });
-            
-                    }
-                    
-                    if(container.includes('ingredient-entry'))
-                    {
-                       
-                        ingredientsCost += cost;  
-                        total_prepquantity_ing += parseFloat($('#quantity'+$(this).attr('id').replace(/\D/g, '')).val()) || 0; 
-                    }
-                    else
-                    {
-                        packagingsCost += cost; 
-                        total_prepquantity_pac += parseFloat($('#quantity'+$(this).attr('id').replace(/\D/g, '')).val()) || 0; 
-                    }
-            }); 
-            $('#packaging_cost').val(packagingsCost.toFixed(2));
-            $('#ingredient_cost').val(ingredientsCost.toFixed(2));  
-
-
-            const packagingCost = parseFloat($('#packaging_cost').val()) || 0;
-            const ingredientCost = parseFloat($('#ingredient_cost').val()) || 0;
-            const labor = parseFloat($('#labor_cost').val()) || 0;
-            const gas = parseFloat($('#gas_cost').val()) / 100 || 0;
-            const StorageCost = parseFloat($('#storage_cost').val()) / 100 || 0; 
-            const utilities = parseFloat($('#utilities').val()) / 100 || 0; 
-            const markupPercent = parseFloat($('#markup_percentage').val()) || 0; 
-            const landed_cost = parseFloat($('#landed_cost').val()) || 0; 
-            const purchase_price = parseFloat($('#purchase_price').val()) || 0; 
-
-
-            const opex = gas + StorageCost + utilities;
-            const lc_sp = landed_cost + purchase_price;
-
-            $('#opex').val(opex.toFixed(2)); 
-            
-            
-            const food_cost = packagingCost + ingredientCost;
-            const fc_pm_opex =  food_cost + packagingCost + opex;
-
-            $('#food_cost').val(food_cost.toFixed(2));
-            $('#fc_pm_opex').val(fc_pm_opex.toFixed(2));
-            $('#lc_sp').val(lc_sp.toFixed(2));
-            $('#landed_cost').val(food_cost.toFixed(2));
-            $('#purchase_price').val(food_cost.toFixed(2));
-            const total = labor + gas + StorageCost + utilities + markupPercent + food_cost + opex;
-
-        
-            const finalValueVATex = total;
-         
-            $('#ttp').val(finalValueVATex.toFixed(2));
-            $('#final_value_vatex').val(finalValueVATex.toFixed(2));
-            $('#final_value_vatinc').val((finalValueVATex * 1.12).toFixed(2)); 
-
-            $('[id*="qty-contribution"]').each(function() {
-
-                let id = $(this).attr('id');
-                let lastChar = id.split("qty-contribution")[1]; 
-                let cost = Number($(`#cost${lastChar}`).val()); 
-                $(this).val(Number($(`#quantity${lastChar}`).val()).getContribution(total_prepquantity_ing).toString() + '%');
-                if(!isNaN(cost.getContribution($(`#ingredient_cost`).val())))
-                {
-                    $(`#costparent-contribution${lastChar}`).val(cost.getContribution($(`#ingredient_cost`).val()).toString() + '%');      
-                }
-                else
-                {
-                     $(`#costparent-contribution${lastChar}`).val('0.00' + '%');
-                }
-               
-            }); 
-
-             $('[id*="qty-contribution-pack"]').each(function() {
-                    
-                let id = $(this).attr('id');
-                let lastChar = id.split("qty-contribution-pack")[1]; 
-                let cost = Number($(`#cost${lastChar}`).val()); 
-                $(this).val(Number($(`#quantity${lastChar}`).val()).getContribution(total_prepquantity_pac).toString() + '%');
-
-                if(!isNaN(cost.getContribution($(`#packaging_cost`).val())))
-                {
-                    $(`#costparent-contribution-pack${lastChar}`).val(cost.getContribution($(`#packaging_cost`).val()).toString() + '%');
-                } 
-                else
-                {
-                    $(`#costparent-contribution${lastChar}`).val('0.00' + '%');
-                }
-            }); 
+        function getIdNumber(id)
+        {
+            return id.replace(/[^0-9]/g, '');
         }
-
-
-
-        Number.prototype.getContribution = function(total_cost) {
-           // total_ingredient_cost = $(total_cost).val() || 0;
-            contribution = this.toFixed(2) || 0;
-
-            return Number(contribution / total_cost * 100, 1).toFixed(2) || 0;
-        } 
-
-
+        function getIdName(id)
+        {
+            return id.replace(/\d+/g, '');
+        }
+ 
+ 
          function showNoData() {
             const hasRows = $('[id*="packaging-entry"]').length; 
              console.log(hasRows + ' hasRows packaging');
@@ -1967,18 +2086,13 @@
             $('#approve-btn').show(); 
             $('#reject-btn').show();
             $('#cancel-btn').show();
+            $('#add_comment_field').prop('disabled', false);
+            $('.add-comment-btn').show();
+            $('[id*="Textarea"]').prop('disabled', false); 
         }
 
 
-           //triggering tasteless_code change and input to calculate packeaging/ingredients cost
-        $(document).ready(function() {
-        $('[id*="quantity"], [id*="tasteless_code"]').each(function() {
-            const eventInput = new Event('input', { bubbles: true });
-            const eventChange = new Event('change', { bubbles: true }); 
-            this.dispatchEvent(eventInput);
-            this.dispatchEvent(eventChange);
-        });
-        });
+       
 
 
 
@@ -1987,6 +2101,7 @@
         {
             const production_item_lines = @json($production_item_lines);
             const production_items_comments = @json($production_items_comments);  
+ 
 
             //looping for parent packeaging/ingredients
             production_item_lines.forEach(item => {
@@ -2008,31 +2123,28 @@
                         ""
                     );
                     $(newRowHtml).appendTo('#package-tbody');
-                     showNoDataIngredient();
-                     if ($(`#itemDesc${item.production_item_line_id}`).length > 0) {
-                        PackagingSearchInit(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id);
-                     }
+                    showNoDataIngredient();
+                    if ($(`#itemDesc${item.production_item_line_id}`).length > 0) {
+                        PackagingSearchInit(`#itemDesc${item.production_item_line_id}`, item.production_item_line_id); 
+                    }
                 }
-                
+
                 else if(item.production_item_line_id == item.packaging_id && item.production_item_line_type != 'labor')
                 { 
                     const newRowHtml = generateRowingredientHtml(
-                        item.production_item_line_id,
-                        item.production_item_line_id,
-                        item.item_code,
-                        item.description,
-                        item.landed_cost,
-                        item.quantity,
-                        item.yield,
-                        item.packaging_size,
-                        item.landed_cost,
-                        "",
-                        "",
-                        item.preparations,
-                        item.preparation_desc,
-                        "",
-                        ""
-                        //rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost , costparent_contribution, qty_contribution, preparations ,description
+                        item.production_item_line_id, //rowId
+                        item.production_item_line_id, //DB_id
+                        item.item_code, //tasteless_code
+                        item.description, //itemDesc
+                        item.landed_cost, //ttp
+                        item.quantity, //quantity
+                        item.yield, //yiel
+                        item.packaging_size, //packsize
+                        item.landed_cost, //cost
+                        "", //costparent_contribution
+                        "", //qty_contribution
+                        item.preparations, //preparations
+                        item.preparation_desc // description  
                     );
                     $(newRowHtml).appendTo('#ingredient-tbody');
                     showNoData();
@@ -2100,16 +2212,7 @@
             });
 
 
-            production_item_lines.forEach(item => {
-                
-                if (item.production_item_line_type == 'labor') { 
-                        tableRow++; 
-                        const newRowPackHtml = Sub_gen_Labor_row(tableRow, item.time_labor, item.yield, item.preparations, item.preparation_desc);  
-                        $(newRowPackHtml).appendTo(`.sub-labor`); 
-                        showNoDataLabor(); 
-                        $(`#time-labor${tableRow}`).trigger('change');
-                }    
-            });
+        
  
             if(production_items_comments)
             {
@@ -2129,8 +2232,8 @@
                     }  
                 });
             }
-        } 
-
+        }   
+      
         function submitComment(comment_type, append_to,production_items_id, comment_content, comment_id, parent_id, created_by)
         {
             is_SendingComment = true;
@@ -2152,27 +2255,37 @@
                         is_SendingComment = false;
                         if(comment_type == 'comment_reply')
                         {
-                            const newRowHtm2l = Add_Comment_Reply(comment_id, comment_content, created_by, "http://timfs.test/uploads/1/2019-10/avatar.jpg","{{now()}}");
+                            const newRowHtm2l = Add_Comment_Reply(comment_id, comment_content, created_by, "{{CRUDBooster::myPhoto()}}" ,"{{now()}}");
                             $(newRowHtm2l).appendTo(append_to); 
                             $(`#Textarea${parent_id}`).val("");
                         }
                         else
                         {
-                            const newRowHtml = Add_Comment(comment_id, comment_content, created_by, "http://timfs.test/uploads/1/2019-10/avatar.jpg","{{now()}}");
+                            const newRowHtml = Add_Comment(comment_id, comment_content, created_by, "{{CRUDBooster::myPhoto()}}","{{now()}}");
                             $(newRowHtml).appendTo('.comment-section'); 
                             $(`#add_comment_field`).val("");
                         }
                     } 
                 }); 
         }
-
+        const production_item_lines = @json($production_item_lines);
+        production_item_lines.forEach(item => {
+            
+            if (item.production_item_line_type == 'labor') { 
+                    tableRow++; 
+                    const newRowPackHtml = Sub_gen_Labor_row(tableRow, item.time_labor, item.yield, item.preparations, item.preparation_desc);  
+                    $(newRowPackHtml).appendTo(`.sub-labor`); 
+                    showNoDataLabor(); 
+                    $(`#time-labor${tableRow}`).trigger('change');
+            }    
+        });
 
         //To Append HTML section
          function Add_Comment(rowId, message, name, image_link, time) {
             return `
                     <li class=" media">
                         <div class="media-left">
-                                <img src="${image_link}" alt="User Avatar" width="30" height="30" class="rounded-circle mr-3" >
+                                <img src="${image_link}" alt="User Avatar" width="38" height="38" style="border-radius:50%; object-fit:cover;" />
                             </div>
                             <div class="media-body">
                                 <h4 class="media-heading">
@@ -2225,7 +2338,7 @@
                                 margin-left: 50px;
                                 margin-bottom: 10px;">
                                 <div class="media-left">
-                                <img src="${image_link}" alt="User Avatar" width="30" height="30" class="rounded-circle mr-3" >
+                                <img src="${image_link}" alt="User Avatar" width="38" height="38" style="border-radius:50%; object-fit:cover;" />
                                 </div>
                                 <div class="media-body">
                                 <h4 class="media-heading">
@@ -2285,11 +2398,16 @@
                     <label class="label-wide">
                     <label> 
                     <label class="label-wide">
-                    <span class="required-star">*</span> Yield %
+                    <span class="required-star">*</span> Yield
                     <input value="${yields}"  class="form-control yield"  name="LaborLines[${rowId}][yiel]" id="yiel${rowId}" type="number" required>
                     </label>
+                    
+                     <label class="label-wide">
+                    <span class="required-star">*</span> Yield UOM <span class="date-updated"></span>
+                    <input value="" class="form-control" id="yield_uom" name="LaborLines[${rowId}][yield_uom]" id="yiel${rowId}"  type="number"/>
+                    </label> 
                     <label class="label-wide">
-                    <span class="required-star">*</span> Minutes per pack <span class="date-updated"></span>
+                    <span class="required-star">*</span> Duration <span class="date-updated"></span>
                     <input value="" class="form-control ttp"  LaborLines[${rowId}][pack-minute] id="pack-minute${rowId}" type="number" readonly required>
                     </label> 
                      
@@ -2331,12 +2449,8 @@
                             </div>
                             
                         </label>
-                        <label>
-                            <span class="required-star">*</span> Preparation Qty
-                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
-                        </label> 
-                          <label>
-                        <span class="required-star">*</span> Preparations
+                         <label>
+                        <span class="required-star">*</span> Process
                         <select class="form-control select labor-cost-dropdown" id="preparations${rowId}" name="preparations" required>
                             <option value=""  ${description == null ? 'selected' : ''}>Select Process </option> 
                             @foreach($menu_ingredients_preparations as $preparations)
@@ -2346,6 +2460,11 @@
                             @endforeach
                         </select>
                         </label> 
+                        <label>
+                            <span class="required-star">*</span> Preparation Qty
+                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
+                        </label> 
+                         
                         <label class="label-wide">
                             <span class="required-star">*</span> Yield %
                             <input value="${yiel}" class="form-control yield" id="yield${rowId}" type="number" required>
@@ -2407,12 +2526,8 @@
                             </div>
                             
                         </label>
-                        <label>
-                            <span class="required-star">*</span> Preparation Qty
-                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
-                        </label> 
-                        <label>
-                        <span class="required-star">*</span> Preparations
+                           <label>
+                        <span class="required-star">*</span> Process
                         <select class="form-control select labor-cost-dropdown" id="preparations${rowId}" name="preparations" required>
                             <option value=""  ${description == null ? 'selected' : ''}>Select Process </option>
                              @foreach($menu_ingredients_preparations as $preparations)
@@ -2421,7 +2536,12 @@
                                 </option>
                             @endforeach
                         </select>
+                        </label>
+                        <label>
+                            <span class="required-star">*</span> Preparation Qty
+                            <input value="${quantity}" id="quantity${rowId}" class="form-control prep-quantity" type="number" min="0" step="any" required/>
                         </label> 
+                      
                         <label class="label-wide">
                             <span class="required-star">*</span> Yield %
                             <input value="${yiel}" class="form-control yield" id="yield${rowId}" type="number" required>
@@ -2590,6 +2710,8 @@
                 </div> 
             `;
         }
+
+        //$('#ProductionItems').find('input, select, textarea').trigger('change'); 
     });
 
  

@@ -768,7 +768,7 @@ use ProductionItemsApproval;
 
 
 	public function addProductionItemsToDB(Request $request){
- 
+	 
 		$message = '';
 		$time_stamp_now = date('Y-m-d H:i:s');
 			
@@ -1074,9 +1074,9 @@ use ProductionItemsApproval;
 			$ingredients = $request->input('produtionlines');
 			$labor_lines = $request->input('LaborLines');
 			$new_id = 0;
-			$labor_new_id = 0;
+			$labor_new_id = 0; 
 			// Flatten all new item_codes for later comparison
-			// dd($ingredients);	
+			 //dd($ingredients);	
 			//mula dito
 			// dd($ingredients);	
 			$newItemCodesID = []; 
@@ -1095,14 +1095,14 @@ use ProductionItemsApproval;
 							[ 
 								'production_item_id' => $production_item_id,
 								'item_code' => $ingredient['tasteless_code'],	
-								'description' => $ingredient['description'],
+								'description' => $ingredient['itemDesc'],
 								'quantity' => $ingredient['quantity'],
 								'yield' => $ingredient['yield'],
 								'preparations' => $ingredient['preparations'], 
-								'landed_cost' => $ingredient['ttp'],
+								'landed_cost' =>  $ingredient['ttp'] ?? $ingredient['cost'],
 								'packaging_id' =>  $parent_id, 
 								'production_item_line_id' => $new_id,
-								'production_item_line_type' => $ingredient['production_item_line_type'],
+								'production_item_line_type' => $ingredient['production_type'],
 								'approval_status' => 202,
 							]
 						);
@@ -1180,8 +1180,9 @@ use ProductionItemsApproval;
 						trans('crudbooster.denied_access')
 					);
 				}
-				
+			
 				$data = []; 
+				$data['isAddPage'] = $action;
 				/*
 				$data['production_category'] = ProductionItemCategory::active();
 				$data['storage_location'] = ProductionItemStorageLocation::active();
@@ -1215,7 +1216,8 @@ use ProductionItemsApproval;
 	
 	public function getDetail($id)
 	{
-		$data = [];  
+		$data = []; 
+		$data['isAddPage'] = "detail"; 
 		$data['item'] = self::getItemDetails($id);  
 		$costings = self::costing(self::getItemDetails($id)->reference_number);
 		$data['view'] = 'true'; 
@@ -1233,7 +1235,7 @@ use ProductionItemsApproval;
 	{
 		
 
-		$item = DB::table('production_item_lines')
+			$item = DB::table('production_item_lines')
 			->leftjoin('production_items', 'production_items.reference_number', '=', 'production_item_lines.production_item_id')
 			->where('production_items.id', $id)
 			->select('production_item_lines.*') 
@@ -1411,25 +1413,30 @@ use ProductionItemsApproval;
 				->toArray(); 
 
 
-			$data['production_item_lines'] = DB::table('production_item_lines')
-											->select('production_item_lines.*', 
-											DB::raw('
-												case WHEN item_masters.landed_cost is null
-												THEN new_packagings.ttp 
-												ELSE item_masters.landed_cost
-												END as default_cost
-											'), 
-											'production_item_lines.production_item_line_id',
-											'item_masters.ttp', 
-											'item_masters.packaging_size',
-											'menu_ingredients_preparations.preparation_desc')
-											->leftjoin('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
-											->leftjoin('new_packagings', 'production_item_lines.item_code', '=', 'new_packagings.nwp_code')
-											->leftjoin('menu_ingredients_preparations', 'production_item_lines.preparations', '=', 'menu_ingredients_preparations.id')
-											->where('production_item_lines.production_item_id', $ref) 
-											->orderBy('production_item_lines.production_item_line_id' , 'asc')
-											->get()
-											->toArray(); 
+			$data['production_item_lines'] =  DB::table('production_item_lines')
+												->select('production_item_lines.*', 
+												DB::raw('
+													case WHEN item_masters.landed_cost is null
+													THEN new_packagings.ttp
+													ELSE item_masters.landed_cost
+													END as default_cost
+												'), 
+												DB::raw('
+													case WHEN item_masters.landed_cost is null
+													THEN new_packagings.packaging_size 
+													ELSE item_masters.packaging_size
+													END as packaging_size
+												'), 
+												'production_item_lines.production_item_line_id',
+												'item_masters.ttp',  
+												'menu_ingredients_preparations.preparation_desc')
+												->leftjoin('item_masters', 'production_item_lines.item_code', '=', 'item_masters.tasteless_code')
+												->leftjoin('new_packagings', 'production_item_lines.item_code', '=', 'new_packagings.nwp_code')
+												->leftjoin('menu_ingredients_preparations', 'production_item_lines.preparations', '=', 'menu_ingredients_preparations.id')
+												->where('production_item_lines.production_item_id', $ref) 
+												->orderBy('production_item_lines.production_item_line_id' , 'asc')
+												->get()
+												->toArray();  
 
 			$data['menu_ingredients_preparations'] = DB::table('menu_ingredients_preparations') 
 				->where('status', 'ACTIVE') 
@@ -1622,16 +1629,7 @@ use ProductionItemsApproval;
 
 		public function SendComment(Request $request)
 		{ 		
-			// 		'production_items_id',
-			//     'comment_content',
-			//     'comment_id',
-			//     'parent_id',
-			//     'created_by',
-			//     'created_at',
-			//     'updated_at'
-			// ];
-
-
+		
 				$data =  $request->all();
 				$data['created_by'] = CRUDBooster::myId();
 				$data['created_at'] = now();

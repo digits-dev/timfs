@@ -410,7 +410,8 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 
 		public function getDetail($id)
 		{
-			$data = [];  
+			$data = [];
+			$data['isAddPage'] = "detail";   
 			$data['item'] = self::getItemDetails($id);  
 			$costings = self::costing(self::getItemDetails($id)->reference_number);
 			$data['view'] = 'true'; 
@@ -422,7 +423,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 
 		public function approveOrReject($id)
 		{	
-			$data = [];  
+			$data = [];   
 			$data['item'] = self::getItemDetails($id);  
 			$costings = self::costing(self::getItemDetails($id)->reference_number);
 				 
@@ -594,13 +595,18 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 											->select('production_item_lines_approvals.*', 
 											DB::raw('
 												case WHEN item_masters.landed_cost is null
-												THEN new_packagings.ttp 
+												THEN new_packagings.ttp
 												ELSE item_masters.landed_cost
 												END as default_cost
 											'), 
+											DB::raw('
+												case WHEN item_masters.landed_cost is null
+												THEN new_packagings.packaging_size 
+												ELSE item_masters.packaging_size
+												END as packaging_size
+											'), 
 											'production_item_lines_approvals.production_item_line_id',
-											'item_masters.ttp', 
-											'item_masters.packaging_size',
+											'item_masters.ttp',  
 											'menu_ingredients_preparations.preparation_desc')
 											->leftjoin('item_masters', 'production_item_lines_approvals.item_code', '=', 'item_masters.tasteless_code')
 											->leftjoin('new_packagings', 'production_item_lines_approvals.item_code', '=', 'new_packagings.nwp_code')
@@ -609,6 +615,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 											->orderBy('production_item_lines_approvals.production_item_line_id' , 'asc')
 											->get()
 											->toArray();  
+			
 			$data['menu_ingredients_preparations'] = DB::table('menu_ingredients_preparations')
 				->where('status', 'ACTIVE') 
 				->get()
@@ -746,10 +753,10 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			$new_id = 0;
 			$labor_new_id = 0;
 			// Flatten all new item_codes for later comparison
-			 //dd($ingredients);	
+			   
 			//mula dito
 
-			
+			 
 			$newItemCodesID = []; 
 			if (count($ingredients) > 0) {
 				foreach ($ingredients as $parentCode => $ingredientGroup) {
@@ -766,15 +773,15 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 							[ 
 								'production_item_id' => $production_item_id,
 								'item_code' => $ingredient['tasteless_code'],	
-								'description' => $ingredient['description'],
+								'description' => $ingredient['itemDesc'],
 								'quantity' => $ingredient['quantity'],
 								'yield' => $ingredient['yield'],
 								'preparations' => $ingredient['preparations'], 
-								'landed_cost' => $ingredient['ttp'],
+								'landed_cost' =>  $ingredient['ttp'] ?? $ingredient['cost'],
 								'packaging_id' =>  $parent_id, 
 								'production_item_line_id' => $new_id,
-								'production_item_line_type' => $ingredient['production_item_line_type'],
-								'approval_status' => 202,
+								'production_item_line_type' => $ingredient['production_type'],
+								'approval_status' => 200,
 							]
 						);
 					}
