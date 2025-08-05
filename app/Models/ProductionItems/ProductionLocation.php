@@ -11,7 +11,21 @@ class ProductionLocation extends Model
 
     protected $table = 'production_locations';
 
+
+      protected $fillable = [
+        'production_location_description',
+        'status',
+        'created_by',
+        'updated_by',
+        'created_at',
+        'updated_at'
+    ];
+
+
     public function scopeActive($query){
         return $query->where('status','ACTIVE')->get();
     }
+
+
+
 }

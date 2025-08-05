@@ -846,7 +846,7 @@
 			$submaster_details = self::getSubmasters();
 
 			$data = array_merge($data, $submaster_details);
-			
+ 
 			return $this->view('item-master/edit-item', $data);
 		}
 
@@ -1006,6 +1006,8 @@
 		public function submitAddOrEdit(Request $request) {
 			$input = $request->all();
 
+			
+
 			if ($input['item_photo']) {
 				$filename_filler = $input['tasteless_code'] ?? 'new_item';
 				$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
@@ -1044,7 +1046,7 @@
 				->toArray();
 
 			$data = $request->all();
-
+			
 			unset(
 				$data['_token'], 
 				$data['segmentations'], 
@@ -1057,8 +1059,8 @@
 			$data['type'] = 'Inventory Part';
 			$data['tax_status'] = $data['tax_codes_id'];
 			$data['tasteless_code'] = $tasteless_code;
-			if ($filename) $data['image_filename'] = $filename;
-
+			if ($filename) $data['image_filename'] = $filename;  
+ 
 			//segmentation => initializing all to 'X'
 			foreach ($segment_columns as $segment_column) {
 				$data[$segment_column] = 'X';
@@ -1130,6 +1132,7 @@
 		}
 
 		public function exportItems(Request $request) {
+			//dd($request);
 			$filename = $request->input('filename');
 			return Excel::download(new ItemExport, $filename.'.xlsx');
 		}

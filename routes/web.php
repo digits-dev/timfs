@@ -28,8 +28,14 @@ use App\Http\Controllers\AdminItemMastersFasController;
 use App\Http\Controllers\AdminItemMastersFasApprovalController;
 use App\Http\Controllers\AdminFaCoaSubCategoriesController;
 use App\Http\Controllers\AdminBrandsAssetsController;
+use App\Http\Controllers\ProductionItems\AdminProductionCategoryController;
+use App\Http\Controllers\ProductionItems\AdminProductionItemsApprovalController;
+use App\Http\Controllers\ProductionItems\AdminProductionItemsComments;
 use App\Http\Controllers\SystemUpdateController;
 use App\Http\Controllers\ProductionItems\AdminProductionItemsController;
+use App\Http\Controllers\ProductionItems\AdminProductionItemsHistory;
+use App\Http\Controllers\ProductionItems\AdminProductionLocationsController;
+
 Route::get('/', function () {
     return redirect('admin/login');
     //return view('welcome');
@@ -211,9 +217,20 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/brands_assets/upload-brands', [AdminBrandsAssetsController::class, 'uploadBrand']);
     Route::post('/admin/brands_assets/brand-upload-save',[AdminBrandsAssetsController::class, 'brandUploadSave'])->name('brand-upload-save');
 
-    //PRODUCTION ITEMS
-    Route::get('/admin/production_items/add-production-items', [AdminProductionItemsController::class, 'addProductionItems'])->name('add-production-items');
+    //PRODUCTION ITEMS 
     Route::post('/admin/production_items/item-search',[AdminProductionItemsController::class, 'itemSearch'])->name('item-search');
+    Route::post('/admin/production_items/package-search',[AdminProductionItemsController::class, 'PackageSearch'])->name('packag-search');
+    Route::get('/admin/production_items/get-data/{id}',[AdminProductionItemsController::class, 'ingredientsSearch'])->name('ingredients-search');
+    Route::post('/admin/production_items/add-production-items-to-db', [AdminProductionItemsController::class, 'addProductionItemsToDB'])->name('add-production-items-to-db');
+    Route::get('/admin/production_locations/add-production-location', [AdminProductionLocationsController::class, 'addProductionItems'])->name('add-production-location');
+    Route::post('/admin/production_locations/add-production-location', [AdminProductionLocationsController::class, 'addProductionItemsToDB'])->name('add-production-location-to-db');
+    Route::post('/admin/production_items/item-export',[AdminProductionItemsController::class, 'exportItems'])->name('export-items');
+    Route::post('/admin/production_items_history/export-items-history',[AdminProductionItemsHistory::class, 'exportItemsHistory'])->name('export-items-history');
+    Route::post('/admin/production_item_categories/add-production-category', [AdminProductionCategoryController::class, 'addProductionCategoryToDB'])->name('add-production-category-to-db');
+    Route::get('/admin/production_items/{table}/{status}/{status_value}/{description}', [AdminProductionItemsController::class, 'getProductionItemsSubmaster'])->name('getProductionItemsSubmaster');
+    Route::get('/admin/production_items_approvals/approve_or_reject_production_items/{id}', [AdminProductionItemsApprovalController::class, 'approveOrReject'])->name('approve_or_reject_production_items');
+    Route::post('/admin/production_items_approvals/approve_or_reject_production_items', [AdminProductionItemsApprovalController::class, 'addProductionItemsToDB'])->name('approve_or_reject_production_items_push');
+    Route::post('/admin/production_items_approvals/send-comment', [AdminProductionItemsController::class, 'SendComment'])->name('send-comment');
 });
 
 Route::get('/item_masters/api/get-items/{secret_key}', [AdminItemMastersController::class, 'getUpdatedItems'])->name('get_updated_items');
