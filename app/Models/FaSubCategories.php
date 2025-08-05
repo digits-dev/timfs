@@ -9,7 +9,16 @@ class FaSubCategories extends Model
 {
     use HasFactory;
     protected $table = 'fa_sub_categories';
-
+    protected $fillable = [
+        'coa_id',
+        'description',
+        'description',
+        'status',
+        'created_by',
+        'created_at',
+        'updated_by',
+        'updated_at'
+    ];
     public function scopeDetail($query, $id){
         return $query
         ->where('coa_id', $id)

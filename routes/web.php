@@ -217,6 +217,10 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/brands_assets/upload-brands', [AdminBrandsAssetsController::class, 'uploadBrand']);
     Route::post('/admin/brands_assets/brand-upload-save',[AdminBrandsAssetsController::class, 'brandUploadSave'])->name('brand-upload-save');
 
+    //submaster sub category upload
+    Route::get('/admin/fa_coa_sub_categories/upload-sub-category', [AdminFaCoaSubCategoriesController::class, 'uploadSubCategory']);
+    Route::post('/admin/fa_coa_sub_categories/sub-category-upload-save',[AdminFaCoaSubCategoriesController::class, 'subCategoryUploadSave'])->name('sub-category-upload-save');
+
     //PRODUCTION ITEMS 
     Route::post('/admin/production_items/item-search',[AdminProductionItemsController::class, 'itemSearch'])->name('item-search');
     Route::post('/admin/production_items/package-search',[AdminProductionItemsController::class, 'PackageSearch'])->name('packag-search');
