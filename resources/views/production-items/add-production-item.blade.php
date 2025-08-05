@@ -9,10 +9,7 @@
 <script src="https://unpkg.com/timeago.js/dist/timeago.min.js"></script>
 <link rel="stylesheet" href="{{asset('css/edit-rnd-menu.css')}}">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-  />
+ 
 
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -544,8 +541,7 @@
                                                 <span class="item-from label"></span> <span class="label label-danger"></span>
                                                 <div>
                                                     <input  
-                                                        type="number" 
-                                                        step="0.01"
+                                                        type="number"  
                                                         id="labor_cost_per_minute" 
                                                         name="labor_cost_per_minute"
                                                         class="form-control display-labor span-2" 
@@ -751,7 +747,7 @@
                                             <tr>
                                                 <td>Transfer Price Category </td>
                                                 <td>
-                                                    <select name="transfer_price_category" id="transfer_price_category" class="form-control select2">
+                                                    <select name="transfer_price_category" id="transfer_price_category" class="form-control select2" readonly required>
                                                          <option value="">Select Category</option>
                                                         @foreach ($transfer_price_category as $tcat)
                                                         <option value="{{ $tcat->id }}"  data-markup="{{ $tcat->transfer_price_category_markup }}" {{ $item->transfer_price_category == $tcat->id ? 'selected' : '' }}>
@@ -764,7 +760,7 @@
                                             <tr>
                                                 <td>Markup %</td>
                                                 <td> 
-                                                    <input type="number" name="markup_percentage" id="markup_percentage" value="{{ $item->markup_percentage }}" class="form-control text-right" readonly required>
+                                                    <input type="text" name="markup_percentage" id="markup_percentage" value="{{ $item->markup_percentage }}" class="form-control text-right" readonly required>
                                                 </td>
                                             </tr> 
                                            
@@ -886,9 +882,9 @@
                     <div class="panel-footer"> 
                         <button type="button" _action="approve" class="btn btn-success action-btn" id="approve-btn"><i class="fa fa-thumbs-up"></i> Approve</button>
                         <button type="button" _action="reject" class="btn btn-danger action-btn" id="reject-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-down"></i> Reject</button>
-                        <a href='{{ CRUDBooster::mainpath() }}' id="cancel-btn" class='btn btn-default'>Cancel</a>
-                    </div>
+                    </div> 
                     @endif
+                    <a href='{{ CRUDBooster::mainpath() }}' id="cancel-btn" class='btn btn-default'>Cancel</a>
                  @endif
             </div>
  
@@ -898,10 +894,20 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
- 
+    Swal.fire({
+        title: 'Loading...',
+        html: 'Please wait...',
+        allowEscapeKey: false,
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading()
+        },
+    });
+    
     $(document).ready(function() {
-         const allSubcategories = {!! json_encode($subcategories) !!};
-       
+        Swal.close();
+        const allSubcategories = {!! json_encode($subcategories) !!}; 
+
         console.log("{{$isAddPage}}");
 
         //for showing message no package or ingredients found 
@@ -914,7 +920,7 @@
         //check if need to disable fields
         let disableifapproval = "{{$table}}"; 
         let view_ = "{{$view}}"; 
-       
+         console.log(view_);
         // This Section is for all calculations
         state = {
             yieldPercent : 0,
@@ -984,7 +990,7 @@
         }
         
         function calculateFinalValues() {
-            console.log($('#tasteless_code_original1').val());
+           
             let ingredientsCost = 0;
             let packagingsCost = 0;
             let total_prepquantity_ing = 0;
@@ -1022,8 +1028,10 @@
             const labor = parseFloat($('#labor_cost').val()) || 0;
             const gas = parseFloat($('#gas_cost').val()) / 100 || 0;
             const StorageCost = parseFloat($('#storage_cost').val()) / 100 || 0; 
-            const utilities = parseFloat($('#utilities').val()) / 100 || 0; 
-            const markupPercent = parseFloat($('#markup_percentage').val()) || 0; 
+            const utilities = parseFloat($('#utilities').val()) / 100 || 0;  
+            let markup_percentage = $('#markup_percentage').val().replace('%', ''); 
+            const markupPercent = parseFloat(markup_percentage / 100) || 0; 
+            
             const landed_cost = parseFloat($('#landed_cost').val()) || 0; 
             const purchase_price = parseFloat($('#purchase_price').val()) || 0; 
            // const opex = gas + StorageCost + utilities;
@@ -1035,7 +1043,7 @@
             let meralcoxfc = parseFloat($('#meralcoxfc').val()) / 100 || 0;
             let waterxfc = parseFloat($('#waterxfc').val()) / 100 || 0;
             let opex = gas_costxfc + storage_costxfc + meralcoxfc + waterxfc; 
-            console.log(opex);
+            
             $('#opex').val(opex.toFixed(2)); 
             
             
@@ -1156,6 +1164,18 @@
                 placeholder: 'None selected...'
             });
         
+        $('#cancel-btn').on('click', function(){
+             Swal.fire({
+                title: 'Loading...',
+                html: 'Please wait...',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading()
+                },
+            });
+        })
+
         $('#transfer_price_category').select2({
             width: '380px'  // makes Select2 respect the select's width/max-width
         });
@@ -1171,41 +1191,38 @@
             width: '100%',
             height: '100%' 
         }); 
-            console.log(commentId);
+            
         $('.add-comment-btn').click(function(){
             if(is_SendingComment == false)
             {
-                console.log(commentId);
-                console.log('add comemnt'); 
+                
                 let comment = $(`#add_comment_field`).val();
                 if(comment)
                 {   
                     commentId++; 
-                    submitComment('comment', '.comment-section', reference_number, comment, commentId, '', "{{CRUDBooster::myName()}}");
+                    submitComment('comment', '.comment-section', reference_number, comment, commentId, '', "{{CRUDBooster::myName()}}", false);
                 } 
             }
         })
 
-        $(document).on('click', '[id*="send-comment-btn"]', function() { 
+        $(document).on('click', '.send-comment-btn', function() { 
             if(is_SendingComment == false)
             {
                 let id = $(this).attr('id').replace(/\D/g, '');  
                 let reply = $(`#Textarea${id}`).val();
-                console.log(id);
+                
                 if(reply)
                 {  
                     commentId++; 
                     let parentId = $(this).closest('.collapse').closest('.post-footer-option').prev('.comment-sub').attr('id'); 
-                    submitComment('comment_reply', `.comment-reply${id}`,  reference_number, reply, commentId, parentId, "{{CRUDBooster::myName()}}");  
+                    submitComment('comment_reply', `.comment-reply${id}`,  reference_number, reply, commentId, parentId, "{{CRUDBooster::myName()}}", true);  
                 }
             }
            
 
         });
  
-        $(window).on('load', function() {
-           ScrollToBottom('.comment-section');
-        });
+        
         
         function ScrollToBottom(section)
         {
@@ -1217,7 +1234,7 @@
 
         $("#add-Row").click(function () { 
             tableRow++;
-            console.log( tableRow + " dd-Row");
+            
             const newRowHtml = generateRowHtml(tableRow, "", "", "", "","","", "", "", "");
              $(newRowHtml).appendTo('#package-tbody');
             PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
@@ -1228,8 +1245,8 @@
 
          $("#add-Row-ingredient").click(function () { 
             tableRow++;
-            console.log( tableRow + " dd-Row");
-            const newRowHtml = generateRowingredientHtml(tableRow, "", "", "", "", "", "", "", "", "", "");
+            
+            const newRowHtml = generateRowingredientHtml(tableRow, "", "", "", "", "", "", "", "", "", "", "");
             $(newRowHtml).appendTo('#ingredient-tbody'); 
             IngredientSearch(`#itemDesc${tableRow}`, tableRow); 
             showNoData();
@@ -1241,9 +1258,9 @@
         $(document).on('click', '.add-sub-btn', function(event) {
             tableRow++;
             const parentId = $(this).parent().attr('id').split("ingredient-entry")[1];   
-            const newRowPackHtml = Sub_gen_ingredient_row(tableRow, "", "", "", "", "", "", "", "", "", "");   
+            const newRowPackHtml = Sub_gen_ingredient_row(tableRow, "", "", "", "", "", "", "", "", "", "", "");   
             $(newRowPackHtml).appendTo(`.sub-ingredient${parentId}`);
-            console.log(parentId);
+            
             IngredientSearch(`#itemDesc${tableRow}`, tableRow); 
              format_decimal()
         });
@@ -1254,14 +1271,15 @@
             const parentId = $(this).parent().attr('id').split("packaging-entry")[1];  
             const newRowPackHtml = Sub_gen_pack_row(tableRow, "", "", "", "", "","", "", "", "");  
             $(newRowPackHtml).appendTo(`.sub-pack${parentId}`);
-            console.log(parentId);
+             
             PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
              format_decimal()
         });
 
         $(document).on('click', '.add-sub-btn-labor', function(event) {
             tableRow++; 
-            const newRowPackHtml = Sub_gen_Labor_row(tableRow,"","","","");  
+            const newRowPackHtml = Sub_gen_Labor_row(tableRow,"","","","","");  
+             // function Sub_gen_Labor_row(rowId, time_labor, yields, preparations, description, labor_yield_uom) {
             $(newRowPackHtml).appendTo(`.sub-labor`); 
             showNoDataLabor();
              format_decimal()
@@ -1310,7 +1328,7 @@
          //for packaging search items
         function PackagingSearchInit(selector, rowId) {
            const token = $("#token").val();   
-            console.log(rowId + 'pogi');
+            
                 $(`#itemDesc${rowId}`  ).on('input', function() {
                 $(`#quantity${rowId}`).val('');
                 $(`#cost${rowId}`).val('');
@@ -1338,7 +1356,7 @@
                             }).get()
                     },
                     success: function (data) {
-                        console.log(data);
+                        
                         if (data.status_no == 1) {
                             $(`#ui-id-2${rowId}`).hide();
                             response($.map(data.items, item => ({
@@ -1361,7 +1379,7 @@
                 select: function (event, ui) {
                   const curid = $(this).attr("id"); 
                   var id = curid.split("itemDesc")[1];
-                    console.log(id);
+                    
                     $(`#tasteless_code${id}`).val(ui.item.tasteless_code).trigger('change');
                     $(`#tasteless_code_original${id}`).val(ui.item.tasteless_code).trigger('change');
                     $(`#itemDesc${id}`).val(ui.item.item_description);  
@@ -1387,7 +1405,7 @@
         //for packaging ingredients items
         function IngredientSearch(selector, rowId) {
             const token = $("#token").val();   
-            console.log(rowId + 'pogi');
+           
                 $(`#itemDesc${rowId}`  ).on('input', function() {
                 $(`#quantity${rowId}`).val('');
                 $(`#cost${rowId}`).val('');
@@ -1395,7 +1413,7 @@
                 $(`#tasteless_code_original${rowId}`).val('');
                 $(`#ttp${rowId}`).val('');
                 $(`#pack-size${rowId}`).val('');  
-                $(`#ingredient-qty${rowId}`).val('');  
+                $(`#actual_pack_uom${rowId}`).val('');  
             });
  
             $(selector).autocomplete({
@@ -1416,7 +1434,7 @@
                             }).get()
                     },
                     success: function (data) {
-                            console.log(data);
+                            
                             if (data.status_no == 1) {
                                 $(`#ui-id-2${rowId}`).hide();
                                 response($.map(data.items, item => ({
@@ -1531,6 +1549,9 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $('#ProductionItems').find('input, select, textarea').prop('disabled', false);
+                    let markup_percentage = $('#markup_percentage').val().replace('%', ''); 
+                    const markupPercent = parseFloat(markup_percentage / 100) || 0; 
+                    $('#markup_percentage').val(markupPercent); 
                     $('#sumit-form-button').click();
                 }
             });
@@ -1546,18 +1567,9 @@
                 const ingredientRows = $('[id*="ingredient-entry"]').length;  
                 $('#segmentations').val(JSON.stringify(segmentations));
                 const isValid = checkLandedCost() && checkCommiMargin();
-                console.log(segmentations);
+               
              if (isValid) {
-             if(packagingRows == 0 || ingredientRows == 0)
-                {
-                    Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Please ensure that both Ingredients and Packaging Production lines are not left empty.',
-                    confirmButtonText: 'OK'
-                    });
-                } else
-                {
+             
                     //check if user if on update or add module
                     let itemId = "{{ $item->id }}";
                     if(itemId == "")
@@ -1574,7 +1586,10 @@
                         }).then((result) => {
                             
                                 if (result.isConfirmed) {
-                                    $('#sumit-form-button').click();
+                                    let markup_percentage = $('#markup_percentage').val().replace('%', ''); 
+                                    const markupPercent = parseFloat(markup_percentage / 100) || 0; 
+                                    $('#markup_percentage').val(markupPercent);  
+                                    $('#sumit-form-button').click(); 
                                 }
                             
                         });
@@ -1591,14 +1606,14 @@
                         returnFocus: false,
                         }).then((result) => {
                         
-                                if (result.isConfirmed) {
-                                        $('#sumit-form-button').click(); 
-                                }
-                            
-                            
+                                if (result.isConfirmed) { 
+                                    let markup_percentage = $('#markup_percentage').val().replace('%', ''); 
+                                    const markupPercent = parseFloat(markup_percentage / 100) || 0; 
+                                    $('#markup_percentage').val(markupPercent);  
+                                    $('#sumit-form-button').click(); 
+                                } 
                         });
-                    }
-                }
+                    } 
             }else{
                 Swal.fire({
                     icon: "error",
@@ -1610,6 +1625,20 @@
            
         });
  
+
+        $('#ProductionItems').on('submit', function() {
+        Swal.fire({
+            title: 'Loading...',
+            html: 'Please wait...',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+            });
+        });
+
+
 
         function getSelectedSegmentations() {
             const segmentation = {};
@@ -1668,7 +1697,7 @@
 
 
                         $(`#cost${lastChar}`).val(Number(ingredientCost).toFixed(2)).attr('readonly', true);
-                        $(`#ingredient-qty${lastChar}`).val(Number(ingredientQty).toFixed(2)).attr('readonly', true); 
+                        $(`#actual_pack_uom${lastChar}`).val(Number(ingredientQty).toFixed(2)).attr('readonly', true); 
                     }  
                 }
                 else
@@ -1696,6 +1725,7 @@
                 let total = math.round(calculateLabor(), 2); 
                  $(`#pack-minute${lastChar}`).val(total); 
                  CalculateLabor();
+                 calculateFinalValues();
             }); 
  
             
@@ -1728,13 +1758,7 @@
             const text = $(this).val();
             $('#purchase_description').val(text);
         });
-        
-        $('form input').on('keyup keypress', function(event) {
-            if (event.keyCode == 13) {
-                event.preventDefault();
-                return;
-            }
-        });
+         
 
         //set sub packaging/ingredients as primary  
        $(document).on('click', '[id*="set-primary"]', function() { 
@@ -1763,7 +1787,7 @@
                 'preparations': $(`#preparations${parentId}`).val(),
                 'yield': $(`#yield${parentId}`).val(),
                 'ttp': $(`#ttp${parentId}`).val(),
-                'ingredient-qty': $(`#ingredient-qty${parentId}`).val(),
+                'actual_pack_uom': $(`#actual_pack_uom${parentId}`).val(),
                 'qty-contribution': $(`#qty-contribution${parentId}`).val(), 
                 'pack-size': $(`#pack-size${parentId}`).val(),
                 'cost': $(`#cost${parentId}`).val(),
@@ -1783,15 +1807,14 @@
                 'preparations': $(`#preparations${sub_id}`).val(),
                 'yield': $(`#yield${sub_id}`).val(),
                 'ttp': $(`#ttp${sub_id}`).val(),
-                'ingredient-qty': $(`#ingredient-qty${sub_id}`).val(),
+                'actual_pack_uom': $(`#actual_pack_uom${sub_id}`).val(),
                 'qty-contribution': $(`#qty-contribution${sub_id}`).val(),
                 'pack-size': $(`#pack-size${sub_id}`).val(),
                 'cost': $(`#cost${sub_id}`).val(),
                 'costparent-contribution': $(`#costparent-contribution${sub_id}`).val(),
                 'default_cost': $(`#default_cost${sub_id}`).val(),
             };
-            console.log(sub_contents);
-             console.log(parent_contents);
+            
 
             entry.removeClass('animate__animated animate__bounceIn'); 
             
@@ -1856,10 +1879,34 @@
         
 
         $('#transfer_price_category').on('change', function(){ 
-            var markup = $(this).find('option:selected').data('markup');  // get data-markup
-            $('#markup_percentage').val(Number(markup / 100).toFixed(2)).trigger('input'); 
+            if($(this).val() != 8)
+            {
+                var markup = $(this).find('option:selected').data('markup');  // get data-markup
+                $('#markup_percentage').val(markup + ' %').trigger('input');
+            } 
+             
         });
- 
+
+
+        $('#transfer_price_category').on('change', function(){
+            if($(this).val() == 8)
+            {
+                $('#markup_percentage').removeAttr('readonly required');
+            }else
+            {
+                $('#markup_percentage').attr('readonly', true).attr('required', true);
+
+            }
+        })
+
+        $('#markup_percentage').on('change', function(){  
+            $('#markup_percentage').val(getIdNumber($(this).val().replace(' %', '')) + ' %');  
+        });
+        
+        $('#markup_percentage').val($('#markup_percentage').val() * 100).trigger('change');
+
+        $('#transfer_price_category').trigger('change');
+        
         $('#gas_cost, #ingredient_cost, #storage_cost, #meralco, #water').on('change', function() { 
                 let id = $(this).attr('id'); 
                 state[id] = $(this).val(); 
@@ -1870,6 +1917,11 @@
         $('#ttp, #landed_cost').on('input', function() { 
             updateCommiMargin();
         });
+
+
+
+         
+
 
         $(document).on('click', '.move-up', function() {
             const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper');
@@ -1968,12 +2020,12 @@
             );
         });
         
-         $(document).on('click', '.delete', function(event) {
+          $(document).on('click', '.delete', function(event) {
              
             const entry = $(this).parents(
                 '.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper'
             );
-            entry.addClass('animate__animated animate__bounceOut').one('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', function() {
+            entry.hide(300, function() {
                 entry.prevAll('br').first().remove(); 
                 $(this).remove();
                 showNoData();
@@ -1992,13 +2044,10 @@
                 .substitute-packaging, 
                 .new-substitute-packaging
             `);
-           subEntry.addClass('animate__animated animate__bounceOut').one('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', function() {
+            subEntry.hide('fast', function() {
                 $(this).remove();
-                showNoDataLabor();
-                calculateFinalValues();
-                CalculateLabor();
+              calculateFinalValues();
             });
-
            
         });
   
@@ -2017,6 +2066,10 @@
         
         function getIdNumber(id)
         {
+            if(!id.replace(/[^0-9]/g, ''))
+            {
+                return 0;      
+            }
             return id.replace(/[^0-9]/g, '');
         }
         function getIdName(id)
@@ -2027,7 +2080,7 @@
  
          function showNoData() {
             const hasRows = $('[id*="packaging-entry"]').length; 
-             console.log(hasRows + ' hasRows packaging');
+           
             if (hasRows === 0) {
                 $('.no-data-available').show();
                 is_noingredient = true;
@@ -2039,8 +2092,7 @@
 
         function showNoDataIngredient() {
             const hasRows = $('[id*="ingredient-entry"]').length;  
-            console.log(hasRows + ' hasRows ingredients');
-              console.log(hasRows + 'show');  
+        
             if (hasRows === 0) {
                 $('.no-data-available-ingredient').show(); 
             } else {
@@ -2050,8 +2102,7 @@
 
           function showNoDataLabor() {
             const hasRows = $('[id*="labor-entry-sub"]').length;  
-            console.log(hasRows + ' hasRows ingredients');
-              console.log(hasRows + 'show');  
+           
              if (hasRows === 0) {
                 $('.no-data-available-labor').show(); 
             } else {
@@ -2078,24 +2129,8 @@
                 }
             });
         }
-  
-        if(disableifapproval == 'production_items_approvals' || view_ == 'true')
-        {
-            $('#ProductionItems').find('input, select, textarea').prop('disabled', true);
-            $('[class*="btn"]').hide();
-            $('#approve-btn').show(); 
-            $('#reject-btn').show();
-            $('#cancel-btn').show();
-            $('#add_comment_field').prop('disabled', false);
-            $('.add-comment-btn').show();
-            $('[id*="Textarea"]').prop('disabled', false); 
-        }
 
-
-       
-
-
-
+      
         
         function Load_Production_Item_Lines()
         {
@@ -2119,8 +2154,8 @@
                         item.description,
                         item.default_cost,
                         item.packaging_size,
-                        "",
-                        ""
+                        item.cost_contribution, //costparent_contribution
+                        item.qty_contribution, //qty_contribution
                     );
                     $(newRowHtml).appendTo('#package-tbody');
                     showNoDataIngredient();
@@ -2141,10 +2176,11 @@
                         item.yield, //yiel
                         item.packaging_size, //packsize
                         item.landed_cost, //cost
-                        "", //costparent_contribution
-                        "", //qty_contribution
+                        item.cost_contribution, //costparent_contribution
+                        item.qty_contribution, //qty_contribution
                         item.preparations, //preparations
-                        item.preparation_desc // description  
+                        item.preparation_desc, // description  
+                        item.actual_pack_uom
                     );
                     $(newRowHtml).appendTo('#ingredient-tbody');
                     showNoData();
@@ -2201,7 +2237,7 @@
                         "",
                         ""
                     );
-                    // console.log(`.sub-ingredient${oldindex}`);
+                  
                     $(newRowHtml).appendTo(`.sub-ingredient${matchingInput}`); 
                     showNoData();
                     if ($(`#itemDesc${item.production_item_line_id}`).length > 0) {
@@ -2234,7 +2270,7 @@
             }
         }   
       
-        function submitComment(comment_type, append_to,production_items_id, comment_content, comment_id, parent_id, created_by)
+        function submitComment(comment_type, append_to,production_items_id, comment_content, comment_id, parent_id, created_by, is_sending_reply_comment)
         {
             is_SendingComment = true;
             $.ajax({
@@ -2251,7 +2287,7 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'  // If using Laravel for CSRF protection
                 },
                     success: function(response) {
-                         console.log(response);
+                      
                         is_SendingComment = false;
                         if(comment_type == 'comment_reply')
                         {
@@ -2265,6 +2301,11 @@
                             $(newRowHtml).appendTo('.comment-section'); 
                             $(`#add_comment_field`).val("");
                         }
+                        if(!is_sending_reply_comment)
+                        {
+                            ScrollToBottom('.comment-section');
+                        }
+                        
                     } 
                 }); 
         }
@@ -2273,12 +2314,16 @@
             
             if (item.production_item_line_type == 'labor') { 
                     tableRow++; 
-                    const newRowPackHtml = Sub_gen_Labor_row(tableRow, item.time_labor, item.yield, item.preparations, item.preparation_desc);  
+                    const newRowPackHtml = Sub_gen_Labor_row(tableRow, item.time_labor, item.yield, item.preparations, item.preparation_desc, item.labor_yield_uom);  
+                                // function Sub_gen_Labor_row(rowId, time_labor, yields, preparations, description, labor_yield_uom) {
                     $(newRowPackHtml).appendTo(`.sub-labor`); 
                     showNoDataLabor(); 
                     $(`#time-labor${tableRow}`).trigger('change');
             }    
         });
+
+       
+
 
         //To Append HTML section
          function Add_Comment(rowId, message, name, image_link, time) {
@@ -2315,8 +2360,8 @@
                                     <textarea class="form-control" id="Textarea${rowId}" rows="3"></textarea>
                                 
                                     <ul class="list-unstyled" style="display:flex; gap:15px;">
-                                        <li style="color:#999; margin-left: 0px; font-size:12px; display:flex;" id="send-comment-btn${rowId}">
-                                            <i class="glyphicon glyphicon-send " style="margin-right:5px;"></i> Send
+                                        <li style="color:#999; margin-left: 0px; font-size:12px; display:flex;" class="send-comment-btn" id="send-comment-btn${rowId}">
+                                            <i class="glyphicon glyphicon-send " style="margin-right:5px;"></i> Send 
                                         </li>
                                         <li style="color:#999;  font-size:12px; display:flex; align-items:center; cursor:pointer;"data-toggle="collapse" data-target="#collapseExample${rowId}" aria-expanded="false" aria-controls="collapseExample${rowId}">
                                         <i class="glyphicon glyphicon-remove" style="margin-right:5px;"></i> Cancel
@@ -2357,12 +2402,13 @@
                  `;
         }
 
-          function Sub_gen_Labor_row(rowId, time_labor, yields, preparations, description) {
+          function Sub_gen_Labor_row(rowId, time_labor, yields, preparations, description, labor_yield_uom) {
             return `  
                 <div class="substitute-packaging animate__animated animate__bounceIn"  id="labor-entry-sub${rowId}">
                 <div class="packaging-inputs">
                     <input
                         value="labor"
+                        step="0.01"
                         class="form-control yield hide"
                         name="LaborLines[${rowId}][production_item_line_type]" 
                         type="text"  
@@ -2384,12 +2430,12 @@
                     <span class="required-star">*</span> Time (minutes)
                     <input
                         value="${time_labor}"
+                        step="0.01"
                         class="form-control yield"
                         name="LaborLines[${rowId}][time-labor]"
                         id="time-labor${rowId}" 
                         type="number"
-                        min="0"
-                        step="1"
+                        min="0" 
                         placeholder="Enter minutes"
                         required
                     >
@@ -2399,16 +2445,16 @@
                     <label> 
                     <label class="label-wide">
                     <span class="required-star">*</span> Yield
-                    <input value="${yields}"  class="form-control yield"  name="LaborLines[${rowId}][yiel]" id="yiel${rowId}" type="number" required>
+                    <input value="${yields}"  step="0.01" class="form-control yield"  name="LaborLines[${rowId}][yiel]" id="yiel${rowId}" type="number" required>
                     </label>
                     
                      <label class="label-wide">
                     <span class="required-star">*</span> Yield UOM <span class="date-updated"></span>
-                    <input value="" class="form-control" id="yield_uom" name="LaborLines[${rowId}][yield_uom]" id="yiel${rowId}"  type="number"/>
+                    <input value="${labor_yield_uom}" class="form-control" id="labor_yield_uom" name="LaborLines[${rowId}][labor_yield_uom]" id="yiel${rowId}"  type="text"/>
                     </label> 
                     <label class="label-wide">
                     <span class="required-star">*</span> Duration <span class="date-updated"></span>
-                    <input value="" class="form-control ttp"  LaborLines[${rowId}][pack-minute] id="pack-minute${rowId}" type="number" readonly required>
+                    <input value="" class="form-control ttp" step="0.01" name="LaborLines[${rowId}][duration]" id="pack-minute${rowId}" type="number" readonly required>
                     </label> 
                      
                 </div>
@@ -2476,7 +2522,7 @@
                         
                         <label>
                             <span class="required-star">*</span> Actual Pack UOM
-                            <input value="" class="form-control pack-quantity" id="ingredient-qty${rowId}" type="number" readonly required>
+                            <input value="" class="form-control pack-quantity" id="actual_pack_uom${rowId}" type="number" readonly required>
                         </label> 
                         <label>
                             <span class="required-star">*</span> Packaging Size
@@ -2496,7 +2542,7 @@
             `;
           }
                                                 
-          function generateRowingredientHtml(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost , costparent_contribution, qty_contribution, preparations ,description) {
+          function generateRowingredientHtml(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost , costparent_contribution, qty_contribution, preparations ,description , actual_pack_uom) {
             return ` 
             
             <div class="packaging-wrapper animate__animated animate__bounceIn" id="ingredient-entry${rowId}">
@@ -2553,7 +2599,7 @@
                         
                         <label>
                             <span class="required-star">*</span> Actual Pack UOM
-                            <input value="" class="form-control pack-quantity" id="ingredient-qty${rowId}" type="number" readonly required>
+                            <input value="${actual_pack_uom}" class="form-control pack-quantity" id="actual_pack_uom${rowId}" type="number" readonly required>
                         </label>
                         <label>
                             <span class="required-star">*</span> Qty Contribution
@@ -2710,7 +2756,24 @@
                 </div> 
             `;
         }
+         $('form input').on('keyup keypress', function(event) {
+            if (event.keyCode == 13) {
+                event.preventDefault();
+                return;
+            }
+        });
 
+        if(disableifapproval == 'production_items_approvals' || view_ == 'true')
+        {
+           
+            $('#ProductionItems').find('input, select, textarea').prop('disabled', true);
+            $('[class*="btn"]').hide();
+            $('#approve-btn').show(); 
+            $('#reject-btn').show(); 
+            $('#add_comment_field').prop('disabled', false);
+            $('.add-comment-btn').show();
+            $('[id*="Textarea"]').prop('disabled', false);  
+        }
         //$('#ProductionItems').find('input, select, textarea').trigger('change'); 
     });
 

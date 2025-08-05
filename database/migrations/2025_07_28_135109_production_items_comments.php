@@ -14,7 +14,7 @@ class ProductionItemsComments extends Migration
       public function up()
     {
         Schema::create('production_items_comments', function (Blueprint $table) {
-            $table->id(); // Primary key (optional but recommended)
+            $table->id();  
             $table->integer('production_items_id')->length(10)->unsigned()->nullable();
             $table->text('comment_content')->nullable();
             $table->string('comment_id', 255)->nullable();

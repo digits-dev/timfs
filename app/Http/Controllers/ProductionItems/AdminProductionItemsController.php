@@ -71,10 +71,14 @@ use ProductionItemsApproval;
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Reference Number","name"=>"reference_number"];
+			$this->col[] = ["label"=>"Tasteless code","name"=>"reference_number"];
 			$this->col[] = ["label"=>"Description","name"=>"full_item_description"];
 			$this->col[] = ["label"=>"Production Category","name"=>"production_category","join"=>"production_item_categories,category_description" ];
 			$this->col[] = ["label"=>"Production Location","name"=>"production_location","join"=>"production_locations,production_location_description"];
+			$this->col[] = ["label"=>"Labor Cost","name"=>"labor_cost"];	
+			$this->col[] = ["label"=>"Markup %","name"=>"markup_percentage","callback"=>function($row){
+				return ($row->markup_percentage * 100) . '%';
+			}];
 			$this->col[] = ["label"=>"FC Landed cost","name"=>"landed_cost"];
 			$this->col[] = ["label"=>"OPEX","name"=>"opex"];
 			$this->col[] = ["label"=>"PM / Store Supplies", "name" => "packaging_cost","callback"=>function($row){
@@ -420,40 +424,7 @@ use ProductionItemsApproval;
 
  
 
-		public function getItemLastDetails($id) {
-			$item = DB::table('production_items') 
-				->select( 
-					'production_items.id',
-					'production_items.reference_number',
-					'production_items.description',
-					'production_items.production_category',
-					'production_items.production_location', 
-					'production_items.labor_cost',
-					'production_items.gas_cost',
-					'production_items.utilities',
-					'production_items.storage_cost',
-					'production_items.storage_multiplier',
-					'production_items.total_storage_cost',
-					'production_items.storage_location', 
-					'production_items.raw_mast_provision',
-					'production_items.markup_percentage',
-					'production_items.final_value_vatex',
-					'production_items.final_value_vatinc',
-					'production_items.created_by',
-					'production_items.updated_by',
-					'production_items.created_at',
-					'production_items.updated_at'
-				)
-				->where('production_items.id', $id)
-				->limit(1)
-				->first();
-
-
-			return $item;
-		}
-
-		 
-
+ 
 	public function generateChangesTableFields(array $differences, $reference_number, $created_at): string {
 				//return null string if no changes
 				if (empty($differences)) {
@@ -499,668 +470,224 @@ use ProductionItemsApproval;
 				$html .= '</tbody></table>';
 
 				return $html;
-			}
-
-	
-
-	public function generateChangesTable($new_data, $old_data, $reference_number, $created_at): string
-	{
-		 
- 
-		$html = '
-				<style>
-				.ingredients-table {
-					width: 100%;
-					border-collapse: separate;
-					border-spacing: 0 10px; /* vertical space between groups */
-					font-family: Arial, sans-serif;
-					font-size: 14px;
-				}
-				.ingredients-table thead tr {
-					background-color: #f0f0f0;
-				}
-				.ingredients-table thead th {
-					padding: 10px 15px;
-					border-bottom: 2px solid #ccc;
-					text-align: left;
-				}
-				.ingredients-table tbody tr.group-row td {
-					padding: 8px 15px;
-					border: none; /* remove inner horizontal borders */
-					background-color: #fff; /* white background */
-					vertical-align: middle;
-				}
-				.ingredients-table tbody tr.added td {
-					background-color: #e6f4ea; /* soft green */
-				}
-				.ingredients-table tbody tr.deleted td {
-					background-color: #fdecea; /* soft red */
-				}
-				.ingredients-table tbody tr.updated td {
-					background-color: #fff9e6; /* soft yellow */
-				}
-				/* Remove border bottom from all rows except last in group */
-				.ingredients-table tbody tr:not(.group-row) td {
-					border-bottom: none !important;
-				}
-				/* Optional: add subtle border or shadow around groups by adding it to last row of each group */
-				/* You can keep your existing logic to add classes like added, deleted, updated */
-				.label {
-					display: inline-block;
-					padding: 0.25em 0.6em;
-					font-size: 75%;
-					font-weight: 600;
-					line-height: 1;
-					color: #fff;
-					text-align: center;
-					white-space: nowrap;
-					vertical-align: baseline;
-					border-radius: 0.375rem;
-					user-select: none;
-					margin-right: 5px;
-				}
-				.label-info {
-					background-color: #17a2b8; /* blue */
-				}
-				.label-danger {
-					background-color: #dc3545; /* red */
-				}
-
-					.ingredients-table {
-				border-collapse: separate;
-				border-spacing: 0 10px; /* space between groups */
-				}
-
-				/* Remove borders from all rows first */
-				.ingredients-table tbody tr td {
-				border: none;
-				padding: 8px 15px;
-				}
-
-				/* Add border only after every 4 rows (1 group of description, qty, cost, yield) */
-				.ingredients-table tbody tr:nth-child(5n) td {
-				border-bottom: 2px solid #ccc; /* solid border after every group */
-				}
-				.label-warning {
-					background-color: #ffc107; /* yellow */
-					color: #212529; /* dark text for contrast */
-				}
-				</style>
-
-				<table class="ingredients-table">
-					<thead>
-						<tr>
-							<th>Key</th>
-							<th>Old Ingredients</th>
-							<th>New Ingredients</th>
-						</tr>
-					</thead>
-					<tbody>
-				';
-
-	 
-		$newdatacount = count($new_data);
-		$olddatacount = count($old_data);
-		 
- 
-		//clean the keys of ingredients to match index on old datas
-		$newArray = [];
-		foreach ($new_data as $item) {
-			$newArray[] = $item;   
-		}
- 
-		if($newdatacount >= $olddatacount)
-		{
-			for ($i = 0; $i < $newdatacount; $i++) {
-				 
-				foreach ($newArray[$i] as $key => $value) {
-					 
-					$safe_key = htmlspecialchars($key);
-					$safe_value = htmlspecialchars($value);
- 
-					if($value != $old_data[$i][$key]){
-
-
-							DB::table('production_items_history')->insert([
-							'reference' => $reference_number,
-							'item_code' =>  $old_data[$i]['item_code'],
-							'action' => 'Update Production Item lines', 
-							'description' => 'User Production Item Creation',
-							'key_old_value' => $safe_key, // .': '. $safe_value,
-							'description_old_value' => $old_data[$i][$key],	
-							'key_new_value' => $safe_key,
-							'description_new_value' => $safe_value,  
-							'updated_by' => CRUDBooster::myId() ?: 1, 
-							'details'  =>  'new update for production with reference number ' . $reference_number,
-							'created_at' => $created_at,  
-							'updated_at' => now(),
-							]);
-
-
-
-						if($safe_value != '' && $old_data[$i][$key] == '')
-						{
-							$html .= "<tr class='group-row added'>
-								<td style='padding: 8px 12px;'><span class='label label-info'>New! </span> {$safe_key}</td>
-								<td style='padding: 8px 12px;'>N/A</td>
-								<td style='padding: 8px 12px;'>{$safe_value}</td>
-								</tr>";
-						}else if($safe_value == '' && $old_data[$i][$key] != '')
-						{
-							$html .= "<tr class='group-row deleted'>
-								<td style='padding: 8px 12px;'><span class='label label-danger'>Deleted </span> {$safe_key}</td>
-								<td style='padding: 8px 12px;'>{$old_data[$i][$key]}</td>
-								<td style='padding: 8px 12px;'>N/A</td>
-								</tr>";	
-						}else
-						{
-							$html .= "<tr class='group-row updated'>
-								<td style='padding: 8px 12px;'><span class='label label-warning'>Updated </span> {$safe_key}</td>
-								<td style='padding: 8px 12px;'>{$old_data[$i][$key]}</td>
-								<td style='padding: 8px 12px;'>{$safe_value}</td>
-								</tr>";	
-						} 
-					}else
-					{ 
- 						$html .= "<tr class='group-row ' style='border-bottom: 1px solid #eee;'>
-									<td style='padding: 8px 12px;'>{$safe_key}</td>
-									<td style='padding: 8px 12px;'>{$old_data[$i][$key]}</td>
-									<td style='padding: 8px 12px;'>{$safe_value}</td>
-									</tr>";
-					} 
-				}
-				
-			}
-		
-		}
-		 else
-		{ 
-			for ($i = 0; $i < $olddatacount; $i++) {
-
-				//dd($new_data[$i]['description']);
-				foreach ($old_data[$i] as $key => $value) {  
-
-					$safe_key = htmlspecialchars($key);
-					$safe_value = htmlspecialchars($value); 
-					if($value != $new_data[$i][$key]){ 
-
- 						// reference
-						// item_code
-						// action
-						// description
-						// key_old_value
-						// description_old_value
-						// key_new_value
-						// description_new_value
-						// created_by
-						// updated_by
-						// details
-						// created_at
-						// updated_at
-
-						DB::table('production_items_history')->insert([
-						'reference' => $reference_number,
-						'item_code' =>  $old_data[$i]['item_code'],
-						'action' => 'Update Production Item lines', 
-						'description' => 'User Production Item Creation',
- 						'key_old_value' => $safe_key, // .': '. $safe_value,
-						'description_old_value' => $old_data[$i][$key],	
-						'key_new_value' => $safe_key,
-						'description_new_value' => $safe_value,  
-						'updated_by' => CRUDBooster::myId() ?: 1, 
-						'details'  =>  'new update for production with reference number ' . $reference_number,
-						'created_at' => $created_at,  
-						'updated_at' => now(),
-						]);
-
-					 	if($safe_value != '' && $new_data[$i][$key] == '')
-						{
-							$html .= "<tr class='group-row deleted'>
-								<td style='padding: 8px 12px;'><span class='label label-danger'>Deleted</span> {$safe_key}</td>
-								<td style='padding: 8px 12px;'>{$safe_value}</td>
-								<td style='padding: 8px 12px;'>N/A</td>
-								</tr>";
-						}
-						else if($safe_value == '' && $new_data[$i][$key] != '')
-						{
-							$html .= "<tr class='group-row added'>
-								<td style='padding: 8px 12px;'><span class='label label-info'>New! </span>{$safe_key}</td>
-								<td style='padding: 8px 12px;'>N/A</td>
-								<td style='padding: 8px 12px;'>{$new_data[$i][$key]}</td>
-								</tr>";	
-						}
-						else
-						{
-							$html .= "<tr class='group-row updated'>
-								<td style='padding: 8px 12px;'><span class='label label-warning'>Updated </span>{$safe_key}</td>
-								<td style='padding: 8px 12px;'>{$safe_value}</td>
-								<td style='padding: 8px 12px;'>{$new_data[$i][$key]}</td> 
-								</tr>";	
-						}
-						
-					}
-					else
-					{ 
-						$html .= "<tr class='group-row ' style='border-bottom: 1px solid #eee;'>
-								<td style='padding: 8px 12px;'>{$safe_key}</td>
-								<td style='padding: 8px 12px;'>{$safe_value}</td>
-								<td style='padding: 8px 12px;'>{$new_data[$i][$key]}</td>
-								</tr>";
-					} 
-				} 
-			}
-		}
-
-
-		 
-		$html .= '</tbody></table>';
-
-		return '<div>' . $html .'</div>';
-
-
-
 	}
 
+	
+
+	public function getItemLastDetails($id) {
+		$item = DB::table('production_items') 
+			->select( 
+				'*'
+			)
+			->where('production_items.reference_number', $id)
+			->limit(1) 
+			->first();
 
 
-
-
-
+		return $item;
+	}
+		
+		 
 
 	public function addProductionItemsToDB(Request $request){
-	 
+ 
 		$message = '';
-		$time_stamp_now = date('Y-m-d H:i:s');
-			
-		 	$input = $request->only([ 
-					'reference_number',
-					'id',
-					'tasteless_code',
-					'full_item_description',
-					'file_link',
-					'brands_id',
-					'tax_codes_id',
-					'accounts_id',
-					'cogs_accounts_id',
-					'asset_accounts_id',
-					'purchase_description',
-					'fulfillment_type_id',
-					'uoms_id',
-					'uoms_set_id',
-					'currencies_id',
-					'purchase_price',
-					'ttp',
-					'ttp_percentage',
-					'landed_cost',
-					'suppliers_id',
-					'reorder_pt',
-					'groups_id',
-					'categories_id',
-					'subcategories_id',
-					'packaging_dimension',
-					'packaging_size',
-					'packagings_id',
-					'supplier_item_code',
-					'moq_store',
-					'segmentations',
-					'productionlines',
-					'labor_cost_per_minute',
-					'total_minutes_per_pack',
-					'labor_cost_val',
-					'LaborLines',
-					'packaging_cost',
-					'ingredient_cost',
-					'labor_cost',
-					'gas_cost',
-					'storage_cost',
-					'transfer_price_category',
-					'markup_percentage',
-					'utilities',
-					'production_category',
-					'production_location',
-					'storage_location',
-					'final_value_vatex',
-					'final_value_vatinc',
-			]);
+		$time_stamp_now = date('Y-m-d H:i:s');  
+		$data = $request->all(); 
 
-
-			$data =  $request->all();
-
-			
-
-
-			if($request['id']){
+		if ($request['id']) {
+			// Fetch old data
 			 
-				
-					$lastData= [];
-					$lastData = self::getItemLastDetails($request['id']); // Old data from DB
-					$currentData = $request->only(array_keys((array) $lastData)); // Current data from request, matching keys
-					$item = ProductionItems::where('id', $request['id'])
-					->select('reference_number', 'created_at')
-					->first();
-
-					// Find differences: fields if current != lastdata
-					$differences = [];
-					foreach ($lastData as $key => $value) {
-						
-						if (isset($currentData[$key]) && (string)$currentData[$key] !== (string)$value) {
-							$differences[$key] = [
-								'old' => $value,
-								'new' => $currentData[$key],
-							];
-						}
-					} 
-
-					// //check lines data vs. last data
-					$response = self::ingredientsSearch($request['id']); // Old data ingredients
-					
-					$ingredients = $response->getOriginalContent()['produtionlines']->map(function ($item) {
-						return [
-							'description' => $item->description,
-							'item_code' => $item->item_code,
-							'quantity' => $item->quantity,
-							'cost' => $item->landed_cost,
-							'yield' => $item->yield ?? 'N/A',
-						];
-					})->toArray();  
-					$ingredientsFromRequest = $request->input('produtionlines'); // New ingredients from request --(needs key index clean to match key on old data and check what change, you can see cleaning on generateChangesTable fucntion)
-
-				 
-
-					$old_ingredients_data = [];
-					$new_ingredients_data = [];
-
-					foreach ($ingredients as $key => $ingredient) {
-						$old_ingredients_data[$key] = [
-							'description' => $ingredient['description'],
-							'item_code'   =>$ingredient['item_code'],
-							'quantity'    => round($ingredient['quantity'],2),
-							'cost'    	  => round($ingredient['cost'],2),
-							'yield'       => (round($ingredient['yield'],2) != 0) ? round($ingredient['yield'],2) : 'N/A',
-						];
-					}
-					
-					foreach ($ingredientsFromRequest as $key => $ingredient) {
-
-						foreach ($ingredient as $code => $parent_code) {
-							$new_ingredients_data[$code] = [
-								'description' => $parent_code['description'],
-								'item_code'   => $parent_code['tasteless_code'],
-								'quantity'    => round($parent_code['quantity'],2),
-								'cost'        => round($parent_code['cost'],2),
-								'yield'       => (round($parent_code['yield'],2) != 0) ? round($parent_code['yield'],2) : 'N/A',
-							]; 
-						}  
-					} 
-				
-
-					
-					$clean_index = [];
-
-					foreach($new_ingredients_data as $index)
-					{
-
-						$clean_index[] = $index;   
-					}
-	 
-					 // if nothing changes return error
-					 
-					if($old_ingredients_data == $clean_index && empty($differences))
-					{
-						return response()->json(['No changes are made but your trying to update?'
-							], 422);  
-					}else
-					{
-						// //get generated HTML
-						$detailsHtmlFields = $this->generateChangesTableFields($differences, $item->reference_number, $item->created_at);
-						$ProductionItemLines = $this->generateChangesTable($new_ingredients_data, $old_ingredients_data,  $item->reference_number, $item->created_at);
-						
-	
-						if($old_ingredients_data == $clean_index)
-						{
-							
-							$ProductionItemLines = '<p style="font-family: Arial, sans-serif; font-size: 14px;">No changes detected.</p>';
-							
-						}
-						
-						if($detailsHtmlFields == 'null')
-						{
-							$detailsHtmlFields = '<p style="font-family: Arial, sans-serif; font-size: 14px;">No changes detected.</p>';
-						} 
-						
-
-						// //combine 2 html generated
-						$combinedDetails ='<hr> <label style="font-size: 20px; font-weight: bold; color: #f1c40f; background-color: #2c3e50; padding: 6px 12px; border-radius: 6px; display: inline-block;"> Fields changes </label>' . $detailsHtmlFields . '<hr> <label style="font-size: 20px; font-weight: bold; color: #f1c40f; background-color: #2c3e50; padding: 6px 12px; border-radius: 6px; display: inline-block;"> Production item lines </label>' . $ProductionItemLines;
-						
-						//push logs to DB cms_logs
-						DB::table('cms_logs')->insert([
-							'ipaddress' => request()->ip(),
-							'useragent' => request()->userAgent(),
-							'url' => request()->fullUrl(),
-							'description' => 'Update data at production item reference number '. $item->reference_number,
-							'details' => $combinedDetails,
-							'id_cms_users' => CRUDBooster::myId() ?: 1,
-							'created_at' => $item->created_at,
-							'updated_at' => now(),
-						]);
-
-
- 
-						DB::table('production_items_history')->insert([
-						'reference' =>$item->reference_number,
-						'action' => 'Update', 
-						'description' => 'User Production Item Creation ' .  $item->reference_number,
-						'key_old_value' => '', // .': '. $safe_value,
-						'description_old_value' => '',	
-						'key_new_value' => '',
-						'description_new_value' => '',  
-						'updated_by' => CRUDBooster::myId() ?: 1, 
-						'details'  =>  $combinedDetails, 
-						'created_at' =>  $item->created_at,  
-						'updated_at' => now(),
-						]);
-
-  
-						$message = "✔️ Item updated successfully...";
-						
-						
-						$data['updated_at'] = $time_stamp_now;
-						$data['action_type'] = "UPDATE";
-						$data['approval_status'] = 202;
-						$data['updated_by'] = CRUDBooster::myId();
-						$data['reference_number'] = $item->reference_number;
-
-						//delete old ingredients to db for new add
-						//DB::table('production_item_lines')->where('production_item_id', $production_items_toDB->reference_number)->delete();
-
-
-						$message = "✔️ Item reference number " . $data['reference_number'] . " updated successfully...";
-					} 
-
-		}
-		else
- 		{ 
 			
-				 
-				$nextId = CodeCounter::where('type', 'PRODUCTION ITEMS')->value('code_7');
-				CodeCounter::where('type', 'PRODUCTION ITEMS')->increment('code_7');
+			$item = ProductionItems::select('reference_number', 'created_at')->find($request->id);
 
+			$message = "✔️ Item reference number " . $item->reference_number . " updated successfully.";
 
-				$ref = $nextId;
-				$message = "✔️ successfully Added Pending Item with reference number ". $ref;		
-				$data['reference_number'] = $ref;
-				
-				$data['created_by'] = CRUDBooster::myId();
-				$data['updated_by'] = CRUDBooster::myId();
-				$data['approval_status'] = 202;
-				$data['action_type'] = "CREATE"; 
-			    //status 202=pending, 200=approve, 400=reject
+			// Update data meta
+			$data['updated_at'] = $time_stamp_now;
+			$data['action_type'] = "UPDATE";
+			$data['approval_status'] = 204;
+			$data['updated_by'] = CRUDBooster::myId();
+			$data['reference_number'] = $item->reference_number;
 
- 
+		} else {
+			// Handle create new production item
+			$nextId = CodeCounter::where('type', 'PRODUCTION ITEMS')->value('code_7');
+			CodeCounter::where('type', 'PRODUCTION ITEMS')->increment('code_7');
 
-				DB::table('cms_logs')->insert([
+			$ref = $nextId;
+			$message = "✔️ Successfully added pending item with Item code " . $ref;
+		 
+			$data['reference_number'] = $ref;
+			$data['created_by'] = CRUDBooster::myId();
+			$data['updated_by'] = CRUDBooster::myId();
+			$data['approval_status'] = 204;
+			$data['action_type'] = "CREATE";
+
+			DB::table('cms_logs')->insert([
 				'ipaddress' => request()->ip(),
 				'useragent' => request()->userAgent(),
 				'url' => request()->fullUrl(),
 				'description' => 'User Production Item Creation',
-				'details'  =>  'new production item has been created with reference number ' . $ref,
+				'details' => 'New production item has added to pending item with Item code ' . $ref,
 				'id_cms_users' => CRUDBooster::myId(),
 				'created_at' => now(),
 				'updated_at' => now(),
-				]);
+			]);
 
-				DB::table('production_items_history')->insert([
+			DB::table('production_items_history')->insert([
 				'reference' => $ref,
-				'action' => 'Create', 
+				'action' => 'Create',
 				'description' => 'User Production Item Creation',
-				'key_old_value' => '', // .': '. $safe_value,
-				'description_old_value' => '',	
+				'key_old_value' => '',
+				'description_old_value' => '',
 				'key_new_value' => '',
-				'description_new_value' => '',  
-				'updated_by' => CRUDBooster::myId() ?: 1, 
-				'details'  =>  'new production item has on pending with reference number ' . $ref, 
+				'description_new_value' => '',
+				'updated_by' => CRUDBooster::myId() ?: 1,
+				'details' => 'New production item has added to pending item with Item code ' . $ref,
 				'created_at' => now(),
 				'updated_at' => now(),
-				]);
+			]);
+		}
+ 
+		if (!empty($data['item_photo'])) {
+			$filenameFiller = $data['tasteless_code'] ?? 'new_item';
+			$randomString = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
+			$imgFile = $data['item_photo'];
+			$filename = date('Y-m-d') . "-{$filenameFiller}-{$randomString}." . $imgFile->getClientOriginalExtension();
 
+			$image = Image::make($imgFile);
+			$image->resize(1024, 768, function ($constraint) {
+				$constraint->aspectRatio();
+				$constraint->upsize();
+			});
+			$image->save(public_path('img/production-items/' . $filename));
 
-		}	
-			$input = $data; 
-			if ($input['item_photo']) {
-				$filename_filler = $input['tasteless_code'] ?? 'new_item';
-				$random_string = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', Str::random(10));
-	
-				$img_file = $input['item_photo'];
-				$filename = date('Y-m-d') . "-$filename_filler-$random_string." . $img_file->getClientOriginalExtension();
-				$image = Image::make($img_file);
-				
-				$image->resize(1024, 768, function ($constraint) {
-					$constraint->aspectRatio();
-					$constraint->upsize();
-				});
-	
-				// Save the resized image to the public folder
-				$image->save(public_path('img/production-items/' . $filename));
-				// Optimize the uploaded image
-				$optimizerChain = OptimizerChainFactory::create();
-				$optimizerChain->optimize(public_path('img/production-items/' . $filename));
+			$optimizerChain = OptimizerChainFactory::create();
+			$optimizerChain->optimize(public_path('img/production-items/' . $filename));
+
+			$data['image_filename'] = $filename;
+		}
+
+		// Handle segmentation columns
+		$segmentColumns = DB::table('segmentations')
+			->where('status', 'ACTIVE')
+			->pluck('segment_column_name')
+			->toArray();
+
+		$segmentations = (array) json_decode($data['segmentations'] ?? '[]');
+
+		// Initialize all segmentation columns with default 'X'
+		foreach ($segmentColumns as $segmentColumn) {
+			$data[$segmentColumn] = 'X';
+		}
+
+		// Overwrite with actual segmentations from input
+		foreach ($segmentations as $value => $columns) {
+			foreach ($columns as $columnName) {
+				$data[$columnName] = $value;
 			}
+		}
+
+		// Process ingredients and labor lines
+		$productionItemId = $data['reference_number'];
+		$ingredients = $request->input('produtionlines', []);
+		$laborLines = $request->input('LaborLines', []);
+
+		$newItemCodesID = [];
+		$newId = 0;  
+		// Save ingredient lines 
+
+		if($ingredients)
+		{
+		foreach ($ingredients as $ingredientGroup) {
+			$parentId = ++$newId;
+			foreach ($ingredientGroup as $ingredient) {
+				ProductionItemLinesModelApproval::updateOrCreate(
+					[
+						'production_item_id' => $productionItemId,
+						'production_item_line_id' => $newId,
+					],
+					[
+						'production_item_id' => $productionItemId,
+						'item_code' => $ingredient['tasteless_code'],
+						'cost_contribution' => self::removePercent($ingredient['costparent-contribution'] ?? $ingredient['costparent-contribution-pack'] ?? null),
+						'qty_contribution' => self::removePercent($ingredient['qty-contribution'] ?? $ingredient['qty-contribution-pack'] ?? null),
+						'actual_pack_uom' => $ingredient['actual_pack_uom'],
+						'description' => $ingredient['itemDesc'],
+						'quantity' => $ingredient['quantity'],
+						'yield' => $ingredient['yield'],
+						'preparations' => $ingredient['preparations'],
+						'landed_cost' => $ingredient['ttp'] ?? $ingredient['cost'],
+						'packaging_id' => $parentId,
+						'production_item_line_id' => $newId,
+						'production_item_line_type' => $ingredient['production_type'],
+						'approval_status' => 204,
+					]
+				);
+				$newItemCodesID[] = $newId++;
+			}
+		}
+	}
+	if($laborLines)
+	{
+		// Save labor lines
+		foreach ($laborLines as $laborLine) {
+			$newId++;
+			$newItemCodesID[] = $newId;
+			ProductionItemLinesModelApproval::updateOrCreate(
+				[
+					'production_item_id' => $productionItemId,
+					'production_item_line_id' => $newId,
+				],
+				[
+					'production_item_id' => $productionItemId,
+					'time_labor' => $laborLine['time-labor'],
+					'labor_yield_uom' => $laborLine['labor_yield_uom'],
+					'duration' => $laborLine['duration'],
+					'yield' => $laborLine['yiel'],
+					'preparations' => $laborLine['preparations'],
+					'production_item_line_type' => $laborLine['production_item_line_type'],
+					'approval_status' => 204,
+					'production_item_line_id' => $newId,
+				]
+			);
+		}
+	}
 
 
-			if ($filename) $data['image_filename'] = $filename;  
+		// Delete removed ingredients
+		ProductionItemLinesModelApproval::where('production_item_id', $productionItemId)
+			->whereNotIn('production_item_line_id', $newItemCodesID)
+			->delete();
 
-
-			$segment_columns = DB::table('segmentations')
-						->where('status', 'ACTIVE')
-						->pluck('segment_column_name')
-						->toArray();
 		
 
-			$segmentations = (array) json_decode($data['segmentations']);
-			//segmentation => initializing all to 'X'
-			foreach ($segment_columns as $segment_column) {
-				$data[$segment_column] = 'X';
-			}
-
-			//overwriting the selected segmentations
-			foreach ($segmentations as $value => $columns) {
-				foreach ($columns as $column_name) {
-					$data[$column_name] = $value; 
-				} 
-			}
-
-			
-			$production_item_id = $data['reference_number'];
-			$ingredients = $request->input('produtionlines');
-			$labor_lines = $request->input('LaborLines');
-			$new_id = 0;
-			$labor_new_id = 0; 
-			// Flatten all new item_codes for later comparison
-			 //dd($ingredients);	
-			//mula dito
-			// dd($ingredients);	
-			$newItemCodesID = []; 
-			if (count($ingredients) > 0) {
-				foreach ($ingredients as $parentCode => $ingredientGroup) {
-					$gg = $new_id;
-				  	$parent_id = $gg + 1;
-					foreach ($ingredientGroup as $ingredient) {  
-						$new_id++;
-						$newItemCodesID[] = $new_id; 
-						ProductionItemLinesModelApproval::updateOrCreate(
-							[
-								'production_item_id' => $production_item_id,
-								'production_item_line_id' => $new_id,
-							],
-							[ 
-								'production_item_id' => $production_item_id,
-								'item_code' => $ingredient['tasteless_code'],	
-								'description' => $ingredient['itemDesc'],
-								'quantity' => $ingredient['quantity'],
-								'yield' => $ingredient['yield'],
-								'preparations' => $ingredient['preparations'], 
-								'landed_cost' =>  $ingredient['ttp'] ?? $ingredient['cost'],
-								'packaging_id' =>  $parent_id, 
-								'production_item_line_id' => $new_id,
-								'production_item_line_type' => $ingredient['production_type'],
-								'approval_status' => 202,
-							]
-						);
-					}
-					$gg = 0;
-				}
-			} 
-			//$(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][description]`); 
-		
-
-			ProductionItemLinesModelApproval::where('production_item_id', $production_item_id)
-				->whereNotIn('production_item_line_id', $newItemCodesID) 
-				->delete();
-			//hanggadito 
-			 
-			if (count($labor_lines) > 0) {
-				foreach ($labor_lines as $parentCode => $labor_lines_description) {
-					
-					$new_id++;
-					$newItemCodesID[] = $new_id;
-					ProductionItemLinesModelApproval::updateOrCreate(
-						[
-							'production_item_id' => $production_item_id,
-							'production_item_line_id' => $new_id,
-						],
-						[ 
-							'production_item_id' => $production_item_id, 
-							'time_labor' => $labor_lines_description['time-labor'], 
-							'yield' => $labor_lines_description['yiel'],
-							'preparations' => $labor_lines_description['preparations'], 
-							'production_item_line_id' => $new_id,
-							'production_item_line_type' => $labor_lines_description['production_item_line_type'],
-							'approval_status' => 202,
-						]
-					); 
-				}
-			} 
-
-		 
-			$data['final_value_existing'] = DB::table('production_items_approvals')
+		// Retrieve existing final value or fallback
+		$data['final_value_existing'] = DB::table('production_items_approvals')
 			->where('reference_number', $data['reference_number'])
 			->value('final_value_vatex') ?? $data['final_value_vatex'];
-			//loop each ingredients and save sa DB 	production_item_lines table
-			 
-				$cost = ProductionItemsModelApproval::updateOrCreate(
-					['reference_number' => $data['reference_number']],
-					$data
-				);
-			 //return redirect()->back()->with('success', 'Production item saved successfully!');
-			return redirect(CRUDBooster::mainpath())
+
+		// Update or create main production item
+		ProductionItemsModelApproval::updateOrCreate(
+			['reference_number' => $data['reference_number']],
+			$data
+		);
+
+		// Redirect with success message
+		return redirect(CRUDBooster::mainpath())
 			->with([
-					'message_type' => 'success',
-					'message' => $message,
+				'message_type' => 'success',
+				'message' => $message,
 			])->send();
+
 		
 	}
 	
-	 
+	 function removePercent($value) {
+		$cleanValue = str_replace('%', '', $value);
+		return floatval($cleanValue);
+	}
 	 	public function getAdd() {
 			if (!CRUDBooster::isCreate())
 				CRUDBooster::redirect(
@@ -1589,16 +1116,8 @@ use ProductionItemsApproval;
 				})
 				->take(100);
 
-			$unionquery = $query1->unionAll($query2)->get();
-
-
-
-
-
-
-
-
-
+			$unionquery = $query1->unionAll($query2)->get(); 
+ 
 			if ($unionquery->isEmpty()) {
 				return response()->json([
 					'status_no' => 0,
@@ -1649,89 +1168,181 @@ use ProductionItemsApproval;
 		}
 
 	 	public function exportItems(Request $request) {
-			//dd($request);
-			//$filename = $request->input('filename');
-			//return Excel::download(new ProdutionItems, $filename.'.xlsx');
-			$filename = $request->input('filename') . '.csv';
+				$filename = $request->input('filename') . '.csv';
 
-			$callback = function () {
-			$handle = fopen('php://output', 'w');
+				$callback = function () {
+    			$handle = fopen('php://output', 'w');
 
-			// Header row
-			fputcsv($handle, [
-				'Reference Number',
-				'Productionion Description',
-				'Productionion Category',
-				'Productionion Location',
-				'Labor Cost',
-				'Gas Cost',
-				'Utilities',
-				'Storage Cost',
-				'Total Storage Cost',
-				'Depreciation',
-				'Raw Mast Provision',
-				'Markup Percentage',
-				'Final Value (VAT Excluded)',
-				'Final Value (VAT Included)',
-				'Item Code',
-				'Line Description',
-				'Quantity',
-				'Landed Cost', 
-				'Created By',
-				'Updated By',
-				'Created At',
-				'Updated At'
-			]);
+    			// Header row (adjusted to match your new query columns)
+				fputcsv($handle, [
+					'Reference Number',
+					'Item Code',
+					'Description',
+					'Quantity',
+					'Landed Cost',
+					'Yield',
+					'Packaging ID',
+					'Approved By (Line)',
+					'Production Item Line ID',
+					'Approval Status (Line)',
+					'Production Item Line Type',
+					'Preparation Description',
+					'Time Labor',
+					'Cost Contribution',
+					'Qty Contribution',
+					'Duration',
+					'Actual Pack UOM',
+					'Labor Yield UOM',
+					'Category Description',
+					'Production Location Description',
+					'Labor Cost',
+					'Labor Cost Per Minute',
+					'Total Minutes Per Pack',
+					'Labor Cost Value',
+					'Gas Cost',
+					'Gas Cost X FC',
+					'Transfer Price Category',
+					'Packaging Cost',
+					'Storage Cost',
+					'Storage Cost X FC',
+					'Meralco',
+					'Meralco X FC',
+					'Water',
+					'Water X FC',
+					'Storage Multiplier',
+					'Total Storage Cost',
+					'Storage Location',
+					'Raw Mast Provision',
+					'Markup Percentage',
+					'Final Value Existing',
+					'Final Value VAT Excluded',
+					'Final Value VAT Included',
+					'Action Type',
+					'Full Item Description',
+					'Approved By (Item)',
+					'Approval Status (Item)',
+					'Approved At',
+					'Created By',
+					'Updated By',
+					'Created At',
+					'Updated At',
+					'OPEX'
+				]);
 
-			DB::table('production_items')
-			->leftJoin('production_item_lines', 'production_items.reference_number', '=', 'production_item_lines.production_item_id')
-			->leftJoin('production_locations', 'production_items.production_location', '=', 'production_locations.id')
-			->leftJoin('production_item_categories', 'production_items.production_category', '=', 'production_item_categories.id')
-			->select(
-				'production_items.reference_number',
-				'production_items.full_item_description as product_description',
-				'production_item_categories.category_description',
-				'production_locations.production_location_description',
-				'production_items.labor_cost',
-				'production_items.gas_cost',
-				'production_items.utilities',
-				'production_items.storage_cost',
-				'production_items.total_storage_cost', 
-				'production_items.raw_mast_provision',
-				'production_items.markup_percentage',
-				'production_items.final_value_vatex',
-				'production_items.final_value_vatinc',
-				'production_item_lines.item_code',
-				'production_item_lines.description as ingredient_description',
-				'production_item_lines.quantity',
-				'production_item_lines.landed_cost', 
-				'production_items.created_by',
-				'production_items.updated_by',
-				'production_items.created_at',
-				'production_items.updated_at'
-			)->cursor()->each(function ($row) use ($handle) {
- 						fputcsv($handle, [
+				DB::table('production_items')
+					->leftJoin('production_item_lines', 'production_items.reference_number', '=', 'production_item_lines.production_item_id')
+					->leftJoin('production_locations', 'production_items.production_location', '=', 'production_locations.id')
+					->leftJoin('production_item_categories', 'production_items.production_category', '=', 'production_item_categories.id')
+					->leftJoin('menu_ingredients_preparations', 'production_item_lines.preparations', '=', 'menu_ingredients_preparations.id')
+					->select(
+						'production_items.reference_number',
+						'production_item_lines.item_code',
+						'production_item_lines.description',
+						'production_item_lines.quantity',
+						'production_item_lines.landed_cost',
+						'production_item_lines.yield',
+						'production_item_lines.packaging_id',
+						'production_item_lines.approved_by',
+						'production_item_lines.production_item_line_id',
+						'production_item_lines.approval_status',
+						'production_item_lines.production_item_line_type',
+						'menu_ingredients_preparations.preparation_desc',
+						'production_item_lines.time_labor',
+						'production_item_lines.cost_contribution',
+						'production_item_lines.qty_contribution',
+						'production_item_lines.duration',
+						'production_item_lines.actual_pack_uom',
+						'production_item_lines.labor_yield_uom',
+						'production_item_categories.category_description',
+						'production_locations.production_location_description',
+						'production_items.labor_cost',
+						'production_items.labor_cost_per_minute',
+						'production_items.total_minutes_per_pack',
+						'production_items.labor_cost_val',
+						'production_items.gas_cost',
+						'production_items.gas_costxfc',
+						'production_items.transfer_price_category',
+						'production_items.packaging_cost',
+						'production_items.storage_cost',
+						'production_items.storage_costxfc',
+						'production_items.meralco',
+						'production_items.meralcoxfc',
+						'production_items.water',
+						'production_items.waterxfc',
+						'production_items.storage_multiplier',
+						'production_items.total_storage_cost',
+						'production_items.storage_location',
+						'production_items.raw_mast_provision',
+						'production_items.markup_percentage',
+						'production_items.final_value_existing',
+						'production_items.final_value_vatex',
+						'production_items.final_value_vatinc',
+						'production_items.action_type',
+						'production_items.full_item_description',
+						'production_items.approved_by',
+						'production_items.approval_status',
+						'production_items.approved_at',
+						'production_items.created_by',
+						'production_items.updated_by',
+						'production_items.created_at',
+						'production_items.updated_at',
+						'production_items.opex'
+					)
+					->cursor()
+					->each(function ($row) use ($handle) {
+						fputcsv($handle, [
 							$row->reference_number,
-							$row->product_description,
+							$row->item_code,
+							$row->description,
+							$row->quantity,
+							$row->landed_cost,
+							$row->yield,
+							$row->packaging_id,
+							$row->approved_by,
+							$row->production_item_line_id,
+							$row->approval_status,
+							$row->production_item_line_type,
+							$row->preparation_desc,
+							$row->time_labor,
+							$row->cost_contribution,
+							$row->qty_contribution,
+							$row->duration,
+							$row->actual_pack_uom,
+							$row->labor_yield_uom,
 							$row->category_description,
 							$row->production_location_description,
 							$row->labor_cost,
+							$row->labor_cost_per_minute,
+							$row->total_minutes_per_pack,
+							$row->labor_cost_val,
 							$row->gas_cost,
-							$row->utilities,
+							$row->gas_costxfc,
+							$row->transfer_price_category,
+							$row->packaging_cost,
 							$row->storage_cost,
-							$row->total_storage_cost, 
+							$row->storage_costxfc,
+							$row->meralco,
+							$row->meralcoxfc,
+							$row->water,
+							$row->waterxfc,
+							$row->storage_multiplier,
+							$row->total_storage_cost,
+							$row->storage_location,
 							$row->raw_mast_provision,
 							$row->markup_percentage,
+							$row->final_value_existing,
 							$row->final_value_vatex,
 							$row->final_value_vatinc,
-							$row->item_code,
-							$row->ingredient_description,
-							$row->quantity,
-							$row->landed_cost, 
+							$row->action_type,
+							$row->full_item_description,
+							$row->approved_by,
+							$row->approval_status,
+							$row->approved_at,
 							$row->created_by,
 							$row->updated_by,
 							$row->created_at,
-							$row->updated_at
+							$row->updated_at,
+							$row->opex
 						]);
 					});
 
@@ -1741,6 +1352,8 @@ use ProductionItemsApproval;
 			return response()->streamDownload($callback, $filename, [
 				'Content-Type' => 'text/csv',
 			]);
+ 
+
 		}
  
 	}

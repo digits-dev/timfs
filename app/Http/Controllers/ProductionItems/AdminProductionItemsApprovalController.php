@@ -11,6 +11,10 @@ namespace App\Http\Controllers\ProductionItems;
 
 class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
  
+	public function __construct() {
+		 $this->main_controller = new AdminProductionItemsController;
+	}
+
     public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -31,7 +35,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			$this->button_export = false;
 			$this->table = "production_items_approvals";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
-
+			 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"Reference Number","name"=>"reference_number"];
@@ -39,7 +43,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			$this->col[] = ["label" => "Approval Status", "name" => "approval_status",
 							"callback"=>function($row)
 							{
-								 if ($row->approval_status == '202') {
+								 if ($row->approval_status == '204') {
 									return '<center><span style="
 											background-color:rgb(252, 164, 41); 
 											color: white; 
@@ -49,8 +53,21 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 											font-size: 8px; 
 											text-align: center;
 											min-width: 20px;
-										">PENDING</span></center>';
-								}else if ($row->approval_status == '400')
+										">TO CHECK</span></center>';
+								}  
+								else if ($row->approval_status == '202') {
+									return '<center><span style="
+											background-color:rgb(252, 164, 41); 
+											color: white; 
+											padding: 3px 8px; 
+											border-radius: 3px; 
+											font-weight: bold; 
+											font-size: 8px; 
+											text-align: center;
+											min-width: 20px;
+										">TO APPROVE</span></center>';
+								}
+								else if ($row->approval_status == '400')
 								{
 									return '<center><span style="
 											background-color:rgba(255, 0, 0, 0.86); 
@@ -80,7 +97,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			$this->col[] = ["label"=>"Action Type","name"=>"action_type"];
 			$this->col[] = ["label"=>"Production Category","name"=>"production_category","join"=>"production_item_categories,category_description" ];
 			$this->col[] = ["label"=>"Production Location","name"=>"production_location","join"=>"production_locations,production_location_description"];
-				$this->col[] = ["label"=>"FC Landed cost","name"=>"landed_cost"];
+			$this->col[] = ["label"=>"FC Landed cost","name"=>"landed_cost"];
 			$this->col[] = ["label"=>"OPEX","name"=>"opex"];
 			$this->col[] = ["label"=>"PM / Store Supplies", "name" => "packaging_cost","callback"=>function($row){
 				return round($row->packaging_cost , 2);
@@ -117,7 +134,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 					'url'=>CRUDBooster::mainpath('approve_or_reject_production_items/[id]'),
 					'icon'=>'fa fa-thumbs-up',
 					'color' => ' ',
-					"showIf"=>"[approval_status] == '202'",
+					"showIf"=>"[approval_status] != '200'",
 			];
 
 	        /* 
@@ -138,9 +155,69 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 	        | @label, @count, @icon, @color 
 	        |
 	        */
-	        $this->index_statistic = array(); 
-			 	$pending_count = DB::table('production_items_approvals')
+	        $this->index_statistic = array();  
+			if(CRUDBooster::myPrivilegeId() != 1)
+			{	
+				switch(CRUDBooster::myPrivilegeId())
+				{
+					case 26: 
+
+						$pending_count = DB::table('production_items_approvals')
+							->where('approval_status', '204')
+							->count(); 
+						$rejected_count = DB::table('production_items_approvals')
+							->where('approval_status', '400')
+							->count();
+						$this->index_statistic[] = [
+							'label' => 'To Check Items',
+							'count' => $pending_count,
+							'icon' => 'fa fa-hourglass-half',
+							'color' => 'orange',
+						]; 
+						$this->index_statistic[] = [
+							'label' => 'Rejected Items',
+							'count' => $rejected_count,
+							'icon' => 'fa fa-thumbs-down',
+							'color' => 'red',
+						];  
+
+					break;
+					case 24 || 14: 
+
+						$pending_count = DB::table('production_items_approvals')
+							->where('approval_status', '202')
+							->count();
+						$approved_count = DB::table('production_items_approvals')
+							->where('approval_status', '200')
+							->count();
+						$rejected_count = DB::table('production_items_approvals')
+							->where('approval_status', '400')
+							->count();
+						$this->index_statistic[] = [
+							'label' => 'To Approve Items',
+							'count' => $pending_count,
+							'icon' => 'fa fa-hourglass-half',
+							'color' => 'orange',
+						];
+						$this->index_statistic[] = [
+							'label' => 'Approved Items',
+							'count' => $approved_count,
+							'icon' => 'fa fa-thumbs-up',
+							'color' => 'green',
+						];
+						$this->index_statistic[] = [
+							'label' => 'Rejected Items',
+							'count' => $rejected_count,
+							'icon' => 'fa fa-thumbs-down',
+							'color' => 'red',
+						];  	
+					break;  
+				} 
+			}else
+			{
+				$pending_count = DB::table('production_items_approvals')
 					->where('approval_status', '202')
+					->orWhere('approval_status', '204')
 					->count();
 				$approved_count = DB::table('production_items_approvals')
 					->where('approval_status', '200')
@@ -166,6 +243,10 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 					'icon' => 'fa fa-thumbs-down',
 					'color' => 'red',
 				]; 
+			}
+			
+
+				
 
 
 
@@ -322,13 +403,29 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
+			if(CRUDBooster::myPrivilegeId() != 1)
+			{	
+				switch(CRUDBooster::myPrivilegeId())
+				{
+					case 26:
+							$query->where('approval_status', 204)
+								->orWhere('approval_status', 400);
+					break;
+					case 24 || 14:
+							$query->where('approval_status', 202)
+								->orWhere('approval_status', 400)
+								->orWhere('approval_status', 200);
+					break;  
+				} 
+			}
+
 	        $query->orderByRaw('GREATEST(production_items_approvals.created_at, production_items_approvals.updated_at) DESC');     
 	    }
 
 	    /*
 	    | ---------------------------------------------------------------------- 
 	    | Hook for manipulate row of index table html 
-	    | ---------------------------------------------------------------------- 
+	    | ---------------------------------------------------------------------- 	
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
@@ -416,7 +513,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			$costings = self::costing(self::getItemDetails($id)->reference_number);
 			$data['view'] = 'true'; 
 			 
-
+			//dd($data);
 			$data = array_merge($data, $costings);  
 			return $this->view('production-items/add-production-item', $data);
 		}
@@ -629,222 +726,342 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 
 
 
-		public function addProductionItemsToDB(Request $request){
+	public function addProductionItemsToDB(Request $request){
 	 
-			$message = ''; 
-			$data =  $request->all();
- 			$ref = $data['reference_number'];
-			//	dd($request->action);
-			if($request->action == 'reject')
-			{
-				DB::table('cms_logs')->insert([
+		$message = '';
+		$data = $request->all();
+		$ref = $data['reference_number'];
+		$userId = CRUDBooster::myId() ?: 1;
+
+		if ($request->action === 'reject') {
+			// Log rejection
+			$logDetails = 'Production Items Reject ' . $ref;
+
+			DB::table('cms_logs')->insert([
 				'ipaddress' => request()->ip(),
 				'useragent' => request()->userAgent(),
 				'url' => request()->fullUrl(),
 				'description' => 'User Reject Production Item',
-				'details'  =>  'Production Items Reject ' . $ref,
-				'id_cms_users' => CRUDBooster::myId(),
+				'details' => $logDetails,
+				'id_cms_users' => $userId,
 				'created_at' => now(),
 				'updated_at' => now(),
-				]);
+			]);
 
-				DB::table('production_items_history')->insert([
+			DB::table('production_items_history')->insert([
 				'reference' => $ref,
-				'action' => 'Create', 
+				'action' => 'Create',
 				'description' => 'User Reject Production Item',
-				'key_old_value' => '', // .': '. $safe_value,
-				'description_old_value' => '',	
+				'key_old_value' => '',
+				'description_old_value' => '',
 				'key_new_value' => '',
-				'description_new_value' => '',  
-				'updated_by' => CRUDBooster::myId() ?: 1, 
-				'details'  =>  'Production Items Reject ' . $ref, 
+				'description_new_value' => '',
+				'updated_by' => $userId,
+				'details' => $logDetails,
 				'created_at' => now(),
 				'updated_at' => now(),
-				]);
+			]);
 
-				$approvalStatus = ProductionItemsModelApproval::updateOrCreate(
-					['reference_number' => $data['reference_number']],
-					['approval_status' => 400]                                 
-				); 
+			ProductionItemsModelApproval::updateOrCreate(
+				['reference_number' => $ref],
+				['approval_status' => 400]
+			);
 
-				return redirect(CRUDBooster::mainpath())
+			return redirect(CRUDBooster::mainpath())
 				->with([
-						'message_type' => 'success',
-						'message' => 'Item Successfully Rejected',
+					'message_type' => 'success',
+					'message' => 'Item Successfully Rejected',
 				])->send();
+		}
+
+		// If not rejected, assume approval
+
+		$approval_flow = [ 
+			204, // to check 
+			202, // to approve
+			200 // approved -> push to production item lines
+		];
+ 
+		$approval_statsus = DB::table('production_items_approvals')
+				->select('approval_status') 
+				->where('reference_number', $ref)
+				->pluck('approval_status')
+				->first(); 
+  
+		if($approval_flow[array_search($approval_statsus, $approval_flow) + 1] == $approval_flow[count($approval_flow) - 1]) //checking if status code is last on array
+		{
+			 
+			$message = "✔️ Item Added successfully with reference number $ref";
+			$data['created_by'] = $userId;
+			$data['updated_by'] = $userId;
+			$data['approval_status'] = 200; // approved status
+
+			// Get existing image filename if any
+			$imageFilename = DB::table('production_items_approvals')
+				->where('reference_number', $ref)
+				->value('image_filename');
+
+			if ($imageFilename) {
+				$data['image_filename'] = $imageFilename;
 			}
-				 
-		 
-				$message = "✔️ Item Added successfully with reference number ". $ref;	 
-				
-				$data['created_by'] = CRUDBooster::myId();
-				$data['updated_by'] = CRUDBooster::myId();
-				$data['approval_status'] = 200;
-				
-			    //status 202=pending, 200=approve, 400=reject
 
-
-					$input = $data;
-
-					 $input['item_photo'] = DB::table('production_items_approvals') 
-					->select('image_filename')
-					->where('reference_number', '=', $ref)
-					->pluck('image_filename')
-    				->first();
-
-
-
-					if ($input['item_photo']) $data['image_filename'] = $input['item_photo'];  
-
-
+			// Process segmentations
 			$segment_columns = DB::table('segmentations')
 				->where('status', 'ACTIVE')
 				->pluck('segment_column_name')
 				->toArray();
 
+			$segmentations = (array) json_decode($data['segmentations'] ?? '[]');
 
-			$segmentations = (array) json_decode($data['segmentations']);
-			//segmentation => initializing all to 'X'
-			foreach ($segment_columns as $segment_column) {
-				$data[$segment_column] = 'X';
+			foreach ($segment_columns as $col) {
+				$data[$col] = 'X'; // initialize all to 'X'
 			}
 
-			//overwriting the selected segmentations
 			foreach ($segmentations as $value => $columns) {
-				foreach ($columns as $column_name) {
-					$data[$column_name] = $value; 
-				} 
+				foreach ($columns as $colName) {
+					$data[$colName] = $value; // overwrite selected
+				}
 			}
 
 
 
 
+			// Process ingredients and labor lines
+			$productionItemId = $data['reference_number'];
+			$ingredients = $request->input('produtionlines', []);
+			$laborLines = $request->input('LaborLines', []); 
+			$newItemCodesID = [];
+			$newId = 0;  
+			// Save ingredient lines 
 
-				DB::table('cms_logs')->insert([
-				'ipaddress' => request()->ip(),
-				'useragent' => request()->userAgent(),
-				'url' => request()->fullUrl(),
-				'description' => 'User Approve Production Item',
-				'details'  =>  'Production Items Approved ' . $ref,
-				'id_cms_users' => CRUDBooster::myId(),
-				'created_at' => now(),
-				'updated_at' => now(),
-				]);
-
-				DB::table('production_items_history')->insert([
-				'reference' => $ref,
-				'action' => 'Create', 
-				'description' => 'User Approve Production Item',
-				'key_old_value' => '', // .': '. $safe_value,
-				'description_old_value' => '',	
-				'key_new_value' => '',
-				'description_new_value' => '',  
-				'updated_by' => CRUDBooster::myId() ?: 1, 
-				'details'  =>  'Production Items Approved ' . $ref, 
-				'created_at' => now(),
-				'updated_at' => now(),
-				]);
-
- 
-			
-			$production_item_id = $data['reference_number'];
-			$ingredients = $request->input('produtionlines');
-			$labor_lines = $request->input('LaborLines');
-			$new_id = 0;
-			$labor_new_id = 0;
-			// Flatten all new item_codes for later comparison
-			   
-			//mula dito
-
-			 
-			$newItemCodesID = []; 
-			if (count($ingredients) > 0) {
-				foreach ($ingredients as $parentCode => $ingredientGroup) {
-					$gg = $new_id;
-				  	$parent_id = $gg + 1;
-					foreach ($ingredientGroup as $ingredient) {  
-						$new_id++;
-						$newItemCodesID[] = $new_id; 
+			if($ingredients)
+			{
+				foreach ($ingredients as $ingredientGroup) {
+					$parentId = ++$newId;
+					foreach ($ingredientGroup as $ingredient) {
 						ProductionItemLines::updateOrCreate(
 							[
-								'production_item_id' => $production_item_id,
-								'production_item_line_id' => $new_id,
+								'production_item_id' => $productionItemId,
+								'production_item_line_id' => $newId,
 							],
-							[ 
-								'production_item_id' => $production_item_id,
-								'item_code' => $ingredient['tasteless_code'],	
+							[
+								'production_item_id' => $productionItemId,
+								'item_code' => $ingredient['tasteless_code'],
+								'cost_contribution' => $this->main_controller->removePercent($ingredient['costparent-contribution'] ?? $ingredient['costparent-contribution-pack'] ?? null),
+								'qty_contribution' => $this->main_controller->removePercent($ingredient['qty-contribution'] ?? $ingredient['qty-contribution-pack'] ?? null),
+								'actual_pack_uom' => $ingredient['actual_pack_uom'],
 								'description' => $ingredient['itemDesc'],
 								'quantity' => $ingredient['quantity'],
 								'yield' => $ingredient['yield'],
-								'preparations' => $ingredient['preparations'], 
-								'landed_cost' =>  $ingredient['ttp'] ?? $ingredient['cost'],
-								'packaging_id' =>  $parent_id, 
-								'production_item_line_id' => $new_id,
+								'preparations' => $ingredient['preparations'],
+								'landed_cost' => $ingredient['ttp'] ?? $ingredient['cost'],
+								'packaging_id' => $parentId,
+								'production_item_line_id' => $newId,
 								'production_item_line_type' => $ingredient['production_type'],
 								'approval_status' => 200,
 							]
 						);
+						$newItemCodesID[] = $newId++;
 					}
-					$gg = 0;
 				}
-			} 
-			//$(`#itemDesc${lastCharsub}`).attr('name', `produtionlines[${parentid}][${lastCharsub}][description]`); 
-		
-
-			ProductionItemLines::where('production_item_id', $production_item_id)
-				->whereNotIn('production_item_line_id', $newItemCodesID) 
-				->delete();
-			//hanggadito 
-			 
-			if (count($labor_lines) > 0) {
-				foreach ($labor_lines as $parentCode => $labor_lines_description) {
-					
-					$new_id++;
-					$newItemCodesID[] = $new_id;
+			}
+			if($laborLines)
+			{
+				// Save labor lines
+				foreach ($laborLines as $laborLine) {
+					$newId++;
+					$newItemCodesID[] = $newId;
 					ProductionItemLines::updateOrCreate(
 						[
-							'production_item_id' => $production_item_id,
-							'production_item_line_id' => $new_id,
+							'production_item_id' => $productionItemId,
+							'production_item_line_id' => $newId,
 						],
-						[ 
-							'production_item_id' => $production_item_id, 
-							'time_labor' => $labor_lines_description['time-labor'], 
-							'yield' => $labor_lines_description['yiel'],
-							'preparations' => $labor_lines_description['preparations'], 
-							'production_item_line_id' => $new_id,
-							'production_item_line_type' => $labor_lines_description['production_item_line_type'],
-							'approval_status' => 202,
+						[
+							'production_item_id' => $productionItemId,
+							'time_labor' => $laborLine['time-labor'],
+							'labor_yield_uom' => $laborLine['labor_yield_uom'],
+							'duration' => $laborLine['duration'],
+							'yield' => $laborLine['yiel'],
+							'preparations' => $laborLine['preparations'],
+							'production_item_line_type' => $laborLine['production_item_line_type'],
+							'approval_status' => 200,
+							'production_item_line_id' => $newId,
 						]
-					); 
+					);
 				}
 			}
 
-			$data['final_value_existing'] = DB::table('production_items')
-			->where('reference_number', $data['reference_number'])
-			->value('final_value_vatex') ?? $data['final_value_vatex'];
-				 
- 
 
-			//loop each ingredients and save sa DB 	production_item_lines table
-			// dd($ingredients); 
-				$approvalStatus = ProductionItemsModelApproval::updateOrCreate(
-					['reference_number' => $data['reference_number']],
-					['approval_status' => 200,
-					'approved_by' => CRUDBooster::myId(),
-					'approved_at' => now()]                                 
+			// Delete removed ingredients
+			ProductionItemLines::where('production_item_id', $productionItemId)
+				->whereNotIn('production_item_line_id', $newItemCodesID)
+				->delete();
+	
+				// Update final_value_existing from main table or fallback
+				$data['final_value_existing'] = DB::table('production_items')
+					->where('reference_number', $ref)
+					->value('final_value_vatex') ?? $data['final_value_vatex'];
+
+				// Update approval status & info
+				ProductionItemsModelApproval::updateOrCreate(
+					['reference_number' => $ref],
+					[
+						'approval_status' => 200,
+						'approved_by' => $userId,
+						'approved_at' => now(),
+					]
 				);
 
-				$cost = ProductionItems::updateOrCreate(
-					['reference_number' => $data['reference_number']],
+				// Update or create main production item
+				ProductionItems::updateOrCreate(
+					['reference_number' => $ref],
 					$data
 				);
-			 //return redirect()->back()->with('success', 'Production item saved successfully!');
+
+
+
+				// Log approval
+				self::pushLogs($request);
+		}  
+		else 
+		{
+			ProductionItemsModelApproval::updateOrCreate(
+				['reference_number' => $ref],
+				[
+					'approval_status' => $approval_flow[array_search($approval_statsus, $approval_flow) + 1], 
+				]
+			);
+
+
 			return redirect(CRUDBooster::mainpath())
 			->with([
-					'message_type' => 'success',
-					'message' => $message,
+				'message_type' => 'success',
+				'message' => 'item push for ',
 			])->send();
+		}
+
+			return redirect(CRUDBooster::mainpath())
+			->with([
+				'message_type' => 'success',
+				'message' => $message,
+			])->send();
+	
 		
+	}
+
+	
+
+	function pushLogs(Request $request)
+	{
+		
+			$lastData = []; 
+			$old_datas = $this->main_controller->getItemLastDetails($request->reference_number); 
+		 	if($old_datas)
+			{
+				foreach ($old_datas as $key => $value) {
+					if (isset($value) &&  is_numeric($value) && $key != 'reference_number' && $key != 'id') {
+						
+						$rounded = round($value, 2); 
+						$lastData[$key] = $rounded;  // casting to float removes trailing zeros
+
+					}else if($key != 'id')
+					{ 
+						$lastData[$key] = $value; 
+					}
+				}
+				
+			
+				$currentData = [];
+
+				
+				foreach ($request->only(array_keys((array)$lastData)) as $key => $value) {
+					if (isset($value) &&  is_numeric($value) && $key != 'reference_number') {
+						
+						$rounded = round($value, 2); 
+						$currentData[$key] = $rounded;  // casting to float removes trailing zeros
+
+					}else if($key != 'id')
+					{
+						$currentData[$key] = $value; 
+					}
+				} 
+				
+				$item = ProductionItems::select('reference_number', 'created_at')
+				->where('reference_number', $request->reference_number)
+				->first();
+			
+				// Find differences between old and new data
+				$differences = [];
+				foreach ($lastData as $key => $value) {
+					if (isset($currentData[$key]) && (string)$currentData[$key] !== (string)$value) {
+						$differences[$key] = ['old' => $value, 'new' => $currentData[$key]];
+					}
+				}
+	
+				// Generate changes HTML
+				$detailsHtmlFields = $this->main_controller->generateChangesTableFields($differences, $item->reference_number, $item->created_at);
+				
+				if ($detailsHtmlFields == 'null') {
+					$detailsHtmlFields = '<p style="font-family: Arial, sans-serif; font-size: 14px;">No changes detected.</p>';
+				}
+
+				$combinedDetails = 
+					'<hr><label style="font-size: 20px; font-weight: bold; color: #f1c40f; background: #2c3e50; padding: 6px 12px; border-radius: 6px; display: inline-block;">Fields changes</label>' 
+					. $detailsHtmlFields;
+				
+				// Log changes
+				DB::table('cms_logs')->insert([
+					'ipaddress' => request()->ip(),
+					'useragent' => request()->userAgent(),
+					'url' => request()->fullUrl(),
+					'description' => 'Update data at production item reference number ' . $item->reference_number,
+					'details' => $combinedDetails,
+					'id_cms_users' => CRUDBooster::myId() ?: 1,
+					'created_at' => $item->created_at,
+					'updated_at' => now(),
+				]);
+
+				DB::table('production_items_history')->insert([
+					'reference' => $item->reference_number,
+					'action' => 'Update',
+					'description' => 'User Production Item Creation ' . $item->reference_number,
+					'key_old_value' => '',
+					'description_old_value' => '',
+					'key_new_value' => '',
+					'description_new_value' => '',
+					'updated_by' => CRUDBooster::myId() ?: 1,
+					'details' => $combinedDetails,
+					'created_at' => $item->created_at,
+					'updated_at' => now(),
+				]); 
+			}else
+			{	
+					DB::table('cms_logs')->insert([
+						'ipaddress' => request()->ip(),
+						'useragent' => request()->userAgent(),
+						'url' => request()->fullUrl(),
+						'description' => 'User Approve Production Item',
+						'details' => 'User Approve Production Item code ' . $request->reference_number,
+						'id_cms_users' => CRUDBooster::myId() ?: 1,
+						'created_at' => now(),
+						'updated_at' => now(),
+					]);
+
+					DB::table('production_items_history')->insert([
+						'reference' => $request->reference_number,
+						'action' => 'Create',
+						'description' => 'User Reject Production Item',
+						'key_old_value' => '',
+						'description_old_value' => '',
+						'key_new_value' => '',
+						'description_new_value' => '',
+						'updated_by' => CRUDBooster::myId() ?: 1,
+						'details' =>  'User Approve Production Item code ' . $request->reference_number,
+						'created_at' => now(),
+						'updated_at' => now(),
+					]);
+			}	
+			
 	}
 
 }
