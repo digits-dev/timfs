@@ -18,3 +18,4 @@ yarn-error.log
 /.vscode
 *.log
 public/img/item-master-fa/*
+public/img/production-items/*
