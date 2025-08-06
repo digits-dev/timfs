@@ -25,7 +25,7 @@ class AdminProductionCategoryController extends \crocodicstudio\crudbooster\cont
 			$this->button_action_style = "button_icon";
 			$this->button_add = true;
 			$this->button_edit = true;
-			$this->button_delete = false;
+			$this->button_delete = true;
 			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
@@ -68,24 +68,15 @@ class AdminProductionCategoryController extends \crocodicstudio\crudbooster\cont
 	        $this->form = [];
     
 		 
-				$this->form[] = ['label'=>'Production category','name'=>'category_description','type'=>'text','validation'=>'required|string|max:255','width'=>'col-sm-10'];
-				 
-				$this->form[] = [ 'label' => 'Status', 'name' => 'status', 'type' => 'select', 'validation' => 'required|string|max:20', 'width' => 'col-sm-10', 'dataenum' => 'ACTIVE;INACTIVE'];
+			$this->form[] = ['label'=>'Production category','name'=>'category_description','type'=>'text','validation'=>'required|string|max:255','width'=>'col-sm-10'];
+			$this->form[] = [ 'label' => 'Status', 'name' => 'status', 'type' => 'select', 'validation' => 'required|string|max:20', 'width' => 'col-sm-10', 'dataenum' => 'ACTIVE;INACTIVE'];
 				
 			 
 				
 			 
 			# END FORM DO NOT REMOVE THIS LINE
 				
-			if (CRUDBooster::getCurrentMethod() != 'getEdit') {
-				$this->form[] = ['label'=>'Created By','name'=>'created_by','type'=>'select','validation'=>'required|integer','width'=>'col-sm-10','datatable'=>'cms_users,name'];
-				
- 
-				$this->form[] = ['label'=>'Updated By','name'=>'updated_by','type'=>'select','validation'=>'required|integer','width'=>'col-sm-10','datatable'=>'cms_users,name'];
-				
-				$this->form[] = ['label'=>'Created At', 'name'=>'created_at', 'type'=>'datetime', 'validation'=>'required|date_format:Y-m-d H:i:s', 'width'=>'col-sm-10'];
-				$this->form[] = ['label'=>'Updated At', 'name'=>'updated_at', 'type'=>'datetime', 'validation'=>'required|date_format:Y-m-d H:i:s', 'width'=>'col-sm-10'];
-			}
+			 
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -196,76 +187,8 @@ class AdminProductionCategoryController extends \crocodicstudio\crudbooster\cont
 		{
 			$postdata['updated_by'] = CRUDBooster::myId(); // sets current user ID
 		}
-
-
-		public function getAdd() {
-			if (!CRUDBooster::isCreate())
-				CRUDBooster::redirect(
-				CRUDBooster::adminPath(),
-				trans('crudbooster.denied_access')
-			);
-
-			return $this->view('production-items/add-production-category', ['location' => $location]);
+		public function hook_before_add(&$postdata) 
+		{ 
+			$postdata['created_by'] = CRUDBooster::myId(); 
 		}
- 
-
-	 
-
-		public function addProductionCategoryToDB(Request $request)
-		{
-			
-			$message = '';
-			$time_stamp_now = date('Y-m-d H:i:s');
-			$exists = ProductionItemCategory::where('category_description', $request['production_category_description'])->exists();
-			if ($exists) {
-				return back()->withErrors(['production_category_description' => 'This description already exists.']);
-			}	
-
-
-			if($request['id']){
-				$message = "✔️ Item updated successfully...";
-				$productcategory = ProductionItemCategory::findOrFail($request['id']);
-				$time_stamp = $time_stamp_now;
-				$productcategory->category_description = $request['production_category_description'];
-				$productcategory->status = 'ACTIVE'; 
-				$productcategory->updated_by = CRUDBooster::myId(); 
-				$productcategory->updated_at = $time_stamp;
-			}
-			else
-			{
-				$message = "✔️ Item Added successfully...";
-				$productcategory = new ProductionItemCategory();
-				$time_stamp = $time_stamp_now;
-				$productcategory->category_description = $request['production_category_description'];
-				$productcategory->status = 'ACTIVE';
-				$productcategory->created_by = CRUDBooster::myId();
-				$productcategory->updated_by = CRUDBooster::myId();
-				$productcategory->created_at = $time_stamp;
-				$productcategory->updated_at = $time_stamp;	
-				
-				
-
-				 DB::table('cms_logs')->insert([
-					'ipaddress' => request()->ip(),
-					'useragent' => request()->userAgent(),
-					'url' => request()->fullUrl(),
-					'description' => 'Production Item Category',
-					'details'  =>  'new Production Category named "' . $request['production_category_description'] . '" has been created',
-					'id_cms_users' => CRUDBooster::myId(),
-					'created_at' => now(),
-					'updated_at' => now(),
-				]);
-			}
-			
-			
-			$productcategory->save();
-
-			return redirect(CRUDBooster::mainpath())
-				->with([
-					'message_type' => 'success',
-					'message' => $message,
-				])->send();
-
-		}
-  
 }

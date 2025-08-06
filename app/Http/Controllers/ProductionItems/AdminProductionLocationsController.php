@@ -28,7 +28,7 @@ class AdminProductionLocationsController extends \crocodicstudio\crudbooster\con
 			$this->button_action_style = "button_icon";
 			$this->button_add = true;
 			$this->button_edit = true;
-			$this->button_delete = false;
+			$this->button_delete = true;
 			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
@@ -60,16 +60,7 @@ class AdminProductionLocationsController extends \crocodicstudio\crudbooster\con
 				
 			 
 			# END FORM DO NOT REMOVE THIS LINE
-				
-			if (CRUDBooster::getCurrentMethod() != 'getEdit') {
-				$this->form[] = ['label'=>'Created By','name'=>'created_by','type'=>'select','validation'=>'required|integer','width'=>'col-sm-10','datatable'=>'cms_users,name'];
-				
- 
-				$this->form[] = ['label'=>'Updated By','name'=>'updated_by','type'=>'select','validation'=>'required|integer','width'=>'col-sm-10','datatable'=>'cms_users,name'];
-				
-				$this->form[] = ['label'=>'Created At', 'name'=>'created_at', 'type'=>'datetime', 'validation'=>'required|date_format:Y-m-d H:i:s', 'width'=>'col-sm-10'];
-				$this->form[] = ['label'=>'Updated At', 'name'=>'updated_at', 'type'=>'datetime', 'validation'=>'required|date_format:Y-m-d H:i:s', 'width'=>'col-sm-10'];
-			}
+			 
 			# END FORM DO NOT REMOVE THIS LINE
 
 	        /* 
@@ -196,83 +187,13 @@ class AdminProductionLocationsController extends \crocodicstudio\crudbooster\con
 	    }
 
 		public function hook_before_edit(&$postdata,$id) 
-		{
+		{ 
 			$postdata['updated_by'] = CRUDBooster::myId(); // sets current user ID
 		}
 
-		
-		public function getAdd() {
-			if (!CRUDBooster::isCreate())
-				CRUDBooster::redirect(
-				CRUDBooster::adminPath(),
-				trans('crudbooster.denied_access')
-			);
-
-			return $this->view('production-items/add-production-location', ['location' => $location]);
+		public function hook_before_add(&$postdata) 
+		{ 
+			$postdata['created_by'] = CRUDBooster::myId(); // sets current user ID
 		}
- 
-
-	 
-
-		public function addProductionItemsToDB(Request $request)
-		{
-			
-			$message = '';
-			$time_stamp_now = date('Y-m-d H:i:s');
-			$exists = ProductionLocation::where('production_location_description', $request['production_location_description'])->exists();
-			if ($exists) {
-				return back()->withErrors(['production_location_description' => 'This description already exists.']);
-			}	
-
-
-			if($request['id']){
-				$message = "✔️ Item updated successfully...";
-				$productlocation = ProductionLocation::findOrFail($request['id']);
-				$time_stamp = $time_stamp_now;
-				$productlocation->production_location_description = $request['production_location_description'];
-				$productlocation->status = 'ACTIVE'; 
-				$productlocation->updated_by = CRUDBooster::myId(); 
-				$productlocation->updated_at = $time_stamp;
-			}
-			else
-			{
-				
-				$message = "✔️ Item Added successfully...";
-				$productlocation = new ProductionLocation();
-				$time_stamp = $time_stamp_now;
-				$productlocation->production_location_description = $request['production_location_description'];
-				$productlocation->status = 'ACTIVE';
-				$productlocation->created_by = CRUDBooster::myId();
-				$productlocation->updated_by = CRUDBooster::myId();
-				$productlocation->created_at = $time_stamp;
-				$productlocation->updated_at = $time_stamp;		
-				
-				
-				 DB::table('cms_logs')->insert([
-					'ipaddress' => request()->ip(),
-					'useragent' => request()->userAgent(),
-					'url' => request()->fullUrl(),
-					'description' => 'Production Location Creation',
-					'details'  =>  'new Production Location named "' . $request['production_location_description'] . '" has been created',
-					'id_cms_users' => CRUDBooster::myId(),
-					'created_at' => now(),
-					'updated_at' => now(),
-				]);
-			}
-			
-			
-			$productlocation->save();
-
-			return redirect(CRUDBooster::mainpath())
-				->with([
-					'message_type' => 'success',
-					'message' => $message,
-				])->send();
-
-		}
- 
-        public function addProductionItems(){
 		 
-			return view('production-items/add-production-location');
-		}
 }
