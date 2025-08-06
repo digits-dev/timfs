@@ -1187,4 +1187,26 @@
 				'updated_items' => $updated_items,
 			]);
 		}
+
+		public function getCustomSyncApiItems(Request $request) {
+			$query = $request->all();
+            if (!isset($query['secret_key']) || $query['secret_key'] != config('api.secret_key')) {
+                return response(['message' => 'Unauthorized'], 403);
+            }
+
+            $tasteless_code = $query['tasteless_code'];
+
+            $dateFrom = $query['datefrom'] ?? null;
+            $dateTo = $query['dateto'] ?? null;
+
+            $items = DB::table('item_masters')
+				->whereIn('tasteless_code', $tasteless_code)
+				->orWhereBetween(DB::raw('DATE(approved_at_1)'), [$dateFrom,$dateTo])
+				->get()
+				->toArray();
+
+            return response()->json([
+                'items' => $items,
+            ]);
+        }
 	}
