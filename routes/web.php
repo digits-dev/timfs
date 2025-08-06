@@ -239,4 +239,4 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
 
 Route::get('/item_masters/api/get-items/{secret_key}', [AdminItemMastersController::class, 'getUpdatedItems'])->name('get_updated_items');
 Route::get('/item_masters_fas/api/get-items/{secret_key}', [AdminItemMastersFasController::class, 'getUpdatedItems'])->name('get_updated_items');
-Route::get('/item_masters/api/get-custom-sync-items/{params}', [AdminItemMastersController::class, 'getCustomSyncApiItems'])->name('get_custom_sync_api_items');
+Route::get('/item_masters/api/get-custom-sync-items', [AdminItemMastersController::class, 'getCustomSyncApiItems'])->name('get_custom_sync_api_items');
