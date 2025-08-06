@@ -408,6 +408,13 @@
 				}
 			}
 
+			// Auto populate action type, approval status, and approved at 
+			$postdata['action_type'] = 'Create';
+			$postdata['approval_status'] = 1;
+			$postdata['approved_by'] = 1;
+			$postdata['approved_at'] = now();
+
+
 
 	    }
 

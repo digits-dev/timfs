@@ -28,7 +28,9 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
             $coa   = DB::table('fa_coa_categories')->where(DB::raw('LOWER(TRIM(description))'),strtolower(trim($row['coa'])))->first();
             $sub_category   = DB::table('fa_sub_categories')->where(DB::raw('LOWER(TRIM(description))'),strtolower(trim($row['sub_category'])))->first();
             $currency   = DB::table('currencies')->where(DB::raw('LOWER(TRIM(currency_code))'),strtolower(trim($row['currency'])))->first();
-            
+            $currency   = DB::table('currencies')->where(DB::raw('LOWER(TRIM(currency_code))'),strtolower(trim($row['currency'])))->first();
+            $asset_type   = DB::table('asset_types')->where(DB::raw('LOWER(TRIM(asset_type_description))'),strtolower(trim($row['asset_type'])))->first();
+
             $tasteless_code = CodeCounter::where('id', 1)->where('type', 'ITEM MASTER')->value('code_9');
 					
             ItemMastersFa::create([
@@ -50,6 +52,7 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
                 'model'               => $row['model'],
                 'size'                => $row['measurement'],
                 'color'               => $row['color'],
+                'asset_type'          => $asset_type->id,
                 //'approval_status'     => 202,
                 'approval_status'     => 200,
                 'sku_statuses_id'     => 1,
@@ -77,6 +80,7 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
                 'model'               => $row['model'],
                 'size'                => $row['measurement'],
                 'color'               => $row['color'],
+                'asset_type'          => $row['asset_type'],
                 //'approval_status'     => 202,
                 'approval_status'     => 200,
                 'sku_statuses_id'     => 1,
@@ -89,7 +93,7 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
         }
     }
 
-    public function prepareForValidation($data, $index){
+    public function prepareForValidation($data, $index){ 
         //COA CODE
         $data['coa_exist']['check'] = false;
         $checkRowDb = DB::table('fa_coa_categories')->select(DB::raw("LOWER(TRIM(description)) AS description"))->get()->toArray();
@@ -142,6 +146,19 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
              $data['currency_exist']['check'] = true;
          }
 
+         $data['asset_type_exist']['check'] = false;
+         $assettype = DB::table('asset_types')->select(DB::raw("LOWER(TRIM(asset_type_description)) AS description"))->get()->toArray();
+         $checkRowDbColumn = array_column($assettype, 'description');
+         
+
+          if(!empty($data['asset_type'])){
+             if(in_array(strtolower(trim($data['asset_type'])), $checkRowDbColumn)){
+                 $data['asset_type_exist']['check'] = true;
+             }
+         }else{
+             $data['asset_type_exist']['check'] = true;
+         }
+
         return $data;
     }
 
@@ -167,6 +184,11 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
                     $onFailure('Currency not exist in Brand Submaster!');
                 }
             },
+            '*.asset_type_exist' => function($attribute, $value, $onFailure) {
+                if ($value['check'] === false) {
+                    $onFailure('Asset type not appropriate!');
+                }
+            },
         ];
     }
 
@@ -182,6 +204,7 @@ class UploadAssetsMasterfile implements ToCollection, SkipsEmptyRows, WithHeadin
             '*.vendor1_id.required'         => 'Vendor 1 Name Required!',
             '*.measurement.required'        => 'Measurement Required!',
             '*.color.required'              => 'Color Required!',
+            '*.asset_type.required'         => 'Asset Type Required!',
         ];
     }
 }

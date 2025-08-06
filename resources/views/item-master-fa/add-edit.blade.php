@@ -265,6 +265,17 @@
                                 <th><span class="required-star">*</span> Color</th>
                                 <td><input value="{{ $item->color ?: '' }}" type="text" name="color" id="color" class="form-control" required oninput="this.value = this.value.toUpperCase()"></td>
                             </tr>
+                            <tr>
+                                <th><span class="required-star">*</span> Asset Type</th>
+                                <td>
+                                    <select name="asset_type" id="asset_type" class="form-control" required>
+                                        <option value="" disabled {{ empty($item->asset_type) ? 'selected' : '' }}>None selected...</option>
+                                          @foreach ($asset_types as $asset_type)
+                                         <option value="{{ $asset_type->id }}" {{ $asset_type->id == $item->asset_type ? 'selected' : '' }}>{{ $asset_type->asset_type_description }}</option>
+                                        @endforeach
+                                    </select> 
+                                </td>
+                            </tr>
                             @if ($item->tasteless_code)
                                 <tr>
                                     <th><span class="required-star">*</span> SKU Status</th>
@@ -296,7 +307,7 @@
 </div>
 
 <script type="application/javascript">
-    $(`#categories_id,#sub_category_id,#currency_id,#brand_id,#sku_statuses_id`).select2({
+    $(`#categories_id,#sub_category_id,#currency_id,#brand_id,#sku_statuses_id,#asset_type`).select2({
         width: '100%',
         height: '100%',
         placeholder: 'None selected...'
