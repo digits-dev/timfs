@@ -137,8 +137,8 @@ use ProductionItemsApproval;
 	        | 
 	        */
 	        $this->table_row_color = [
-				['condition' => "[final_value_existing] > [final_value_vatex]", 'color' => 'danger'],
-				['condition' => "[final_value_existing] < [final_value_vatex]", 'color' => 'success'] 
+				['condition' => "[final_value_existing] < [final_value_vatex]", 'color' => 'danger'],
+				['condition' => "[final_value_existing] > [final_value_vatex]", 'color' => 'success'] 
 			];
 
 
@@ -673,11 +673,20 @@ use ProductionItemsApproval;
 
 		
 
-		// Retrieve existing final value or fallback
-		$data['final_value_existing'] = DB::table('production_items_approvals')
-			->where('reference_number', $data['reference_number'])
-			->value('final_value_vatex') ?? $data['final_value_vatex'];
+		// Retrieve existing final value or fallback  
+		$data['final_value_existing'] = DB::table('production_items') 
+		->where('production_items.reference_number', $data['reference_number'])
+		->select(DB::raw("
+			CASE 
+				WHEN {$data['final_value_vatex']} = final_value_vatex
+				THEN final_value_existing
+				ELSE final_value_vatex
+			END AS final_value_existings
+		"))
+		->value('final_value_existings'); 
 
+		
+			
 		// Update or create main production item
 		ProductionItemsModelApproval::updateOrCreate(
 			['reference_number' => $data['reference_number']],

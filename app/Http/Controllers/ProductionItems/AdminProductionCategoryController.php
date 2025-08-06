@@ -98,7 +98,8 @@ class AdminProductionCategoryController extends \crocodicstudio\crudbooster\cont
 	        | @color = Default is none. You can use bootstrap success,info,warning,danger,primary.        
 	        | 
 	        */
-	        $this->table_row_color = array();     	          
+	       	$this->table_row_color = array();     	          
+			$this->table_row_color[] = ["condition"=>"[status] == 'INACTIVE'","color"=>"danger"];          
 
 	        
 	        /*
@@ -155,8 +156,8 @@ class AdminProductionCategoryController extends \crocodicstudio\crudbooster\cont
 	        | $this->load_js[] = asset("myfile.js");
 	        |
 	        */
-	        $this->load_js = array();
-	        
+	        $this->load_js = array(); 
+	        $this->load_js[] = asset("js/ProductionCategory.js");
 	        
 	        
 	        /*

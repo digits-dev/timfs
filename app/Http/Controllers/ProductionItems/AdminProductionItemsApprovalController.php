@@ -656,17 +656,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 				->where('status', 'ACTIVE')
 				->orderBy('type_description')
 				->get()
-				->toArray();
-			$data['sku_legends'] = DB::table('sku_legends')
-			->where('status', 'ACTIVE')
-			->where('sku_legend', '!=', 'X')
-			->get()
-			->toArray();
-			$data['segmentations'] = DB::table('segmentations')
-				->where('status', 'ACTIVE')
-				->orderBy('segment_column_description')
-				->get()
-				->toArray();
+				->toArray(); 
 			$data['production_category'] = DB::table('production_item_categories')
 				->where('status', 'ACTIVE') 
 				->get()
@@ -899,13 +889,14 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 
 			// Delete removed ingredients
 			ProductionItemLines::where('production_item_id', $productionItemId)
-				->whereNotIn('production_item_line_id', $newItemCodesID)
-				->delete();
-	
+			->whereNotIn('production_item_line_id', $newItemCodesID)
+			->delete();
+
 				// Update final_value_existing from main table or fallback
-				$data['final_value_existing'] = DB::table('production_items')
-					->where('reference_number', $ref)
-					->value('final_value_vatex') ?? $data['final_value_vatex'];
+				$data['final_value_existing'] = DB::table('production_items_approvals')
+				->where('reference_number', $ref)
+				->value('final_value_existing') ?? $data['final_value_vatex'];
+		 
 
 				// Update approval status & info
 				ProductionItemsModelApproval::updateOrCreate(
