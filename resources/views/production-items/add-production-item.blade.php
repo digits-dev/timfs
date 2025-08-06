@@ -876,16 +876,17 @@
                     @else
                         <button type="button" id="save-datas" class="btn btn-success">+ Create data</button>
                 @endif
-                    <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-link'>← Back</a>
+                   <a href='{{ CRUDBooster::mainpath() }}' id="cancel-btn" class='btn btn-default'>Cancel</a>
                 @else
                     @if(!$view) 
                     <div class="panel-footer"> 
                         <button type="button" _action="approve" class="btn btn-success action-btn" id="approve-btn"><i class="fa fa-thumbs-up"></i> Approve</button>
                         <button type="button" _action="reject" class="btn btn-danger action-btn" id="reject-btn" style="margin-right: 10px;"><i class="fa fa-thumbs-down"></i> Reject</button>
-                    </div> 
-                    @endif
+                        
+                    @endif 
                     <a href='{{ CRUDBooster::mainpath() }}' id="cancel-btn" class='btn btn-default'>Cancel</a>
-                 @endif
+                    </div> 
+                 @endif 
             </div>
  
     </div>
@@ -1163,18 +1164,7 @@
                 height: '100%',
                 placeholder: 'None selected...'
             });
-        
-        $('#cancel-btn').on('click', function(){
-             Swal.fire({
-                title: 'Loading...',
-                html: 'Please wait...',
-                allowEscapeKey: false,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading()
-                },
-            });
-        })
+         
 
         $('#transfer_price_category').select2({
             width: '380px'  // makes Select2 respect the select's width/max-width
@@ -2772,7 +2762,8 @@
             $('#reject-btn').show(); 
             $('#add_comment_field').prop('disabled', false);
             $('.add-comment-btn').show();
-            $('[id*="Textarea"]').prop('disabled', false);  
+            $('[id*="Textarea"]').prop('disabled', false);
+            $('#cancel-btn').show(); 
         }
         //$('#ProductionItems').find('input, select, textarea').trigger('change'); 
     });

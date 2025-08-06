@@ -25,19 +25,29 @@ class UpdateAssetsMasterfile implements ToCollection, WithHeadingRow
     {
       
         foreach ($rows->toArray() as $row){
+<<<<<<< HEAD
             // dd($rows);
             $brand = DB::table('brands_assets')->where(DB::raw('LOWER(TRIM(brand_description))'),strtolower(trim($row['brand_name'])))->first();
         			
+=======
+            //$brand = DB::table('brands_assets')->where(DB::raw('LOWER(TRIM(brand_description))'),strtolower(trim($row['brand_name'])))->first();
+            $coa   = DB::table('fa_coa_categories')->where(DB::raw('LOWER(TRIM(description))'),strtolower(trim($row['coa'])))->first();
+            $sub_category   = DB::table('fa_sub_categories')->where(DB::raw('LOWER(TRIM(description))'),strtolower(trim($row['sub_category'])))->first();
+>>>>>>> master
             ItemMastersFa::where(['tasteless_code'=>$row['tasteless_code']])
             ->update([
-                'item_description'            => $row['item_description'],
-                'approved_at'                 => date('Y-m-d H:i:s')
+                // 'item_description'    => $row['item_description'],
+                'categories_id'       => $coa->id,
+                'subcategories_id'    => $sub_category->id,
+                'approved_at'         => date('Y-m-d H:i:s')
             ]); 
 
             ItemMastersFasApprovals::where(['tasteless_code'=>$row['tasteless_code']])
             ->update([
-                'item_description'            => $row['item_description'],
-                'approved_at'                 => date('Y-m-d H:i:s')
+                // 'item_description'    => $row['item_description'],
+                'categories_id'       => $coa->id,
+                'subcategories_id'    => $sub_category->id,
+                'approved_at'         => date('Y-m-d H:i:s')
             ]);
         }
     }

@@ -70,27 +70,28 @@ use ProductionItemsApproval;
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
-			$this->col = [];
-			$this->col[] = ["label"=>"Tasteless code","name"=>"reference_number"];
-			$this->col[] = ["label"=>"Description","name"=>"full_item_description"];
-			$this->col[] = ["label"=>"Production Category","name"=>"production_category","join"=>"production_item_categories,category_description" ];
-			$this->col[] = ["label"=>"Production Location","name"=>"production_location","join"=>"production_locations,production_location_description"];
-			$this->col[] = ["label"=>"Labor Cost","name"=>"labor_cost"];	
-			$this->col[] = ["label"=>"Markup %","name"=>"markup_percentage","callback"=>function($row){
+			$this->col = []; 
+			$this->col[] = ["label"=>"Original Markup %","name"=>"transfer_price_category.transfer_price_category_markup"]; 
+			$this->col[] = ["label"=>"Tasteless code","name"=>"production_items.reference_number"];
+			$this->col[] = ["label"=>"Description","name"=>"production_items.full_item_description"];
+			$this->col[] = ["label"=>"Production Category","name"=>"production_items.production_category","join"=>"production_item_categories,category_description" ];
+			$this->col[] = ["label"=>"Production Location","name"=>"production_items.production_location","join"=>"production_locations,production_location_description"];
+			$this->col[] = ["label"=>"Labor Cost","name"=>"production_items.labor_cost"];	
+			$this->col[] = ["label"=>"Markup %","name"=>"production_items.markup_percentage","callback"=>function($row){ 
 				return ($row->markup_percentage * 100) . '%';
 			}];
-			$this->col[] = ["label"=>"FC Landed cost","name"=>"landed_cost"];
-			$this->col[] = ["label"=>"OPEX","name"=>"opex"];
-			$this->col[] = ["label"=>"PM / Store Supplies", "name" => "packaging_cost","callback"=>function($row){
+			$this->col[] = ["label"=>"FC Landed cost","name"=>"production_items.landed_cost"];
+			$this->col[] = ["label"=>"OPEX","name"=>"production_items.opex"];
+			$this->col[] = ["label"=>"PM / Store Supplies", "name" => "production_items.packaging_cost","callback"=>function($row){
 				return round($row->packaging_cost , 2);
 			}];
-			$this->col[] = ["label"=>"TP (Existing)","name"=>"final_value_existing"];
-			$this->col[] = ["label"=>"TP Vat Ex (Revised Price)","name"=>"final_value_vatex"];
-			$this->col[] = ["label"=>"TP Vat Inc (Updated)","name"=>"final_value_vatinc"];
-			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name" ];
-			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name" ];
-			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
-			$this->col[] = ["label"=>"Updated At","name"=>"updated_at"]; 
+			$this->col[] = ["label"=>"TP (Existing)","name"=>"production_items.final_value_existing"];
+			$this->col[] = ["label"=>"TP Vat Ex (Revised Price)","name"=>"production_items.final_value_vatex"];
+			$this->col[] = ["label"=>"TP Vat Inc (Updated)","name"=>"production_items.final_value_vatinc"];
+			$this->col[] = ["label"=>"Created By","name"=>"production_items.created_by","join"=>"cms_users,name" ];
+			$this->col[] = ["label"=>"Updated By","name"=>"production_items.updated_by","join"=>"cms_users,name" ];
+			$this->col[] = ["label"=>"Created At","name"=>"production_items.created_at"];
+			$this->col[] = ["label"=>"Updated At","name"=>"production_items.updated_at"]; 
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -135,9 +136,12 @@ use ProductionItemsApproval;
 	        | @color = Default is none. You can use bootstrap success,info,warning,danger,primary.        
 	        | 
 	        */
-	        $this->table_row_color = array();     	          
+	        $this->table_row_color = [
+				['condition' => "[transfer_price_category_markup] / 100 > [markup_percentage]", 'color' => 'danger'],
+				['condition' => "[transfer_price_category_markup] / 100 < [markup_percentage]", 'color' => 'success'] 
+			];
 
-	        
+
 	        /*
 	        | ---------------------------------------------------------------------- 
 	        | You may use this bellow array to add statistic at dashboard 
@@ -234,8 +238,7 @@ use ProductionItemsApproval;
 	        | @condition = If condition. You may use field alias. E.g : [id] == 1
 	        | @color = Default is none. You can use bootstrap success,info,warning,danger,primary.        
 	        | 
-	        */
-	        $this->table_row_color = array();     	          
+	        */ 	          
 
 	        
 	        /*
@@ -272,7 +275,8 @@ use ProductionItemsApproval;
 	        |
 	        */
 	     
-	        
+			
+
 	        
 	        
 	        /*
@@ -311,6 +315,9 @@ use ProductionItemsApproval;
 	        
 	        
 	    }
+	 
+
+	 
 
 
 	    /*
@@ -335,8 +342,8 @@ use ProductionItemsApproval;
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-	        //Your code here
-	             
+	         $query->leftJoin('transfer_price_category', 'transfer_price_category.id', '=', 'production_items.transfer_price_category')
+          		->addSelect('transfer_price_category.transfer_price_category_markup'); 
 	    }
 
 	    /*
@@ -422,6 +429,7 @@ use ProductionItemsApproval;
 
 	    }
 
+		
  
 
  
@@ -516,6 +524,8 @@ use ProductionItemsApproval;
 			CodeCounter::where('type', 'PRODUCTION ITEMS')->increment('code_7');
 
 			$ref = $nextId;
+ 
+
 			$message = "✔️ Successfully added pending item with Item code " . $ref;
 		 
 			$data['reference_number'] = $ref;

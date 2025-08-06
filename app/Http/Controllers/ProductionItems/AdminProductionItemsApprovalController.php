@@ -97,6 +97,10 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			$this->col[] = ["label"=>"Action Type","name"=>"action_type"];
 			$this->col[] = ["label"=>"Production Category","name"=>"production_category","join"=>"production_item_categories,category_description" ];
 			$this->col[] = ["label"=>"Production Location","name"=>"production_location","join"=>"production_locations,production_location_description"];
+			$this->col[] = ["label"=>"Labor Cost","name"=>"labor_cost"];	
+			$this->col[] = ["label"=>"Markup %","name"=>"markup_percentage","callback"=>function($row){
+				return ($row->markup_percentage * 100) . '%';
+			}];
 			$this->col[] = ["label"=>"FC Landed cost","name"=>"landed_cost"];
 			$this->col[] = ["label"=>"OPEX","name"=>"opex"];
 			$this->col[] = ["label"=>"PM / Store Supplies", "name" => "packaging_cost","callback"=>function($row){
@@ -431,6 +435,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
 	    }
+ 
 
 	    /*
 	    | ---------------------------------------------------------------------- 

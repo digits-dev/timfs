@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         'App\Console\Commands\DatabaseBackup',
+        \App\Console\Commands\UpdateApprovalStatus::class,
     ];
 
     /**
@@ -27,6 +28,8 @@ class Kernel extends ConsoleKernel
     {
         //$schedule->command('mysql:backup')->daily()->at('23:00');
         $schedule->call('\App\Http\Controllers\PriceChangeController@updateCosting')->daily()->at('00:01');
+
+        $schedule->command('check:menu-approval-status')->everyMinute()->withoutOverlapping()->name('check-approval-status');
     }
 
     /**

@@ -5,6 +5,18 @@
 	use DB;
 	use CRUDBooster;
 	use App\Models\FaSubCategories;
+	use Carbon\Carbon;
+	use Illuminate\Support\Facades\Schema;
+	use Illuminate\Support\Facades\Storage;
+	use Intervention\Image\Facades\Image;
+	use Spatie\ImageOptimizer\OptimizerChainFactory;
+	use Illuminate\Support\Str;
+	use App\Imports\UploadSubCategory;
+	use PhpOffice\PhpSpreadsheet\Spreadsheet;
+	use PhpOffice\PhpSpreadsheet\Reader\Exception;
+	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+	use PhpOffice\PhpSpreadsheet\IOFactory;
+	use Maatwebsite\Excel\Facades\Excel;
 
 	class AdminFaCoaSubCategoriesController extends \crocodicstudio\crudbooster\controllers\CBController {
 		public function __construct() {
@@ -27,7 +39,7 @@
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
-			$this->button_export = false;
+			$this->button_export = true;
 			$this->table = "fa_sub_categories";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
@@ -130,7 +142,9 @@
 	        | 
 	        */
 	        $this->index_button = array();
-
+			if(CRUDBooster::isSuperadmin()){
+				$this->index_button[] = ["title"=>"Upload","label"=>"Upload","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('upload-sub-category')];
+			}
 
 
 	        /* 
@@ -346,5 +360,31 @@
 			return($subcategories);
 		}
 
+		public function uploadSubCategory() {
+			$data['page_title']= 'Upload';
+			return view('upload.sub-category-upload', $data)->render();
+		}
 
+		public function subCategoryUploadSave(Request $request) {
+			$data = Request::all();	
+			$file = $data['import_file'];
+			$path_excel = $file->store('temp');
+			$path = storage_path('app').'/'.$path_excel;
+
+			try {
+				Excel::import(new UploadSubCategory, $path);	
+			    CRUDBooster::redirect(CRUDBooster::adminpath('fa_coa_sub_categories'), trans("Upload Successfully!"), 'success');
+			} catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+				$failures = $e->failures();
+				$error = [];
+				foreach ($failures as $failure) {
+					$line = $failure->row();
+					foreach ($failure->errors() as $err) {
+						$error[] = $err . " on line: " . $line; 
+					}
+				}
+				$errors = collect($error)->unique()->toArray();
+			}
+			CRUDBooster::redirect(CRUDBooster::adminpath('brands_assets'), $errors[0], 'danger');
+		}
 	}
