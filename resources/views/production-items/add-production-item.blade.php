@@ -544,8 +544,9 @@
                                                         type="number"  
                                                         id="labor_cost_per_minute" 
                                                         name="labor_cost_per_minute"
+                                                        step="0.01"
                                                         class="form-control display-labor span-2" 
-                                                        value="{{round($item->labor_cost_per_minute)}}"
+                                                        value="{{round($item->labor_cost_per_minute, 2)}}"
                                                         placeholder="eg 120" 
                                                         required
                                                      />
@@ -556,7 +557,7 @@
                                                 <input  
                                                     id="total_minutes_per_pack" 
                                                     name="total_minutes_per_pack"
-                                                    value="{{round($item->total_minutes_per_pack)}}"
+                                                    value="{{round($item->total_minutes_per_pack , 2)}}"
                                                     class="form-control costparent cost" 
                                                     type="text" 
                                                     readonly 
@@ -569,7 +570,7 @@
                                                     id="labor_cost_val" 
                                                     name="labor_cost_val"
                                                     class="form-control costparent cost" 
-                                                    value="{{round($item->labor_cost_val)}}"
+                                                    value="{{round($item->labor_cost_val , 2)}}"
                                                     type="text" 
                                                     readonly 
                                                     required
@@ -687,45 +688,56 @@
                                         </thead>
                                             <tbody> 
                                                 <tr>
+                                                    <td> Choose Opex </td>
+                                                    <td colspan="2"> 
+                                                        <select name="opex_category" id="production_items_opex" class="form-control">
+                                                            <option value="" disabled selected> Manual </option>
+                                                            @foreach ($production_items_opexs as $production_items_opex)
+                                                                <option value="{{ $production_items_opex->id }}" {{ $production_items_opex->id == $item->opex_category ? 'selected' : '' }}>{{ $production_items_opex->opex_description }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td> 
+                                                </tr>
+                                                <tr> 
                                                     <td>Gas Cost (%)</td>
                                                     <td>
                                                         <input type="number"  step="0.01" name="gas_cost" id="gas_cost" value="{{ $item->gas_cost }}" class="form-control text-right">
                                                     </td>
                                                       <td>
-                                                        <input type="number" name="gas_costxfc" id="gas_costxfc" value="{{ $item->gas_costxfc }}" class="form-control text-right" readonly required>
+                                                        <input type="number"  step="0.01" name="gas_costxfc" id="gas_costxfc" value="{{ $item->gas_costxfc }}" class="form-control text-right" readonly required>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td>Storage Cost (%)</td>
                                                     <td>
-                                                        <input type="number" name="storage_cost" id="storage_cost" value="{{ $item->storage_cost }}" class="form-control text-right">
+                                                        <input type="number"  step="0.01" name="storage_cost" id="storage_cost" value="{{ $item->storage_cost }}" class="form-control text-right">
                                                     </td>
                                                       <td>
-                                                        <input type="number" name="storage_costxfc" id="storage_costxfc" value="{{ $item->storage_costxfc }}" class="form-control text-right" readonly required>
+                                                        <input type="number"  step="0.01" name="storage_costxfc" id="storage_costxfc" value="{{ $item->storage_costxfc }}" class="form-control text-right" readonly required>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td> Meralco (%)</td>
                                                     <td>
-                                                        <input type="number" name="meralco" id="meralco" value="{{ $item->meralco }}" class="form-control text-right">
+                                                        <input type="number"  step="0.01" name="meralco" id="meralco" value="{{ $item->meralco }}" class="form-control text-right">
                                                     </td>
                                                       <td>
-                                                        <input type="number" name="meralcoxfc" id="meralcoxfc" value="{{ $item->meralcoxfc }}" class="form-control text-right" readonly required>
+                                                        <input type="number"  step="0.01" name="meralcoxfc" id="meralcoxfc" value="{{ $item->meralcoxfc }}" class="form-control text-right" readonly required>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td> Water (%)</td>
                                                     <td>
-                                                        <input type="number" name="water" id="water" value="{{ $item->water }}" class="form-control text-right">
+                                                        <input type="number"  step="0.01" name="water" id="water" value="{{ $item->water }}" class="form-control text-right">
                                                     </td>
                                                     <td>
-                                                        <input type="number" name="waterxfc" id="waterxfc" value="{{ $item->waterxfc }}" class="form-control text-right" readonly required>
+                                                        <input type="number"  step="0.01" name="waterxfc" id="waterxfc" value="{{ $item->waterxfc }}" class="form-control text-right" readonly required>
                                                     </td>
                                                 </tr>
                                                     <tr>
                                                     <td> Opex</td>
                                                     <td colspan="2">
-                                                        <input type="number" name="opex" id="opex" value="{{ $item->opex }}" class="form-control text-right" readonly required>
+                                                        <input type="number"  step="0.01" name="opex" id="opex" value="{{ $item->opex }}" class="form-control text-right" readonly required>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -908,7 +920,11 @@
     $(document).ready(function() {
         Swal.close();
         const allSubcategories = {!! json_encode($subcategories) !!}; 
+        
+          
 
+        
+        
         console.log("{{$isAddPage}}");
 
         //for showing message no package or ingredients found 
@@ -997,7 +1013,7 @@
             let total_prepquantity_ing = 0;
             let total_prepquantity_pac = 0;
             const rawMastProvision = 0; 
-
+           
             $('[class*="packaging-wrapper"]').each(function() {
                  
                 var id = $(this).attr('id');
@@ -1158,14 +1174,15 @@
             #production_category,
             #transfer_price_category,
             #production_location,
-            #storage_location
+            #storage_location,
+            #production_items_opex
             `).select2({
                 width: '100%',
                 height: '100%',
                 placeholder: 'None selected...'
             });
-         
-
+          
+          
         $('#transfer_price_category').select2({
             width: '380px'  // makes Select2 respect the select's width/max-width
         });
@@ -1195,7 +1212,7 @@
             }
         })
 
-        $(document).on('click', '.send-comment-btn', function() { 
+        $(document).on('click', '.send-comment-reply', function() { 
             if(is_SendingComment == false)
             {
                 let id = $(this).attr('id').replace(/\D/g, '');  
@@ -1229,8 +1246,7 @@
              $(newRowHtml).appendTo('#package-tbody');
             PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
             showNoData();
-                showNoDataIngredient();
-                 format_decimal()
+                showNoDataIngredient(); 
         });
 
          $("#add-Row-ingredient").click(function () { 
@@ -1241,7 +1257,7 @@
             IngredientSearch(`#itemDesc${tableRow}`, tableRow); 
             showNoData();
                 showNoDataIngredient();
-                 format_decimal()
+                
         });
         
  
@@ -1252,7 +1268,7 @@
             $(newRowPackHtml).appendTo(`.sub-ingredient${parentId}`);
             
             IngredientSearch(`#itemDesc${tableRow}`, tableRow); 
-             format_decimal()
+       
         });
 
 
@@ -1262,8 +1278,7 @@
             const newRowPackHtml = Sub_gen_pack_row(tableRow, "", "", "", "", "","", "", "", "");  
             $(newRowPackHtml).appendTo(`.sub-pack${parentId}`);
              
-            PackagingSearchInit(`#itemDesc${tableRow}`, tableRow); 
-             format_decimal()
+            PackagingSearchInit(`#itemDesc${tableRow}`, tableRow);  
         });
 
         $(document).on('click', '.add-sub-btn-labor', function(event) {
@@ -1271,8 +1286,7 @@
             const newRowPackHtml = Sub_gen_Labor_row(tableRow,"","","","","");  
              // function Sub_gen_Labor_row(rowId, time_labor, yields, preparations, description, labor_yield_uom) {
             $(newRowPackHtml).appendTo(`.sub-labor`); 
-            showNoDataLabor();
-             format_decimal()
+            showNoDataLabor(); 
         });
 
         ajax_add(); 
@@ -1805,8 +1819,7 @@
                 'default_cost': $(`#default_cost${sub_id}`).val(),
             };
             
-
-            entry.removeClass('animate__animated animate__bounceIn'); 
+ 
             
             const prevBr = entry;   
 
@@ -1872,7 +1885,11 @@
             if($(this).val() != 8)
             {
                 var markup = $(this).find('option:selected').data('markup');  // get data-markup
-                $('#markup_percentage').val(markup + ' %').trigger('input');
+                if(markup != null)
+                {
+                    $('#markup_percentage').val(markup + ' %').trigger('input'); 
+                }
+                
             } 
              
         });
@@ -1889,11 +1906,11 @@
             }
         })
 
-        $('#markup_percentage').on('change', function(){  
+        $('#markup_percentage').on('input', function(){  
             $('#markup_percentage').val(getIdNumber($(this).val().replace(' %', '')) + ' %');  
         });
         
-        $('#markup_percentage').val($('#markup_percentage').val() * 100).trigger('change');
+        $('#markup_percentage').val($('#markup_percentage').val() * 100).trigger('input');
 
         $('#transfer_price_category').trigger('change');
         
@@ -1909,17 +1926,29 @@
         });
 
 
+        const opex_ids = ['gas_cost','storage_cost','meralco','water']; 
 
-         
+        $('#production_items_opex').on('change', function(){
+           
+            const production_items_opexs = @json($production_items_opexs);
+            const opex_value = production_items_opexs[$(this).val() - 1]; 
+            opex_ids.forEach(function(e)
+            {  
+                $(`#${e}`).val(parseFloat(opex_value[e]).toFixed(2)).trigger('change'); 
+            }); 
+            calculateFinalValues(); 
+        }) 
+
+        opex_ids.forEach(function(e)
+        {  
+            $(`#${e}`).on('keyup', function(){ 
+                $('#production_items_opex').val(null).trigger('change.select2');
+            });
+        }); 
 
 
         $(document).on('click', '.move-up', function() {
-            const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper');
-            const chld = entry.find('.animate__bounceIn, .animate__rubberBand'); 
-
-
-            entry.removeClass('animate__animated animate__bounceIn');
-            chld.removeClass('animate__animated animate__bounceIn animate__rubberBand'); 
+            const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper'); 
 
             const prevBr = entry.prevAll('br').first(); 
             let sibling = entry.prev();
@@ -1961,11 +1990,7 @@
 
         $(document).on('click', '.move-down', function() {
             const entry = $(this).parents('.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper');
-            const chld = entry.find('.animate__bounceIn, .animate__rubberBand'); 
-
-
-            entry.removeClass('animate__animated animate__bounceIn');
-            chld.removeClass('animate__animated animate__bounceIn animate__rubberBand'); 
+             
 
             const nextBr = entry.nextAll('br').first();
 
@@ -2010,8 +2035,8 @@
             );
         });
         
-          $(document).on('click', '.delete', function(event) {
-             
+        $(document).on('click', '.delete', function(event) {
+            
             const entry = $(this).parents(
                 '.ingredient-wrapper, .new-ingredient-wrapper, .packaging-wrapper, .new-packaging-wrapper'
             );
@@ -2022,12 +2047,12 @@
                 showNoDataIngredient();
                 calculateFinalValues();
             });
-          
+            
         }); 
 
 
         $(document).on('click', '.delete-sub', function(event) {
-               
+           let parent  =  $(this).closest('.sub-elements').attr('class')
             const subEntry = $(this).parents(`
                 .substitute-ingredient, 
                 .new-substitute-ingredient, 
@@ -2036,9 +2061,14 @@
             `);
             subEntry.hide('fast', function() {
                 $(this).remove();
-              calculateFinalValues();
+                calculateFinalValues();
+                if(parent == 'sub-labor sub-elements')
+                { 
+                    $('#labor_cost_per_minute').trigger('change');
+                } 
             });
-           
+
+          
         });
   
 
@@ -2103,31 +2133,26 @@
         
         showNoData(); 
         showNoDataIngredient();
-        showNoDataLabor();
-        format_decimal(); 
-        function format_decimal(){
-           $('#ProductionItems').find('input').on('blur', function() {
+        showNoDataLabor(); 
+        
+        $(document).on('blur', 'input', function(){
+             
                 if ($(this).attr('type') === 'number') {
                     let val = parseFloat($(this).val());
                     if (!isNaN(val)) {
                         $(this).val(val.toFixed(2)).trigger('input');
                     } else {
-                        $(this).val('').trigger('input');
+                        $(this).val(parseFloat(0).toFixed(2)).trigger('input');
                     }
                     calculateTotalStorage();
                     calculateFinalValues();
                 }
-            });
-        }
-
-      
-        
+        });
+       
         function Load_Production_Item_Lines()
         {
             const production_item_lines = @json($production_item_lines);
-            const production_items_comments = @json($production_items_comments);  
- 
-
+            const production_items_comments = @json($production_items_comments);   
             //looping for parent packeaging/ingredients
             production_item_lines.forEach(item => {
           
@@ -2235,6 +2260,7 @@
                     }
                 } 
                 tableRow = item.production_item_line_id;
+                 
             });
 
 
@@ -2309,7 +2335,8 @@
                     $(newRowPackHtml).appendTo(`.sub-labor`); 
                     showNoDataLabor(); 
                     $(`#time-labor${tableRow}`).trigger('change');
-            }    
+            }  
+         
         });
 
        
@@ -2350,7 +2377,7 @@
                                     <textarea class="form-control" id="Textarea${rowId}" rows="3"></textarea>
                                 
                                     <ul class="list-unstyled" style="display:flex; gap:15px;">
-                                        <li style="color:#999; margin-left: 0px; font-size:12px; display:flex;" class="send-comment-btn" id="send-comment-btn${rowId}">
+                                        <li style="color:#999; margin-left: 0px; font-size:12px; display:flex;" class="send-comment-reply" id="send-comment-reply${rowId}">
                                             <i class="glyphicon glyphicon-send " style="margin-right:5px;"></i> Send 
                                         </li>
                                         <li style="color:#999;  font-size:12px; display:flex; align-items:center; cursor:pointer;"data-toggle="collapse" data-target="#collapseExample${rowId}" aria-expanded="false" aria-controls="collapseExample${rowId}">
@@ -2394,7 +2421,7 @@
 
           function Sub_gen_Labor_row(rowId, time_labor, yields, preparations, description, labor_yield_uom) {
             return `  
-                <div class="substitute-packaging animate__animated animate__bounceIn"  id="labor-entry-sub${rowId}">
+                <div class="substitute-packaging"  id="labor-entry-sub${rowId}">
                 <div class="packaging-inputs">
                     <input
                         value="labor"
@@ -2440,7 +2467,7 @@
                     
                      <label class="label-wide">
                     <span class="required-star">*</span> Yield UOM <span class="date-updated"></span>
-                    <input value="${labor_yield_uom}" class="form-control" id="labor_yield_uom" name="LaborLines[${rowId}][labor_yield_uom]" id="yiel${rowId}"  type="text"/>
+                    <input value="${labor_yield_uom}" class="form-control" id="labor_yield_uom${rowId}" name="LaborLines[${rowId}][labor_yield_uom]" id="yiel${rowId}"  type="text"/>
                     </label> 
                     <label class="label-wide">
                     <span class="required-star">*</span> Duration <span class="date-updated"></span>
@@ -2460,7 +2487,7 @@
         function Sub_gen_ingredient_row(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost, costparent_contribution, qty_contribution, preparations, description)
           {
             return `  
-                <div class="substitute-packaging sub-ing animate__animated animate__bounceIn" id="ingredient-entry${rowId}" >
+                <div class="substitute-packaging sub-ing" id="ingredient-entry${rowId}" >
                 <div class="packaging-inputs">
                        <label class="packaging-label">
                             <span class="required-star">*</span> Ingredient <span class="item-from label"></span> <span class="label label-danger"></span>
@@ -2535,7 +2562,7 @@
           function generateRowingredientHtml(rowId, DB_id, tasteless_code, itemDesc, ttp, quantity, yiel, packsize, cost , costparent_contribution, qty_contribution, preparations ,description , actual_pack_uom) {
             return ` 
             
-            <div class="packaging-wrapper animate__animated animate__bounceIn" id="ingredient-entry${rowId}">
+            <div class="packaging-wrapper" id="ingredient-entry${rowId}">
                 <div class="packaging-entry" isExisting="true">
                     <div class="packaging-inputs">
                         <label class="packaging-label">
@@ -2630,7 +2657,7 @@
           function Sub_gen_pack_row(rowId, DB_id, tasteless_code, quantity, cost, description, default_cost, packsize, costparent_contribution, qty_contribution )
           {
             return `  
-            <div class="substitute-packaging  sub-pack  animate__animated animate__bounceIn" id="packaging-entry${rowId}">
+            <div class="substitute-packaging  sub-pack" id="packaging-entry${rowId}">
                 <div class="packaging-inputs">
                       <label class="packaging-label">
                             <span class="required-star">*</span> Packaging <span class="item-from label"></span> <span class="label label-danger"></span>
@@ -2680,7 +2707,7 @@
           function generateRowHtml(rowId, DB_id, tasteless_code, quantity, cost, description, default_cost, packsize, costparent_contribution, qty_contribution) {
             return `  
                  
-                    <div class="packaging-wrapper animate__animated animate__bounceIn" id="packaging-entry${rowId}">
+                    <div class="packaging-wrapper" id="packaging-entry${rowId}">
                     <div class="packaging-entry" isExisting="true">
                         <div class="packaging-inputs">
                             <label class="packaging-label">
@@ -2754,9 +2781,8 @@
         });
 
         if(disableifapproval == 'production_items_approvals' || view_ == 'true')
-        {
-           
-            $('#ProductionItems').find('input, select, textarea').prop('disabled', true);
+        { 
+            $('#ProductionItems').find('input, select, textarea').prop('disabled', true); 
             $('[class*="btn"]').hide();
             $('#approve-btn').show(); 
             $('#reject-btn').show(); 
@@ -2764,8 +2790,8 @@
             $('.add-comment-btn').show();
             $('[id*="Textarea"]').prop('disabled', false);
             $('#cancel-btn').show(); 
-        }
-        //$('#ProductionItems').find('input, select, textarea').trigger('change'); 
+        } 
+        $('input').trigger('blur');
     });
 
  

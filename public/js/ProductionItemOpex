@@ -1,0 +1,5 @@
+$(document).ready(function() {
+    $("#gas_cost").keyup(function() {
+        this.value = this.value.toLocaleUpperCase();
+    });
+});

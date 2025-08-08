@@ -26,6 +26,7 @@ class ProductionItemsModelApproval extends Model
     'storage_multiplier',
     'packaging_cost',
     'ingredient_cost',
+    'opex_category',
     'total_storage_cost', 
     'gas_costxfc', 
     'storage_costxfc',

@@ -498,7 +498,7 @@ use ProductionItemsApproval;
 		 
 
 	public function addProductionItemsToDB(Request $request){
- 
+  
 		$message = '';
 		$time_stamp_now = date('Y-m-d H:i:s');  
 		$data = $request->all(); 
@@ -601,79 +601,15 @@ use ProductionItemsApproval;
 
 		// Process ingredients and labor lines
 		$productionItemId = $data['reference_number'];
-		$ingredients = $request->input('produtionlines', []);
+		$ingredient_packagings = $request->input('produtionlines', []);
 		$laborLines = $request->input('LaborLines', []);
 
-		$newItemCodesID = [];
-		$newId = 0;  
-		// Save ingredient lines 
-
-		if($ingredients)
-		{
-			foreach ($ingredients as $ingredientGroup) {
-				$parentId = ++$newId;
-				foreach ($ingredientGroup as $ingredient) {
-					ProductionItemLinesModelApproval::updateOrCreate(
-						[
-							'production_item_id' => $productionItemId,
-							'production_item_line_id' => $newId,
-						],
-						[
-							'production_item_id' => $productionItemId,
-							'item_code' => $ingredient['tasteless_code'],
-							'cost_contribution' => self::removePercent($ingredient['costparent-contribution'] ?? $ingredient['costparent-contribution-pack'] ?? null),
-							'qty_contribution' => self::removePercent($ingredient['qty-contribution'] ?? $ingredient['qty-contribution-pack'] ?? null),
-							'actual_pack_uom' => $ingredient['actual_pack_uom'],
-							'description' => $ingredient['itemDesc'],
-							'quantity' => $ingredient['quantity'],
-							'yield' => $ingredient['yield'],
-							'preparations' => $ingredient['preparations'],
-							'landed_cost' => $ingredient['ttp'] ?? $ingredient['cost'],
-							'packaging_id' => $parentId,
-							'production_item_line_id' => $newId,
-							'production_item_line_type' => $ingredient['production_type'],
-							'approval_status' => 204,
-						]
-					);
-					$newItemCodesID[] = $newId++;
-				}
-			}
-		}
-		if($laborLines)
-		{
-			// Save labor lines
-			foreach ($laborLines as $laborLine) {
-				$newId++;
-				$newItemCodesID[] = $newId;
-				ProductionItemLinesModelApproval::updateOrCreate(
-					[
-						'production_item_id' => $productionItemId,
-						'production_item_line_id' => $newId,
-					],
-					[
-						'production_item_id' => $productionItemId,
-						'time_labor' => $laborLine['time-labor'],
-						'labor_yield_uom' => $laborLine['labor_yield_uom'],
-						'duration' => $laborLine['duration'],
-						'yield' => $laborLine['yiel'],
-						'preparations' => $laborLine['preparations'],
-						'production_item_line_type' => $laborLine['production_item_line_type'],
-						'approval_status' => 204,
-						'production_item_line_id' => $newId,
-					]
-				);
-			}
-		}
-
-
-		// Delete removed ingredients
-		ProductionItemLinesModelApproval::where('production_item_id', $productionItemId)
-			->whereNotIn('production_item_line_id', $newItemCodesID)
-			->delete();
-
+		
+		// Save ingredient lines  
+		self::saveProductionLines(ProductionItemLinesModelApproval::class,$ingredient_packagings, $laborLines , $productionItemId);
 		
 
-		// Retrieve existing final value or fallback  
+		// Retrieve last final value or fallback  
 		$data['final_value_existing'] = DB::table('production_items') 
 		->where('production_items.reference_number', $data['reference_number'])
 		->select(DB::raw("
@@ -683,9 +619,11 @@ use ProductionItemsApproval;
 				ELSE final_value_vatex
 			END AS final_value_existings
 		"))
-		->value('final_value_existings'); 
-
-		
+		->value('final_value_existing'); 
+		 if(!$data['opex_category'])
+		 {
+			$data['opex_category'] = null;
+		 }
 			
 		// Update or create main production item
 		ProductionItemsModelApproval::updateOrCreate(
@@ -702,11 +640,84 @@ use ProductionItemsApproval;
 
 		
 	}
-	
-	 function removePercent($value) {
-		$cleanValue = str_replace('%', '', $value);
-		return floatval($cleanValue);
-	}
+		public function saveProductionLines($ProductionItemLinesModel,$ingredient_packagings, $laborLines , $productionItemId){
+
+			$newItemCodesID = [];
+			
+			$newId = 0; 
+			
+			if($ingredient_packagings)
+			{
+				foreach ($ingredient_packagings as $ingredient_pack) {
+					$parentId = ++$newId;
+					foreach ($ingredient_pack as $ingredients_packs) {
+						$ProductionItemLinesModel::updateOrCreate(
+							[
+								'production_item_id' => $productionItemId,
+								'production_item_line_id' => $newId,
+							],
+							[
+								'production_item_id' => $productionItemId,
+								'item_code' => $ingredients_packs['tasteless_code'],
+								'cost_contribution' => self::removePercent($ingredients_packs['costparent-contribution'] ?? $ingredients_packs['costparent-contribution-pack'] ?? null)  ?? 0,
+								'qty_contribution' => self::removePercent($ingredients_packs['qty-contribution'] ?? $ingredients_packs['qty-contribution-pack'] ?? null)  ?? 0,
+								'actual_pack_uom' => $ingredients_packs['actual_pack_uom'] ?? 0,
+								'description' => $ingredients_packs['itemDesc'],
+								'quantity' => $ingredients_packs['quantity'] ?? 0,
+								'yield' => $ingredients_packs['yield'] ?? 0,
+								'preparations' => $ingredients_packs['preparations'],
+								'landed_cost' => $ingredients_packs['ttp'] ?? $ingredients_packs['cost']  ?? 0,
+								'packaging_id' => $parentId,
+								'production_item_line_id' => $newId,
+								'production_item_line_type' => $ingredients_packs['production_type'],
+								'approval_status' => 204,
+							]
+						);
+						$newItemCodesID[] = $newId++;
+					}
+				}
+			}
+			if($laborLines)
+			{
+				// Save labor lines
+				foreach ($laborLines as $laborLine) {
+					$newId++;
+					$newItemCodesID[] = $newId;
+					$ProductionItemLinesModel::updateOrCreate(
+						[
+							'production_item_id' => $productionItemId,
+							'production_item_line_id' => $newId,
+						],
+						[
+							'production_item_id' => $productionItemId,
+							'time_labor' => $laborLine['time-labor'] ?? 0,
+							'labor_yield_uom' => $laborLine['labor_yield_uom'] ?? '',
+							'duration' => $laborLine['duration'] ?? 0,
+							'yield' => $laborLine['yiel'] ?? 0,
+							'preparations' => $laborLine['preparations'],
+							'production_item_line_type' => $laborLine['production_item_line_type'],
+							'approval_status' => 204,
+							'production_item_line_id' => $newId,
+						]
+					);
+				}
+			}
+
+
+		// Delete removed ingredients
+		$ProductionItemLinesModel::where('production_item_id', $productionItemId)
+			->whereNotIn('production_item_line_id', $newItemCodesID)
+			->delete();
+		}
+
+
+
+
+
+		function removePercent($value) {
+			$cleanValue = str_replace('%', '', $value);
+			return floatval($cleanValue);
+		}
 	 	public function getAdd() {
 			if (!CRUDBooster::isCreate())
 				CRUDBooster::redirect(
@@ -949,7 +960,7 @@ use ProductionItemsApproval;
 				->get()
 				->toArray(); 
 
-
+			
 			$data['production_item_lines'] =  DB::table('production_item_lines')
 												->select('production_item_lines.*', 
 												DB::raw('
@@ -984,7 +995,10 @@ use ProductionItemsApproval;
 				->select(DB::raw('MAX(ROUND(comment_id)) as max_comment_id'))
 				->value('max_comment_id');
 	
- 
+			$data['production_items_opexs'] = DB::table('production_items_opex')
+						->where('status', 'ACTIVE') 
+						->get()
+						->toArray();    
 
 			return $data;
 		}

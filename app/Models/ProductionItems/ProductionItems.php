@@ -49,6 +49,7 @@ protected $table = 'production_items';
     'storage_multiplier',
     'packaging_cost',
     'ingredient_cost',
+    'opex_category',
     'total_storage_cost', 
     'gas_costxfc', 
     'storage_costxfc',

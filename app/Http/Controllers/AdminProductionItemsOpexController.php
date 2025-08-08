@@ -1,15 +1,17 @@
 <?php namespace App\Http\Controllers;
 
-	use Session;
+use App\Models\ProductionItems\ProductionItems;
+use Session;
 	use Request;
 	use DB;
 	use CRUDBooster;
 
-	class AdminProductionItemStorageLocationsController extends \crocodicstudio\crudbooster\controllers\CBController {
+	class AdminProductionItemsOpexController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 	    public function cbInit() {
+	    	# START CONFIGURATION DO NOT REMOVE THIS LINE
+ 
 
-			# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->title_field = "id";
 			$this->limit = "20";
 			$this->orderby = "id,desc";
@@ -25,31 +27,75 @@
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "production_item_storage_locations";
+			$this->table = "production_items_opex";
+
+
+
+
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
-			$this->col = [];
-			$this->col[] = ["label"=>"Storage Location Description","name"=>"storage_location_description"];
-			$this->col[] = ["label"=>"status","name"=>"status"];
-			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name" ];
-			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name" ];
+			$this->col = []; 
+			$this->col[] = ["label"=>"Opex Description","name"=>"opex_description"];
+			$this->col[] = ["label"=>"Gas Cost","name"=>"gas_cost"];
+			$this->col[] = ["label"=>"Meralco","name"=>"meralco"];
+			$this->col[] = ["label"=>"Storage Cost","name"=>"storage_cost"];
+			$this->col[] = ["label"=>"Water","name"=>"water"];
+			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
-			$this->col[] = ["label"=>"Updated At","name"=>"updated_at"];  
+			$this->col[] = ["label"=>"Updated At","name"=>"updated_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Storage Location Description','name'=>'storage_location_description','type'=>'text','validation'=>'required|string|max:255','width'=>'col-sm-10'];
-			$this->form[] = [ 'label' => 'Status', 'name' => 'status', 'type' => 'select', 'validation' => 'required|string|max:20', 'width' => 'col-sm-10', 'dataenum' => 'ACTIVE;INACTIVE'];
-				
-			 # END FORM DO NOT REMOVE THIS LINE
 
-			# OLD START FORM
-			//$this->form = [];
-			//$this->form[] = ['label'=>'Storage Location Description','name'=>'storage_location_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Status','name'=>'status','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			# OLD END FORM
+			$this->form[] =  [
+				'label' => 'Opex Description',
+				'name' => 'opex_description',
+				'type' => 'text',         
+				'validation' => 'required', 
+				'width' => 'col-sm-6',
+			];
+
+			$this->form[] =  [
+				'label' => 'Gas Cost',
+				'name' => 'gas_cost',
+				'type' => 'number',         
+				'validation' => 'required|numeric',
+				'step' => '0.01',           
+				'width' => 'col-sm-6',
+			];
+
+			$this->form[] = [
+				"label" => "Meralco",
+				"name" => "meralco",
+				"type" => "number",
+				"step" => "0.01",
+				"validation" => "required|numeric",
+				'width' => 'col-sm-6',
+			];
+
+			$this->form[] = [
+				"label" => "Storage Cost",
+				"name" => "storage_cost",
+				"type" => "number",
+				"step" => "0.01",
+				"validation" => "required|numeric",
+				'width' => 'col-sm-6',
+			];
+
+			$this->form[] = [
+				"label" => "Water",
+				"name" => "water",
+				"type" => "number",
+				"step" => "0.01",
+				"validation" => "required|numeric",
+				'width' => 'col-sm-6',
+			];
+
+
+			# END FORM DO NOT REMOVE THIS LINE     
 
 			/* 
 	        | ---------------------------------------------------------------------- 
@@ -148,8 +194,12 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
-	        $this->script_js = NULL;
-
+	        $this->script_js = '$(document).ready(function() {
+									$("#opex_description").keyup(function() {
+										this.value = this.value.toLocaleUpperCase();
+									});
+								});';
+											
 
             /*
 	        | ---------------------------------------------------------------------- 
@@ -182,12 +232,8 @@
 	        | URL of your javascript each array 
 	        | $this->load_js[] = asset("myfile.js");
 	        |
-	        */
-	        $this->load_js = array();
-		
-	        $this->load_js[] = asset("js/ProductionStorageLocation.js");
-	 	    dd($this->load_js);
-	    
+	        */ 
+	        $this->load_js = array();  
 	        /*
 	        | ---------------------------------------------------------------------- 
 	        | Add css style at body 
@@ -257,10 +303,10 @@
 	    | @arr
 	    |
 	    */
-	   public function hook_before_add(&$postdata) 
-		{ 
-			$postdata['created_by'] = CRUDBooster::myId(); 
-		}
+	    public function hook_before_add(&$postdata) {        
+	        //Your code here
+			$postdata['created_by'] = CRUDBooster::myId();
+	    }
 
 	    /* 
 	    | ---------------------------------------------------------------------- 
@@ -271,10 +317,9 @@
 	    */
 	    public function hook_after_add($id) {        
 	        //Your code here
-
+			
 	    }
-		
-		
+
 	    /* 
 	    | ---------------------------------------------------------------------- 
 	    | Hook for manipulate data input before update data is execute
@@ -283,10 +328,10 @@
 	    | @id       = current id 
 	    | 
 	    */
-	    public function hook_before_edit(&$postdata,$id) 
-		{
-			$postdata['updated_by'] = CRUDBooster::myId(); // sets current user ID
-		}
+	    public function hook_before_edit(&$postdata,$id) {        
+	        //Your code here
+			$postdata['updated_by'] = CRUDBooster::myId();
+	    }
 
 	    /* 
 	    | ---------------------------------------------------------------------- 
@@ -296,8 +341,8 @@
 	    | 
 	    */
 	    public function hook_after_edit($id) {
-	        //Your code here 
-
+	        //Your code here  
+			self::updateAllProductionItems($id); 
 	    }
 
 	    /* 
@@ -309,7 +354,7 @@
 	    */
 	    public function hook_before_delete($id) {
 	        //Your code here
-
+				
 	    }
 
 	    /* 
@@ -321,10 +366,19 @@
 	    */
 	    public function hook_after_delete($id) {
 	        //Your code here
-
+			 
 	    }
 
-	
+		public function updateAllProductionItems($id){
+			$opex_category = DB::table('production_items_opex')
+							->select('*')
+							->where('id', $id)	
+							->get()
+							->first(); 
+ 
+    
+			 
+		}
 
 	    //By the way, you can still create your own method in here... :) 
 

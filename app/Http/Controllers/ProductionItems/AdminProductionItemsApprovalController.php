@@ -133,12 +133,13 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 	  
 		 
 			$this->addaction = array();
+
 			$this->addaction[] = [
 					'title'=>'Approve',
 					'url'=>CRUDBooster::mainpath('approve_or_reject_production_items/[id]'),
 					'icon'=>'fa fa-thumbs-up',
 					'color' => ' ',
-					"showIf"=>"[approval_status] != '200'",
+					"showIf"=>"[approval_status] != '400'",
 			];
 
 	        /* 
@@ -715,6 +716,11 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 			$data['comment_id'] = DB::table('production_items_comments')
 				->select(DB::raw('MAX(ROUND(comment_id)) as max_comment_id'))
 				->value('max_comment_id');
+			
+			$data['production_items_opexs'] = DB::table('production_items_opex')
+					->where('status', 'ACTIVE') 
+					->get()
+					->toArray();    
 
 			return $data;
 		}
@@ -764,7 +770,7 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 
 			return redirect(CRUDBooster::mainpath())
 				->with([
-					'message_type' => 'success',
+					'message_type' => 'info',
 					'message' => 'Item Successfully Rejected',
 				])->send();
 		}
@@ -817,107 +823,40 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 					$data[$colName] = $value; // overwrite selected
 				}
 			}
-
-
-
-
+ 
 			// Process ingredients and labor lines
 			$productionItemId = $data['reference_number'];
-			$ingredients = $request->input('produtionlines', []);
-			$laborLines = $request->input('LaborLines', []); 
-			$newItemCodesID = [];
-			$newId = 0;  
-			// Save ingredient lines 
+			$ingredient_packagings = $request->input('produtionlines', []);
+			$laborLines = $request->input('LaborLines', []);  
+			 
+			$this->main_controller->saveProductionLines(ProductionItemLines::class,$ingredient_packagings, $laborLines , $productionItemId); 
+			
+			// Update final_value_existing from main table or fallback
+			$data['final_value_existing'] = DB::table('production_items_approvals')
+			->where('reference_number', $ref)
+			->value('final_value_existing') ?? $data['final_value_vatex'];
+		
 
-			if($ingredients)
-			{
-				foreach ($ingredients as $ingredientGroup) {
-					$parentId = ++$newId;
-					foreach ($ingredientGroup as $ingredient) {
-						ProductionItemLines::updateOrCreate(
-							[
-								'production_item_id' => $productionItemId,
-								'production_item_line_id' => $newId,
-							],
-							[
-								'production_item_id' => $productionItemId,
-								'item_code' => $ingredient['tasteless_code'],
-								'cost_contribution' => $this->main_controller->removePercent($ingredient['costparent-contribution'] ?? $ingredient['costparent-contribution-pack'] ?? null),
-								'qty_contribution' => $this->main_controller->removePercent($ingredient['qty-contribution'] ?? $ingredient['qty-contribution-pack'] ?? null),
-								'actual_pack_uom' => $ingredient['actual_pack_uom'],
-								'description' => $ingredient['itemDesc'],
-								'quantity' => $ingredient['quantity'],
-								'yield' => $ingredient['yield'],
-								'preparations' => $ingredient['preparations'],
-								'landed_cost' => $ingredient['ttp'] ?? $ingredient['cost'],
-								'packaging_id' => $parentId,
-								'production_item_line_id' => $newId,
-								'production_item_line_type' => $ingredient['production_type'],
-								'approval_status' => 200,
-							]
-						);
-						$newItemCodesID[] = $newId++;
-					}
-				}
-			}
-			if($laborLines)
-			{
-				// Save labor lines
-				foreach ($laborLines as $laborLine) {
-					$newId++;
-					$newItemCodesID[] = $newId;
-					ProductionItemLines::updateOrCreate(
-						[
-							'production_item_id' => $productionItemId,
-							'production_item_line_id' => $newId,
-						],
-						[
-							'production_item_id' => $productionItemId,
-							'time_labor' => $laborLine['time-labor'],
-							'labor_yield_uom' => $laborLine['labor_yield_uom'],
-							'duration' => $laborLine['duration'],
-							'yield' => $laborLine['yiel'],
-							'preparations' => $laborLine['preparations'],
-							'production_item_line_type' => $laborLine['production_item_line_type'],
-							'approval_status' => 200,
-							'production_item_line_id' => $newId,
-						]
-					);
-				}
-			}
+			// Update approval status & info
+			ProductionItemsModelApproval::updateOrCreate(
+				['reference_number' => $ref],
+				[
+					'approval_status' => 200,
+					'approved_by' => $userId,
+					'approved_at' => now(),
+				]
+			);
 
-
-			// Delete removed ingredients
-			ProductionItemLines::where('production_item_id', $productionItemId)
-			->whereNotIn('production_item_line_id', $newItemCodesID)
-			->delete();
-
-				// Update final_value_existing from main table or fallback
-				$data['final_value_existing'] = DB::table('production_items_approvals')
-				->where('reference_number', $ref)
-				->value('final_value_existing') ?? $data['final_value_vatex'];
-		 
-
-				// Update approval status & info
-				ProductionItemsModelApproval::updateOrCreate(
-					['reference_number' => $ref],
-					[
-						'approval_status' => 200,
-						'approved_by' => $userId,
-						'approved_at' => now(),
-					]
-				);
-
-				// Update or create main production item
-				ProductionItems::updateOrCreate(
-					['reference_number' => $ref],
-					$data
-				);
+			// Update or create main production item
+			ProductionItems::updateOrCreate(
+				['reference_number' => $ref],
+				$data
+			);
 
 
 
-				// Log approval
-				self::pushLogs($request);
+			// Log approval
+			self::pushLogs($request);
 		}  
 		else 
 		{
