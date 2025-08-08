@@ -729,7 +729,7 @@ use ProductionItemsApproval;
 		}
 
 		public function getEdit($id, $action = 'edit', $approval_id = null) {
-			
+		 
 				if ($action == 'edit') {
 					if (!CRUDBooster::isUpdate())
 						CRUDBooster::redirect(
@@ -762,7 +762,7 @@ use ProductionItemsApproval;
 			
 				$costings = self::costing(self::getItemDetails($id)->reference_number);
 				 
-			 
+				 
 
 			 	 $data = array_merge($data, $costings);
 			 	//dd($data);

@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\Jobs\ProcessProductonItemsOpex;
 use App\Models\ProductionItems\ProductionItems;
 use Session;
 	use Request;
@@ -370,17 +371,20 @@ use Session;
 	    }
 
 		public function updateAllProductionItems($id){
+
 			$opex_category = DB::table('production_items_opex')
 							->select('*')
 							->where('id', $id)	
 							->get()
-							->first(); 
+							->first();  
  
-    
-			 
-		}
-
-	    //By the way, you can still create your own method in here... :) 
-
+			ProcessProductonItemsOpex::dispatch(
+				$id,
+				$opex_category->gas_cost,
+				$opex_category->water,
+				$opex_category->meralco,
+				$opex_category->storage_cost
+			); 
+		} 
 
 	}
