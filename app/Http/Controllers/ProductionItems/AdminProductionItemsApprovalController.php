@@ -847,6 +847,9 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 				]
 			);
 
+
+			 $this->main_controller->updateStatus(200, $ref);
+			 
 			// Update or create main production item
 			ProductionItems::updateOrCreate(
 				['reference_number' => $ref],
@@ -860,20 +863,17 @@ class AdminProductionItemsApprovalController extends \crocodicstudio\crudbooster
 		}  
 		else 
 		{
-			ProductionItemsModelApproval::updateOrCreate(
-				['reference_number' => $ref],
-				[
-					'approval_status' => $approval_flow[array_search($approval_statsus, $approval_flow) + 1], 
-				]
-			);
+			$approval_status = $approval_flow[array_search($approval_statsus, $approval_flow) + 1]; 
 
+			// Update production_item_lines
+			$this->main_controller->updateStatus($approval_status, $ref);
 
-			return redirect(CRUDBooster::mainpath())
-			->with([
-				'message_type' => 'success',
-				'message' => 'item push for ',
-			])->send();
-		}
+				return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'success',
+					'message' => 'Tasteless code: '. $ref.' successfully checked',
+				])->send();
+			}
 
 			return redirect(CRUDBooster::mainpath())
 			->with([

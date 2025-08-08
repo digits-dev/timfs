@@ -162,12 +162,21 @@
                                                 </td>
                                             </tr>
                                             @endif
+                                             @if ($item->reference_number)
                                             <tr>
                                                 <th><span class="required-star">*</span> Item Description</th>
                                                 <td>
-                                                    <input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()">
+                                                    <input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" readonly oninput="this.value = this.value.toUpperCase()">
                                                 </td>
                                             </tr>
+                                            @else
+                                            <tr>
+                                                <th><span class="required-star">*</span> Item Description</th>
+                                                <td>
+                                                    <input value="{{ $item->full_item_description ?: '' }}" type="text" name="full_item_description" id="full_item_description" class="form-control" required oninput="this.value = this.value.toUpperCase()" >
+                                                </td>
+                                            </tr>
+                                            @endif 
                                             @if($table == 'production_items') 
                                              <tr>
                                                 <th><span class="required-star">*</span> Display Photo</th>

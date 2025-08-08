@@ -619,10 +619,9 @@
 	        |
 	        */
 	        $this->style_css = "
-			.item-master-image {
-				max-width: 100px;
-			}
-			
+				.item-master-image {
+					max-width: 100px;
+				} 
 			";
 	        
 	        /*

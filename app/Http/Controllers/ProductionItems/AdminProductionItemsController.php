@@ -71,6 +71,7 @@ use ProductionItemsApproval;
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = []; 
+			$this->col[] = ["label" => "Display Photo", "name" => "image_filename","visible" =>  true];
 			$this->col[] = ["label"=>"Original Markup %","name"=>"transfer_price_category.transfer_price_category_markup"]; 
 			$this->col[] = ["label"=>"Tasteless code","name"=>"production_items.reference_number"];
 			$this->col[] = ["label"=>"Description","name"=>"production_items.full_item_description"];
@@ -288,7 +289,7 @@ use ProductionItemsApproval;
 	        |
 	        */
 	        $this->load_js = array();
-	        
+	          $this->load_js[] = asset("js/zoom.js");
 	        
 	        
 	        /*
@@ -299,7 +300,12 @@ use ProductionItemsApproval;
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = NULL;
+	        $this->style_css = "
+			.production-items-image {
+				max-width: 100px;
+			}
+			
+			";
 	        
 	        
 	        
@@ -312,7 +318,7 @@ use ProductionItemsApproval;
 	        |
 	        */
 	        $this->load_css = array();
-	        
+	        $this->load_css[] = asset("css/zoom.css");
 	        
 	    }
 	 
@@ -354,8 +360,12 @@ use ProductionItemsApproval;
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
-	    }
 
+			if ($column_index == 1 && $column_value) {
+				$column_value = '<image class="production-items-image" style="with="50px"; height="50px";" src="'. asset("img/production-items/$column_value") . '" data-action="zoom"/>';
+			}
+	    }
+ 
 	    /*
 	    | ---------------------------------------------------------------------- 
 	    | Hook for manipulate data input before add data is execute
@@ -503,29 +513,43 @@ use ProductionItemsApproval;
 		$time_stamp_now = date('Y-m-d H:i:s');  
 		$data = $request->all(); 
 
-		if ($request['id']) {
-			// Fetch old data
-			 
+		if ($request['id']) { 
+			//for the mean time 
+			$approval_statsus = DB::table('production_items_approvals')
+				->select('approval_status') 
+				->where('reference_number', $data['reference_number'])
+				->pluck('approval_status')
+				->first(); 
+				
+				
+			if($approval_statsus != 200)
+			{
+				return redirect(CRUDBooster::mainpath())
+				->with([
+					'message_type' => 'warning',
+					'message' => 'Tasteless code: '. $data['reference_number'] . ' is still in pending items you cannot edit it!',
+				])->send();
+
+			}
 			
-			$item = ProductionItems::select('reference_number', 'created_at')->find($request->id);
+			$item = ProductionItems::select('created_at')->find($request->id);
 
-			$message = "✔️ Item reference number " . $item->reference_number . " updated successfully.";
-
+			$message = "✔️ Item reference number " . $data['reference_number'] . " updated successfully.";
+			
 			// Update data meta
 			$data['updated_at'] = $time_stamp_now;
 			$data['action_type'] = "UPDATE";
 			$data['approval_status'] = 204;
 			$data['updated_by'] = CRUDBooster::myId();
-			$data['reference_number'] = $item->reference_number;
+			$data['reference_number'] = $data['reference_number'];
 
-		} else {
+		} else { 
 			// Handle create new production item
 			$nextId = CodeCounter::where('type', 'PRODUCTION ITEMS')->value('code_7');
-			CodeCounter::where('type', 'PRODUCTION ITEMS')->increment('code_7');
-
-			$ref = $nextId;
- 
-
+			CodeCounter::where('type', 'PRODUCTION ITEMS')->increment('code_7'); 
+		
+			$ref = $data['production_category'] == 4 ? '8' . substr($nextId, 1) :  $nextId;
+  	 
 			$message = "✔️ Successfully added pending item with Item code " . $ref;
 		 
 			$data['reference_number'] = $ref;
@@ -631,6 +655,9 @@ use ProductionItemsApproval;
 			$data
 		);
 
+
+		self::updateStatus(204, $data['reference_number']);
+
 		// Redirect with success message
 		return redirect(CRUDBooster::mainpath())
 			->with([
@@ -640,6 +667,35 @@ use ProductionItemsApproval;
 
 		
 	}
+
+
+		public function updateStatus($approval_status, $ref)
+		{
+				// Update production_item_lines
+			DB::update("UPDATE production_item_lines
+						SET approval_status = ?
+						WHERE production_item_id = ?",
+						[$approval_status, $ref]);
+
+			// Update production_item_lines_approvals
+			DB::update("UPDATE production_item_lines_approvals
+						SET approval_status = ?
+						WHERE production_item_id = ?",
+						[$approval_status, $ref]);
+
+			DB::update("UPDATE production_items
+					SET approval_status = ?
+					WHERE reference_number = ?",
+					[$approval_status, $ref]);
+
+			DB::update("UPDATE production_items_approvals
+					SET approval_status = ?
+					WHERE reference_number = ?",
+					[$approval_status, $ref]); 
+		}
+
+
+
 		public function saveProductionLines($ProductionItemLinesModel,$ingredient_packagings, $laborLines , $productionItemId){
 
 			$newItemCodesID = [];

@@ -81,6 +81,7 @@ class ProcessProductonItemsOpex implements ShouldQueue
             ",
             [$gas_cost, $gas_cost, $water, $water, $meralco, $meralco, $storage_cost, $storage_cost, $id]
         );
-         echo 'Memory usage at chunk end: ' . round(memory_get_usage() / 1024 / 1024, 2) . " MB\n";
+        
+        echo 'Memory usage at chunk end: ' . round(memory_get_usage() / 1024 / 1024, 2) . " MB\n";
     }
 }
